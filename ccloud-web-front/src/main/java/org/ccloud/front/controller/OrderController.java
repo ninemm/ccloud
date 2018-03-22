@@ -58,6 +58,7 @@ public class OrderController extends BaseFrontController {
 	public void myOrder() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -76,7 +77,7 @@ public class OrderController extends BaseFrontController {
 
 		List<Map<String, Object>> bizUsers = new ArrayList<>();
 		bizUsers.add(all);
-		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerId(sellerId);
+		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerId(sellerId,dataArea);
 		for (SalesOrder order : orders) {
 			Map<String, Object> items = new HashMap<>();
 			items.put("title", order.getStr("realname"));

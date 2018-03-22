@@ -275,9 +275,10 @@ public class Consts {
 	public static final String TEMPLATE_DANLU = "1";//丹露模板
 	public static final String TEMPLATE_NAME_ALI = "阿里";//阿里模板
 	public static final String TEMPLATE_NAME_DANLU = "丹露";//丹露模板	
-	public static final String TEMPLATE_FILE_NAME_ALI = "aliTemplate.xlsx";//阿里模板文件名
+	public static final String TEMPLATE_FILE_NAME_ALI = "aliTemplate.xls";//阿里模板文件名
 	public static final String TEMPLATE_FILE_NAME_DANLU = "danluTemplate.xls";//丹露模板文件名
 	
+	public static final String PLAN = "plan_type";//销售计划
 	public static final String WEEK_PLAN = "101201";//周计划
 	public static final String MONTH_PLAN = "101202";//月计划
 	public static final String YEAR_PLAN = "101203";//年计划

@@ -152,7 +152,7 @@ public class SellerQuery extends JBaseQuery {
 	}
 
 	public List<Seller> findByDataArea(String dataArea) {
-		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.* FROM `cc_seller` cs LEFT JOIN USER u ON u.department_id = cs.dept_id LEFT JOIN department d ON d.id = cs.dept_id WHERE d.data_area LIKE '"+dataArea+"'");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.* FROM `cc_seller` cs LEFT JOIN department d ON d.id = cs.dept_id WHERE d.data_area LIKE '"+dataArea+"'");
 		sqlBuilder.append(" GROUP BY cs.id ORDER BY cs.seller_type");
 		return DAO.find(sqlBuilder.toString());
 	}
