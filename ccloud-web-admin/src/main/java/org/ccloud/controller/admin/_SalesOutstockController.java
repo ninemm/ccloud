@@ -559,7 +559,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
-				+ "salesOutstockInfo.xlsx";
+				+ "salesOutstockInfo.xls";
 
 		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
 				printStatus, stockOutStatus, null, dataArea, null, null,null,null);

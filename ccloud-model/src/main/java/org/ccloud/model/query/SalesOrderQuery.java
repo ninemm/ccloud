@@ -88,7 +88,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "t1.activity_id", activityId, params, needWhere);
 
 		if (needWhere) {
@@ -105,6 +104,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
+		if(!sellerId.equals("")) {
+			fromBuilder.append(" and o.seller_id = '"+sellerId+"' ");
+		}
 		fromBuilder.append(" and ( o.order_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) order by o.create_date desc");
 
 		if (params.isEmpty())
@@ -123,6 +125,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
+		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
@@ -138,7 +141,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		
 		if (StrKit.notBlank(keyword)) {
-			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
+			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%' or u.realname like '%" + keyword + "%')");
 		}
 
 		if (StrKit.notBlank(startDate)) {
@@ -2126,8 +2129,12 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	}
 //查找已下订单的业务员
-	public List<SalesOrder> findBySellerId(String sellerId){
-		String sql = "select cs.biz_user_id, u.realname from cc_sales_order cs LEFT JOIN user u on u.id = cs.biz_user_id where cs.seller_id  ='"+sellerId+"' GROUP BY cs.biz_user_id";
-		return DAO.find(sql);
+	public List<SalesOrder> findBySellerId(String sellerId,String dataArea){
+		StringBuilder fromBuilder = new StringBuilder("select cs.biz_user_id, u.realname from cc_sales_order cs ");
+		fromBuilder.append("LEFT JOIN user u on u.id = cs.biz_user_id ");
+		fromBuilder.append("where cs.seller_id  ='"+sellerId+"' ");
+		fromBuilder.append("and cs.data_area  like '"+dataArea+"' ");
+		fromBuilder.append(" GROUP BY cs.biz_user_id");
+		return DAO.find(fromBuilder.toString());
 	}
  }
