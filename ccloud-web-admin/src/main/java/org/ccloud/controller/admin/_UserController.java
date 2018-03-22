@@ -140,6 +140,14 @@ public class _UserController extends JBaseCRUDController<User> {
 					break;
 				}
 			}
+			for(User us : users) {
+				if(StringUtils.isBlank(us.getAvatar())) {
+					continue;
+				}else {
+					user.setAvatar(us.getAvatar());;
+					break;
+				}
+			}
 			Department dept = DepartmentQuery.me().findById(user.getDepartmentId());
 			String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 			user.setDataArea(dataArea);
