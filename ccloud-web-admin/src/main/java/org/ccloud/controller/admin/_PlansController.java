@@ -53,18 +53,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.model.*;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
-import org.ccloud.model.Dict;
-import org.ccloud.model.Plans;
-import org.ccloud.model.Seller;
-import org.ccloud.model.User;
-import org.ccloud.model.query.DictQuery;
-import org.ccloud.model.query.PlansQuery;
-import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.UserExecel;
 
 import com.google.common.collect.ImmutableMap;
@@ -276,7 +269,8 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 			 for(int i = 0;i<users.size() ; i++) {
 				 Cell cell = sheet.getRow(4).getCell(i+2);
 				 User us = UserQuery.me().findById(cell.getStringCellValue());
-				 Seller seller = SellerQuery.me()._findByDeptId(us.getDepartmentId());
+				 List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(us.getDepartmentId());
+				 String seller_id= deptList.get(0).get("seller_id");
 				 for(int j = 0;j<productRecords.size();j++) {
 					String sellerProductId = sheet.getRow(j+6).getCell(0).getStringCellValue();
 					Cell cl = sheet.getRow(j+6).getCell(i+2);
@@ -289,7 +283,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 					cl.setCellType(CellType.STRING);
 					Plans plans = new Plans();
 					plans.setId(StrKit.getRandomUUID());
-					plans.setSellerId(seller.getId());
+					plans.setSellerId(seller_id);
 					plans.setUserId(us.getId());
 					plans.setType(dict.getValue());
 					plans.setSellerProductId(sellerProductId);
