@@ -87,14 +87,19 @@
 			[
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
       			{field: "biz_bill_sn", title: "业务单号", align: "center", width: '7%',sortable: true,
+      			<@shiro.lacksRole name="021"> 
       			formatter: function(value, row, rowIndex) {
 	      				var strHtml = '<a href="#" name="order_sn" onclick="orderInfo(\''+row.biz_bill_sn+'\')">'+row.biz_bill_sn+'</a>';
 						return strHtml;
 					},
+      			</@shiro.lacksRole>	
       			edit:false},
-      			{field: "cc_warehouse", title: "仓库", align: "center", width: '8%',sortable: true, edit:false},
+      			{field: "realname", title: "业务员", align: "center", width: '8%',sortable: true, edit:false},
+      			{field: "warehouseName", title: "仓库", align: "center", width: '8%',sortable: true, edit:false},
       			{field: "sellerName", title: "产品名", align: "center", width: '10%', edit:false},
       			{field: "out_count", title: "出库数量", align: "center", width: '5%',sortable: true, edit:false},
+      			
+      			<@shiro.lacksRole name="021"> 
       			{field: "out_amount", title: "出库金额", align: "center", width: '5%',
       				formatter: function(value,row,rowIndex){
 					if(value==null) return "";
@@ -107,6 +112,8 @@
 					else return formatNumber(value);
 					},
       			sortable: true, edit:false},
+      			</@shiro.lacksRole>	
+      			
       			{field: "balance_count", title: "库存", align: "center", width: '5%',sortable: true,	edit:false},
       					
       			{field: "biz_type", title: "出库类型", align: "center", width: '3%', sortable: true,
@@ -114,32 +121,54 @@
 						if(value==100203){return "采购退货出库"}
 						else if(value == 100204){return "销售出库"}
 						else if (value == 100207){return "调拨出库"}
-						else if (value == 100209){return "盘亏出库"}
+						else if (value == 100209){return "盘亏"}
 					},
       			edit:false},
    				{field: "create_date", title: "创建时间", align: "center", width: '10%',sortable: true,edit: false},   
    			];
    		return fields;
 	}
-	
-	
 	function orderInfo(sn){
-	if(sn.substring(0,2)!="SS"){
-			layer.open({
-				title:"退货详细",
-				type: 2, 
-				area: ['70%', '80%'],
-				content: '${CPATH}/admin/purchaseRefundOutstock/_detail/' + sn
-			}); 
-		}else{
+	if(sn.substring(0,2)=="SS"){
+			
 			layer.open({
 				title:"销售出库订单详细",
 				type: 2,
 				area: ['70%', '80%'],
 				content: '${CPATH}/admin/salesOutstock/stockdetailBySn/' + sn
 			});
+		}else if (sn.substring(0,2)=="TB"){
+			layer.open({
+				title:"调拨出库",
+				type: 2,
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/transferBill/_detail/' + sn
+			})
+		}else if (sn.substring(0,2)=="ST"){
+			layer.open({
+				title:"盘亏",
+				type: 2,
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/inventoryDetail/detailBySn/' + sn
+			})
+		}else{
+			layer.open({
+				title:"退货详细",
+				type: 2, 
+				area: ['70%', '80%'],
+				content: '${CPATH}/admin/purchaseRefundOutstock/_detail/' + sn
+			}); 
 		}
 	}
+	
+	
+	function batchDown(){
+		var startDate = $('#startDate').val() + " 00:00:00";
+		var endDate = $('#endDate').val() + " 23:59:59";
+		var k = $('#search').val()
+		var sellerProductId=$("#sellerProductId option:selected").val();
+		jQuery.mm.down("${CPATH}/admin/inventoryDetail/downloadingOut?startDate="+startDate+"&endDate="+endDate+"&k="+k+"&sellerProductId="+sellerProductId);
+    }
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -183,12 +212,15 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-4">
-                 <label class="control-label col-sm-4">单号/产品:</label>
+                 <label class="control-label col-sm-4">关键词:</label>
                  <div class="col-sm-8 input-group input-group-sm">
-                     <input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="业务单号/产品名称">
+                     <input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="业务单号/产品名/业务员/客户名">
                  </div>
              </div>
-             <div class="col-sm-8" style="text-align:right;">
+             <div class="col-sm-7" style="text-align:right;">
+                 <button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchDown()"><i class="fa fa-download"></i> 导出</button>
+             </div>
+             <div class="col-sm-1" style="text-align:right;">
                  <input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
              </div>
 		</div>

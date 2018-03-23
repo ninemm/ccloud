@@ -29,6 +29,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Department;
 import org.ccloud.model.Inventory;
 import org.ccloud.model.InventoryDetail;
+import org.ccloud.model.PurchaseRefundOutstock;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.TransferBill;
 import org.ccloud.model.TransferBillDetail;
@@ -37,6 +38,8 @@ import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.InventoryQuery;
+import org.ccloud.model.query.PurchaseRefundOutstockDetailQuery;
+import org.ccloud.model.query.PurchaseRefundOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.TransferBillDetailQuery;
 import org.ccloud.model.query.TransferBillQuery;
@@ -495,5 +498,14 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 
 		return sBuilder.toString();
 	}
-
+	
+	//调拨单详情
+	public void _detail() {
+		String sn = getPara(0);
+		Record transferBill = TransferBillQuery.me().findByTransferBillSn(sn);
+		setAttr("transferBill", transferBill);
+		List<transferBillInfo> transferBillList = TransferBillDetailQuery.me().findByTransferBillDetailId(transferBill.getStr("id"));
+		setAttr("ilist", transferBillList);
+		render("detail.html");
+	}
 }
