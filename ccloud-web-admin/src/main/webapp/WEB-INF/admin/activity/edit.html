@@ -68,6 +68,7 @@
 	var MaxInputs       = 15; //maximum input boxes allowed  
 	var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID  
 	var AddButton       = $("#AddMoreFileBox"); //Add button ID  
+	var templateList = new Array();
 	var x = InputsWrapper.length; //initlal text box count 
 	<#if activity??>
 		$("#expendHead").empty();
@@ -331,7 +332,7 @@
 		if (listc != null && listc.length > 0) {
 			cIds = listc.toString();
 		}
-		var templateInfo = localStorage.getItem("template");
+		var templateInfo = localStorage.getItem("ExecuteTemplate");
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -342,7 +343,7 @@
 				return validate.isValid()
 			},
 			type : "post", 
-			data : {"customerType":cIds,"templateInfo":JSON.stringify(templateInfo)},
+			data : {"customerType":cIds,"templateList":templateList},
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
@@ -378,7 +379,6 @@
 		$newTr.find("#remark").attr("name", remarkName);
 		$newTr.find("#orderList").attr("name","orderList" + newTrIdx);
 		$newTr.find("#activityExecteId").attr("name","activityExecteId"+newTrIdx);
-		$newTr.find("#templateInfo").attr("name","templateInfo"+newTrIdx);
 		$newTr.find("#dateTime").attr("name","dateTime"+newTrIdx);
 		orderNum();
 	}
@@ -466,7 +466,6 @@
 	})	
 	
 	function editTemplate(obj){
-		localStorage.clear();
 		var timestamp = (new Date()).valueOf();
 		$(obj).parent().parent().parent().find("#dateTime").val(dateTime);
 		layer.open({
@@ -477,10 +476,10 @@
 		}); 
 	}
 	function setTemplate(){
-		/* var template = localStorage.getItem("template");
-		console.log(template);
-		$("#templateInfo").val(template);
-		localStorage.clear(); */
+		 var template = localStorage.getItem("template");
+		 for(var i = 0 ; i < template.length ; i++){
+		 	templateList.push(template[i]);
+		 }
 		layer.closeAll();
 	}
 </#macro>
@@ -810,7 +809,6 @@
 								<span class="rowNum">0</span>
 								<input type="hidden" name = "activityExecteId" id="activityExecteId"/>
 								<input type="hidden" name = "dateTime" id="dateTime" value =""/>
-								<input type="hidden" name = "templateInfo" id="templateInfo" value = ""/>
 							</td>
 							<td>
 								<div class = "validata-box" style="padding-left:35%;">

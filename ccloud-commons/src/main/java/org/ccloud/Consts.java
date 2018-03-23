@@ -286,7 +286,10 @@ public class Consts {
 	public static final String CUSTOMER_VISIT_STATUS_DEFAULT = "100102"; //待审核
 	public static final String CUSTOMER_VISIT_STATUS_REJECT = "100103"; //拒绝
 	
-	
+	//活动执行步骤模板类型
+	public static final String ACTIVITY_EXECUTE_TEMPLATE_INPUT = "103016"; //输入框
+	public static final String ACTIVITY_EXECUTE_TEMPLATE_RADIO = "103017"; //单选
+	public static final String ACTIVITY_EXECUTE_TEMPLATE_CHECKBOX= "103018"; //多选
 	
 	
 	

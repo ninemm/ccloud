@@ -38,6 +38,7 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Activity;
 import org.ccloud.model.ActivityApply;
 import org.ccloud.model.ActivityExecute;
+import org.ccloud.model.ActivityExecuteTemplate;
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
@@ -186,8 +187,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public void save() {
 		final Activity activity = getModel(Activity.class);
 		List<ExpenseDetail> expenseOldList = ExpenseDetailQuery.me().findByActivityId(activity.getId());
-		Map<String, String[]> map = getParaMap();
-		String templateInfo = getPara("templateInfo");
+		Map<String, String[]> paraMap = getParaMap();
+		String[] templateInfo=getParaValues("templateList");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String [] imagePath = getParaValues("imageUrl[]");
 		String [] item1 = getParaValues("item1[]");
@@ -255,11 +256,26 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 					continue;
 				}
 				ActivityExecute activityExecute = new ActivityExecute();
-				activityExecute.setId(StrKit.getRandomUUID());
+				String activityExecuteId = StrKit.getRandomUUID();
+				activityExecute.setId(activityExecuteId);
 				activityExecute.setActivityId(activity.getId());
 				activityExecute.setOrderList(getPara("orderList"+(i+1)));
 				activityExecute.setRemark(getPara("remark"+(i+1)));
 				activityExecute.save();
+				
+				for(int j = 0 ; j < templateInfo.length ; j++) {
+					if(templateInfo[j].equals("")) {
+						continue;
+					}
+					ActivityExecuteTemplate activityExecuteTemplate = new ActivityExecuteTemplate();
+					activityExecuteTemplate.setId(StrKit.getRandomUUID());
+					activityExecuteTemplate.setActivityExecuteId(activityExecuteId);
+					activityExecuteTemplate.setSellerId(sellerId);
+				/*	activityExecuteTemplate.setTemplateValue(templateValue);
+					activityExecuteTemplate.setTemplateValueType(templateValueType);
+					activityExecuteTemplate.setTemplateValueOpt(templateValueOpt);*/
+					activityExecuteTemplate.save();
+				}
 			}
 		}
 		BigDecimal totalMoney = new BigDecimal(0);
