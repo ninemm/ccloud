@@ -113,6 +113,15 @@
    	   	ids = new Array();
 		$("[name='dataItem']:checkbox").each(function() {
 			if ($(this).is(":checked")) {
+				if($(this).parent().find("[name='dataItem1']").val()==5){
+					toastr.error('客户已核销', '无法加入核销');
+					status=false;
+					return;
+				}else if($(this).parent().find("[name='dataItem1']").val()!=4){
+					toastr.error('客户拜访没有结束', '无法加入核销');
+					status=false;
+					return;
+				}
 				ids.push($(this).val());
 			}
 		}); 
