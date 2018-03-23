@@ -322,13 +322,13 @@ function initComposition(compositionList){
 			$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
 			$newProductDetail.find("#product_sn").val(el.product_sn);
 			$newProductDetail.find("#gift").append("<a class='gift-open' >展开</a>");
-			$newProductDetail.find("#subProduct").text(el.product_name + ' ' + (el.main_product_count/el.main_convert).toFixed(2) + '件');
-			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + (el.sub_product_count/el.sub_convert).toFixed(2) + '件'+
+			$newProductDetail.find("#subProduct").text(el.product_name + ' ' + (el.main_product_count/el.main_convert).toFixed(0) + el.main_bunit + (el.main_product_count%el.main_convert).toFixed(0) + el.main_sunit);
+			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + Math.floor(el.sub_product_count/el.sub_convert).toFixed(0) + el.sub_bunit + (el.sub_product_count%el.sub_convert).toFixed(0) + el.sub_sunit +
 				"</p>");
 		}else{
 			var $type = $menuRight.find(".type:last");
 			var $newProductDetail = $type.find(".composition:last");
-			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + (el.sub_product_count/el.sub_convert).toFixed(2) + '件'+"</p>");
+			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + (el.sub_product_count/el.sub_convert).toFixed(0) + el.sub_bunit + (el.sub_product_count%el.sub_convert).toFixed(0) + el.sub_sunit +"</p>");
 		}
 
 	});
