@@ -47,11 +47,11 @@ $(function() {
 	var $product = $("#productList");
 
 	function initProduct(id){
+		var comId = "";
 		$.get('${CPATH}/order/orderAgain?orderId=' + id,
 			function(result){
 				var productList = result.orderDetail;
 				$.each(productList, function(index, el) {
-					if(el.is_gift == 0) {
 						$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
 						var $newProductDetail = $product.find(".common:last");
 						$newProductDetail.find("#productName").text(el.custom_name);
@@ -66,7 +66,17 @@ $(function() {
 						$newProductDetail.find("#smallPrice").val((el.product_price/el.convert_relate).toFixed(2));
 						$newProductDetail.find("#bigUnit").val(el.big_unit);
 						$newProductDetail.find("#smallUnit").val(el.small_unit);
-						$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+						if (el.composite_id != null) {
+							if (el.composite_id !=  comId) {
+								$newProductDetail.find("#compositionId").val(el.composite_id);
+								$newProductDetail.find("#compositionNum").val((el.product_count/el.comCount).toFixed(0));
+								$newProductDetail.find("#compositionNum").removeAttr("disabled");
+								$newProductDetail.find("#compositionId").removeAttr("disabled");
+								comId = el.composite_id;
+							}
+						} else {
+							$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+						}
 						$newProductDetail.find("#productId").val(el.productId);
 						$newProductDetail.find("#convert").val(el.convert_relate);
 						
@@ -75,38 +85,9 @@ $(function() {
 						$newProductDetail.find("#bigNum").removeAttr("readonly");
 						$newProductDetail.find("#smallNum").removeAttr("readonly");
 						$newProductDetail.find("#isGift").val(el.is_gift);
-						
-					} else {
-						var $newProductDetail = $product.find(".common:last");
-						$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
-		
-						//默认
-						if($newProductDetail.find("#sellProductId").val() == el.sell_product_id){
-							$newProductDetail.find("#isDefault").attr("checked","true");
+						if(el.is_gift == 1) {
+							$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
 						}
-		
-						$newProductDetail.find("#giftProduct").val(el.custom_name);
-						$newProductDetail.find("#giftSellProductId").val(el.sell_product_id);
-						$newProductDetail.find("#giftProductId").val(el.productId);
-						$newProductDetail.find("#giftConvert").val(el.convert_relate);
-						$newProductDetail.find("#giftBigPrice").val(el.product_price);
-						
-						var bigNum = parseInt(el.product_count/el.convert_relate);
-						var smallNum = el.product_count % el.convert_relate;
-						//数量
-						if(bigNum > 0 && el.big_unit){
-							$newProductDetail.find("#giftNum").val(bigNum);
-							$newProductDetail.find("#giftUnitName").val("/"+el.big_unit);
-							$newProductDetail.find("#giftUnitName").attr('data-values', "bigUnit");
-							$newProductDetail.find("#giftUnit").val("bigUnit");
-						}else{
-							$newProductDetail.find("#giftNum").val(smallNum);
-							$newProductDetail.find("#giftUnitName").val("/"+el.small_unit);
-							$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
-							$newProductDetail.find("#giftUnit").val("smallUnit");
-						}
-					
-					}
 				});	
 				total();		
 			}
@@ -127,8 +108,8 @@ $(function() {
 			total += rowTotal;
 		});
 
-		$("#total").val(total);
-		$("#totalNum").text("共" + (products.length) + "款,合计:" + formatNumber(total) + "元")
+		$("#total").val(${order.total_amount!});
+		$("#totalNum").text("共" + (products.length) + "款,合计:" + formatNumber(${order.total_amount!}) + "元")
 	
 	}
 
@@ -263,6 +244,8 @@ $(function() {
 				<div id="productList">
 					<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
 						<input type="hidden" name="sellProductId" id="sellProductId" value="">
+						<input type="hidden" id="compositionId" name="compositionId" disabled = "disabled">
+						<input type="hidden" id="compositionNum" name="compositionNum" disabled = "disabled">
 						<input type="hidden" name="productId" id="productId" value="">
 						<input type="hidden" name="convert" id="convert" value="">
 						<input type="hidden" name="isGift" id="isGift" value="">
@@ -329,7 +312,6 @@ $(function() {
 						</div>
 					</div>
 					<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
-						<input type="hidden" id="compositionId" name="compositionId" value="">
 						<nobr>
 							<p class="product_name" id="compositionName">
 								35度中国劲酒_125ml_1*24
@@ -338,7 +320,6 @@ $(function() {
 						<div class="product_bUnit">
 							<span class="price" id="compositionPriceSpan">￥725</span>
 							<div class="spinner">
-								<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
 							</div>
 							<input type="number" class="street-value"  id="compositionPrice" value="720" name="compositionPrice" readonly>
 						</div>

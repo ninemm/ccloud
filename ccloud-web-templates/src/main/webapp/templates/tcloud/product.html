@@ -322,13 +322,45 @@ function initComposition(compositionList){
 			$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
 			$newProductDetail.find("#product_sn").val(el.product_sn);
 			$newProductDetail.find("#gift").append("<a class='gift-open' >展开</a>");
-			$newProductDetail.find("#subProduct").text(el.product_name + ' ' + (el.main_product_count/el.main_convert).toFixed(0) + el.main_bunit + (el.main_product_count%el.main_convert).toFixed(0) + el.main_sunit);
-			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + Math.floor(el.sub_product_count/el.sub_convert).toFixed(0) + el.sub_bunit + (el.sub_product_count%el.sub_convert).toFixed(0) + el.sub_sunit +
+			var bigCount = (el.main_product_count/el.main_convert).toFixed(0);
+			var smallCount = (el.main_product_count%el.main_convert).toFixed(0);
+			var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
+			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);
+			var bigCountHtml = "";
+			var smallCountHtml = "";
+			var sub_bigCountHtml = "";
+			var sub_smallCountHtml = "";			
+			if (bigCount != 0) {
+				 bigCountHtml = "" + bigCount + el.main_bunit + "";
+			}
+			if (smallCount != 0) {
+				smallCountHtml = "" + smallCount + el.main_sunit + "";
+			}
+			if (sub_bigCount != 0) {
+				sub_bigCountHtml = "" + sub_bigCount + el.sub_bunit + "";
+			}
+			
+			if (sub_smallCount != 0) {
+				sub_smallCountHtml = "" + sub_smallCount + el.sub_sunit + "";
+			}
+			$newProductDetail.find("#subProduct").text(el.product_name + ' ' + bigCountHtml + smallCountHtml);
+			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +
 				"</p>");
 		}else{
+			var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
+			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);		
+			var sub_bigCountHtml = "";
+			var sub_smallCountHtml = "";
 			var $type = $menuRight.find(".type:last");
 			var $newProductDetail = $type.find(".composition:last");
-			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + (el.sub_product_count/el.sub_convert).toFixed(0) + el.sub_bunit + (el.sub_product_count%el.sub_convert).toFixed(0) + el.sub_sunit +"</p>");
+			if (sub_bigCount != 0) {
+				sub_bigCountHtml = "" + sub_bigCount + el.sub_bunit + "";
+			}
+			
+			if (sub_smallCount != 0) {
+				sub_smallCountHtml = "" + sub_smallCount + el.sub_sunit + "";
+			}			
+			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"</p>");
 		}
 
 	});
