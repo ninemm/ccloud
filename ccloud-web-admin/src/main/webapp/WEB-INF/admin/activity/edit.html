@@ -51,6 +51,20 @@
 }
 </#macro>
 <#macro script>
+	$(function(){
+	 	if($(".category").val() == 101002){
+			$(".investType").show();
+			$(".visitNum").show();
+			$("#expendDetail").show();
+			$(".investNum").hide();
+		}else{
+			$(".investType").hide();
+			$(".investNum").show();
+			$(".visitNum").hide();
+			$("#expendDetail").hide();
+			$(InputsWrapper).empty();
+		}
+	});
 	var MaxInputs       = 15; //maximum input boxes allowed  
 	var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID  
 	var AddButton       = $("#AddMoreFileBox"); //Add button ID  
