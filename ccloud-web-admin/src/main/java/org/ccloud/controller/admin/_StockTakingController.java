@@ -134,8 +134,13 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 						if (findByInventory.size()!=0) {
 							//存在--只更改数量 总价格
 							inventory=InventoryQuery.me().findById(findByInventory.get(0).getStr("id"));
-							inventory.setInCount( inventory.getInCount().add(productCount));
-							inventory.setInAmount(inventory.getInAmount().add(amount));
+							if ( productCount.compareTo(BigDecimal.ZERO)>0) {
+								inventory.setInCount( inventory.getInCount().add(productCount));
+								inventory.setInAmount(inventory.getInAmount().add(amount));
+							}else {
+								inventory.setOutCount( inventory.getOutCount().add(productCount.abs()));
+								inventory.setOutAmount(inventory.getOutAmount().add(amount.abs()));
+							}
 							inventory.setModifyDate(new Date());
 							inventory.setBalanceCount(inventory.getBalanceCount().add(productCount));
 							inventory.setBalanceAmount(inventory.getBalanceAmount().add(amount));
