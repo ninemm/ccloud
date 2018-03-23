@@ -139,7 +139,7 @@ public class _AdminController extends JBaseController {
 			changePassword="true";
 		}
 		String sellerID=CookieUtils.get(this, "_seller"+mobile);
-		if(StrKit.isBlank(sellerID)) {
+		if(StrKit.isBlank(sellerID) && !user.getUsername().equals("admin")) {
 			CookieUtils.put(this, "_seller"+mobile,sellerId);
 		}
 		setAttr("changePassword",changePassword);
@@ -152,7 +152,7 @@ public class _AdminController extends JBaseController {
 		String password = getPara("password");
 		String rememberMeStr = getPara("remember_me");
 		boolean rememberMe = false;
-		if (rememberMeStr != null && rememberMeStr.equals("on")) {
+		if (rememberMeStr != null && rememberMeStr.equals("onb")) {
 			rememberMe = true;
 		}
 
