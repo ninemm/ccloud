@@ -53,7 +53,7 @@
 					templateValueType : item.templateValueType,
 					templateValueTypeValue : item.templateValueTypeValue
 				}
-			templateList.push(template);	
+			templateList.push(template);
 			if(item.activityExecteId == _activityExecteId){
 				addActivityExTpl(item);
 			}
@@ -82,7 +82,7 @@
 		<!--添加validate -->
 		var remarkName = "templateValue" + newTrIdx;
 		$newTr.find("#activityExecteTemplateId").attr("name","activityExecteTemplateId"+newTrIdx);
-		$newTr.find("#activityExecteTemplateId").val(el.activityExecteId);
+		$newTr.find("#activityExecteTemplateId").val(el.activityExecteTemplateId);
 		$newTr.find("#templateValue").attr("name", "templateValue" + newTrIdx);
 		$newTr.find("#templateValue").val(el.templateValue);
 		$newTr.find("#templateValueType").attr("name","templateValueType" + newTrIdx);
@@ -138,7 +138,11 @@
 		
 	}
 	function doSubmit(){
-		
+		$.each(templateList,function(index,item){
+			if(item.activityExecteId ==  $("#activityExecteId").val()){
+				templateList.splice(index,1);
+			}
+		})
 		for(var i = 1 ; i <= num ; i++){
 			var tr = 'tr' + i;
 			var trId = document.getElementById(""+tr+"");
@@ -154,6 +158,7 @@
 			}
 		}
 		localStorage.setItem("template", JSON.stringify(templateList));
+		console.log(templateList);
 		parent.setTemplate();
 	}
 	
