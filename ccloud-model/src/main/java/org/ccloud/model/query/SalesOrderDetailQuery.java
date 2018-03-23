@@ -55,8 +55,8 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 		sqlBuilder.append(" LEFT JOIN cc_goods g ON g.id = p.goods_id ");
 		sqlBuilder.append(" LEFT JOIN cc_warehouse w ON sod.warehouse_id = w.id ");
-		sqlBuilder.append(" LEFT JOIN cc_product_composition cpc ON cpc.id = sod.composite_id AND cpc.seller_product_id = sod.sell_product_id ");
-		sqlBuilder.append(" LEFT JOIN cc_product_composition cpc1 ON cpc1.id = sod.composite_id AND cpc1.sub_seller_product_id = sod.sell_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_composition cpc ON cpc.parent_id = sod.composite_id AND cpc.seller_product_id = sod.sell_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_composition cpc1 ON cpc1.parent_id = sod.composite_id AND cpc1.sub_seller_product_id = sod.sell_product_id ");
 		sqlBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		sqlBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
 		sqlBuilder.append(" WHERE order_id = ? ");
