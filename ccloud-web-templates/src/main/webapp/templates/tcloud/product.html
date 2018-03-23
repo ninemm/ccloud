@@ -139,12 +139,11 @@ $(function() {
     	var compositionName = $this.find("#compositionName").text();
     	var compositionValueName = $this.find("#compositionValueName").text();
     	var subProduct = $this.find("#subProduct").text();
-    	var subsubProduct = $this.find("#subsubProduct").text();
+			var subsubProduct = $this.find("#subsubProduct").html();
     	var product_image_list_store = $this.find("#product_image_list_store").val();
     	var product_sn = $this.find("#product_sn").val();
     	var imageS = getImageS(product_image_list_store, product_sn);
 		var imgSwiper;
-		
 		layer.open({
 		  type: 1,
 		  title: ['商品详情',
@@ -156,7 +155,7 @@ $(function() {
 			'</div>' +
 			'<p>名称：' + compositionName + '</p>' +
 			'<p>规格：' + compositionValueName + '</p>' +
-			'<p>赠品：' + subProduct + '</br>' + subsubProduct + '</p>',
+			'<div>赠品：' + subProduct + '<br/>' + subsubProduct + '</div>',
 		  anim: 'scale',
 		  className: 'product-detail',
 		  success: function () {
