@@ -37,12 +37,6 @@
 		})
 	})
 		var customerType = ${(customerType)};
-		/*strHtml = '<option selected="selected" value="">全部</option>';
-		for(index in customerType){
-			var row = customerType[index].columns;
-			strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
-		}
-		$("#customer_type").html(strHtml);*/
 		$("#customer_type").select2({
 			minimumResultsForSearch: -1,
 			data:customerType
@@ -53,6 +47,13 @@
 		$("#customer_name").select2({
 			data: customerName
 		});
+
+		var questionType = ${(questionType)};
+
+		$("#question_type").select2({
+		data: questionType
+		});
+
 	})
 
 	function doSubmit(){
@@ -60,7 +61,7 @@
 			{btn : ['确定', '取消']},
 			function() {
 				layer.closeAll();
-				$.get('${CPATH}/admin/customerVisit/count?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val() ,
+				$.get('${CPATH}/admin/customerVisit/count?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val() + '&question_type=' + $('#question_type').val() ,
 				function(result){
 					if (result.errorCode > 0) {
 						toastr.error(result.message, '没有图片');
@@ -68,7 +69,7 @@
 						layer.load(1, {
 							shade: [0.4,'#000']
 						});
-						window.open('${CPATH}/admin/customerVisit/exportImage?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val(),"_parent","","");
+						window.open('${CPATH}/admin/customerVisit/exportImage?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val() + '&question_type=' + $('#question_type').val(),"_parent","","");
 						setTimeout(function() {
 							layer.closeAll();
 						}, 1000);
@@ -107,6 +108,11 @@
 		<form id="form" class="form-horizontal" >
 			<div class="box-body">
 				<div class="form-group col-sm-12">
+					<label class="control-label col-sm-2">问题类型:</label>
+					<div class="input-group col-md-4 col-sm-2">
+						<select class="form-control input-sm" type="text" id="question_type" name="question_type" value="" readonly>
+						</select>
+					</div>
 					<label class="control-label col-sm-2">客户类型:</label>
 					<div class="input-group col-md-4 col-sm-2">
 						<select class="form-control input-sm" type="text" id="customer_type" name="customer_type" value="" readonly>
