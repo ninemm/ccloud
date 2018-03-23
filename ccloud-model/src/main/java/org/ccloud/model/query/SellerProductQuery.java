@@ -119,10 +119,11 @@ public class SellerProductQuery extends JBaseQuery {
 	}
 	
 	public List<SellerProduct> findProductBySellerId(String sellerId) {
- 		StringBuilder fromBuilder = new StringBuilder("select cg.*,t1.valueName from cc_seller_product cg ");
-		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
-		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cg.product_id ");
-		fromBuilder.append("WHERE cg.seller_id = ? ");
+ 		StringBuilder fromBuilder = new StringBuilder("select cg.*,t1.valueName,ct.big_unit,ct.small_unit,ct.convert_relate from cc_seller_product cg ");
+ 		fromBuilder.append(" LEFT JOIN cc_product ct on ct.id = cg.product_id ");
+		fromBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cg.product_id ");
+		fromBuilder.append(" WHERE cg.seller_id = ? ");
 		return DAO.find(fromBuilder.toString(), sellerId);
 	}	
 
