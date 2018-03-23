@@ -50,6 +50,7 @@ import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
+import org.ccloud.model.query.ActivityExecuteTemplateQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
@@ -62,6 +63,7 @@ import org.ccloud.model.query.QyBasicflowtypeQuery;
 import org.ccloud.model.query.QyBasicshowtypeQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.vo.ExTemplate;
 import org.ccloud.model.vo.ImageJson;
 
 import com.alibaba.fastjson.JSON;
@@ -189,8 +191,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public void save() {
 		final Activity activity = getModel(Activity.class);
 		List<ExpenseDetail> expenseOldList = ExpenseDetailQuery.me().findByActivityId(activity.getId());
-		Map<String, String[]> paraMap = getParaMap();
-		String[] templateInfo=getParaValues("templateList");
+		String templateInfo=getPara("templateList");
+		List<ExTemplate> list = new ArrayList<>();
+		if(StrKit.notBlank(templateInfo)) {
+			JSONArray jsonArray = JSONArray.parseArray(templateInfo);
+			list =  jsonArray.toJavaList(ExTemplate.class);
+		}
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String [] imagePath = getParaValues("imageUrl[]");
 		String [] item1 = getParaValues("item1[]");
@@ -248,35 +254,99 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		int num = Integer.valueOf(getPara("num"));
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(activity.getId());
 		if(activityExecutes.size() > 0) {
-			for(ActivityExecute ae : activityExecutes) {
-				ActivityExecuteQuery.me().batchDelete(ae.getId());
-			}
 		}
+		List<String> list2 = new ArrayList<>();
+		List<String> list3 = new ArrayList<>();
 		if(num > 0) {
 			for(int i = 0; i < num ; i++) {
-				if(getPara("orderList" + (i + 1)) == ""){
+				if(StrKit.isBlank(getPara("orderList" + (i + 1)))){
 					continue;
 				}
-				ActivityExecute activityExecute = new ActivityExecute();
-				String activityExecuteId = StrKit.getRandomUUID();
-				activityExecute.setId(activityExecuteId);
-				activityExecute.setActivityId(activity.getId());
-				activityExecute.setOrderList(getPara("orderList"+(i+1)));
-				activityExecute.setRemark(getPara("remark"+(i+1)));
-				activityExecute.save();
+				String aEId = (getPara("activityExecteId"+(i+1))!=null?getPara("activityExecteId"+(i+1)):"");
+				for(ActivityExecute ae : activityExecutes) {
+					if(aEId.equals(ae.getId())) {
+						list2.add(ae.getId());
+					}
+					list3.add(ae.getId());
+				}
+			}
+			for(int k = 0 ; k < list3.size() ; k++) {
+				if(!list2.contains(list3.get(k))){
+					ActivityExecuteQuery.me().batchDelete(list3.get(k));
+					ActivityExecuteTemplateQuery.me().deleteByActivityExecuteId(list3.get(k));
+				}
+			}
+			for(int i = 0; i < num ; i++) {
+				if(StrKit.isBlank(getPara("orderList" + (i + 1)))){
+					continue;
+				}
 				
-				for(int j = 0 ; j < templateInfo.length ; j++) {
-					if(templateInfo[j].equals("")) {
+				String aEId = (getPara("activityExecteId"+(i+1))!=null?getPara("activityExecteId"+(i+1)):"");
+				String activityExecuteId = "";
+				boolean flang =false;
+				ActivityExecute activityExecute = new ActivityExecute();
+				for(String s : list2) {
+					if(aEId.equals(s)) {
+						activityExecuteId = s;
+						activityExecute = ActivityExecuteQuery.me().findById(activityExecuteId);
+						activityExecute.setOrderList(getPara("orderList"+(i+1)));
+						activityExecute.setRemark(getPara("remark"+(i+1)));
+						activityExecute.setModifyDate(new Date());
+						activityExecute.update();
+						flang = true;
+						break;
+					}
+				}
+				if(flang == false) {
+					if(StrKit.isBlank(getPara("orderList" + (i + 1)))){
 						continue;
 					}
-					ActivityExecuteTemplate activityExecuteTemplate = new ActivityExecuteTemplate();
-					activityExecuteTemplate.setId(StrKit.getRandomUUID());
-					activityExecuteTemplate.setActivityExecuteId(activityExecuteId);
-					activityExecuteTemplate.setSellerId(sellerId);
-				/*	activityExecuteTemplate.setTemplateValue(templateValue);
-					activityExecuteTemplate.setTemplateValueType(templateValueType);
-					activityExecuteTemplate.setTemplateValueOpt(templateValueOpt);*/
-					activityExecuteTemplate.save();
+					activityExecuteId = StrKit.getRandomUUID();
+					activityExecute.setId(activityExecuteId);
+					activityExecute.setActivityId(activity.getId());
+					activityExecute.setOrderList(getPara("orderList"+(i+1)));
+					activityExecute.setRemark(getPara("remark"+(i+1)));
+					activityExecute.setCreateDate(new Date());
+					activityExecute.save();
+				}
+				List<ActivityExecuteTemplate> activityExecuteTemplates =  ActivityExecuteTemplateQuery.me().findActivityExecuteId(activityExecuteId);
+				List<String> list4 = new ArrayList<>();
+				if(list.size()>0) {
+					for(int j = 0 ; j < list.size() ; j++) {
+						list4.add(list.get(j).getActivityExecteTemplateId());
+					}
+					for(ActivityExecuteTemplate activityExecuteTemplate : activityExecuteTemplates) {
+						if(!list4.contains(activityExecuteTemplate.getId())) {
+							ActivityExecuteTemplateQuery.me().batchDelete(activityExecuteTemplate.getId());
+						}
+					}
+					
+					for(int j = 0 ; j < list.size() ; j++) {
+						if(list.get(j).getActivityExecteId().equals(aEId)) {
+							ActivityExecuteTemplate activityExecuteTemplate = new ActivityExecuteTemplate();
+							if(StrKit.isBlank(list.get(j).getActivityExecteTemplateId())) {
+								activityExecuteTemplate.setId(StrKit.getRandomUUID());
+								activityExecuteTemplate.setActivityExecuteId(activityExecuteId);
+								activityExecuteTemplate.setSellerId(sellerId);
+								if(StrKit.notBlank(list.get(j).getTemplateValue())){
+									activityExecuteTemplate.setTemplateValue(list.get(j).getTemplateValue());
+								}
+								activityExecuteTemplate.setTemplateValueType(list.get(j).getTemplateValueType());
+								activityExecuteTemplate.setTemplateValueOpt(list.get(j).getTemplateValueTypeValue());
+								activityExecuteTemplate.setCreateDate(new Date());
+								activityExecuteTemplate.save();
+							}else {
+								activityExecuteTemplate = ActivityExecuteTemplateQuery.me().findById(list.get(j).getActivityExecteTemplateId());
+								if(StrKit.notBlank(list.get(j).getTemplateValue())){
+									activityExecuteTemplate.setTemplateValue(list.get(j).getTemplateValue());
+								}
+								activityExecuteTemplate.setTemplateValueType(list.get(j).getTemplateValueType());
+								activityExecuteTemplate.setTemplateValueOpt(list.get(j).getTemplateValueTypeValue());
+								activityExecuteTemplate.setModifyDate(new Date());
+								activityExecuteTemplate.update();
+							}
+						}
+					}
 				}
 			}
 		}
@@ -431,7 +501,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			map.put("name",record.get("name").toString());
 			if (!StringUtils.isBlank(id)) {
 				Activity activity = ActivityQuery.me().findById(id);
-				String[] customerTypes = activity.getCustomerType().split(",");
+				if(StrKit.notBlank(activity.getCustomerType())) {
+					String[] customerTypes = activity.getCustomerType().split(",");
 					for(int i = 0;i<customerTypes.length;i++){
 						if((record.get("id").toString()).equals(customerTypes[i])){
 							map.put("isvalid", 1);
@@ -440,6 +511,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 							map.put("isvalid", 0);
 						}
 					}
+				}else {
+					map.put("isvalid", 0);
+				}
 			}else {
 					map.put("isvalid", 0);
 			}
@@ -1018,8 +1092,18 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	public void editTemplate() {
-		String dateTime = getPara("dateTime");
-		setAttr("dateTime",dateTime);
+		String activityExecteId = getPara("activityExecteId");
+		List<ActivityExecuteTemplate> activityExecuteTemplates = ActivityExecuteTemplateQuery.me().findActivityExecuteId(activityExecteId);
+		List<Dict> dicts = DictQuery.me().findDictByType(Consts.ACTIVITY_EXECUTE_TEMPLATE);
+		setAttr("activityExecuteTemplates", JSON.toJSON(activityExecuteTemplates));
+		setAttr("dicts", JSON.toJSON(dicts));
+		setAttr("activityExecteId",activityExecteId);
 		render("template.html");
+	}
+	
+	public void getActivityExecuteTemplate() {
+		String activityExecteId = getPara("activityExecteId");
+		List<ActivityExecuteTemplate> activityExecuteTemplates = ActivityExecuteTemplateQuery.me().findActivityExecuteId(activityExecteId);
+		renderJson(activityExecuteTemplates);
 	}
 }

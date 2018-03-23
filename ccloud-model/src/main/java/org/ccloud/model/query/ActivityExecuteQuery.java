@@ -36,12 +36,7 @@ public class ActivityExecuteQuery extends JBaseQuery {
 	}
 
 	public ActivityExecute findById(final String id) {
-		return DAO.getCache(id, new IDataLoader() {
-			@Override
-			public Object load() {
-				return DAO.findById(id);
-			}
-		});
+		return DAO.findById(id);
 	}
 
 	public Page<ActivityExecute> paginate(int pageNumber, int pageSize, String orderby) {

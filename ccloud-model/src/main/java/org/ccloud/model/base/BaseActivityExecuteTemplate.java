@@ -138,4 +138,19 @@ public abstract class BaseActivityExecuteTemplate<M extends BaseActivityExecuteT
 		return getStr("template_value_opt");
 	}
 
+	public void setCreateDate(java.util.Date createDate) {
+		set("create_date", createDate);
+	}
+
+	public java.util.Date getCreateDate() {
+		return get("create_date");
+	}
+
+	public void setModifyDate(java.util.Date modifyDate) {
+		set("modify_date", modifyDate);
+	}
+
+	public java.util.Date getModifyDate() {
+		return get("modify_date");
+	}
 }
