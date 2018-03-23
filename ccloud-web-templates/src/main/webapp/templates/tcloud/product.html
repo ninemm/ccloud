@@ -324,11 +324,12 @@ function initComposition(compositionList){
 			$newProductDetail.find("#product_sn").val(el.product_sn);
 			$newProductDetail.find("#gift").append("<a class='gift-open' >展开</a>");
 			$newProductDetail.find("#subProduct").text(el.product_name + ' ' + (el.main_product_count/el.main_convert).toFixed(2) + '件');
-			$newProductDetail.find("#subsubProduct").append(el.sub_product_name + ' ' + (el.sub_product_count/el.sub_convert).toFixed(2) + '件');
+			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + (el.sub_product_count/el.sub_convert).toFixed(2) + '件'+
+				"</p>");
 		}else{
 			var $type = $menuRight.find(".type:last");
 			var $newProductDetail = $type.find(".composition:last");
-			$newProductDetail.find("#subsubProduct").append(el.sub_product_name + ' ' + (el.sub_product_count/el.sub_convert).toFixed(2) + '件');
+			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + (el.sub_product_count/el.sub_convert).toFixed(2) + '件'+"</p>");
 		}
 
 	});
