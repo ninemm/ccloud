@@ -269,7 +269,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 	public void getProductInfo() {
 		String sellerId = getSessionAttr("sellerId");
 		if (StringUtils.isNotBlank(sellerId)) {
-			List<SellerProduct> list = SellerProductQuery.me().findBySellerId(sellerId);
+			List<SellerProduct> list = SellerProductQuery.me().findProductBySellerId(sellerId);
 			List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
 			for (SellerProduct sellerProduct : list) {
 				Map<String, String> productOptionMap = new HashMap<String, String>();

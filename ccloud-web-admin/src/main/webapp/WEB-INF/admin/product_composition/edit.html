@@ -214,8 +214,12 @@ function deleteTr(obj){
   $(obj).parent().parent().remove();
   var id =$(obj).parent().parent().attr("id");
   var delIndex = parseInt(id.substr(id.length-1,1))-1;
-  var countName = "productComposition["+ delIndex +"].product_count";
-  $('#form').data('bootstrapValidator').enableFieldValidators(countName, false);  
+  var bigcountName = "productComposition["+ delIndex +"].product_bigcount";
+  var smallcountName = "productComposition["+ delIndex +"].product_smallcount";
+<!--   $('#form').data('bootstrapValidator').enableFieldValidators(bigcountName, false);  -->
+<!--   $('#form').data('bootstrapValidator').enableFieldValidators(smallcountName, false);   -->
+  $("form").bootstrapValidator('removeField',bigcountName);
+  $("form").bootstrapValidator('removeField',smallcountName); 
 }
 
 function addNew() {

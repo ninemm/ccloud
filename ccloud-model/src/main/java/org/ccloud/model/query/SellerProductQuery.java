@@ -117,6 +117,14 @@ public class SellerProductQuery extends JBaseQuery {
 		fromBuilder.append(" WHERE id.warehouse_id IN( SELECT w.id FROM cc_warehouse w WHERE w.seller_id = ? ) GROUP BY id.sell_product_id) ");
 		return DAO.find(fromBuilder.toString(), sellerId, sellerId);
 	}
+	
+	public List<SellerProduct> findProductBySellerId(String sellerId) {
+ 		StringBuilder fromBuilder = new StringBuilder("select cg.*,t1.valueName from cc_seller_product cg ");
+		fromBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cg.product_id ");
+		fromBuilder.append("WHERE cg.seller_id = ? ");
+		return DAO.find(fromBuilder.toString(), sellerId);
+	}	
 
 	public List<SellerProduct> findByProductIdAndSellerId(String seller_product_id, String sellerId) {
 		StringBuilder fromBuilder = new StringBuilder("select * from cc_seller_product where id=? and seller_id=?");
