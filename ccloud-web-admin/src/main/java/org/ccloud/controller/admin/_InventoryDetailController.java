@@ -151,7 +151,7 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 			} else if (record.getStr("biz_type").equals("100207")) {
 				record.set("biz_type", "调拨出库");
 			} else if (record.getStr("biz_type").equals("100209")) {
-				record.set("biz_type", "盘亏出库");
+				record.set("biz_type", "盘亏");
 			}
 			OutDetailExcel outDetailExcel = new OutDetailExcel();
 			outDetailExcel.setBiz_bill_sn(record.getStr("biz_bill_sn"));
