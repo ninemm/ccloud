@@ -162,13 +162,14 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		setAttr("id", warehouse_id);
 	}
 	
+	
+	//仓库授权
 	public void adduserJoinWarehouse() {
 		Db.tx(new IAtom() {
 		    @Override
 		    public boolean run() throws SQLException {
 				String warehouse_id=getPara("id");
 				String userIds = getPara("userIds");
-				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 				String user_id = WarehouseQuery.me().findWarehouseIdByUserId(warehouse_id);
 				int i=UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
 				if (i==0) {

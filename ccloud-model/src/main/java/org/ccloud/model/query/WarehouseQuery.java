@@ -164,9 +164,8 @@ public class WarehouseQuery extends JBaseQuery {
 
 	//根据仓库找到创建仓库的人
 	public String findWarehouseIdByUserId(String warehouse_id) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT u.id ");
-		fromBuilder.append(" FROM cc_warehouse w LEFT JOIN cc_seller cs ON cs.id=w.seller_id LEFT JOIN `group` g ON g.dept_id=cs.dept_id");
-		fromBuilder.append(" LEFT JOIN `user` u ON u.department_id=g.dept_id WHERE w.id='"+warehouse_id+"' AND g.group_code='role02'");
+		StringBuilder fromBuilder = new StringBuilder("SELECT d.principal_user_id AS id ");
+		fromBuilder.append("FROM cc_warehouse w LEFT JOIN cc_seller cs ON cs.id=w.seller_id LEFT JOIN department d ON d.id=cs.dept_id  WHERE w.id='"+warehouse_id+"'");
 		Record findFirst = Db.findFirst(fromBuilder.toString());
 		return findFirst.getStr("id");
 	}	
