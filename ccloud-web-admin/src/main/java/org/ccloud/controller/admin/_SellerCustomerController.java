@@ -781,16 +781,18 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 							.trimResults()
 							.splitToList(customerVO.getAreaName());
 
-					if (areaCodeList.size() == 3){
+					if (areaCodeList.size() != 0){
 						customer.setProvCode(areaCodeList.get(0));
 						customer.setCityCode(areaCodeList.get(1));
-						customer.setCountryCode(areaCodeList.get(2));
+						if(areaCodeList.size() == 3) customer.setCountryCode(areaCodeList.get(2));
+						else customer.setCountryCode("");
 					}
 
-					if (areaNameList.size() == 3) {
+					if (areaNameList.size() != 0) {
 						customer.setProvName(areaNameList.get(0));
 						customer.setCityName(areaNameList.get(1));
-						customer.setCountryName(areaNameList.get(2));
+						if(areaNameList.size() == 3) customer.setCountryName(areaNameList.get(2));
+						else customer.setCountryName("");
 					}
 				}
 
