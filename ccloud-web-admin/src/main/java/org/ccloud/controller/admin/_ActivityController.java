@@ -48,6 +48,8 @@ import org.ccloud.model.QyBasicflowtype;
 import org.ccloud.model.QyBasicshowtype;
 import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
+import org.ccloud.model.YxBasicchannelinfo;
+import org.ccloud.model.YxBasicchanneltypeinfo;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityExecuteTemplateQuery;
@@ -63,6 +65,8 @@ import org.ccloud.model.query.QyBasicflowtypeQuery;
 import org.ccloud.model.query.QyBasicshowtypeQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.YxBasicchannelinfoQuery;
+import org.ccloud.model.query.YxBasicchanneltypeinfoQuery;
 import org.ccloud.model.vo.ExTemplate;
 import org.ccloud.model.vo.ImageJson;
 
@@ -582,12 +586,18 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		List<QyBasicflowtype> flowList = MidDataUtil.getFlowTypeInfo(startDate, endDate, page, pageCount);
 		List<QyBasicfeetype> feeList = MidDataUtil.getFeeTypeInfo(startDate, endDate, page, pageCount);
 		List<QyBasicshowtype> showList = MidDataUtil.getShowTypeInfo(startDate, endDate, page, pageCount);
+		List<YxBasicchannelinfo> channelList = MidDataUtil.getBasicChannel();
+		List<YxBasicchanneltypeinfo> channelTypeList = MidDataUtil.getBasicChannelType();
 		QyBasicflowtypeQuery.me().deleteAll();
 		QyBasicfeetypeQuery.me().deleteAll();
 		QyBasicshowtypeQuery.me().deleteAll();
+		YxBasicchannelinfoQuery.me().deleteAll();
+		YxBasicchanneltypeinfoQuery.me().deleteAll();
 		Db.batchSave(flowList, flowList.size());
 		Db.batchSave(feeList, feeList.size());
 		Db.batchSave(showList, showList.size());
+		Db.batchSave(channelList, channelList.size());
+		Db.batchSave(channelTypeList, channelTypeList.size());
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
