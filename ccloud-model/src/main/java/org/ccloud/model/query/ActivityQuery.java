@@ -319,4 +319,9 @@ public class ActivityQuery extends JBaseQuery {
         return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	public Record findByActivityApplyId(String activityApplyId) {
+		String sql = "SELECT ca.* FROM cc_activity ca LEFT JOIN cc_activity_apply caa ON caa.activity_id=ca.id WHERE caa.id='"+activityApplyId+"'";
+		return Db.findFirst(sql);
+	}
+
 }
