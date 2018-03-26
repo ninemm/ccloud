@@ -46,7 +46,6 @@ import org.ccloud.model.MidIdno;
 import org.ccloud.model.QyBasicfeetype;
 import org.ccloud.model.QyBasicflowtype;
 import org.ccloud.model.QyBasicshowtype;
-import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.YxBasicchannelinfo;
 import org.ccloud.model.YxBasicchanneltypeinfo;
