@@ -93,8 +93,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Seller> sellers = SellerQuery.me().findByDataArea(dataArea);
 		String sellerId = "";
-		for(Seller seller:sellers) {
-			sellerId += "'"+seller.getId()+"',";
+		if(sellers.size()>0) {
+			for(Seller seller:sellers) {
+				sellerId += "'"+seller.getId()+"',";
+			}
+		}else {
+			sellerId = "'"+getSessionAttr(Consts.SESSION_SELLER_ID)+"',";
+			sellers.add(SellerQuery.me().findById(getSessionAttr(Consts.SESSION_SELLER_ID).toString()));
 		}
 //		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 //		List<Activity> actList = ActivityQuery.me().findBySellerId(sellerId);
