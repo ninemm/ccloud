@@ -69,6 +69,7 @@ import org.ccloud.model.query.YxBasicchannelinfoQuery;
 import org.ccloud.model.query.YxBasicchanneltypeinfoQuery;
 import org.ccloud.model.vo.ExTemplate;
 import org.ccloud.model.vo.Expense;
+import org.ccloud.model.vo.ExpensesDetail;
 import org.ccloud.model.vo.ImageJson;
 
 import com.alibaba.fastjson.JSON;
@@ -570,7 +571,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setIsPublish(0);
 				activity.setCreateDate(new Date());
 				acList.add(activity);
-				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
+//				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
 			}
 		}
 		Db.batchSave(acList, acList.size());
@@ -602,6 +603,42 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
+	private List<ExpenseDetail> getExpenseDetailsList(String expenseId, String actId, String typeId, String flowNo) {
+		List<ExpenseDetail> expenseDetails = new ArrayList<>();
+		@SuppressWarnings("rawtypes")
+		List<ExpensesDetail> expenseList = MidDataUtil.getExpenseDetail(expenseId, typeId);
+		for (ExpensesDetail expensesDetail : expenseList) {
+			ExpenseDetail expenseDetail = new ExpenseDetail();
+			expenseDetail.setId(StrKit.getRandomUUID());
+			expenseDetail.setActivityId(actId);
+			expenseDetail.setFlowNo(flowNo);
+			expenseDetail.setFlowTypeId(expensesDetail.getFlowTypeID());
+			String dict = findFlowDictType(typeId);
+			expenseDetail.setFlowDictType(dict);
+			if (dict.equals("feeType_name_display")) {
+				String name = QyBasicfeetypeQuery.me().findNameById(expensesDetail.getCostType());
+				Dict code = DictQuery.me().findbyName(name);
+				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
+			}
+			if (StrKit.notBlank(expensesDetail.getChannelID())) {
+				expenseDetail.setItem1(expensesDetail.getChannelID());
+			} else {
+				expenseDetail.setItem1(expensesDetail.getCostType());
+			}
+//			getItem(expenseDetail, expensesDetail, 5);
+//			expenseDetail.setCreateDate(expensesDetail.getCreateTime());
+//			expenseDetail.setModifyDate(expensesDetail.getModifyTime());
+			if (expensesDetail.getFlag().equals("0")) {
+				expenseDetail.setState(false);
+			} else {
+				expenseDetail.setState(true);
+			}
+			expenseDetails.add(expenseDetail);
+		}
+		return expenseDetails;
+	}
+	
+	@SuppressWarnings("unused")
 	private List<ExpenseDetail> getExpenseDetailList(String expenseId, String actId, String typeId) {
 		List<ExpenseDetail> expenseDetails = new ArrayList<>();
 		List<QyExpensedetail> midDatas = QyExpensedetailQuery.me().findByActivityId(expenseId);
@@ -619,7 +656,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
 			}
 			expenseDetail.setItem1(qyExpensedetail.getItem1());
-			getItem(expenseDetail, qyExpensedetail, 5);
+//			getItem(expenseDetail, qyExpensedetail, 5);
 			expenseDetail.setCreateDate(qyExpensedetail.getCreateTime());
 			expenseDetail.setModifyDate(qyExpensedetail.getModifyTime());
 			if (qyExpensedetail.getFlag() == 0) {
@@ -632,16 +669,16 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return expenseDetails;
 	}
 	
-	private void getItem(ExpenseDetail expenseDetail, QyExpensedetail qyExpensedetail, int num) {
-		int j = 2;
-		for (int i = 2; i < num; i++) {
-			String item = "Item" + String.valueOf(i);
-			if (StrKit.notBlank(qyExpensedetail.get(item).toString())) {
-				expenseDetail.set("item" + String.valueOf(j), qyExpensedetail.get(item));
-				j++;
-			}
-		}
-	}
+//	private void getItem(ExpenseDetail expenseDetail, ExpensesDetail qyExpensedetail, int num) {
+//		int j = 2;
+//		for (int i = 2; i < num; i++) {
+//			String item = "Item" + String.valueOf(i);
+//			if (StrKit.notBlank(qyExpensedetail.get(item).toString())) {
+//				expenseDetail.set("item" + String.valueOf(j), qyExpensedetail.get(item));
+//				j++;
+//			}
+//		}
+//	}
 
 	private String[] getAreaType(String data) {
 		String[] value = new String[2];
