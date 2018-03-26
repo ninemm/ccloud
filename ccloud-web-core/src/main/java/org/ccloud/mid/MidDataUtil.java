@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.QyBasicfeetype;
 import org.ccloud.model.QyBasicflowtype;
 import org.ccloud.model.QyBasicshowtype;
@@ -28,6 +29,7 @@ import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.YxBasicchannelinfo;
 import org.ccloud.model.YxBasicchanneltypeinfo;
+import org.ccloud.model.vo.Expense;
 import org.ccloud.model.vo.Mid_ActivityInfo;
 import org.ccloud.utils.HttpUtils;
 
@@ -47,11 +49,11 @@ public class MidDataUtil {
     private static final String GET_JINGPAI_EXPENSEDETAILS = "http://yxmiddb.jingpai.com/WebAPI/api/ExpensesDetail";
     private static final String GET_JINGPAI_BASICCHANNELTYPE = "http://yxmiddb.jingpai.com/WebAPI/api/BasicChannelType";
     private static final String GET_JINGPAI_BASICCHANNEL= "http://yxmiddb.jingpai.com/WebAPI/api/BasicChannel";
-    
+    private static final String GET_JINGPAI_EXPENSESDETAIL= "http://yxmiddb.jingpai.com/WebAPI/api/ExpensesDetail";
 
 	public static void main(String[] args) throws RemoteException {
-		List<YxBasicchannelinfo> list = getBasicChannel();
-		System.out.println(list.size());
+//		List<YxBasicchannelinfo> list = getBasicChannel();
+//		System.out.println(list.size());
 	}
 
 	public static List<Mid_ActivityInfo> getActivityInfo(String startTime, String endTime, String pageIndex, String pageSize) {
@@ -122,17 +124,17 @@ public class MidDataUtil {
 		return list;
 	}
 	
-	public static List<QyExpense> getExpensesInfo(String startTime, String endTime, String pageIndex, String pageSize) {
+	public static List<Expense> getExpensesInfo(String startTime, String endTime, String pageIndex, String pageSize) {
         Map<String, String> map = new HashMap<>();
         map.put("BegTime", startTime);
         map.put("EndTime", endTime);
         map.put("PageIndex", pageIndex);
         map.put("PageSize", pageSize);
-        List<QyExpense> list = new ArrayList<>();
+        List<Expense> list = new ArrayList<>();
 		try {
 			String result = HttpUtils.post(GET_JINGPAI_EXPENSES, map);
 			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("Expenses");
-			list = jsonArray.toJavaList(QyExpense.class);
+			list = jsonArray.toJavaList(Expense.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -174,6 +176,21 @@ public class MidDataUtil {
 			String result = HttpUtils.get(GET_JINGPAI_BASICCHANNELTYPE);
 			JSONArray jsonArray = JSONArray.parseArray(result);
 			list = jsonArray.toJavaList(YxBasicchanneltypeinfo.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
+	public static List<ExpenseDetail> getExpenseDetail(String expenseID, String type) {
+        List<ExpenseDetail> list = new ArrayList<>();
+        Map<String, String> map = new HashMap<>();
+        map.put("strExpenseID", expenseID);
+		try {
+			String result = HttpUtils.get(GET_JINGPAI_EXPENSESDETAIL, map);
+//			String response = getResponseType(type);
+			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("Expenses");
+			list = jsonArray.toJavaList(ExpenseDetail.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

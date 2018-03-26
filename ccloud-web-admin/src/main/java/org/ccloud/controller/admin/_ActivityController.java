@@ -68,6 +68,7 @@ import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.YxBasicchannelinfoQuery;
 import org.ccloud.model.query.YxBasicchanneltypeinfoQuery;
 import org.ccloud.model.vo.ExTemplate;
+import org.ccloud.model.vo.Expense;
 import org.ccloud.model.vo.ImageJson;
 
 import com.alibaba.fastjson.JSON;
@@ -545,10 +546,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public void getMidData() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 //		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();//测试数据
-		List<QyExpense> expenseList = MidDataUtil.getExpensesInfo("2018-02-15", "2018-03-01", "1", "5");
+		List<Expense> expenseList = MidDataUtil.getExpensesInfo("2018-02-15", "2018-03-01", "1", "5");
 		List<Activity> acList = new ArrayList<>();
 		List<ExpenseDetail> dlist = new ArrayList<>();
-		for (QyExpense qyExpense : expenseList) {
+		for (Expense qyExpense : expenseList) {
 			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
 				Activity activity = new Activity();
 				activity.setId(StrKit.getRandomUUID());
