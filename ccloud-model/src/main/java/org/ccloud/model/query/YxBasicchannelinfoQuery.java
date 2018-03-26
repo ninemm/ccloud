@@ -67,5 +67,9 @@ public class YxBasicchannelinfoQuery extends JBaseQuery {
 		return 0;
 	}
 
+	public void deleteAll() {
+		DAO.doDelete("ChannelID is not null");
+	}
+
 	
 }
