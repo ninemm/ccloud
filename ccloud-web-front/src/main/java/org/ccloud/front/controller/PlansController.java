@@ -128,7 +128,8 @@ public class PlansController extends BaseFrontController {
 		String typeName = getPara("typeName");
 		String startDate = getPara("startDate").substring(5);
 		String endDate = getPara("endDate").substring(5);
-		List<Plans> list = PlansQuery.me().findbyUserNameAndTypeNameAndStartDateAndEndDate(userName,typeName,startDate,endDate);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<Plans> list = PlansQuery.me().findbyUserNameAndTypeNameAndStartDateAndEndDate(userName,typeName,startDate,endDate,sellerId);
 		renderJson(list);
 	}
 

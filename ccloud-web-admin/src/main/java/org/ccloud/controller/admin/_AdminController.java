@@ -79,7 +79,7 @@ public class _AdminController extends JBaseController {
 		 * null); if (commentPage != null) { setAttr("comments", commentPage.getList());
 		 * }
 		 */
-
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (user == null) {
 			redirect("/admin/login");
@@ -92,16 +92,16 @@ public class _AdminController extends JBaseController {
 			count = SalesOrderQuery.me().queryCountToDayOrders(user.getId(), selDataArea);
 		}
 		Map<String, List<Record>> salesManAmount = Maps.newHashMap();
-		salesManAmount.put("sales_day", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"day","asc"));
-		salesManAmount.put("sales_month", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"month","asc"));
+		salesManAmount.put("sales_day", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"day","desc"));
+		salesManAmount.put("sales_month", SalesOrderQuery.me().querysalesManAmountBy(selDataArea,"month","desc"));
 		
 		Map<String, List<Record>> goodsSales = Maps.newHashMap();
-		goodsSales.put("goodsSalesToDay", SalesOrderQuery.me().queryGoodsSales(selDataArea, true,"asc"));
-		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"asc"));
+		goodsSales.put("goodsSalesToDay", SalesOrderQuery.me().queryGoodsSales(selDataArea, true,"desc"));
+		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"desc"));
 		
 		Map<String, List<Record>> directBusinessAmount = Maps.newHashMap();
-		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","asc"));
-		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","asc"));
+		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","desc"));
+		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","desc"));
 		
 		Map<String, List<Record>> amountCollect = Maps.newHashMap();
 		amountCollect.put("amount_weeks", SalesOrderQuery.me().queryAmountBy(selDataArea, "weeks"));
@@ -128,22 +128,23 @@ public class _AdminController extends JBaseController {
 		
 		setAttr("identity",SecurityUtils.getSubject().isPermitted("/admin/manager"));
 		
+		String changePassword="false";
 		String mobile = user.getMobile();
 		//将手机号作为键和值存到cookie 第一次登录没有修改密码 弹框提示
-		String changePassword="false";
 		String change=CookieUtils.get(this, user.getMobile());
-		if (!mobile.equals(change)) {
-			//判断登录用户是不是使用的初始密码
-			if (user.getPassword().equals(EncryptUtils.encryptPassword(Consts.USER_DEFAULT_PASSWORD, user.getSalt()))) {
-				CookieUtils.put(this, mobile,mobile);
-				changePassword="true";
-			}
+		//先判断手机号在cookie里面有没有 再判断登录用户是不是使用的初始密码
+		if (!mobile.equals(change)&&user.getPassword().equals(EncryptUtils.encryptPassword(Consts.USER_DEFAULT_PASSWORD, user.getSalt()))) {
+			//没有修改密码 且第一次登录
+			CookieUtils.put(this, mobile,mobile);
+			changePassword="true";
+		}
+		String sellerID=CookieUtils.get(this, "_seller"+mobile);
+		if(StrKit.isBlank(sellerID) && !user.getUsername().equals("admin")) {
+			CookieUtils.put(this, "_seller"+mobile,sellerId);
 		}
 		setAttr("changePassword",changePassword);
-		
 		render("index.html");
 	}
-	
 	@Clear(AdminInterceptor.class)
 	public void login() {
 		
@@ -151,7 +152,7 @@ public class _AdminController extends JBaseController {
 		String password = getPara("password");
 		String rememberMeStr = getPara("remember_me");
 		boolean rememberMe = false;
-		if (rememberMeStr != null && rememberMeStr.equals("on")) {
+		if (rememberMeStr != null && rememberMeStr.equals("onb")) {
 			rememberMe = true;
 		}
 
@@ -190,7 +191,6 @@ public class _AdminController extends JBaseController {
 				List<User> userList = UserQuery.me().findByMobile(mobile);
 				List<Map<String, String>> sellerList = Lists.newArrayList();
 				List<Department> tmpList = Lists.newArrayList();
-				
 				for (User temp : userList) {
 					tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(temp.getDepartmentId());
 					if (tmpList.size() > 0) {
@@ -202,22 +202,29 @@ public class _AdminController extends JBaseController {
 						sellerList.add(seller);
 					}
 				}
-				
-				if (sellerList.size() == 0 && !user.isAdministrator()) {
-					renderError(404);
-					return ;
-				} else if (sellerList.size() > 1) {
-					setAttr("mobile", mobile);
-					setAttr("sellerList", sellerList);
+				String sellerID = CookieUtils.get(this, "_seller"+mobile);
+				if(StrKit.notBlank(sellerID)) {
+					setSessionAttr("isUserID",user.getId());
 					setSessionAttr("sellerList", sellerList);
-					forwardAction("/admin/choice");
-					Map<String, Object> map = new HashMap<>();
-					map.put("mobile", mobile);
-					map.put("sellerList", sellerList);
-					map.put("size", sellerList.size());
-					renderJson(map);
-					return ;
+					change();
+				}else {
+					if (sellerList.size() == 0 && !user.isAdministrator()) {
+						renderError(404);
+						return ;
+					} else if (sellerList.size() > 1) {
+						setAttr("mobile", mobile);
+						setAttr("sellerList", sellerList);
+						setSessionAttr("sellerList", sellerList);
+						forwardAction("/admin/choice");
+						Map<String, Object> map = new HashMap<>();
+						map.put("mobile", mobile);
+						map.put("sellerList", sellerList);
+						map.put("size", sellerList.size());
+						renderJson(map);
+						return ;
+					}
 				}
+				
 				
 				if (!user.isAdministrator() && tmpList != null) {
 					Department dept = tmpList.get(0);
@@ -287,9 +294,13 @@ public class _AdminController extends JBaseController {
 	
 	@Clear(AdminInterceptor.class)
 	public void change() {
-		
 		String mobile = getPara("mobile");
 		String sellerId = getPara("sellerId");
+		if(StrKit.isBlank(sellerId)) {
+			String userId = getSessionAttr("isUserID");
+			mobile = UserQuery.me().findById(userId).getMobile();
+			sellerId = CookieUtils.get(this, "_seller"+mobile);
+		}
 		User curUser = null;
 		
 		List<User> userList = UserQuery.me().findByMobile(mobile);

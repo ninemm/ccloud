@@ -41,7 +41,7 @@ public class Consts {
 	public static final String WORKFLOW_APPLY_SELLER_ID = "sellerId";
 	public static final String WORKFLOW_APPLY_SELLER_CODE = "sellerCode";
     public static final List<String> QRDEALERCODE = new ArrayList<>(Arrays.asList("02701015"));
-	
+
 	public static final String CHARTSET_UTF8 = "UTF-8";
 
 	public static final String INDEX_URL = "/";
@@ -267,14 +267,18 @@ public class Consts {
 	
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
 	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
+	
+	public static final Integer STATUS_YES = 1;// 通用是
+	public static final Integer STATUS_NO = 0;// 通用否
 
 	public static final String TEMPLATE_ALI = "0";//阿里模板
 	public static final String TEMPLATE_DANLU = "1";//丹露模板
 	public static final String TEMPLATE_NAME_ALI = "阿里";//阿里模板
 	public static final String TEMPLATE_NAME_DANLU = "丹露";//丹露模板	
-	public static final String TEMPLATE_FILE_NAME_ALI = "aliTemplate.xlsx";//阿里模板文件名
+	public static final String TEMPLATE_FILE_NAME_ALI = "aliTemplate.xls";//阿里模板文件名
 	public static final String TEMPLATE_FILE_NAME_DANLU = "danluTemplate.xls";//丹露模板文件名
 	
+	public static final String PLAN = "plan_type";//销售计划
 	public static final String WEEK_PLAN = "101201";//周计划
 	public static final String MONTH_PLAN = "101202";//月计划
 	public static final String YEAR_PLAN = "101203";//年计划

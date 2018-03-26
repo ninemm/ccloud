@@ -108,14 +108,14 @@ public class CustomerController extends BaseFrontController {
 		boolean visit = SecurityUtils.getSubject().isPermitted("/admin/customerVisit");
 		
 		Page<Record> customerList = new Page<>();
-		int customerOrderCount = 0;
+		String customerOrderCount = "0";
 		if (StrKit.notBlank(getPara("region"))) {
 			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
 			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), "0", getPara("searchKey")).getTotalRow();
+			customerOrderCount = SellerCustomerQuery.me().getOrderNumber(dataArea, getPara("customerType"), "0", getPara("searchKey")).getStr("orderCount");
 		} else {
 			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			customerOrderCount = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), "0", getPara("searchKey")).getTotalRow();
+			customerOrderCount = SellerCustomerQuery.me().getOrderNumber( selectDataArea, getPara("customerType"), "0", getPara("searchKey")).getStr("orderCount");
 		}
 
 		StringBuilder html = new StringBuilder();
@@ -391,6 +391,9 @@ public class CustomerController extends BaseFrontController {
 
 		String areaCode = getPara("areaCode");
 		if(areaCode.equals(",,")) areaCode = "";
+
+		if(areaName.endsWith(",")) areaName = areaName.substring(0, areaName.length() - 1);
+		if(areaCode.endsWith(",")) areaCode = areaCode.substring(0, areaCode.length() - 1);
 
 		String customerTypeIds = getPara("customerTypeIds", "");
 		String custTypeNames = getPara("customer_type");
@@ -680,16 +683,18 @@ public class CustomerController extends BaseFrontController {
 							.trimResults()
 							.splitToList(customerVO.getAreaName());
 
-					if (areaCodeList.size() == 3){
+					if (areaCodeList.size() != 0){
 						customer.setProvCode(areaCodeList.get(0));
 						customer.setCityCode(areaCodeList.get(1));
-						customer.setCountryCode(areaCodeList.get(2));
+						if(areaCodeList.size() == 3) customer.setCountryCode(areaCodeList.get(2));
+						else customer.setCountryCode("");
 					}
 
-					if (areaNameList.size() == 3) {
+					if (areaNameList.size() != 0) {
 						customer.setProvName(areaNameList.get(0));
 						customer.setCityName(areaNameList.get(1));
-						customer.setCountryName(areaNameList.get(2));
+						if(areaNameList.size() == 3) customer.setCountryName(areaNameList.get(2));
+						else customer.setCountryName("");
 					}
 				}
 
@@ -920,16 +925,18 @@ public class CustomerController extends BaseFrontController {
 				.trimResults()
 				.splitToList(areaName);
 
-		if (areaCodeList.size() == 3){
+		if (areaCodeList.size() != 0){
 			customer.setProvCode(areaCodeList.get(0));
 			customer.setCityCode(areaCodeList.get(1));
-			customer.setCountryCode(areaCodeList.get(2));
+			if(areaCodeList.size() == 3) customer.setCountryCode(areaCodeList.get(2));
+			else customer.setCountryCode("");
 		}
 
-		if (areaNameList.size() == 3) {
+		if (areaNameList.size() != 0) {
 			customer.setProvName(areaNameList.get(0));
 			customer.setCityName(areaNameList.get(1));
-			customer.setCountryName(areaNameList.get(2));
+			if(areaNameList.size() == 3) customer.setCountryName(areaNameList.get(2));
+			else customer.setCountryName("");
 		}
 		customer.setLat(sellerCustomer.getLat());
 

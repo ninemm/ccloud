@@ -114,6 +114,14 @@ public abstract class BaseProductComposition<M extends BaseProductComposition<M>
 		return getStr("sub_seller_product_id");
 	}
 
+	public void setMainProductCount(java.lang.String mainProductCount) {
+		set("main_product_count", mainProductCount);
+	}
+
+	public java.lang.String getMainProductCount() {
+		return getStr("main_product_count");
+	}
+	
 	public void setSubProductCount(java.lang.String subProductCount) {
 		set("sub_product_count", subProductCount);
 	}
@@ -160,6 +168,14 @@ public abstract class BaseProductComposition<M extends BaseProductComposition<M>
 
 	public java.lang.Integer getState() {
 		return get("state");
+	}
+	
+	public void setIsGift(java.lang.Integer isGift) {
+		set("is_gift", isGift);
+	}
+
+	public java.lang.Integer getIsGift() {
+		return get("is_gift");
 	}
 
 }

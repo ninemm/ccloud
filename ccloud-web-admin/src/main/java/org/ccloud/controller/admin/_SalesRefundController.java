@@ -273,7 +273,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			String keyword = getPara("k");
 			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 			String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
-					+ "salesRefundInfo.xlsx";
+					+ "salesRefundInfo.xls";
 			Page<Record> page = SalesRefundInstockQuery.me().paginate(1,Integer.MAX_VALUE, keyword, startDate,
 					endDate, null,null, dataArea,null,null);
 			List<Record> salesRefundList = page.getList();

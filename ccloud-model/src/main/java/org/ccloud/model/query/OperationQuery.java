@@ -173,18 +173,22 @@ public class OperationQuery extends JBaseQuery {
 		sqlBuilder.append("b ON b.operation_id = o.id ");
 		params.add(id);
 		if (list != null && list.size() > 0) { 
-			sqlBuilder.append("LEFT JOIN role_operation_rel ro ON ro.operation_id = o.id ");
+			sqlBuilder.append("LEFT JOIN (SELECT * FROM role_operation_rel ro ");
+			if (list != null && list.size() > 0) { 
+				sqlBuilder.append("WHERE ro.role_id in (?");
+				params.add(list.get(0).getId());
+				for (int i = 1; i < list.size(); i++) {
+					sqlBuilder.append(",?");
+					params.add(list.get(i).getId());
+				}
+
+				sqlBuilder.append(") ");
+				sqlBuilder.append("GROUP BY ro.operation_id ) own ON own.operation_id = o.id ");
+			}	
 		}
 		sqlBuilder.append("WHERE operation_code is not null ");
 		if (list != null && list.size() > 0) { 
-			sqlBuilder.append("AND ro.role_id in (?");
-			params.add(list.get(0).getId());
-			for (int i = 1; i < list.size(); i++) {
-				sqlBuilder.append(",?");
-				params.add(list.get(i).getId());
-			}
-
-			sqlBuilder.append(") ");
+			sqlBuilder.append("AND own.operation_id = o.id ");
 		}		
 		sqlBuilder.append("GROUP BY m.id ORDER BY sys_name, parent_name,module_name");
 		return Db.find(sqlBuilder.toString(), params.toArray());

@@ -249,7 +249,7 @@
 		    content: '${CPATH}/admin/attachment/_choose_layer',
 		    end:function(){
 		    	if(''!=data.url && null != data.url){
-		    		$("#imageDiv").append("<li><div class='imgDiv'><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"><div class='delete'></div></div></li>");
+		    		$("#imageDiv").append("<li style='display:inline;margin-right:15px;'><div class='imgDiv' style='width: 30%; height: 200px;max-width:300px'><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"><div class='delete'></div></div></li>");
 		    		data.url = "";
 	    		}
 		    }
@@ -331,7 +331,7 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动名称:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.title" value="${(activity.title)!}" style="width:261%;">
 						</div>
 					</div>
@@ -339,13 +339,13 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动开始时间:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动结束时间:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 						</div>
 					</div>
@@ -354,14 +354,14 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动编号:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.code" value="${(activity.code)!}">
 						</div>
 					</div>
 					
 					<div class="col-sm-5 validata-box" >
 						<label class="control-label col-sm-4">流程编号:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
 						</div>
 					</div>
@@ -369,13 +369,13 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动方案号:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动类型:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<select class="form-control category" name="activity.category" id="activity.category">
 								${DICT_BOX('activity_category', 'select', (activity.category)!)}
 							</select>
@@ -385,14 +385,14 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">客户类型:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
 							</select>
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box">
 	                    <label for="_title" class="control-label col-sm-4">客户区域:</label>
-	                    <div class="input-group col-sm-8">
+	                    <div class="input-group col-sm-8 input-group-sm">
 	                        <input readonly type="text" id="cityPicker" name = "activity.area_type" data-toggle="cityPicker" style="width:100%;">
 	                        <input type="hidden" id="areaNames" name="areaNames">
 	                        <input type="hidden" id="areaCodes" name="areaCodes">
@@ -402,13 +402,13 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动标签:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.tags" value="${(activity.tags)!}">
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box investType" >
 						<label class="control-label col-sm-4">投入类型:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<select class="form-control" name="invest_type" id="invest_type" multiple="multiple" >
 								<#if activity??>
 									<#list (dicts)! as dict>
@@ -426,13 +426,13 @@
 				<div class="form-group">
 					<!-- <div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">每个客户参与次数：</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
 						</div>
 					</div> -->
 					<!-- <div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">时间限制：</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<select class="form-control" name="activity.time_interval" id="activity.time_interval">
 								${DICT_BOX('activity_time_interval', 'select', (activity.time_interval)!)}
 							</select>
@@ -440,13 +440,13 @@
 					</div> -->
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">名额:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box investNum">
 						<label class="control-label col-sm-4">投入数量:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
 							&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
 							</select>
@@ -456,13 +456,13 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box investAmount">
 	                    <label for="_title" class="control-label col-sm-4">投入金额:</label>
-	                    <div class="input-group col-sm-8">
+	                    <div class="input-group col-sm-8 input-group-sm">
 	                        <input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
 	                    </div>
 	                </div>
 					<div class="col-sm-5 validata-box visitNum">
 						<label class="control-label col-sm-4">拜访次数:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<input class="form-control" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
 						</div>
 					</div>
@@ -470,7 +470,7 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">是否上架:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 							<label class="radio-inline">
 								<input type="radio" name="activity.is_publish" value="1" <#if !activity?? || (activity.is_publish)! == 1>checked</#if> />是
 							</label>
@@ -483,7 +483,7 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">活动内容:</label>
-						<div class="input-group col-sm-8">
+						<div class="input-group col-sm-8 input-group-sm">
 		                 	<textarea class="form-control" rows="3" name="activity.content" value="${(activity.content)!}" style="width:261%;">${(activity.content)!}</textarea>
 		               	</div>
 					</div>
@@ -491,18 +491,20 @@
 				<div class="form-group">
 					<div class="col-sm-5 validata-box">
 							<label class="control-label col-sm-4">活动海报:</label>
-							<div class="input-group col-sm-8">
+							<div class="input-group col-sm-8 input-group-sm">
 			                 	<span class="btn btn-default" id="chooseImg" onClick="imgChoose()">选择图片</span>
 			               	</div>
-					</div>>
-					<div class="col-sm-5 validata-box" style="margin-left:-20%;">
+					</div>
+					
+				</div>
+				<div class="col-sm-12 validata-box">
 						<label class="control-label col-sm-4"></label>
-						<div class="input-group col-md-10 col-sm-10">
-							<ul class="list-inline list-unstyled" id="imageDiv">
+						<div class="input-group col-md-12 col-sm-12">
+							<ul id="imageDiv">
 									<#if imageList??>
 									<#list (imageList)! as img>
-										<li>
-											<div class="imgDiv">
+										<li style="display:inline;margin-right:15px;">
+											<div class="imgDiv" style="width: 30%; height: 200px;margin-right:15px;">
 												<img src="${img}" class='jp-grids-photos img-responsive' >
 												<input type='hidden' name='imageUrl[]' value="${img}">
 												<div class="delete"></div>
@@ -513,7 +515,6 @@
 							</ul>									
 		               	</div>
 					</div>
-				</div>
 			</div>
 		</div>
 		<div class="box-footer"> 

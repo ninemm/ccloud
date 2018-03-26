@@ -75,6 +75,19 @@
     }
 
     $(function() {
+
+        initWxConfig('${appId!}', ${timestamp}, '${nonceStr!}', '${signature!}');
+
+        wxReadyGetLocation(
+            function(lng, lat, addComp, address) {
+                lng = lng.toFixed(6);
+                lat = lat.toFixed(6);
+                center = new BMap.Point(lng, lat);
+                map.centerAndZoom(center, 15);
+                map.enableScrollWheelZoom(true);
+                layer.closeAll();
+            }
+        )
         refresh();
         $(document).on("change", "#customer", function() {
             refresh();
@@ -224,50 +237,6 @@
         });
     }
 
-    wx.config({
-        debug: false,
-        appId: '${appId!}',
-        timestamp: '${timestamp!}',
-        nonceStr: '${nonceStr!}',
-        signature: '${signature!}',
-        jsApiList: [
-            'checkJsApi',
-            'getLocation'
-        ]
-    });
-
-    wx.ready(function() {
-        wx.getLocation({
-            type: 'wgs84',
-            success: function (res) {
-                var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-                var speed = res.speed;                            // 速度，以米/每秒计
-                var accuracy = res.accuracy;                      // 位置精度
-                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-
-                translateCallback = function (point) {            // 回调函数
-                    lng = parseFloat(point.lng).toFixed(6);
-                    lat = parseFloat(point.lat).toFixed(6);
-                    center = new BMap.Point(lng, lat);
-                    map.centerAndZoom(center, 15);
-                    map.enableScrollWheelZoom(true);
-                    layer.closeAll();
-                };
-
-                setTimeout(function() {
-                    BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-                }, 100);
-            },
-            cancel: function (res) {
-                console.log('用户拒绝授权获取地理位置');
-            },
-            fail: function (res) {
-                console.log(JSON.stringify(res));
-            }
-        });
-    });
 </#macro>
 <@layout>
 <div class="weui-content">
