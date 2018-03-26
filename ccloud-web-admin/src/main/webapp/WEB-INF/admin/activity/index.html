@@ -63,13 +63,13 @@
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
       			{field: "code", title: "活动编号", align: "center", visible:false, edit:false},
-      			{field: "title", title: "活动标题", align: "center", width: '10%', edit:false},
+      			{field: "title", title: "活动标题", align: "center", width: '25%', edit:false},
       			{field: "activityCategory", title: "活动类型", align: "center", width: '3%', edit:false},
       			{field: "customer_type", title: "客户类型", align: "center", width: '20%',edit:false},
-      			{field: "area_type", title: "区域类型", align: "center", width: '10%',edit:false},
-      			{field: "start_time", title: "活动时间", align: "center", width: '10%',
+      			{field: "area_type", title: "区域类型", align: "center", width: '35%',edit:false},
+      			{field: "start_time", title: "活动时间", align: "center", width: '160%',
       				formatter: function(value, row, rowIndex) {
-						var str = value +"-<br>"+ row.end_time;
+						var str = value.substring(0,10) +"至<br>"+ row.end_time.substring(0,10);
 						return str;
    					},
       				edit:false
@@ -94,9 +94,9 @@
 				formatter: function(value, row, rowIndex) {
 					var url1 = '${CPATH}/admin/activity/edit?id=' + row.id;
 					if(row.is_publish==0){
-						var strHtml = '<a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="change(\''+row.id+'\')">启用</a>';
+						var strHtml = '<div style="width:100px;"><a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="change(\''+row.id+'\')">启用</a></div>';
 					}else{
-						var strHtml = '<a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="change(\''+row.id+'\')">停用</a>';
+						var strHtml = '<div style="width:100px;"><a href="' + url1 + '" class="btn btn-xs bg-olive btn-flat">编辑</a> <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="change(\''+row.id+'\')">停用</a></div>';
 					}
 					return strHtml;
 				},
