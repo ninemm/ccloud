@@ -240,15 +240,15 @@ public class ImageUtils {
 				g.setFont(font);
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.7f));
 
-				int x = srcImgWidth - getWatermarkLength(content3, g) - 30;
+				int x = srcImgWidth - getWatermarkLength(content3, g) - 20;
 				int y = srcImgHeight - 20;
 				g.drawString(content3, x, y);
 
-				x = srcImgWidth - getWatermarkLength(content2, g) - 30;
+				x = srcImgWidth - getWatermarkLength(content2, g) - 20;
 				y = srcImgHeight - 65;
 				g.drawString(content2, x, y);
 
-				x = srcImgWidth - getWatermarkLength(content1, g) - 30;
+				x = srcImgWidth - getWatermarkLength(content1, g) - 20;
 				y = srcImgHeight - 110;
 				g.drawString(content1, x, y);
 

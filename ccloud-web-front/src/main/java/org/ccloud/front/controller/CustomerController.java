@@ -112,10 +112,12 @@ public class CustomerController extends BaseFrontController {
 		if (StrKit.notBlank(getPara("region"))) {
 			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
 			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			customerOrderCount = SellerCustomerQuery.me().getOrderNumber(dataArea, getPara("customerType"), "0", getPara("searchKey")).getStr("orderCount");
+			Record r = SellerCustomerQuery.me().getOrderNumber(dataArea, getPara("customerType"), "0", getPara("searchKey"));
+			if (r != null)customerOrderCount = r.getStr("orderCount");
 		} else {
 			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			customerOrderCount = SellerCustomerQuery.me().getOrderNumber( selectDataArea, getPara("customerType"), "0", getPara("searchKey")).getStr("orderCount");
+			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea, getPara("customerType"), "0", getPara("searchKey"));
+			if (r != null)customerOrderCount = r.getStr("orderCount");
 		}
 
 		StringBuilder html = new StringBuilder();
