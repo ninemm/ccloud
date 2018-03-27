@@ -2108,6 +2108,10 @@ public class SalesOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
+		if(StrKit.isBlank(status)) {
+			fromBuilder.append(" and o.status not in ('"+Consts.SALES_ORDER_STATUS_CANCEL+"','"+Consts.SALES_ORDER_STATUS_REJECT+"') ");
+		}
+		
 		if (params.isEmpty())
 			return Db.findFirst(fromBuilder.toString());
 
