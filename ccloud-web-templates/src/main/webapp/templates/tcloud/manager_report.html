@@ -144,6 +144,12 @@
     	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getSellerCountMenu', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#dealerCount").height(300);
+		        } else {
+		        	$("#dealerCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];
@@ -217,6 +223,12 @@
     	salesIndentChart.showLoading();    
 		Utils.ajax('${CPATH}/report/getGiftCountByUserMenu', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#giftCount").height(300);
+		        } else {
+		        	$("#giftCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];
@@ -288,6 +300,12 @@
     	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getGiftCountBySellerMenu', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#dealerGiftCount").height(300);
+		        } else {
+		        	$("#dealerGiftCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];

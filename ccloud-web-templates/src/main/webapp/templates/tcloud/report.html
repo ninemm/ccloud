@@ -96,10 +96,6 @@
                 <div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
                 <p class="weui-grid__label">部门报表</p>
             </a> 
-            <a href="${CPATH}/report/otherOrder" class="weui-grid js_grid">
-                <div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
-                <p class="weui-grid__label">第三方订单</p>
-            </a>                       
             <a href="${CPATH}/report/userRank" class="weui-grid js_grid">
                 <div class="weui-grid__icon"><i class="icon-bar-chart"></i></div>
                 <p class="weui-grid__label">销售排行</p>
@@ -132,6 +128,16 @@
 				</div>
 				<p class="weui-grid__label">BI报表</p>
 			</a>
+		</div>
+		</@shiro.hasPermission>
+		
+       	<@shiro.hasPermission name="/admin/salesOrder/otherOrder">
+		<div class="weui-cells__title">第三方订单</div>
+		<div class="weui-grids">
+            <a href="${CPATH}/report/otherOrder" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
+                <p class="weui-grid__label">第三方订单</p>
+            </a>
 		</div>
 		</@shiro.hasPermission>		
         
