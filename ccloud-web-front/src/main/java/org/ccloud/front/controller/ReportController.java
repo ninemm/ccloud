@@ -41,13 +41,14 @@ public class ReportController extends BaseFrontController {
 	public void index() {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataAraa = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		String startDate = date + " 00:00:00";
 		String endDate =  date + " 23:59:59";
 		List<SalesOrder> salesOrders = SalesOrderQuery.me().findAllByDataArea(selectDataArea,startDate,endDate);
 		setAttr("orderNum", salesOrders.size());
 		Page<Record> customerList = new Page<>();
-		customerList = SellerCustomerQuery.me().findByUserTypeForApp(1, Integer.MAX_VALUE, selectDataArea, "", "", "");
+		customerList = SellerCustomerQuery.me().findByUserTypeForApp(1, Integer.MAX_VALUE, selectDataArea, dealerDataAraa, "", "", "");
 		setAttr("customerNum", customerList.getTotalRow());
 		render("report.html");
 	}
