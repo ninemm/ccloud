@@ -180,11 +180,13 @@
 	}
 	
 	function syn() {
+		var index = layer.load(1, {shade: [0.4,'#000']});
 		$.ajax({
 			url:"${CPATH}/admin/activity/getMidData",
 			type:"post",
 			dataType:"json",
 			success:function(data) {
+				layer.closeAll();
 				if(data.errorCode == 0) {
 					toastr.success(data.message, '操作成功');
 					$table.bootstrapTable('refresh');
@@ -196,6 +198,7 @@
 	}
 	
 	function synBasic() {
+		var index = layer.load(1, {shade: [0.4,'#000']});
 		$.ajax({
 			url:"${CPATH}/admin/activity/getMidDataBasic",
 			type:"post",
@@ -207,6 +210,7 @@
 				"pageCount": $("#pageCount").val()
 			},
 			success:function(data) {
+				layer.closeAll();
 				if(data.errorCode == 0) {
 					toastr.success(data.message, '操作成功');
 					$table.bootstrapTable('refresh');
