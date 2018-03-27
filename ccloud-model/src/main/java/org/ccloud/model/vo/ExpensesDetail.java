@@ -22,8 +22,7 @@ public class ExpensesDetail {
 	private String item3;
 	private String item4;
 	
-	@SuppressWarnings("unused")
-	private void setItemInfo() {
+	public void setItemInfo() {
 		if (StrKit.notBlank(this.CommodityCode)) {
 			setItem2(this.CommodityCode);
 		} else {

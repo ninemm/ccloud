@@ -571,6 +571,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setCreateDate(new Date());
 				acList.add(activity);
 //				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
+				getExpenseDetailsList(dlist, qyExpense.getExpenseID(), activity.getId(), activity.getInvestType(), activity.getProcCode());
 			}
 		}
 		Db.batchSave(acList, acList.size());
@@ -602,9 +603,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
-	private List<ExpenseDetail> getExpenseDetailsList(String expenseId, String actId, String typeId, String flowNo) {
-		List<ExpenseDetail> expenseDetails = new ArrayList<>();
-		@SuppressWarnings("rawtypes")
+	private void getExpenseDetailsList(List<ExpenseDetail> dlist, String expenseId, String actId, String typeId, String flowNo) {
 		List<ExpensesDetail> expenseList = MidDataUtil.getExpenseDetail(expenseId, typeId);
 		for (ExpensesDetail expensesDetail : expenseList) {
 			ExpenseDetail expenseDetail = new ExpenseDetail();
@@ -624,17 +623,16 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			} else {
 				expenseDetail.setItem1(expensesDetail.getCostType());
 			}
-//			getItem(expenseDetail, expensesDetail, 5);
-//			expenseDetail.setCreateDate(expensesDetail.getCreateTime());
-//			expenseDetail.setModifyDate(expensesDetail.getModifyTime());
+			getItem(expenseDetail, expensesDetail, 5);
+//			expenseDetail.setCreateDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils));
+//			expenseDetail.setModifyDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils));
 			if (expensesDetail.getFlag().equals("0")) {
 				expenseDetail.setState(false);
 			} else {
 				expenseDetail.setState(true);
 			}
-			expenseDetails.add(expenseDetail);
+			dlist.add(expenseDetail);
 		}
-		return expenseDetails;
 	}
 	
 	@SuppressWarnings("unused")
@@ -668,16 +666,27 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return expenseDetails;
 	}
 	
-//	private void getItem(ExpenseDetail expenseDetail, ExpensesDetail qyExpensedetail, int num) {
-//		int j = 2;
-//		for (int i = 2; i < num; i++) {
-//			String item = "Item" + String.valueOf(i);
-//			if (StrKit.notBlank(qyExpensedetail.get(item).toString())) {
-//				expenseDetail.set("item" + String.valueOf(j), qyExpensedetail.get(item));
-//				j++;
-//			}
-//		}
-//	}
+	private void getItem(ExpenseDetail expenseDetail, ExpensesDetail qyExpensedetail, int num) {
+		qyExpensedetail.setItemInfo();
+		int j = 2;
+		for (int i = 2; i < num; i++) {
+			String otherItem = getItemString(qyExpensedetail,i);
+			if (StrKit.notBlank(otherItem)) {
+				expenseDetail.set("item" + String.valueOf(j), otherItem);
+				j++;
+			}
+		}
+	}
+	
+	private String getItemString(ExpensesDetail qyExpensedetail, int num) {
+		if (num == 2) {
+			return qyExpensedetail.getItem2();
+		} else if (num == 3) {
+			return qyExpensedetail.getItem3();
+		} else {
+			return qyExpensedetail.getItem4();
+		}
+	}
 
 	private String[] getAreaType(String data) {
 		String[] value = new String[2];
