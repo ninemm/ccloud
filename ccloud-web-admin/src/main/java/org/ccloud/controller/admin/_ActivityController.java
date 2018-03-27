@@ -613,19 +613,19 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			expenseDetail.setFlowTypeId(expensesDetail.getFlowTypeID());
 			String dict = findFlowDictType(typeId);
 			expenseDetail.setFlowDictType(dict);
+			String name = QyBasicfeetypeQuery.me().findNameById(expensesDetail.getCostType());
+			Dict code = DictQuery.me().findbyName(name);
 			if (dict.equals("feeType_name_display")) {
-				String name = QyBasicfeetypeQuery.me().findNameById(expensesDetail.getCostType());
-				Dict code = DictQuery.me().findbyName(name);
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
 			}
 			if (StrKit.notBlank(expensesDetail.getChannelID())) {
 				expenseDetail.setItem1(expensesDetail.getChannelID());
 			} else {
-				expenseDetail.setItem1(expensesDetail.getCostType());
+				expenseDetail.setItem1(code.getValue());
 			}
 			getItem(expenseDetail, expensesDetail, 5);
-//			expenseDetail.setCreateDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils));
-//			expenseDetail.setModifyDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils));
+			expenseDetail.setCreateDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
+			expenseDetail.setModifyDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
 			if (expensesDetail.getFlag().equals("0")) {
 				expenseDetail.setState(false);
 			} else {
