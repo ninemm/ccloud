@@ -274,4 +274,11 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 		return getStr("proc_inst_id");
 	}
 
+	public void setMidIdno(java.lang.Long midIdno) {
+		set("mid_idno", midIdno);
+	}
+
+	public java.lang.Long getMidIdno() {
+		return getLong("mid_idno");
+	}
 }
