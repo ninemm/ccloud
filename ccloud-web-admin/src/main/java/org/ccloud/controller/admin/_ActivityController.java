@@ -70,6 +70,7 @@ import org.ccloud.model.query.YxBasicchannelinfoQuery;
 import org.ccloud.model.query.YxBasicchanneltypeinfoQuery;
 import org.ccloud.model.vo.ExTemplate;
 import org.ccloud.model.vo.Expense;
+import org.ccloud.model.vo.ExpensesDetail;
 import org.ccloud.model.vo.ImageJson;
 
 import com.alibaba.fastjson.JSON;
@@ -571,7 +572,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setIsPublish(0);
 				activity.setCreateDate(new Date());
 				acList.add(activity);
-				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
+//				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
+				getExpenseDetailsList(dlist, qyExpense.getExpenseID(), activity.getId(), activity.getInvestType(), activity.getProcCode());
 			}
 		}
 		Db.batchSave(acList, acList.size());
@@ -603,6 +605,39 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
+	private void getExpenseDetailsList(List<ExpenseDetail> dlist, String expenseId, String actId, String typeId, String flowNo) {
+		List<ExpensesDetail> expenseList = MidDataUtil.getExpenseDetail(expenseId, typeId);
+		for (ExpensesDetail expensesDetail : expenseList) {
+			ExpenseDetail expenseDetail = new ExpenseDetail();
+			expenseDetail.setId(StrKit.getRandomUUID());
+			expenseDetail.setActivityId(actId);
+			expenseDetail.setFlowNo(flowNo);
+			expenseDetail.setFlowTypeId(expensesDetail.getFlowTypeID());
+			String dict = findFlowDictType(typeId);
+			expenseDetail.setFlowDictType(dict);
+			String name = QyBasicfeetypeQuery.me().findNameById(expensesDetail.getCostType());
+			Dict code = DictQuery.me().findbyName(name);
+			if (dict.equals("feeType_name_display")) {
+				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
+			}
+			if (StrKit.notBlank(expensesDetail.getChannelID())) {
+				expenseDetail.setItem1(expensesDetail.getChannelID());
+			} else {
+				expenseDetail.setItem1(code.getValue());
+			}
+			getItem(expenseDetail, expensesDetail, 5);
+			expenseDetail.setCreateDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
+			expenseDetail.setModifyDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
+			if (expensesDetail.getFlag().equals("0")) {
+				expenseDetail.setState(false);
+			} else {
+				expenseDetail.setState(true);
+			}
+			dlist.add(expenseDetail);
+		}
+	}
+	
+	@SuppressWarnings("unused")
 	private List<ExpenseDetail> getExpenseDetailList(String expenseId, String actId, String typeId) {
 		List<ExpenseDetail> expenseDetails = new ArrayList<>();
 		List<QyExpensedetail> midDatas = QyExpensedetailQuery.me().findByActivityId(expenseId);
@@ -620,7 +655,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
 			}
 			expenseDetail.setItem1(qyExpensedetail.getItem1());
-			getItem(expenseDetail, qyExpensedetail, 5);
+//			getItem(expenseDetail, qyExpensedetail, 5);
 			expenseDetail.setCreateDate(qyExpensedetail.getCreateTime());
 			expenseDetail.setModifyDate(qyExpensedetail.getModifyTime());
 			if (qyExpensedetail.getFlag() == 0) {
@@ -633,14 +668,25 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return expenseDetails;
 	}
 	
-	private void getItem(ExpenseDetail expenseDetail, QyExpensedetail qyExpensedetail, int num) {
+	private void getItem(ExpenseDetail expenseDetail, ExpensesDetail qyExpensedetail, int num) {
+		qyExpensedetail.setItemInfo();
 		int j = 2;
 		for (int i = 2; i < num; i++) {
-			String item = "Item" + String.valueOf(i);
-			if (StrKit.notBlank(qyExpensedetail.get(item).toString())) {
-				expenseDetail.set("item" + String.valueOf(j), qyExpensedetail.get(item));
+			String otherItem = getItemString(qyExpensedetail,i);
+			if (StrKit.notBlank(otherItem)) {
+				expenseDetail.set("item" + String.valueOf(j), otherItem);
 				j++;
 			}
+		}
+	}
+	
+	private String getItemString(ExpensesDetail qyExpensedetail, int num) {
+		if (num == 2) {
+			return qyExpensedetail.getItem2();
+		} else if (num == 3) {
+			return qyExpensedetail.getItem3();
+		} else {
+			return qyExpensedetail.getItem4();
 		}
 	}
 

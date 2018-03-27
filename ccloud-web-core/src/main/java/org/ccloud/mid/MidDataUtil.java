@@ -21,15 +21,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ccloud.model.ExpenseDetail;
+import org.ccloud.Consts;
 import org.ccloud.model.QyBasicfeetype;
 import org.ccloud.model.QyBasicflowtype;
 import org.ccloud.model.QyBasicshowtype;
-import org.ccloud.model.QyExpense;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.YxBasicchannelinfo;
 import org.ccloud.model.YxBasicchanneltypeinfo;
 import org.ccloud.model.vo.Expense;
+import org.ccloud.model.vo.ExpensesDetail;
 import org.ccloud.model.vo.Mid_ActivityInfo;
 import org.ccloud.utils.HttpUtils;
 
@@ -182,19 +182,37 @@ public class MidDataUtil {
 		return list;
 	}
 	
-	public static List<ExpenseDetail> getExpenseDetail(String expenseID, String type) {
-        List<ExpenseDetail> list = new ArrayList<>();
+	public static List<ExpensesDetail> getExpenseDetail(String expenseID, String type) {
+        List<ExpensesDetail> list = new ArrayList<>();
         Map<String, String> map = new HashMap<>();
         map.put("strExpenseID", expenseID);
 		try {
 			String result = HttpUtils.get(GET_JINGPAI_EXPENSESDETAIL, map);
-//			String response = getResponseType(type);
-			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("Expenses");
-			list = jsonArray.toJavaList(ExpenseDetail.class);
+			String response = getResponseType(type);
+			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray(response);
+			list = jsonArray.toJavaList(ExpensesDetail.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	private static String getResponseType(String type) {
+		if (type.equals(Consts.INVES_PUBLICK)) {
+			return "ExpenseDetail_BrandActivity";
+		} else if (type.equals(Consts.INVEST_CONSUMPTION_CULTIVATION)) { 
+			return "ExpenseDetail_ProductTasting";
+		} else if (type.equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)) {
+			return "ExpenseDetail_Ad";
+		} else if (type.equals(Consts.INVEST_TERMINSL_DISPLAY)) {
+			return "ExpenseDetail_ShopShow";
+		} else if (type.equals(Consts.INVEST_CUSTOMER_VISITE)) {
+			return "ExpenseDetail_NewStores";
+		} else if (type.equals(Consts.INVEST_SUPERMARKET_GIFT)) {
+			return "ExpenseDetail_MarketGift";
+		} else {
+			return "ExpenseDetail_Entry";
+		}
 	}
 
 }
