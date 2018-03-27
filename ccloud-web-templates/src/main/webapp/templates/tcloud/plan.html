@@ -14,7 +14,7 @@
 <#macro script_import>
 </#macro>
 <#macro script>
-
+var flang = true;
 $(function() {
 	$(".startDate").append('开始时间'+' <span class="require">*</span>');
 	$("#datetime-picker").datetimePicker({
@@ -185,6 +185,21 @@ function addProduct(){
 			title: "选择产品",
 			items: productInfoMap,
 			onChange: function(obj){
+				var startDate = $("#start-date").val();
+				var endDate = $("#end-date").val();
+				$.ajax({
+					url:"${CPATH}/plans/checkProduct",
+					type:"post",
+					dataType:"json",
+					data:{"sellerProductId":this.data['values'],"startDate":startDate,"endDate":endDate},
+					success:function(data)
+					{
+						if(data == false){
+							$.toptip("该月份产品计划已经存在");
+							flang = false;
+						}
+					}
+				});
 				var $product = $(this)[0].$input.parents(".productInfo");
 				$product.find("#productId").val(this.data['values']);
 			}
@@ -192,6 +207,11 @@ function addProduct(){
 }
 
 function doSubmit(){
+	if(flang == false){
+		$.toptip("该月份产品计划已经存在");
+		return;
+	}
+							
 	$("#form").ajaxSubmit({
 			beforeSubmit: function() {
 				return true
@@ -216,7 +236,7 @@ function doSubmit(){
 			},
 			error : function() {
 				layer.closeAll();
-				alert("信息提交错误");
+				$.toptip("信息提交错误");
 			}
 		});
 }

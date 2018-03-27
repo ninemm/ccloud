@@ -170,4 +170,8 @@ public class PlansQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}
 	
+	public Plans findbySSEU(String sellerProductId,String startDate,String endDate,String userId) {
+		return DAO.doFindFirst("seller_product_id = ? and start_date = ? and end_date = ? and user_id = ?", sellerProductId,startDate,endDate,userId);
+	}
+	
 }

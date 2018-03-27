@@ -156,4 +156,49 @@ public class PlansController extends BaseFrontController {
 		renderJson(list);
 	}
 
+	public void checkProduct() {
+		String sellerProductId = getPara("sellerProductId");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Plans plans = PlansQuery.me().findbySSEU(sellerProductId,startDate,endDate,user.getId());
+		if(plans!=null) {
+			renderJson(false);
+		}else {
+			renderJson(true);
+		}
+	}
+	
+	public void mPlans() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+
+		List<Map<String, Object>> userIds = new ArrayList<>();
+		userIds.add(all);
+
+		List<Map<String, Object>> sellerProducts = new ArrayList<>();
+		sellerProducts.add(all);
+		
+		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
+		for (Record record : userList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.get("realname"));
+			item.put("value", record.get("id"));
+			userIds.add(item);
+		}
+		
+		List<Plans> plans = PlansQuery.me().findbyDateArea(selectDataArea);
+		for(Plans plan : plans) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", plan.get("custom_name"));
+			item.put("value", plan.getSellerProductId());
+			sellerProducts.add(item);
+		}
+
+		setAttr("userIds", JSON.toJSON(userIds));
+		setAttr("sellerProducts", JSON.toJSON(sellerProducts));
+		render("my_plan_list.html");
+	}
 }
