@@ -77,7 +77,7 @@ public class OrderController extends BaseFrontController {
 
 		List<Map<String, Object>> bizUsers = new ArrayList<>();
 		bizUsers.add(all);
-		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerId(sellerId,dataArea);
+		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerIdAndDataArea(sellerId,dataArea);
 		for (SalesOrder order : orders) {
 			Map<String, Object> items = new HashMap<>();
 			items.put("title", order.getStr("realname"));
@@ -104,7 +104,7 @@ public class OrderController extends BaseFrontController {
 		String endDate = getPara("endDate");
 		String bizUserId = getPara("bizUserId");
 
-		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
+		Page<Record> orderList = SalesOrderQuery.me()._paginateForApp(getPageNumber(), getPageSize(), keyword, status,
 				customerTypeId, startDate, endDate, sellerId, selectDataArea,bizUserId);
 		Record record = SalesOrderQuery.me()
 				.getOrderListCount(keyword, status, customerTypeId, startDate, endDate, sellerId, selectDataArea);
