@@ -67,7 +67,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String sort,String sortOrder, String customerType) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String sort,String sortOrder, String customerType) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -83,7 +83,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" FROM cc_seller_customer c1 ");
 		fromBuilder.append(" LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
 		fromBuilder.append(" LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
-		appendIfNotEmptyWithLike(fromBuilder, "c1.data_area", dataArea, params, true);
+		appendIfNotEmptyWithLike(fromBuilder, "c1.data_area", dealerDataArea, params, true);
 		fromBuilder.append(" GROUP BY c1.id) t1 ON sc.id = t1.id ");
 
 		fromBuilder.append(" JOIN (SELECT c2.id, GROUP_CONCAT(u.realname) AS realnames ");
