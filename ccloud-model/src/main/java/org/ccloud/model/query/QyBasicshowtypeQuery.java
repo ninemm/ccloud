@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+
 import org.ccloud.model.QyBasicshowtype;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -69,6 +70,15 @@ public class QyBasicshowtypeQuery extends JBaseQuery {
 
 	public void deleteAll() {
 		DAO.doDelete("ShowTypeID is not null");
+	}
+
+	public String findNameById(String id) {
+		QyBasicshowtype showtype = DAO.doFindFirst("ShowTypeID = ?", id);
+		if (showtype != null) {
+			return showtype.getShowTypeName();
+		} else {
+			return null;
+		}
 	}
 
 	

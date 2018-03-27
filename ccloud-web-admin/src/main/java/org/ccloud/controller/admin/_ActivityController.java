@@ -575,7 +575,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			}
 		}
 		Db.batchSave(acList, acList.size());
-		Db.batchSave(dlist, dlist.size());
+		for (ExpenseDetail expenseDetail : dlist) {
+			expenseDetail.save();
+		}
+//		Db.batchSave(dlist, dlist.size());
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
@@ -615,15 +618,18 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			expenseDetail.setFlowDictType(dict);
 			String name = QyBasicfeetypeQuery.me().findNameById(expensesDetail.getCostType());
 			Dict code = DictQuery.me().findbyName(name);
+			getItem(expenseDetail, expensesDetail, 5);
 			if (dict.equals("feeType_name_display")) {
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
+				String item2Value = QyBasicshowtypeQuery.me().findNameById(expenseDetail.getItem2());
+				Dict displayCode = DictQuery.me().findbyName(item2Value);
+				expenseDetail.setItem2(displayCode.getValue());
 			}
 			if (StrKit.notBlank(expensesDetail.getChannelID())) {
 				expenseDetail.setItem1(expensesDetail.getChannelID());
 			} else {
 				expenseDetail.setItem1(code.getValue());
-			}
-			getItem(expenseDetail, expensesDetail, 5);
+			}			
 			expenseDetail.setCreateDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
 			expenseDetail.setModifyDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
 			if (expensesDetail.getFlag().equals("0")) {

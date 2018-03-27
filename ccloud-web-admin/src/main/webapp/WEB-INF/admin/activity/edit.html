@@ -236,7 +236,7 @@
 			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th>');
 			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');		
 		} else if (choose == 101105) {
-			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th>');
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th>');
 			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');
 			$(".needs").select2();
 			$(".product").select2({
@@ -318,26 +318,26 @@
 	function showType(el){
 		var typeCode = $(el).val();
 		if (typeCode == 102032) {
-			$(el).parent().parent().find("td:eq(1)").find("select").empty();
-			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_publish', 'select')}');
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_publish', 'select')}');
 		} else if(typeCode == 102033) {
-			$(el).parent().parent().find("td:eq(1)").find("select").empty();
-			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_shop', 'select')}');
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_shop', 'select')}');
 		} else if(typeCode == 102034) {
-			$(el).parent().parent().find("td:eq(1)").find("select").empty();
-			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_retail', 'select')}');
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_retail', 'select')}');
 		} else if(typeCode == 102035) {
-			$(el).parent().parent().find("td:eq(1)").find("select").empty();
-			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_sell', 'select')}');
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_sell', 'select')}');
 		} else if(typeCode == 102036) {
-			$(el).parent().parent().find("td:eq(1)").find("select").empty();
-			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_catering', 'select')}');
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_catering', 'select')}');
 		} else if(typeCode == 102037) {
-			$(el).parent().parent().find("td:eq(1)").find("select").empty();
-			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_dm', 'select')}');
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_dm', 'select')}');
 		} else {
-			$(el).parent().parent().find("td:eq(1)").find("select").empty();
-			$(el).parent().parent().find("td:eq(1)").find("select").append('${DICT_BOX('display_CER', 'select')}');
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_CER', 'select')}');
 		}
 	}
 	
@@ -760,7 +760,7 @@
 														</td>
 														<td>
 															<input type="hidden" name="expenseIds[]" value="${list.id}">
-															<select class="form-control input-sm needs" name="item1[]">
+															<select class="form-control input-sm needs" name="item1[]" <#if list.flowDictType == 'feeType_name_display'>onChange="showType(this)"</#if>>
 																${DICT_BOX('${list.flowDictType}', 'select', '${list.item1}')}
 															</select>
 														</td>
