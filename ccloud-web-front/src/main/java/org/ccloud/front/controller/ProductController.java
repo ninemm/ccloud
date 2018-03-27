@@ -240,8 +240,9 @@ public class ProductController extends BaseFrontController {
 			customerKind = Consts.CUSTOMER_KIND_SELLER;
 		}
 
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				selectDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
+				selectDataArea, dealerDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());

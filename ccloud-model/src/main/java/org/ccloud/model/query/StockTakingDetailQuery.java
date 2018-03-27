@@ -110,7 +110,7 @@ public class StockTakingDetailQuery extends JBaseQuery {
 
 
 	public List<Map<String, Object>> findByStockTakingDetailId1(String id) {
-		StringBuilder fromBuilder = new StringBuilder("select convert_relate , product_id , seller_product_id , remark , csp.price , product_count , product_count , product_amount ");
+		StringBuilder fromBuilder = new StringBuilder("select convert_relate , product_id , seller_product_id , remark , csp.price , product_count  , product_amount ");
 		fromBuilder.append(" FROM cc_stock_taking_detail cstd");
 		fromBuilder.append(" LEFT JOIN cc_seller_product csp ON cstd.seller_product_id = csp.id");
 		fromBuilder.append(" LEFT JOIN cc_product cp ON cp.id = csp.product_id");
