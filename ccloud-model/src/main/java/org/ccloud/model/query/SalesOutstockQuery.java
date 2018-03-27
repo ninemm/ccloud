@@ -617,7 +617,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 				String childFileName = DateUtils.dateString();
 				PathKit.getWebRootPath();
 				String imagePath = PathKit.getWebRootPath() + "/";
-				String newStr = imagePath.substring(0, imagePath.length()-6) + "admin/" + Consts.ORDER_QRCODE_PATH + childFileName ;
+				String newStr = imagePath + Consts.ORDER_QRCODE_PATH + childFileName ;
 
 				String orcodeImgUrl = Consts.ORDER_QRCODE_PATH + childFileName +"/" +  orcodeFileName;
 				stringBuilder.append(order.getStr("customer_id")).append("||" + orderSn).append("||" + order.getStr("contact") + "||");					
