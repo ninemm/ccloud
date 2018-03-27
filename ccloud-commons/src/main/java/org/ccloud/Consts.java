@@ -280,6 +280,7 @@ public class Consts {
 	public static final String FLOW_DICT_TYPE_NAME_DISPLAY = "feeType_name_display";//终端陈列
 	public static final String FLOW_DICT_TYPE_NAME_AD = "feeType_name_AD";//终端广告
 	public static final String FLOW_DICT_TYPE_NAME_CHANNEL = "channel_define";//终端客情
+	public static final String CUSTOMER_IDNO="customer_idno";//终端ID
 	
 	//客户拜访状态
 	public static final String CUSTOMER_VISIT_STATUS_PASS = "100101"; //正常
