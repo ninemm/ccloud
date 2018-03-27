@@ -170,21 +170,15 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 		    public boolean run() throws SQLException {
 				String warehouse_id=getPara("id");
 				String userIds = getPara("userIds");
-				String user_id = WarehouseQuery.me().findWarehouseIdByUserId(warehouse_id);
 				int i=UserJoinWarehouseQuery.me().deleteWarehouseId(warehouse_id);
 				if (i==0) {
 					renderAjaxResultForError("删除失败");
-					return false;  
+					return false;
 				}
 				UserJoinWarehouse userJoinWarehouse=new UserJoinWarehouse();
-				userJoinWarehouse.setUserId(user_id);
 				userJoinWarehouse.setWarehouseId(warehouse_id);
-				userJoinWarehouse.save();
 				String[] userIdArray = userIds.split(",");
 				for (String userId : userIdArray) {
-					if (userId.equals(user_id)) {
-						continue;
-					}
 					userJoinWarehouse.setUserId(userId);
 					boolean save = userJoinWarehouse.save();
 					if (!save) {

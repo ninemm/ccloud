@@ -37,7 +37,6 @@ import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.StockTakingDetailQuery;
 import org.ccloud.model.query.StockTakingQuery;
 import org.ccloud.model.vo.OutDetailExcel;
-import org.ccloud.model.vo.SalesOrderExcel;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -47,7 +46,6 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
-import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 
 /**
