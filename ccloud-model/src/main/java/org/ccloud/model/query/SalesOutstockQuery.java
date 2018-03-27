@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.Consts;
+import org.ccloud.model.Customer;
 import org.ccloud.model.Product;
 import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerProduct;
@@ -139,8 +140,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 				}
 				
 				//生成出库单时候生成二维码
-				generateQrcode(orderId,order,orderDetailList, sellerCode);
-
+				if (Consts.QRDEALERCODE.contains(sellerCode)) {
+					generateQrcode(orderId,order,orderDetailList, sellerCode);
+				}
 				SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, userId, date);// 已审核通过
 
 				return true;
@@ -617,10 +619,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 				String childFileName = DateUtils.dateString();
 				PathKit.getWebRootPath();
 				String imagePath = PathKit.getWebRootPath() + "/";
-				String newStr = imagePath.substring(0, imagePath.length()-6) + "admin/" + Consts.ORDER_QRCODE_PATH + childFileName ;
+				String newStr = imagePath + Consts.ORDER_QRCODE_PATH + childFileName ;
 
 				String orcodeImgUrl = Consts.ORDER_QRCODE_PATH + childFileName +"/" +  orcodeFileName;
-				stringBuilder.append(order.getStr("customer_id")).append("||" + orderSn).append("||" + order.getStr("contact") + "||");					
+				Customer customer = CustomerQuery.me().findSellerCustomerId(order.getStr("customer_id"));
+				stringBuilder.append(order.getStr("customer_id")).append("||" + orderSn).append("||" + customer.getCustomerName() + "||");					
 
 				
                for (Record orderDetail : orderDetailList) {
@@ -631,14 +634,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 				}
                QRcontent = stringBuilder.toString().substring(0, stringBuilder.length() -1);
 				Date date = new Date();
-				if (Consts.QRDEALERCODE.contains(sellerCode)) {
 					org.ccloud.utils.QRCodeUtils.genQRCode(QRcontent, newStr, orcodeFileName);
 	           		int i = SalesOrderQuery.me().updateQrcodeImgUrl(orcodeImgUrl, orderId, date);
 	           		if (i < 0) {
 						return false;
 					}
-				}
-				
 				return true;
 			}
 		});

@@ -148,7 +148,7 @@
 				productChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 				var height = data.length;
-				$("#productCount").height(50 * height + 100);
+				$("#productCount").height(50 * height + 300);
 	            var productOption = {
 	                tooltip : {
 	                    trigger: 'axis'
@@ -225,12 +225,17 @@
     	salesIndentChart.showLoading();    
 		Utils.ajax('${CPATH}/report/getUserRank', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#userCount").height(300);
+		        } else {
+		        	$("#userCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];
 		        var seriesData = [];
 	            var length = data.length;
-            	$("#userCount").height(300);
 		        for (var i = 0; i < data.length; i++) {
 		           yData.push(data[i].realname);
 		           if (orderTag == 'productCount') {

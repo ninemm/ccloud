@@ -82,7 +82,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType);
 		List<Record> customerList = page.getList();
@@ -400,7 +400,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
 				+ "customerInfo.xls";
 
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
 		List<Record> customerList = page.getList();
 

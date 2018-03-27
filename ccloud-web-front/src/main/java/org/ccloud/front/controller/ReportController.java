@@ -31,7 +31,6 @@ import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 
 import com.alibaba.fastjson.JSON;
-import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -41,13 +40,14 @@ public class ReportController extends BaseFrontController {
 	public void index() {
 		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataAraa = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		String startDate = date + " 00:00:00";
 		String endDate =  date + " 23:59:59";
 		List<SalesOrder> salesOrders = SalesOrderQuery.me().findAllByDataArea(selectDataArea,startDate,endDate);
 		setAttr("orderNum", salesOrders.size());
 		Page<Record> customerList = new Page<>();
-		customerList = SellerCustomerQuery.me().findByUserTypeForApp(1, Integer.MAX_VALUE, selectDataArea, "", "", "");
+		customerList = SellerCustomerQuery.me().findByUserTypeForApp(1, Integer.MAX_VALUE, selectDataArea, dealerDataAraa, "", "", "");
 		setAttr("customerNum", customerList.getTotalRow());
 		render("report.html");
 	}
@@ -522,21 +522,23 @@ public class ReportController extends BaseFrontController {
 	
 	//第三方订单金额统计
 	public void getOtherOrderCount() {
+		String platformTag = getPara("platformTag");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
 		String sellerId = getSessionAttr("sellerId");
-		Record record = OrderInfoQuery.me().getCountInfo(null, startDate, endDate, null, null, null, dayTag, sellerId);
+		Record record = OrderInfoQuery.me().getCountInfo(null, startDate, endDate, platformTag, null, null, dayTag, sellerId);
 		renderJson(record);
 	}
 	
 	//第三方产品单统计
 	public void getOtherProductCount() {
+		String platformTag = getPara("platformTag");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
 		String sellerId = getSessionAttr("sellerId");
-		List<Record> record = OrderDetailInfoQuery.me().getOtherProductCount(startDate, endDate, sellerId, dayTag);
+		List<Record> record = OrderDetailInfoQuery.me().getOtherProductCount(startDate, endDate, sellerId, dayTag, platformTag);
 		renderJson(record);		
 	}
 	
