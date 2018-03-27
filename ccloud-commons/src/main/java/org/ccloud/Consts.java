@@ -282,7 +282,9 @@ public class Consts {
 	public static final String WEEK_PLAN = "101201";//周计划
 	public static final String MONTH_PLAN = "101202";//月计划
 	public static final String YEAR_PLAN = "101203";//年计划
-	
+	//计划的显示方式
+	public static final String PLAN_SHOW_BIZUSER = "101204"; // 按业务员方式显示
+	public static final String PLAN_SHOW_SELLER_PRODUCT = "101205"; // 按产品方式显示
 	
 	public static final String WAREHOUSE_IDS_IS_NULL = "1";//当用户没有分配仓库时且不是经管时返回空值的仓库ID
 	

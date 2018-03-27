@@ -92,6 +92,9 @@ public class PlansController extends BaseFrontController {
 		List<Map<String, Object>> userIds = new ArrayList<>();
 		userIds.add(all);
 
+		List<Map<String, Object>> sellerProducts = new ArrayList<>();
+		sellerProducts.add(all);
+		
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		for (Record record : userList) {
 			Map<String, Object> item = new HashMap<>();
@@ -99,8 +102,17 @@ public class PlansController extends BaseFrontController {
 			item.put("value", record.get("id"));
 			userIds.add(item);
 		}
+		
+		List<Plans> plans = PlansQuery.me().findbyDateArea(selectDataArea);
+		for(Plans plan : plans) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", plan.get("custom_name"));
+			item.put("value", plan.getSellerProductId());
+			sellerProducts.add(item);
+		}
 
 		setAttr("userIds", JSON.toJSON(userIds));
+		setAttr("sellerProducts", JSON.toJSON(sellerProducts));
 		render("plan_list.html");
 	}
 
@@ -114,8 +126,9 @@ public class PlansController extends BaseFrontController {
 		String type = getPara("type");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-
-		Page<Record> planList = PlansQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, userId, type, startDate, endDate, sellerId, selectDataArea);
+		String showType = getPara("show");
+		String sellerProductId = getPara("sellerProductId");
+		Page<Record> planList = PlansQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, userId, type, startDate, endDate, sellerId, selectDataArea,showType,sellerProductId);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("planList", planList.getList());
@@ -124,12 +137,22 @@ public class PlansController extends BaseFrontController {
 	}
 	
 	public void getPlans() {
-		String userName = getPara("username");
+		String userId = getPara("userId");
 		String typeName = getPara("typeName");
 		String startDate = getPara("startDate").substring(5);
 		String endDate = getPara("endDate").substring(5);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		List<Plans> list = PlansQuery.me().findbyUserNameAndTypeNameAndStartDateAndEndDate(userName,typeName,startDate,endDate,sellerId);
+		List<Plans> list = PlansQuery.me().findbyUserNameAndTypeNameAndStartDateAndEndDate(userId,typeName,startDate,endDate,sellerId);
+		renderJson(list);
+	}
+	
+	public void getSellerProductPlans() {
+		String sellerProductId = getPara("sellerProductId");
+		String typeName = getPara("typeName");
+		String startDate = getPara("startDate").substring(5);
+		String endDate = getPara("endDate").substring(5);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<Plans> list = PlansQuery.me().findbySTSE(sellerProductId,typeName,startDate,endDate,sellerId);
 		renderJson(list);
 	}
 
