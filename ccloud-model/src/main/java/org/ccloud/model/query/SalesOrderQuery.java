@@ -80,18 +80,25 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
 		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
 		if (StrKit.notBlank(activityId)) {
 			fromBuilder.append("LEFT JOIN (SELECT cs.order_id,ca.title, pc.activity_id FROM cc_sales_order_detail cs ");
 			fromBuilder.append("LEFT JOIN cc_product_composition pc ON cs.composite_id = pc.id ");
 			fromBuilder.append("LEFT JOIN cc_activity ca ON ca.id = pc.activity_id ");
 			fromBuilder.append("GROUP BY cs.order_id) t1 on t1.order_id = o.id ");
+
+			fromBuilder.append("LEFT JOIN (SELECT so.id, caa.activity_id FROM cc_sales_order so ");
+			fromBuilder.append("LEFT JOIN cc_activity_apply caa ON so.activity_apply_id = caa.id ");
+			fromBuilder.append(") t2 on t2.id = o.id ");
 		}
-		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "t1.activity_id", activityId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(activityId)) {
+			fromBuilder.append(" and (t1.activity_id = '" + activityId + "' or t2.activity_id = '" + activityId + "')");
 		}
 
 		if (StrKit.notBlank(startDate)) {
