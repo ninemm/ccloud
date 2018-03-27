@@ -26,10 +26,12 @@
   		<#if history??>
   			var statusName = getItemBykey("statusName");
   			var customerTypeName = getItemBykey("customerTypeName");
+  			var bizUserName = getItemBykey("bizUserName");
   			var dayName = getItemBykey("dayName");
   			var keywordName = getItemBykey("keyword");
   			$("#status").val(statusName);
   			$("#customerTypeId").val(customerTypeName);
+  			$("#bizUserId").val(bizUserName);
   			$("#date").val(dayName);
   			$("#searchInput").val(keywordName);
   		<#else>
@@ -69,6 +71,10 @@
 		}).on("change", "#customerTypeId", function() {
 			setItemBykey("customerTypeId", $("#customerTypeId").data('values'));
 			setItemBykey("customerTypeName", $("#customerTypeId").val());		
+			combo();
+		}).on("change", "#bizUserId", function() {
+			setItemBykey("bizUserId", $("#bizUserId").data('values'));
+			setItemBykey("bizUserName", $("#bizUserId").val());		
 			combo();
 		}).on("change", "#date", function() {
 			getDateOrder();
@@ -135,8 +141,12 @@
 		});
 	
 		$("#customerTypeId").select({
-		  title: "择客户类型",
+		  title: "选择客户类型",
 		  items: ${customerTypes!}
+		});
+		$("#bizUserId").select({
+		  title: "选择业务员",
+		  items: ${bizUsers!}
 		});
 		$('#date').select({
 			title: '选择时间',
@@ -259,6 +269,7 @@
 			"keyword": $("#searchInput").val(),
 			"status": $("#status").data('values'),
 			"customerTypeId": $("#customerTypeId").data('values'),
+			"bizUserId": $("#bizUserId").data('values'),
 			"startDate": startDate,
 			"endDate" : endDate
 		}
@@ -268,12 +279,14 @@
 		var customerTypeIdSession = getItemBykey("customerTypeId");
 		var startDateSession = getItemBykey("startDate");
 		var endDateSession = getItemBykey("endDate");
+		var bizUserSession = getItemBykey("bizUserId");
 		var params = {
 			"page": page,
 			"size": size,
 			"keyword": keywordSession,
 			"status": statusSession,
 			"customerTypeId": customerTypeIdSession,
+			"bizUserId":bizUserSession,
 			"startDate": startDateSession,
 			"endDate" : endDateSession
 		}		
@@ -463,7 +476,7 @@
 				</div>
 				<label class="weui-search-bar__label" id="searchText">
 					<i class="weui-icon-search"></i>
-					<span>请输入客户名或订单号</span>
+					<span>客户名或订单号或业务员</span>
 				</label>
 			</form>
 			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
@@ -480,6 +493,10 @@
 					</div>
 					<div class="weui-flex__item">
 						<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="bizUserId" placeholder="业务员" class="weui-input" readonly>
 						<i class="icon-sort-desc"></i>
 					</div>
 					<div class="weui-flex__item">

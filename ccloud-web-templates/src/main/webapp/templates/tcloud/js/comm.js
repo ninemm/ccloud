@@ -311,6 +311,189 @@ function wxLocation() {
     return df.promise();;
 }
 
+function initWxConfig(appId, timestamp, nonceStr, signature) {
+    wx.config({
+        debug: false,
+        appId: appId,
+        timestamp: timestamp,
+        nonceStr: nonceStr,
+        signature: signature,
+        jsApiList: [
+            'checkJsApi',
+            'getLocation',
+            'chooseImage',
+            'uploadImage',
+            'downloadImage'
+        ]
+    });
+}
+
+function wxReadyGetLocation(callback) {
+    wx.ready(function() {
+        wxGetLocation(callback);
+    });
+}
+
+function wxGetLocation(callback) {
+    wx.getLocation({
+        type: 'wgs84',
+        success: function (res) {
+            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+            var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+            var speed = res.speed;                            // 速度，以米/每秒计
+            var accuracy = res.accuracy;                      // 位置精度
+
+            var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+            var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+
+            translateCallback = function (point) {            // 回调函数
+                var lng = parseFloat(point.lng);
+                var lat = parseFloat(point.lat);
+                geoc.getLocation(point, function(rs) {
+                    var addComp = rs.addressComponents;
+                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+
+                    callback(lng, lat, addComp, address);
+
+                });
+            };
+            setTimeout(function() {
+                BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+            }, 100);
+        },
+        cancel: function (res) {
+            console.log('用户拒绝授权获取地理位置');
+        },
+        fail: function (res) {
+            console.log(JSON.stringify(res));
+        }
+    });
+}
+
+function uploadImages($uploadInput, $uploaderFiles, $picNum, callback) {
+    var imageArr = [];
+    $uploadInput.on("change", function () {
+
+        var files = this.files;
+        var arrNum = imageArr.length;
+        var num = arrNum + files.length;
+
+        if ($uploaderFiles[0].children.length + 1 > num) {
+            $.alert("最多上传2张图片");
+            return false;
+        }
+
+        $picNum.text($uploaderFiles[0].children.length + 1 + '/' + num);
+
+        for (var i = 0; i < files.length; i ++) {
+            var file = files[i];
+            //console.log(file.type)
+            if (!/image\/\w+/.test(file.type)) {
+                $.alert("请确保文件为图像类型");
+                return false;
+            }
+
+            EXIF.getData(file, function() {
+                EXIF.getAllTags(this);
+                Orientation = EXIF.getTag(this, 'Orientation');
+            });
+
+            var reader = new FileReader();
+            (function(x) {
+                reader.onload = function(e) {
+                    var image = new Image();
+                    image.src = e.target.result;
+                    image.onload = function() {
+                        var canvas = document.createElement("canvas");
+                        var ctx = canvas.getContext("2d");
+                        if(Orientation != "" && Orientation != 1){
+                            switch(Orientation){
+                                case 6://需要顺时针（向左）90度旋转
+                                    rotateImg(this,'left',canvas, canvas.width, canvas.height);
+                                    break;
+                                case 8://需要逆时针（向右）90度旋转
+                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);
+                                    break;
+                                case 3://需要180度旋转
+                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);//转两次
+                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);
+                                    break;
+                            }
+                        }
+                        var expectWidth = this.naturalWidth;
+                        var expectHeight = this.naturalHeight;
+
+                        if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 480) {
+                            expectWidth = 480;
+                            expectHeight = expectWidth * this.naturalHeight / this.naturalWidth;
+                        } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 640) {
+                            expectHeight = 640;
+                            expectWidth = expectHeight * this.naturalWidth / this.naturalHeight;
+                        }
+
+                        canvas.width = expectWidth;
+                        canvas.height = expectHeight;
+                        ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+
+                        var blob = canvas.toDataURL("image/jpeg", 0.9);
+                        imageArr.push({"pic":blob, "pic_name":x});
+                        callback(blob, x, imageArr);
+                    };
+                };
+            })(file.name)
+            reader.readAsDataURL(file);
+        }
+    });
+}
+function rotateImg(img, direction,canvas, width, height) {
+    //最小与最大旋转方向，图片旋转4次后回到原方向
+    var min_step = 0;
+    var max_step = 3;
+    if (img == null) return;
+
+    var step = 2;
+    if (step == null) {
+        step = min_step;
+    }
+    if (direction == 'right') {
+        step++;
+        //旋转到原位置，即超过最大值
+        step > max_step && (step = min_step);
+    } else {
+        step--;
+        step < min_step && (step = max_step);
+    }
+    //旋转角度以弧度值为参数
+    var degree = step * 90 * Math.PI / 180;
+    var ctx = canvas.getContext('2d');
+    switch (step) {
+        case 0:
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            break;
+        case 1:
+            canvas.width = height;
+            canvas.height = width;
+            ctx.rotate(degree);
+            ctx.drawImage(img, 0, -height, canvas.width, canvas.height);
+            break;
+        case 2:
+            canvas.width = width;
+            canvas.height = height;
+            ctx.rotate(degree);
+            ctx.drawImage(img, -width, -height, canvas.width, canvas.height);
+            break;
+        case 3:
+            canvas.width = height;
+            canvas.height = width;
+            ctx.rotate(degree);
+            ctx.drawImage(img, -width, 0, canvas.width, canvas.height);
+            break;
+    }
+}
+
+
 $(function() {
 	FastClick.attach(document.body);
 	$(document).on("click", "#button", function() {

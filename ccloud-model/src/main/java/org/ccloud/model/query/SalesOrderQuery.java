@@ -89,7 +89,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "t1.activity_id", activityId, params, needWhere);
 
 		if (needWhere) {
@@ -106,6 +105,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
+		if(!sellerId.equals("")) {
+			fromBuilder.append(" and o.seller_id = '"+sellerId+"' ");
+		}
 		fromBuilder.append(" and ( o.order_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) order by o.create_date desc");
 
 		if (params.isEmpty())
@@ -115,7 +117,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String status,
-			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea) {
+			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea,String bizUserId) {
 		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee,s.is_print, mso.member_id ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
 		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
@@ -124,6 +126,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
 		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
+		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
 		fromBuilder.append("LEFT JOIN cc_member_sales_order mso on mso.order_id = o.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -133,13 +136,14 @@ public class SalesOrderQuery extends JBaseQuery {
 //		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.biz_user_id", bizUserId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
 		
 		if (StrKit.notBlank(keyword)) {
-			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
+			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%' or u.realname like '%" + keyword + "%')");
 		}
 
 		if (StrKit.notBlank(startDate)) {
@@ -915,22 +919,23 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	//统计业务员当日 当月 销售额排行(前5)
-	public List<Record> querysalesManAmountBy(String selDataArea,String by,String desc){
-		StringBuilder fromBuilder = new StringBuilder("SELECT cso.biz_user_id , u.realname title , SUM(so.total_amount) sumamount ");
-		fromBuilder.append(" FROM cc_sales_outstock so ");
-		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
-		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
-		fromBuilder.append(" LEFT JOIN `user` u ON u.id = cso.biz_user_id ");
-		if(by.equals("day")) {
-			fromBuilder.append(" where DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
-		}else if(by.equals("month")) {
-			fromBuilder.append(" where so.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+		public List<Record> querysalesManAmountBy(String selDataArea,String by,String desc){
+			StringBuilder fromBuilder = new StringBuilder("select t1.biz_user_id,t1.title,t1.sumamount from (SELECT cso.biz_user_id , u.realname title , SUM(so.total_amount) sumamount ");
+			fromBuilder.append(" FROM cc_sales_outstock so ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
+			fromBuilder.append(" LEFT JOIN `user` u ON u.id = cso.biz_user_id ");
+			if(by.equals("day")) {
+				fromBuilder.append(" where DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+			}else if(by.equals("month")) {
+				fromBuilder.append(" where so.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+			}
+			fromBuilder.append(" and cso.data_area like '"+selDataArea+"%' ");
+			fromBuilder.append(" GROUP BY cso.biz_user_id ORDER BY sumamount ");
+			fromBuilder.append(desc+" limit 0,5 ");
+			fromBuilder.append(") t1 ORDER BY t1.sumamount asc ");
+			return Db.find(fromBuilder.toString());
 		}
-		fromBuilder.append(" and cso.data_area like '"+selDataArea+"%' ");
-		fromBuilder.append(" GROUP BY cso.biz_user_id ORDER BY sumamount ");
-		fromBuilder.append(desc+" limit 0,5 ");
-		return Db.find(fromBuilder.toString());
-	}
 
 	public Long findTotalOrdersCountByDataArea(String dataArea) {
 		StringBuilder sql = new StringBuilder("SELECT COUNT(o.id) ");
@@ -1418,41 +1423,42 @@ public class SalesOrderQuery extends JBaseQuery {
 	}	
 
 	//商品销售排行 当日or汇总
-	public List<Record> queryGoodsSales(String selDataArea,boolean toDay,String desc){
-		StringBuilder fromBuilder = new StringBuilder("SELECT csp.id , csp.custom_name title , sum(csod.product_count) countgoods , sum(csod.product_amount) sumamount ");
-		fromBuilder.append(" FROM cc_sales_outstock so ");
-		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
-		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
-		fromBuilder.append(" LEFT JOIN cc_sales_outstock_detail csod ON csod.outstock_id=so.id ");
-		fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csod.sell_product_id = csp.id ");
-		fromBuilder.append(" where csod.data_area like '"+selDataArea+"' ");
-		if(toDay) {
-			fromBuilder.append("and DATE_FORMAT(csod.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+		public List<Record> queryGoodsSales(String selDataArea,boolean toDay,String desc){
+			StringBuilder fromBuilder = new StringBuilder("select t1.id,t1.title,t1.countgoods,t1.sumamount from (SELECT csp.id , csp.custom_name title , sum(csod.product_count) countgoods , sum(csod.product_amount) sumamount ");
+			fromBuilder.append(" FROM cc_sales_outstock so ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_outstock_detail csod ON csod.outstock_id=so.id ");
+			fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csod.sell_product_id = csp.id ");
+			fromBuilder.append(" where csod.data_area like '"+selDataArea+"' ");
+			if(toDay) {
+				fromBuilder.append("and DATE_FORMAT(csod.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+			}
+			fromBuilder.append("group by csp.id order by sumamount ");
+			fromBuilder.append(desc+" limit 0,5) t1 ");
+			fromBuilder.append(" ORDER BY t1.sumamount asc ");
+			return Db.find(fromBuilder.toString());
 		}
-		fromBuilder.append("group by csp.id order by sumamount ");
-		fromBuilder.append(desc+" limit 0,5 ");
-		return Db.find(fromBuilder.toString());
-	}
-	
-	//直营商销售排行 当日/当月
-	public List<Record> querySellerSales(String selDataArea,String by,String desc){
-		StringBuilder fromBuilder = new StringBuilder("SELECT cso.seller_id , cs.seller_name title , sum(so.total_amount) sumamount ");
-		fromBuilder.append(" FROM cc_sales_outstock so ");
-		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
-		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
-		fromBuilder.append(" LEFT JOIN cc_seller cs ON cso.seller_id = cs.id ");
-		
-		fromBuilder.append(" where cso.data_area like '"+selDataArea+"' ");
-		if(by.equals("day")) {
-			fromBuilder.append("and DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
-		}else if(by.equals("month")) {
-			fromBuilder.append("and so.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+
+		//直营商销售排行 当日/当月
+		public List<Record> querySellerSales(String selDataArea,String by,String desc){
+			StringBuilder fromBuilder = new StringBuilder("select t1.seller_id,t1.title,t1.sumamount from  (SELECT cso.seller_id , cs.seller_name title , sum(so.total_amount) sumamount ");
+			fromBuilder.append(" FROM cc_sales_outstock so ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
+			fromBuilder.append(" LEFT JOIN cc_seller cs ON cso.seller_id = cs.id ");
+
+			fromBuilder.append(" where cso.data_area like '"+selDataArea+"' ");
+			if(by.equals("day")) {
+				fromBuilder.append("and DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+			}else if(by.equals("month")) {
+				fromBuilder.append("and so.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+			}
+			fromBuilder.append("and cs.seller_type = 1 ");
+			fromBuilder.append("group by cso.seller_id order by sumamount ");
+			fromBuilder.append(desc+" limit 0,5) t1 ORDER BY t1.sumamount ");
+			return Db.find(fromBuilder.toString());
 		}
-		fromBuilder.append("and cs.seller_type = 1 ");
-		fromBuilder.append("group by cso.seller_id order by sumamount ");
-		fromBuilder.append(desc+" limit 0,5 ");
-		return Db.find(fromBuilder.toString());
-	}
 	
 	//销售额 周/月/季度 统计
 	public List<Record> queryAmountBy(String selDataArea,String by){
@@ -2090,7 +2096,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", selectDataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
@@ -2129,6 +2135,61 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.update("update cc_sales_order set order_qrcode_url = ?, confirm_date = ? where id = ?",qrcodeImgUrl,
 				date, orderId);
 
+	}
+//查找已下订单的业务员
+	public List<SalesOrder> findBySellerIdAndDataArea(String sellerId,String dataArea){
+		StringBuilder fromBuilder = new StringBuilder("select cs.biz_user_id, u.realname from cc_sales_order cs ");
+		fromBuilder.append("LEFT JOIN user u on u.id = cs.biz_user_id ");
+//		fromBuilder.append("where cs.seller_id  ='"+sellerId+"' ");
+		fromBuilder.append("where cs.data_area  like '"+dataArea+"' ");
+		fromBuilder.append(" GROUP BY cs.biz_user_id");
+		return DAO.find(fromBuilder.toString());
+	}
+
+	public Page<Record> _paginateForApp(int pageNumber, int pageSize, String keyword, String status,
+			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea,String bizUserId) {
+		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee,s.is_print ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
+		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.biz_user_id", bizUserId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%' or u.realname like '%" + keyword + "%')");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.create_date desc ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
 	public String memberInsert(Map<String, String> moreInfo,String customerType, String orderId, String orderSn, String sellerId,

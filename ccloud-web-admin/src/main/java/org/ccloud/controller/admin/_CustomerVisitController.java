@@ -195,6 +195,19 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
 
 		setAttr("customerName", JSON.toJSON(customerList));
+
+		List<Dict> dictList = DictQuery.me().findDictByType("customer_visit");
+		List<Map<String, Object>> questionTypeList = new ArrayList<>();
+		questionTypeList.add(all);
+
+		for(Dict questionType : dictList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", questionType.getValue());
+			item.put("text", questionType.getName());
+			questionTypeList.add(item);
+		}
+
+		setAttr("questionType", JSON.toJSON(questionTypeList));
 		render("image.html");
 	}
 
@@ -504,9 +517,10 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	public void count() {
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");
+		String questionType = getPara("question_type");
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
-		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, selectDataArea + "%");
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea + "%");
 		if(imageList.size() == 0) renderAjaxResultForError();
 		else renderAjaxResultForSuccess();
 	}
@@ -515,10 +529,11 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	public void exportImage() throws Exception {
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");
+		String questionType = getPara("question_type");
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		String domain = OptionQuery.me().findByKey("cdn_domain").getOptionValue();
-		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, selectDataArea + "%");
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea + "%");
 
 		String zipFileName = "拜访图片.zip";
 

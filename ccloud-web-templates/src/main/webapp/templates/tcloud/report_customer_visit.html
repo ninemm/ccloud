@@ -258,11 +258,13 @@
     }
     
     function urlSelect(params, type){
-    	if (type == 'day') {
+    	if (type == 'month') {
+    		customerVisitCount(params)
 		 	customerCount(params);
 		 	visitCount(params);
 		 	orderStatus(params);
 		} else {
+			customerVisitCount(params)
 		 	customerCount(params);
 		 	visitCount(params);
 		 	orderStatus(params);

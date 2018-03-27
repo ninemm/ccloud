@@ -215,7 +215,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);	
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
-				+ "payables.xlsx";
+				+ "payables.xls";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
 		List<Record> payablesList = page.getList();

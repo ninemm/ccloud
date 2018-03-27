@@ -26,7 +26,6 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.SalesOrder;
-import org.ccloud.model.Seller;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
@@ -101,13 +100,13 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getSessionAttr("sellerId");
+//		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String customerType = getPara("customerType");
 		String deptId = getPara("deptId");
 		String userId = getPara("userId");
 		String print = getPara("print");
-		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea, print);
+		Record record = SalesOrderQuery.me().getMyOrderAmount(startDate, endDate, dayTag, customerType, deptId, null, userId, dataArea, print);
 		renderJson(record);
 	}
 	
@@ -116,12 +115,12 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getSessionAttr("sellerId");
+//		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String customerType = getPara("customerType");
 		String deptId = getPara("deptId");
 		String userId = getPara("userId");
-		Record record = SalesOrderQuery.me().getMyOrderAmountByOutStock(startDate, endDate, dayTag, customerType, deptId, sellerId, userId, dataArea);
+		Record record = SalesOrderQuery.me().getMyOrderAmountByOutStock(startDate, endDate, dayTag, customerType, deptId, null, userId, dataArea);
 		renderJson(record);		
 	}
 	
@@ -323,15 +322,15 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getPara("sellerId");
-		if (StrKit.isBlank(sellerId)) {
-			sellerId = getSessionAttr("sellerId");
-		}
+//		String sellerId = getPara("sellerId");
+//		if (StrKit.isBlank(sellerId)) {
+//			sellerId = getSessionAttr("sellerId");
+//		}
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		String print = getPara("print");
-		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea, print);
+		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, null, orderTag, dataArea, print);
 		renderJson(record);
 	}
 	
@@ -340,14 +339,14 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getPara("sellerId");
-		if (StrKit.isBlank(sellerId)) {
-			sellerId = getSessionAttr("sellerId");
-		}
+//		String sellerId = getPara("sellerId");
+//		if (StrKit.isBlank(sellerId)) {
+//			sellerId = getSessionAttr("sellerId");
+//		}
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getUserRankByOutStock(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
+		List<Record> record = SalesOrderQuery.me().getUserRankByOutStock(startDate, endDate, dayTag, deptId, null, orderTag, dataArea);
 		renderJson(record);
 	}
 	
@@ -365,15 +364,15 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getPara("sellerId");
-		if (StrKit.isBlank(sellerId)) {
-			sellerId = getSessionAttr("sellerId");
-		}
+//		String sellerId = getPara("sellerId");
+//		if (StrKit.isBlank(sellerId)) {
+//			sellerId = getSessionAttr("sellerId");
+//		}
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
 		String print = getPara("print");
-		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag, print);
+		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, null, dataArea, orderTag, print);
 		renderJson(record);
 	}
 	
@@ -382,14 +381,14 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getPara("sellerId");
-		if (StrKit.isBlank(sellerId)) {
-			sellerId = getSessionAttr("sellerId");
-		}
+//		String sellerId = getPara("sellerId");
+//		if (StrKit.isBlank(sellerId)) {
+//			sellerId = getSessionAttr("sellerId");
+//		}
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getGiftCountByUserByOutStock(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag);
+		List<Record> record = SalesOrderQuery.me().getGiftCountByUserByOutStock(startDate, endDate, dayTag, deptId, null, dataArea, orderTag);
 		renderJson(record);
 	}
 	
@@ -439,11 +438,11 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getSessionAttr("sellerId");
+//		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String orderTag = getPara("orderTag");
 		String print = getPara("print");
-		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, sellerId, dataArea, orderTag, print);
+		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, null, dataArea, orderTag, print);
 		renderJson(record);
 	}
 	
@@ -452,10 +451,10 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getSessionAttr("sellerId");
+//		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getSellerCountByOutStock(startDate, endDate, dayTag, sellerId, dataArea, orderTag);
+		List<Record> record = SalesOrderQuery.me().getSellerCountByOutStock(startDate, endDate, dayTag, null, dataArea, orderTag);
 		renderJson(record);
 	}	
 	

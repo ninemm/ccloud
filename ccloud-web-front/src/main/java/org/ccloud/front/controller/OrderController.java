@@ -56,7 +56,9 @@ public class OrderController extends BaseFrontController {
 	//我的订单
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
-
+		String selectDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -65,7 +67,7 @@ public class OrderController extends BaseFrontController {
 		customerTypes.add(all);
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-				                                      .findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+				                                      .findByDataArea(selectDataArea);
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
@@ -73,8 +75,18 @@ public class OrderController extends BaseFrontController {
 			customerTypes.add(item);
 		}
 
+		List<Map<String, Object>> bizUsers = new ArrayList<>();
+		bizUsers.add(all);
+		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerIdAndDataArea(sellerId,dataArea);
+		for (SalesOrder order : orders) {
+			Map<String, Object> items = new HashMap<>();
+			items.put("title", order.getStr("realname"));
+			items.put("value", order.getBizUserId());
+			bizUsers.add(items);
+		}
 		String history = getPara("history");
 		setAttr("history", history);
+		setAttr("bizUsers",JSON.toJSON(bizUsers));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("myOrder.html");
 	}
@@ -90,9 +102,10 @@ public class OrderController extends BaseFrontController {
 		String customerTypeId = getPara("customerTypeId");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		String bizUserId = getPara("bizUserId");
 
-		Page<Record> orderList = SalesOrderQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, status,
-				customerTypeId, startDate, endDate, sellerId, selectDataArea);
+		Page<Record> orderList = SalesOrderQuery.me()._paginateForApp(getPageNumber(), getPageSize(), keyword, status,
+				customerTypeId, startDate, endDate, sellerId, selectDataArea,bizUserId);
 		Record record = SalesOrderQuery.me()
 				.getOrderListCount(keyword, status, customerTypeId, startDate, endDate, sellerId, selectDataArea);
 
@@ -286,8 +299,7 @@ public class OrderController extends BaseFrontController {
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
-				StringBuilder stringBuilder = new StringBuilder();
-				String QRcontent="";
+
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
 				String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
@@ -301,23 +313,14 @@ public class OrderController extends BaseFrontController {
 					return false;
 				}
 
-				String orcodeFileName = orderSn + ".png";
-				String childFileName = DateUtils.dateString();
-				String imagePath = getRequest().getSession().getServletContext().getRealPath("/");
-				String newStr = imagePath.substring(0, imagePath.length()-6) + "admin/" + Consts.ORDER_QRCODE_PATH + childFileName ;
-
-				String orcodeImgUrl = Consts.ORDER_QRCODE_PATH + childFileName +"/" +  orcodeFileName;
 				String[] sellProductIds = paraMap.get("sellProductId");
 				// 常规商品
 				if (sellProductIds != null && sellProductIds.length > 0) {
-					
-					stringBuilder.append(StringUtils.getArrayFirst(paraMap.get("customerId"))).append("||" + orderSn).append("||" + StringUtils.getArrayFirst(paraMap.get("contact")) + "||");					
+
 					for (int index = 0; index < sellProductIds.length; index++) {
 						if (StrKit.notBlank(sellProductIds[index])) {
 							String message = SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
 									user.getDepartmentId(), user.getDataArea(), index);
-							stringBuilder.append(message);
-							message="";
 							if (StrKit.notBlank(message)) {
 								result[0] = message;
 								return false;
@@ -327,17 +330,7 @@ public class OrderController extends BaseFrontController {
 
 					}
 				}
-				
-				QRcontent = stringBuilder.toString().substring(0, stringBuilder.length() -1);
-				if (Consts.QRDEALERCODE.contains(sellerCode)) {
-					org.ccloud.utils.QRCodeUtils.genQRCode(QRcontent, newStr, orcodeFileName);
-	           		int i = SalesOrderQuery.me().updateQrcodeImgUrl(orcodeImgUrl, orderId, date);
-	           		if (i < 0) {
-						return false;
-					}
-				}
-           		
-                
+
 				String[] giftSellProductIds = paraMap.get("giftSellProductId");
 				// 赠品
 				if (giftSellProductIds != null && giftSellProductIds.length > 0) {

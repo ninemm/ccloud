@@ -6,6 +6,7 @@
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/exif.js"></script>
+    <script type="text/javascript" src="${CTPATH}/js/comm.js"></script>
 </#macro>
 <#macro css>
     #visit-add main{
@@ -53,6 +54,17 @@
 
     $(function() {
 
+        initWxConfig('${appId!}', ${timestamp}, '${nonceStr!}', '${signature!}');
+
+        wxReadyGetLocation(
+            function(lng, lat, addComp, address) {
+                $("#lng").val(lng.toFixed(6));
+                $("#lat").val(lat.toFixed(6));
+                $('#location-span').text(address);
+                $('#location').val(address);
+            }
+        )
+
         $("#length").text($("#question_desc").val().length + '/' + 70);
         $(document).on("input", "#question_desc", function() {
             $("#length").text($("#question_desc").val().length + '/' + 70);
@@ -97,128 +109,15 @@
 		        }
 	        });
 		}
-		
-        $("#uploaderInput").on("change",function () {
 
-            var files = this.files;;
-            var arrNum = imageArr.length;
-            var num = arrNum + files.length;
-
-            if (num > count) {
-                $.alert("最多上传三张图片");
-                return false;
+        uploadImages($("#uploaderInput"), $uploaderFiles, $picNum,
+            function(blob, x, imageArr) {
+                $("#pic").val(JSON.stringify(imageArr));
+                var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
+                $uploaderFiles.append(str);
             }
+        )
 
-            $picNum.text($("#uploaderFiles")[0].children.length + 1 + '/' + count);
-
-            for (var i = 0; i < files.length; i ++) {
-                var file = files[i];
-                if (!/image\/\w+/.test(file.type)) {
-                    $.alert("请确保文件为图像类型");
-                    return false;
-                }
-
-                EXIF.getData(file, function() {
-                    EXIF.getAllTags(this);
-                    Orientation = EXIF.getTag(this, 'Orientation');
-                });
-
-                var reader = new FileReader();
-                (function(x) {
-                    reader.onload = function(e) {
-                        var image = new Image();
-                        image.src = e.target.result;
-                        image.onload = function() {
-                            var expectWidth = this.naturalWidth;
-                            var expectHeight = this.naturalHeight;
-
-                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 480) {
-                                expectWidth = 480;
-                                expectHeight = expectWidth * this.naturalHeight / this.naturalWidth;
-                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 640) {
-                                expectHeight = 640;
-                                expectWidth = expectHeight * this.naturalWidth / this.naturalHeight;
-                            }
-
-                            var canvas = document.createElement("canvas");
-                            var ctx = canvas.getContext("2d");
-                            canvas.width = expectWidth;
-                            canvas.height = expectHeight;
-                            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
-
-                            if(Orientation != "" && Orientation != 1){
-                                switch(Orientation){
-                                case 6://需要顺时针（向左）90度旋转
-                                    rotateImg(this,'left',canvas, canvas.width, canvas.height);
-                                    break;
-                                case 8://需要逆时针（向右）90度旋转
-                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);
-                                    break;
-                                case 3://需要180度旋转
-                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);//转两次
-                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);
-                                    break;
-                                }
-                            }
-                            blob = canvas.toDataURL("image/jpeg", 0.5);
-                            imageArr.push({"pic":blob, "pic_name":x});
-                            $("#pic").val(JSON.stringify(imageArr));
-                            var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
-                            $uploaderFiles.append(str);
-                        };
-                    };
-                })(file.name)
-                reader.readAsDataURL(file);
-            }
-        });
-
-    function rotateImg(img, direction,canvas, width, height) {
-        //最小与最大旋转方向，图片旋转4次后回到原方向
-        var min_step = 0;
-        var max_step = 3;
-        if (img == null) return;
-
-        var step = 2;
-        if (step == null) {
-            step = min_step;
-        }
-        if (direction == 'right') {
-            step++;
-            //旋转到原位置，即超过最大值
-            step > max_step && (step = min_step);
-        } else {
-            step--;
-            step < min_step && (step = max_step);
-        }
-        //旋转角度以弧度值为参数
-        var degree = step * 90 * Math.PI / 180;
-        var ctx = canvas.getContext('2d');
-        switch (step) {
-            case 0:
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                break;
-            case 1:
-                canvas.width = height;
-                canvas.height = width;
-                ctx.rotate(degree);
-                ctx.drawImage(img, 0, -height, canvas.width, canvas.height);
-                break;
-            case 2:
-                canvas.width = width;
-                canvas.height = height;
-                ctx.rotate(degree);
-                ctx.drawImage(img, -width, -height, canvas.width, canvas.height);
-                break;
-            case 3:
-                canvas.width = height;
-                canvas.height = width;
-                ctx.rotate(degree);
-                ctx.drawImage(img, -width, 0, canvas.width, canvas.height);
-                break;
-            }
-        }
 
         var index; //第几张图片
         $uploaderFiles.on("click", "li", function() {
@@ -287,100 +186,18 @@
         });
     }
 
-    wx.config({
-        debug: false,
-        appId: '${appId!}',
-        timestamp: '${timestamp!}',
-        nonceStr: '${nonceStr!}',
-        signature: '${signature!}',
-        jsApiList: [
-            'checkJsApi',
-            'getLocation'
-        ]
-    });
-
-    wx.ready(function() {
-        // 获取定位信息
-        wx.getLocation({
-	        type: 'wgs84',
-	        success: function (res) {
-	            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-	            var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-	   
-	            var speed = res.speed;                            // 速度，以米/每秒计
-	            var accuracy = res.accuracy;                      // 位置精度
-	
-	            var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-	            var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-	
-	            translateCallback = function (point) {            // 回调函数
-                    $("#lng").val(parseFloat(point.lng).toFixed(6));
-                    $("#lat").val(parseFloat(point.lat).toFixed(6));
-	                geoc.getLocation(point, function(rs) {
-	                    var addComp = rs.addressComponents;
-	                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-	                    $('#location-span').text(address);
-	                    $('#location').val(address);
-	                });
-	            };
-	            
-	            setTimeout(function() {
-	                BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-	            }, 100);
-	        },
-	        cancel: function (res) {
-	            console.log('用户拒绝授权获取地理位置');
-	        },
-	        fail: function (res) {
-	            console.log(JSON.stringify(res));
-	        }
-        });
-    });
 
     function refreshLocation() {
         $("#location-span").empty();
-        $("#location-span").css('text-align','center');
         $("#location-span").append('<i class="weui-loading"></i>');
-
-        wx.getLocation({
-            type: 'wgs84',
-            success: function (res) {
-                $("#location-span").empty();
-                $("#location-span").removeAttr("style");
-                var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-                var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-                var speed = res.speed;                            // 速度，以米/每秒计
-                var accuracy = res.accuracy;                      // 位置精度
-
-                var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-                var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-
-                translateCallback = function (point) {            // 回调函数
-
-                    $("#lng").val(parseFloat(point.lng).toFixed(6));
-                    $("#lat").val(parseFloat(point.lat).toFixed(6));
-                    geoc.getLocation(point, function(rs) {
-                        var addComp = rs.addressComponents;
-                        var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-                        $('#location-span').text(address);
-                        $('#location').val(address);
-                    });
-                };
-                setTimeout(function() {
-                    BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-                }, 100);
-            },
-            cancel: function (res) {
-                $("#location-span").empty();
-                $("#location-span").removeAttr("style");
-                $("#location-span").text('用户拒绝授权获取地理位置');
-            },
-            fail: function (res) {
-                $("#location-span").empty();
-                $("#location-span").removeAttr("style");
-                $("#location-span").text(JSON.stringify(res));
+        wxGetLocation(
+            function(lng, lat, addComp, address) {
+                $("#lng").val(lng.toFixed(6));
+                $("#lat").val(lat.toFixed(6));
+                $('#location-span').text(address);
+                $('#location').val(address);
             }
-        });
+        )
     }
 </#macro>
 <@layout>
@@ -478,7 +295,7 @@
                             <div class="weui-uploader__bd">
                                 <ul class="weui-uploader__files" id="uploaderFiles"></ul>
                                 <div class="weui-uploader__input-box">
-                                    <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="">
+                                    <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="" capture="camera">
                                     <input type="hidden" name="pic" id="pic">
                                 </div>
                             </div>

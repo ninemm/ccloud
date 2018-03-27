@@ -21,6 +21,8 @@ import java.util.List;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
+
+import org.ccloud.Consts;
 import org.ccloud.model.Plans;
 
 import com.jfinal.plugin.activerecord.Page;
@@ -51,10 +53,10 @@ public class PlansQuery extends JBaseQuery {
 	
 	
 	
-	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type) {
+	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type,String startDate,String endDate,String dateType) {
 		String select = "SELECT cp.user_id,cp.type,cp.seller_product_id,cp.start_date,cp.end_date,cs.seller_name,u.realname,csp.custom_name ,sum(plan_num) as planNum, sum(complete_num) as completeNum ,cp.complete_ratio  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
-		fromBuilder.append("LEFT JOIN cc_seller cs on cs.dept_id = cp.dept_id ");
+		fromBuilder.append("LEFT JOIN cc_seller cs on cs.id = cp.seller_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
 		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = cp.seller_product_id ");
 
@@ -68,6 +70,9 @@ public class PlansQuery extends JBaseQuery {
 		}
 		if(!type.equals("")) {
 			fromBuilder.append(" and cp.type = '"+type+"' ");
+			if(!type.equals(Consts.WEEK_PLAN) && StrKit.notBlank(dateType)) {
+				fromBuilder.append(" and cp.start_date >= '"+startDate+"' and cp.end_date <= '"+endDate+" 23:59:59' ");
+			}
 		}
 		fromBuilder.append("and cp.data_area like '"+dataArea+"' ");
 		fromBuilder.append("GROUP BY cp.seller_id,cp.user_id, cp.type, cp.seller_product_id ,cp.start_date,cp.end_date ");
@@ -134,13 +139,19 @@ public class PlansQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public List<Plans> findbyUserNameAndTypeNameAndStartDateAndEndDate(String userName,String typeName, String startDate,String endDate){
+	public List<Plans> findbyUserNameAndTypeNameAndStartDateAndEndDate(String userName,String typeName, String startDate,String endDate,String sellerId){
 		String sql  = "select o.*,sp.custom_name "
 				+ "from `cc_plans` o "
 				+ "join user u ON o.user_id = u.id "
 				+ "left join cc_seller_product sp ON o.seller_product_id = sp.id "
 				+ "left join dict d ON o.type = d.value "
-				+ "where u.realname = '"+userName+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"'";
+				+ "where u.realname = '"+userName+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"' "
+				+ "and o.seller_id = '"+sellerId+"'";
+		return DAO.find(sql);
+	}
+	
+	public List<Plans> findbyDateArea(String dataArea){
+		String sql = "SELECT * from cc_plans where data_area like '"+dataArea+"' GROUP BY start_date";
 		return DAO.find(sql);
 	}
 	

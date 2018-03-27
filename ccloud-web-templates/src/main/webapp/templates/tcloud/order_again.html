@@ -4,6 +4,7 @@
 	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
 	<script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
+	<script type="text/javascript" src="${CTPATH}/js/comm.js"></script>
 </#macro>
 <#macro title>再来一单</#macro>
 <#macro css> 
@@ -18,6 +19,16 @@
 
 <#macro script>
 $(function() {
+
+	initWxConfig('${appId!}', ${timestamp}, '${nonceStr!}', '${signature!}');
+
+	wxReadyGetLocation(
+		function(lng, lat, addComp, address) {
+			$("#lng").val(lng.toFixed(6));
+			$("#lat").val(lat.toFixed(6));
+			$('#location').val(address);
+		}
+	)
   $("body").on("click","#confirm-input" ,function(){
 	total();
   }).on("click", "#placeOrder", function () {
@@ -36,11 +47,11 @@ $(function() {
 	var $product = $("#productList");
 
 	function initProduct(id){
+		var comId = "";
 		$.get('${CPATH}/order/orderAgain?orderId=' + id,
 			function(result){
 				var productList = result.orderDetail;
 				$.each(productList, function(index, el) {
-					if(el.is_gift == 0) {
 						$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + newHtml + "</div>");
 						var $newProductDetail = $product.find(".common:last");
 						$newProductDetail.find("#productName").text(el.custom_name);
@@ -55,7 +66,17 @@ $(function() {
 						$newProductDetail.find("#smallPrice").val((el.product_price/el.convert_relate).toFixed(2));
 						$newProductDetail.find("#bigUnit").val(el.big_unit);
 						$newProductDetail.find("#smallUnit").val(el.small_unit);
-						$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+						if (el.composite_id != null) {
+							if (el.composite_id !=  comId) {
+								$newProductDetail.find("#compositionId").val(el.composite_id);
+								$newProductDetail.find("#compositionNum").val((el.product_count/el.comCount).toFixed(0));
+								$newProductDetail.find("#compositionNum").removeAttr("disabled");
+								$newProductDetail.find("#compositionId").removeAttr("disabled");
+								comId = el.composite_id;
+							}
+						} else {
+							$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+						}
 						$newProductDetail.find("#productId").val(el.productId);
 						$newProductDetail.find("#convert").val(el.convert_relate);
 						
@@ -64,38 +85,9 @@ $(function() {
 						$newProductDetail.find("#bigNum").removeAttr("readonly");
 						$newProductDetail.find("#smallNum").removeAttr("readonly");
 						$newProductDetail.find("#isGift").val(el.is_gift);
-						
-					} else {
-						var $newProductDetail = $product.find(".common:last");
-						$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
-		
-						//默认
-						if($newProductDetail.find("#sellProductId").val() == el.sell_product_id){
-							$newProductDetail.find("#isDefault").attr("checked","true");
+						if(el.is_gift == 1) {
+							$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
 						}
-		
-						$newProductDetail.find("#giftProduct").val(el.custom_name);
-						$newProductDetail.find("#giftSellProductId").val(el.sell_product_id);
-						$newProductDetail.find("#giftProductId").val(el.productId);
-						$newProductDetail.find("#giftConvert").val(el.convert_relate);
-						$newProductDetail.find("#giftBigPrice").val(el.product_price);
-						
-						var bigNum = parseInt(el.product_count/el.convert_relate);
-						var smallNum = el.product_count % el.convert_relate;
-						//数量
-						if(bigNum > 0 && el.big_unit){
-							$newProductDetail.find("#giftNum").val(bigNum);
-							$newProductDetail.find("#giftUnitName").val("/"+el.big_unit);
-							$newProductDetail.find("#giftUnitName").attr('data-values', "bigUnit");
-							$newProductDetail.find("#giftUnit").val("bigUnit");
-						}else{
-							$newProductDetail.find("#giftNum").val(smallNum);
-							$newProductDetail.find("#giftUnitName").val("/"+el.small_unit);
-							$newProductDetail.find("#giftUnitName").attr('data-values', "smallUnit");
-							$newProductDetail.find("#giftUnit").val("smallUnit");
-						}
-					
-					}
 				});	
 				total();		
 			}
@@ -116,8 +108,8 @@ $(function() {
 			total += rowTotal;
 		});
 
-		$("#total").val(total);
-		$("#totalNum").text("共" + (products.length) + "款,合计:" + formatNumber(total) + "元")
+		$("#total").val(${order.total_amount!});
+		$("#totalNum").text("共" + (products.length) + "款,合计:" + formatNumber(${order.total_amount!}) + "元")
 	
 	}
 
@@ -157,51 +149,6 @@ $(function() {
 		else window.location.href = url[0];
 	}
 
-	wx.config({
-		debug: false,
-		appId: '${appId!}',
-		timestamp: ${timestamp},
-		nonceStr: '${nonceStr!}',
-		signature: '${signature!}',
-		jsApiList: [
-			'checkJsApi',
-			'getLocation'
-		]
-	});
-
-	wx.ready(function() {
-		wx.getLocation({
-			type: 'wgs84',
-			success: function (res) {
-				var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
-				var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
-				var speed = res.speed;                            // 速度，以米/每秒计
-				var accuracy = res.accuracy;                      // 位置精度
-
-				var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
-				var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
-
-				translateCallback = function (point) {            // 回调函数
-					geoc.getLocation(point, function(rs) {
-						var addComp = rs.addressComponents;
-						var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
-						$("#lng").val(parseFloat(point.lng).toFixed(6));
-						$("#lat").val(parseFloat(point.lat).toFixed(6));
-						$('#location').val(address);
-					});
-				};
-				setTimeout(function() {
-					BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
-				}, 100);
-			},
-			cancel: function (res) {
-				console.log('用户拒绝授权获取地理位置');
-			},
-			fail: function (res) {
-				console.log(JSON.stringify(res));
-			}
-		});
-	});
 </#macro>
 
 <@layout>
@@ -297,6 +244,8 @@ $(function() {
 				<div id="productList">
 					<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
 						<input type="hidden" name="sellProductId" id="sellProductId" value="">
+						<input type="hidden" id="compositionId" name="compositionId" disabled = "disabled">
+						<input type="hidden" id="compositionNum" name="compositionNum" disabled = "disabled">
 						<input type="hidden" name="productId" id="productId" value="">
 						<input type="hidden" name="convert" id="convert" value="">
 						<input type="hidden" name="isGift" id="isGift" value="">
@@ -363,7 +312,6 @@ $(function() {
 						</div>
 					</div>
 					<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
-						<input type="hidden" id="compositionId" name="compositionId" value="">
 						<nobr>
 							<p class="product_name" id="compositionName">
 								35度中国劲酒_125ml_1*24
@@ -372,7 +320,6 @@ $(function() {
 						<div class="product_bUnit">
 							<span class="price" id="compositionPriceSpan">￥725</span>
 							<div class="spinner">
-								<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
 							</div>
 							<input type="number" class="street-value"  id="compositionPrice" value="720" name="compositionPrice" readonly>
 						</div>

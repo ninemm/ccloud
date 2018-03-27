@@ -174,7 +174,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	public void downloading() throws UnsupportedEncodingException {
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\customer\\"
-				+ "customerInfo.xlsx";
+				+ "customerInfo.xls";
 
 		Page<Record> page = CustomerQuery.me().paginate(1, Integer.MAX_VALUE, "");
 		List<Record> customerList = page.getList();

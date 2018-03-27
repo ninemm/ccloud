@@ -140,6 +140,14 @@ public class _UserController extends JBaseCRUDController<User> {
 					break;
 				}
 			}
+			for(User us : users) {
+				if(StringUtils.isBlank(us.getAvatar())) {
+					continue;
+				}else {
+					user.setAvatar(us.getAvatar());;
+					break;
+				}
+			}
 			Department dept = DepartmentQuery.me().findById(user.getDepartmentId());
 			String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 			user.setDataArea(dataArea);
@@ -455,7 +463,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user/uploading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void userTemplate() {
-		String realPath = getSession().getServletContext().getRealPath("\\") +"\\WEB-INF\\admin\\user\\userTemplate.xlsx";
+		String realPath = getSession().getServletContext().getRealPath("\\") +"\\WEB-INF\\admin\\user\\userTemplate.xls";
 		renderFile(new File(realPath.replace("\\", "/")));
 	}
 	
@@ -571,7 +579,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		//String deptIds = getPara("deptId");
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
-				+ "userInfo.xlsx";
+				+ "userInfo.xls";
 		String userId = "";
 		Page<User> page = UserQuery.me().paginateUser(1, Integer.MAX_VALUE,  keyword, dataArea, "u.create_date",userId);
 		List<User> userList = page.getList();

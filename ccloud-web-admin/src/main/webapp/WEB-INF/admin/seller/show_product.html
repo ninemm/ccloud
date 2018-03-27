@@ -84,24 +84,22 @@
       					return strHtml;
       				},
       			edit:false},
-      			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '7%',
+      			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '20%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/><input type="hidden" size="9"  name="_bigPrice" value="'+row.price+'"/>';
-					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
+					var strHtml = '￥<input type="text" size="9" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/><input type="hidden" size="9"  name="_bigPrice" value="'+row.price+'"/>/'+row.big_unit;
 					return strHtml;
 				},
       			 edit:false},
-      			 {field: "convert_relate", title: "换算", align: "center", width: '2%',edit:false},
+      			 {field: "convert_relate", title: "换算", align: "center", width: '1%',edit:false},
       			 {field: "samllPrice", title: "销售价格(零)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" readonly style="text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>';
-					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="samll_unit" value="'+row.small_unit+'"/>';
+					var strHtml = '￥<input type="text" size="9" readonly style="width:45px;text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>/'+row.small_unit;
 					return strHtml;
 				},
       			 edit:false},
       			 {field: "cost", title: "成本(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="cost" value="'+formatNumber(row.cost)+'" onblur="changeCostPrice(this)"/><input type="hidden"  name="_cost" value="'+row.cost+'"/>';
+					var strHtml = '￥<input type="text" size="9" style="width:40px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="cost" value="'+formatNumber(row.cost)+'" onblur="changeCostPrice(this)"/><input type="hidden"  name="_cost" value="'+row.cost+'"/>';
 					return strHtml;
 				},
       			 edit:false},
@@ -114,18 +112,17 @@
 				},
 				{field: "", title: "账期价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+formatNumber(row.account_price)+'" onblur="changeAccountPrice(this)"/><input type="hidden" name="_accountPrice" value="'+row.account_price+'"/>';
+					var strHtml = '￥<input type="text" size="9" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+formatNumber(row.account_price)+'" onblur="changeAccountPrice(this)"/><input type="hidden" name="_accountPrice" value="'+row.account_price+'"/>';
 					return strHtml;
 				},
       			 edit:false},
       			 {field: "", title: "税务价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="taxPrice" value="'+formatNumber(row.tax_price)+'"/>';
-					strHtml += '/<input type="text" size="1" readonly style="text-align:center;background-color:transparent;border:0px;" name="big_unit" value="'+row.big_unit+'"/>';
+					var strHtml = '￥<input type="text" size="7" onblur = "changeTaxPrice(this)" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="taxPrice" value="'+formatNumber(row.tax_price)+'"/><input type="hidden"  name="_taxPrice" value="'+row.tax_price+'"/>/'+row.big_unit;
 					return strHtml;
 				},
       			 edit:false},
-				{field: "bar_code", title: "条码", align: "center", width: '5%',
+				{field: "bar_code", title: "条码", align: "center", width: '3%',
       				formatter: function(value, row, rowIndex) {
       				if(value==null){
       					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bar_code" value=""/>';
@@ -169,14 +166,14 @@
 					},
 					edit:false
 				},
-				{field: "action", title: "操作", align: "center", width: '7%',
+				{field: "action", title: "操作", align: "center", width: '17%',
 				formatter: function(value, row, rowIndex) {
 					if(row.is_enable == 0){
-					  var  strHtml = '<a onclick="change(\''+row.id+'\')" class="btn btn-xs bg-olive btn-flat" >上架</a>';
+					  var  strHtml = '<div style="width:100px;"><a onclick="change(\''+row.id+'\')" class="btn btn-xs bg-olive btn-flat" >上架</a>';
 					}else{
-					  var strHtml = '<a onclick="change(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">下架</a>';
+					  var strHtml = '<div style="width:100px;"><a onclick="change(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">下架</a>';
 					}
-					strHtml += '&nbsp;<a type="button" onclick="getQrocde(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal1" name="qrcode" class="btn btn-xs btn-info  btn-flat">二维码</a>';
+					strHtml += '&nbsp;<a type="button" onclick="getQrocde(\''+row.id+'\')" data-toggle="modal" data-target="#exampleModal1" name="qrcode" class="btn btn-xs btn-info  btn-flat">二维码</a></div>';
 					<!-- strHtml += '&nbsp;<a onclick="del(\''+row.id+'\')" class="btn btn-xs btn-danger btn-flat">删除</a>'; -->
 					return strHtml;
 				},
@@ -230,10 +227,10 @@
 								"Id":  $(this).find('td').eq(0).find("input").val(),
 								"order_list": $(this).find('td').eq(1).find("input").val(),
 								"custom_name": $(this).find('td').eq(4).find("input").val(),
-								"price": $(this).find('td').eq(7).find("input[name='bigPrice']").val(),
-								"cost": $(this).find('td').eq(10).find("input").val(),
-								"account_price": $(this).find('td').eq(12).find("input").val(),
-								"tax_price":$(this).find('td').eq(13).find("input").val(),
+								"price": $(this).find('td').eq(7).find("input[name='_bigPrice']").val(),
+								"cost": $(this).find('td').eq(10).find("input").eq(1).val(),
+								"account_price": $(this).find('td').eq(12).find("input").eq(1).val(),
+								"tax_price":$(this).find('td').eq(13).find("input").eq(1).val(),
 								"bar_code": $(this).find('td').eq(14).find("input").val(),
 								"tags": $(this).find('td').eq(15).find("input").val(),
 							};
@@ -343,6 +340,16 @@
 								}, 2 * 1000 );
 		}
 		$(obj).parent().parent().find('td').eq(12).find("input").eq(1).val(accountPrice);
+	}
+	
+	function changeTaxPrice(obj){
+		var taxPrice = $(obj).val();
+		if(taxPrice.indexOf(",") != -1){
+			taxPrice = $(obj).parent().parent().find('td').eq(13).find("input").eq(1).val()
+		}else{
+			taxPrice = parseInt($(obj).val());
+		}
+		$(obj).parent().parent().find('td').eq(13).find("input").eq(1).val(taxPrice);
 	}
 	
 	/*function changeHot(obj){

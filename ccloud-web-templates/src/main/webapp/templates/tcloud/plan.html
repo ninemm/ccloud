@@ -204,6 +204,11 @@ function doSubmit(){
 			}
 		});
 }
+
+function deleteTr(obj){
+	var tr = $(obj).parent();
+	tr.remove();
+}
 </#macro>
 <@layout>
 <div class="weui-content">
@@ -242,21 +247,24 @@ function doSubmit(){
 		</div>
 		<div class="weui-cells__title">计划明细</div>
 		<div class="weui-panel weui-panel_access productList">
-			<div class="weui-cells mg-0 productInfo">
-				<div class="weui-cell weui-cell_access select-area ">
-					<div class="weui-cell__bd">
-						产品名称
+			<div>
+				<div class="icon-trash-o fr ft30 gray" onclick = "deleteTr(this)" style="float: right;margin-top: 5%;margin-right: 2%;font-size: 2rem!important;"></div>
+				<div class="weui-cells mg-0 productInfo">
+					<div class="weui-cell weui-cell_access select-area">
+						<div class="weui-cell__bd">
+							产品名称
+						</div>
+						<input type="text" name="productName" id="productName" class="weui-input" value="">
+						<input type="hidden" name="productId" id="productId" class="weui-input" value="">
+						<div class="weui-cell__ft"></div>
 					</div>
-					<input type="text" name="productName" id="productName" class="weui-input" value="">
-					<input type="hidden" name="productId" id="productId" class="weui-input" value="">
-					<div class="weui-cell__ft"></div>
-				</div>
-				<div class="weui-cell">
-					<div class="weui-cell__bd">
-						数量
+					<div class="weui-cell">
+						<div class="weui-cell__bd">
+							数量
+						</div>
+						<input type="tel" class="weui-input" name="productNum" id="productNum" value="">&nbsp;
+						<div class="weui-cell__ft">件</div>
 					</div>
-					<input type="tel" class="weui-input" name="productNum" id="productNum" value="">
-					<div class="weui-cell__ft">件</div>
 				</div>
 			</div>
 		</div>

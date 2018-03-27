@@ -65,6 +65,12 @@
 		salesIndentChart.showLoading();    	
 		Utils.ajax('${CPATH}/report/getUserRankMenu', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#userCount").height(300);
+		        } else {
+		        	$("#userCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];

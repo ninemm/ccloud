@@ -101,13 +101,15 @@ public class ProductCompositionQuery extends JBaseQuery {
 
 	public List<Record> findDetailByProductId(String id, String sellerId, String keyword, String tag) {
  		StringBuilder fromBuilder = new StringBuilder("SELECT cp.id,cp.name,cp.price,cp.seller_product_id,cp.sub_seller_product_id,cs.product_id as product_id,cg.product_id as sub_product_id, ");
-		fromBuilder.append("t1.valueName as product_sp, t2.valueName as sub_product_sp, cp.price as price, cg.price as sub_price, cp.activity_id as actId, cp.state as state, ");
-		fromBuilder.append("cs.custom_name as product_name,cg.custom_name as sub_product_name,cp.sub_product_count,cp.parent_id,p.product_sn,g.product_image_list_store ");
+		fromBuilder.append("t1.valueName as product_sp, t2.valueName as sub_product_sp, cg.price as sub_price, cp.activity_id as actId, cp.state as state, ");
+		fromBuilder.append("cs.custom_name as product_name,cg.custom_name as sub_product_name,cp.sub_product_count,cp.parent_id,p.product_sn,g.product_image_list_store, ");
+		fromBuilder.append("cp.is_gift,cp.main_product_count, p.big_unit as main_bunit, p.small_unit as main_sunit, p.convert_relate as main_convert, p1.big_unit as sub_bunit, p1.small_unit as sub_sunit, p1.convert_relate as sub_convert ");
 		fromBuilder.append("from `cc_product_composition` cp ");
 		fromBuilder.append("JOIN cc_seller_product cs ON cs.id = cp.seller_product_id ");
 		fromBuilder.append("JOIN cc_product p ON cs.product_id = p.id ");
 		fromBuilder.append("JOIN cc_goods g ON p.goods_id = g.id ");
 		fromBuilder.append("LEFT JOIN cc_seller_product cg ON cg.id = cp.sub_seller_product_id ");
+		fromBuilder.append("JOIN cc_product p1 ON cg.product_id = p1.id ");
 		fromBuilder.append("LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = cs.product_id ");
 		fromBuilder.append("LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");

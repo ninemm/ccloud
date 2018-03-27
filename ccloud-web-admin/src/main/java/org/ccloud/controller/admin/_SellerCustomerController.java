@@ -82,8 +82,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea,sort,sortOrder, customerType);
+		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -397,9 +398,10 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String dataArea = getPara("data_area");
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
-				+ "customerInfo.xlsx";
+				+ "customerInfo.xls";
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%","","", "");
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
@@ -453,7 +455,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	@RequiresPermissions(value = { "/admin/sellerCustomer/uploading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void customerTemplate() {
-		String realPath = getSession().getServletContext().getRealPath("\\")+ "\\WEB-INF\\admin\\seller_customer\\customerTemplate.xlsx";
+		String realPath = getSession().getServletContext().getRealPath("\\")+ "\\WEB-INF\\admin\\seller_customer\\customerTemplate.xls";
 		renderFile(new File(realPath.replace("\\", "/")));
 	}
 
@@ -781,16 +783,18 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 							.trimResults()
 							.splitToList(customerVO.getAreaName());
 
-					if (areaCodeList.size() == 3){
+					if (areaCodeList.size() != 0){
 						customer.setProvCode(areaCodeList.get(0));
 						customer.setCityCode(areaCodeList.get(1));
-						customer.setCountryCode(areaCodeList.get(2));
+						if(areaCodeList.size() == 3) customer.setCountryCode(areaCodeList.get(2));
+						else customer.setCountryCode("");
 					}
 
-					if (areaNameList.size() == 3) {
+					if (areaNameList.size() != 0) {
 						customer.setProvName(areaNameList.get(0));
 						customer.setCityName(areaNameList.get(1));
-						customer.setCountryName(areaNameList.get(2));
+						if(areaNameList.size() == 3) customer.setCountryName(areaNameList.get(2));
+						else customer.setCountryName("");
 					}
 				}
 

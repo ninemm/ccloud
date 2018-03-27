@@ -2,19 +2,23 @@
 <#macro title>订单审核</#macro>
 
 <#macro css>
-	.orderDetail {
-		position:relative;
-		margin-bottom: .5rem;
-	}
-	.orderDetail .icon-trash-o{
-		position: absolute;
-		left: .8rem;
-		font-size: 24px;
-		z-index: 100;
-	}
-	.todo-product-box img{
-		transform: translateY(-20%);
-	}
+    .orderDetail {
+    position:relative;
+    margin-bottom: .5rem;
+    }
+    .orderDetail .icon-trash-o{
+    position: absolute;
+    left: .8rem;
+    font-size: 24px;
+    z-index: 100;
+    }
+    .todo-product-box img{
+    transform: translateY(-20%);
+    }
+    .p-l-15 {
+    overflow: hidden;
+    padding-bottom:.2rem;
+    }
 </#macro>
 <#macro script>
 	$(function() {
@@ -173,7 +177,7 @@
 	function checkEdit(){
 		var $orderDetail = $(".orderDetail");
 		var str = '';
-		
+
 		$.each($orderDetail, function(index, el){
 			var $el = $(el);
 			if($el.find("#sellProductId").val() == undefined){
@@ -371,7 +375,7 @@
 		                      <span class="gray">（${(orderDetail.price)!}）</span>
 		                    </div>
 		                  </div>
-		                  <div class="weui-flex__item t-r relative">
+		                  <div class="weui-flex__item t-r relative fr">
 		                    <input type="hidden" name="bigNumSpan" id="bigNumSpan" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
 													<#if isEdit>
 														<div class="spinner">
@@ -403,7 +407,7 @@
 		                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string(',###.##')}）</span>
 		                    </div>
 		                  </div>
-		                  <div class="weui-flex__item t-r relative">
+		                  <div class="weui-flex__item t-r relative fr">
 		                    <input type="hidden" name="smallNumSpan" id="smallNumSpan" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
 												<#if isEdit>
 													<div class="spinner">
@@ -510,7 +514,7 @@
 								<#else>
 									<input type="number" name="addBigPrice" id="bigPrice" value="0" readonly>
 								</#if>
-	
+
 		                      <span class="gray" id="bigPriceSpanSpan" >（0）</span>
 		                    </div>
 		                  </div>

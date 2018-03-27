@@ -266,7 +266,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 
-	public List<Record> findPhoto(String customerType, String customerName, String data_area){
+	public List<Record> findPhoto(String customerType, String customerName, String questionType, String data_area){
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sql = new StringBuilder("SELECT ccv.id, u.realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
@@ -285,6 +285,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
 
 		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
+		appendIfNotEmpty(sql, "ccv.question_type", questionType, params, false);
 		appendIfNotEmptyWithLike(sql,"t1.customerTypeNames", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
 

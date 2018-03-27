@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Product;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.utils.StringUtils;
@@ -50,14 +49,16 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public List<Record> findByOrderId(String orderId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.seller_id, sp.custom_name,sp.tax_price, sp.price,sp.bar_code, p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, w.code as warehouseCode, t1.valueName,w.name as warehouseName ");
+				" SELECT sod.*, sp.seller_id, sp.custom_name,sp.tax_price, sp.price,sp.bar_code, p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, w.code as warehouseCode, t1.valueName,w.name as warehouseName,IFNULL(cpc.main_product_count,cpc1.sub_product_count) as comCount ");
 		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 		sqlBuilder.append(" LEFT JOIN cc_goods g ON g.id = p.goods_id ");
 		sqlBuilder.append(" LEFT JOIN cc_warehouse w ON sod.warehouse_id = w.id ");
-		sqlBuilder.append("LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
-		sqlBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		sqlBuilder.append(" LEFT JOIN (SELECT * FROM cc_product_composition GROUP BY parent_id) cpc ON cpc.parent_id = sod.composite_id AND cpc.seller_product_id = sod.sell_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_composition cpc1 ON cpc1.parent_id = sod.composite_id AND cpc1.sub_seller_product_id = sod.sell_product_id ");
+		sqlBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		sqlBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
 		sqlBuilder.append(" WHERE order_id = ? ");
 		sqlBuilder.append(" ORDER BY sod.warehouse_id, sod.is_gift ");
 
@@ -204,15 +205,12 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public String insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 	                            String deptId, String dataArea, int index) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
-		StringBuilder stringBuilder = new StringBuilder();
 		String sellerProductId = paraMap.get("sellProductId")[index];
 		String convert = paraMap.get("convert")[index];
 		String bigNum = paraMap.get("bigNum")[index];
 		String smallNum = paraMap.get("smallNum")[index];
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = paraMap.get("productId")[index];
-		Product product = ProductQuery.me().findByPId(productId);
-		String productSn = product.getProductSn();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
@@ -248,8 +246,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			detail.setDeptId(deptId);
 			detail.setDataArea(dataArea);
 			detailList.add(detail);
-			String bAmount =  String.valueOf(bigAmount);
-	     	stringBuilder.append("(" +productSn + "," + bAmount +")" + "|");
+
 		}
 		int[] i = Db.batchSave(detailList, detailList.size());
 		int count = 0;
@@ -259,7 +256,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		if (count != detailList.size()) {
 			return "下单失败";
 		}
-		return stringBuilder.toString();
+		return "";
 	}
 
 	@SuppressWarnings("unchecked")
@@ -336,7 +333,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		String sellerProductId = product.getId();
 		Integer convert = product.getInt("convert_relate");
 		double compositionCount = Double.valueOf(product.getStr("productCount"));
-		Integer productCount = (int) Math.round(compositionCount * convert * number);
+		Integer productCount = (int) Math.round(compositionCount * number);
 		String productId = product.getProductId();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId, sellerProductId);
 		String status = result.get("status").toString();
@@ -361,7 +358,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
 					                           .multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
-			detail.setIsGift(product.getInt("is_gift"));
+			detail.setIsGift(product.getInt("isGift"));
 			detail.setIsComposite(1);
 			detail.setCompositeId(product.getStr("parentId"));
 			detail.setCreateDate(date);
@@ -505,7 +502,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		String sellerProductId = product.getId();
 		Integer convert = product.getInt("convert_relate");
 		double compositionCount = Double.valueOf(product.getStr("productCount"));
-		Integer productCount = (int) Math.round(compositionCount * convert * number);
+		Integer productCount = (int) Math.round(compositionCount * number);
 		String productId = product.getProductId();
 		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId, sellerProductId);
 		String status = result.get("status").toString();
@@ -531,7 +528,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 					                           .multiply(product.getPrice());
 //			BigDecimal amount = new BigDecimal(product.getInt("productCount")).multiply(product.getPrice());
 			detail.setProductAmount(productAmount);
-			detail.setIsGift(product.getIsGift());
+			detail.setIsGift(product.getInt("isGift"));
 			detail.setIsComposite(1);
 			detail.setCompositeId(product.getStr("parentId"));
 			detail.setCreateDate(date);
