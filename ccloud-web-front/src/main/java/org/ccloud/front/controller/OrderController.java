@@ -1,6 +1,7 @@
 package org.ccloud.front.controller;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -77,7 +78,11 @@ public class OrderController extends BaseFrontController {
 
 		List<Map<String, Object>> bizUsers = new ArrayList<>();
 		bizUsers.add(all);
-		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerIdAndDataArea(sellerId,dataArea);
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String startDate = sdf.format(date);
+		String endDate = sdf.format(date)+" 23:59:59";
+		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerIdAndDataArea(sellerId,dataArea,startDate,endDate);
 		for (SalesOrder order : orders) {
 			Map<String, Object> items = new HashMap<>();
 			items.put("title", order.getStr("realname"));
@@ -611,6 +616,27 @@ public class OrderController extends BaseFrontController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("orderDetail", orderDetail);
 		renderJson(map);
+	}
+	
+	public void getBizUser() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerIdAndDataArea(sellerId,dataArea,startDate,endDate);
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> bizUsers = new ArrayList<>();
+		bizUsers.add(all);
+		for (SalesOrder order : orders) {
+			Map<String, Object> items = new HashMap<>();
+			items.put("title", order.getStr("realname"));
+			items.put("value", order.getBizUserId());
+			bizUsers.add(items);
+		}
+		
+		renderJson(bizUsers);
 	}
 	  
 }

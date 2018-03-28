@@ -144,10 +144,6 @@
 		  title: "选择客户类型",
 		  items: ${customerTypes!}
 		});
-		$("#bizUserId").select({
-		  title: "选择业务员",
-		  items: ${bizUsers!}
-		});
 		$('#date').select({
 			title: '选择时间',
 			items: [{
@@ -157,8 +153,15 @@
 				},{title: "最近30天", value: "3"
 			}]
 		})
+		showBizUser(${bizUsers!});
 	});
-  
+  function showBizUser(obj){
+  		console.log(obj);
+		$("#bizUserId").select("update",{
+		  title: "选择业务员",
+		  items: obj
+		});
+  }
 	var newHtml = $(".weui-panel").eq(0).html();
 	var $panel = $('.weui-panel');
 	var $main = $("#main");
@@ -177,6 +180,14 @@
 		$loading.show();
 		$noMore.hide();
 		var params = getParam();
+		//业务员随着时间刷新
+		
+		Utils.ajax('${CPATH}/order/getBizUser', params, 
+			function(data) {
+				showBizUser(data);
+			}
+		);
+		
 		Utils.ajax('${CPATH}/order/orderList', params, 
 			function(data) {
 				$loading.hide();

@@ -2133,11 +2133,17 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	}
 //查找已下订单的业务员
-	public List<SalesOrder> findBySellerIdAndDataArea(String sellerId,String dataArea){
+	public List<SalesOrder> findBySellerIdAndDataArea(String sellerId,String dataArea,String startDate,String endDate){
 		StringBuilder fromBuilder = new StringBuilder("select cs.biz_user_id, u.realname from cc_sales_order cs ");
 		fromBuilder.append("LEFT JOIN user u on u.id = cs.biz_user_id ");
 //		fromBuilder.append("where cs.seller_id  ='"+sellerId+"' ");
-		fromBuilder.append("where cs.data_area  like '"+dataArea+"' ");
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" where cs.create_date >= '"+startDate+"' ");
+		}
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cs.create_date <= '"+endDate+"' ");
+		}
+		fromBuilder.append("and cs.data_area  like '"+dataArea+"' ");
 		fromBuilder.append(" GROUP BY cs.biz_user_id");
 		return DAO.find(fromBuilder.toString());
 	}
