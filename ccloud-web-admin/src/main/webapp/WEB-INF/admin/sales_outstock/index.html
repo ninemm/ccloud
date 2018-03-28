@@ -591,7 +591,7 @@ function orderDetail(id) {
 			</div>
 			<div class="jp-right">
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchCarPrint()"><i class="fa  fa-train"></i>车销订单打印</button>
-				<@shiro.hasPermission name="/admin/salesOutstock/download">
+				<@shiro.hasPermission name="/admin/salesOutstock/downloading">
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchDown()"><i class="fa fa-download"></i> 导出</button>
 				</@shiro.hasPermission>
 				<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchPrintAll()"><i class="fa  fa-rebel"></i> 业务员汇总打印</button>
