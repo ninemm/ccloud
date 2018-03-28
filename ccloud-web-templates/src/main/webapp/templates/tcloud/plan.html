@@ -220,19 +220,23 @@ function doSubmit(){
 			dataType : "json",
 			success : function(data) {
 				layer.closeAll();
-				$.modal({
-					title: data.message,
-					buttons: [
-						{ text: "查看计划", className: "default", onClick: function(){
-							location.href = "${CPATH}/plans/myPlans";
-						}
-						},
-						{ text: "继续新增", className: "primary", onClick: function(){
-							location.href = '${CPATH}/plans';
-						}
-						},
-					]
-				});
+				if (data.errorCode == 0) {
+					$.modal({
+						title: data.message,
+						buttons: [
+							{ text: "查看计划", className: "default", onClick: function(){
+								location.href = "${CPATH}/plans/myPlans";
+							}
+							},
+							{ text: "继续新增", className: "primary", onClick: function(){
+								location.href = '${CPATH}/plans';
+							}
+							},
+						]
+					});
+				} else {
+					$.toptip(data.message, 'error');
+				}
 			},
 			error : function() {
 				layer.closeAll();

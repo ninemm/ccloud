@@ -47,11 +47,15 @@
 <#macro script>
 	
 	var $form = $("#form");
+	$("#userId").select2({
+		width: '100%'
+	});
 	var num = 0;
 	$(function() {
 		jQuery.mm.initValidator('#form', validatorFields)
-		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
-		jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker('form', '#month', 'month', 'yyyy-MM', 3, 10, 3);
+//		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+//		jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		addProduct()
 		$(".monthYear").show();
 		$(".month").show();
@@ -91,6 +95,11 @@
 		}
 	});
 	var validatorFields = {
+		'month': {
+			validators: {
+				notEmpty: { message: '计划周期不能为空' }
+			}
+		}
 	};
 	
 	function doSubmit(){
@@ -198,10 +207,17 @@
 						</div>
 					</div> -->
 					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">计划人员:</label>
+						<label class="control-label col-sm-4">业务人员:</label>
 						<input type = "hidden" id = "planType" name = "planType" value="">
 						<div class="input-group col-sm-8 input-group-sm">
-							<select  class="form-control" name="userId" id="userId" style="float: left;padding-right:5px;margin-right:5px;">
+							<!-- <select  class="form-control" name="userId" id="userId" style="float: left;padding-right:5px;margin-right:5px;">
+								<#if users??>
+									<#list users as user>
+										<option value="${(user.id)}">${(user.realname)}</option>
+									</#list>
+								</#if>
+							</select> -->
+							<select class="form-control input-sm" name="userId" id="userId" multiple="multiple" >
 								<#if users??>
 									<#list users as user>
 										<option value="${(user.id)}">${(user.realname)}</option>
@@ -213,8 +229,12 @@
 				</div>
 				<div class="form-group monthYear">
 					<div class="col-sm-5 validata-box month">
-						<label class="control-label col-sm-4">计划周期:</label>
-						<div class="input-group col-sm-8 input-group-sm">
+	                    <label class="control-label col-sm-4">计划周期:</label>
+	                    <div class="col-sm-8 input-group input-group-sm">
+	                        <input id="month" class="form-control" type="text" value="${month!}" name="month" placeholder="活动开始日期" >
+	                    </div>
+	                </div>
+						<!-- <div class="input-group col-sm-8 input-group-sm">
 							<select  class="form-control" name="month" id="month" style="float: left;padding-right:5px;margin-right:5px;">
 								<#if months??>
 									<#list months as month>
@@ -222,7 +242,7 @@
 									</#list>
 								</#if>
 							</select>
-						</div>
+						</div> -->
 					</div>
 					<!--<div class="col-sm-5 validata-box year">
 						<label class="control-label col-sm-4">计划周期:</label>
@@ -269,9 +289,9 @@
 							<td>
 								<span class="rowNum">0</span>
 							</td>
-							<td>
+							<td style = "padding-top:0px;">
 								<div class = "validata-box">
-									<select id="sellerProduct" name="sellerProduct" class="form-control">
+									<select id="sellerProduct" name="sellerProduct" class="form-control" style="height:30px;">
 										<option value="0">---请选择---</option>
 										<#if sellerProducts??>
 											<#list sellerProducts as sp>

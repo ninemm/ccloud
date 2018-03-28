@@ -61,6 +61,11 @@ public class PlansController extends BaseFrontController {
 		String[] productIds = getParaValues("productId");
 		String[] productNum = getParaValues("productNum");
 		for(int i=0;i<productIds.length;i++) {
+			Plans plan = PlansQuery.me().findbySSEU(productIds[i],getPara("start-date"),getPara("end-date"),user.getId());
+			if(plan!=null) {
+				renderAjaxResultForError("已经存在产品："+SellerProductQuery.me().findById(productIds[i]).getCustomName()+"的计划");
+				return;
+			}
 			Plans plans = new Plans();
 			plans.setId(StrKit.getRandomUUID());
 			plans.setSellerId(sellerId);
@@ -170,35 +175,22 @@ public class PlansController extends BaseFrontController {
 	}
 	
 	public void mPlans() {
+		render("plan_my_list.html");
+	}
+	
+	public void myPlanList() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Map<String, Object> all = new HashMap<>();
-		all.put("title", "全部");
-		all.put("value", "");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String keyword = getPara("keyword");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
-		List<Map<String, Object>> userIds = new ArrayList<>();
-		userIds.add(all);
+		Page<Record> planList = PlansQuery.me().paginateForAppMyPlan(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, selectDataArea,user.getId());
 
-		List<Map<String, Object>> sellerProducts = new ArrayList<>();
-		sellerProducts.add(all);
-		
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
-		for (Record record : userList) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", record.get("realname"));
-			item.put("value", record.get("id"));
-			userIds.add(item);
-		}
-		
-		List<Plans> plans = PlansQuery.me().findbyDateArea(selectDataArea);
-		for(Plans plan : plans) {
-			Map<String, Object> item = new HashMap<>();
-			item.put("title", plan.get("custom_name"));
-			item.put("value", plan.getSellerProductId());
-			sellerProducts.add(item);
-		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("planList", planList.getList());
 
-		setAttr("userIds", JSON.toJSON(userIds));
-		setAttr("sellerProducts", JSON.toJSON(sellerProducts));
-		render("my_plan_list.html");
+		renderJson(map);
 	}
 }

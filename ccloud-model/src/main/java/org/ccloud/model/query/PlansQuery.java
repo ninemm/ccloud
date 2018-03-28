@@ -174,4 +174,42 @@ public class PlansQuery extends JBaseQuery {
 		return DAO.doFindFirst("seller_product_id = ? and start_date = ? and end_date = ? and user_id = ?", sellerProductId,startDate,endDate,userId);
 	}
 	
+	public Page<Record> paginateForAppMyPlan(int pageNumber, int pageSize, String keyword,
+            String startDate, String endDate, String sellerId, String dataArea,String userId) {
+			String select = "select o.*, u.realname, d.name as typeName, sp.custom_name ";
+			StringBuilder fromBuilder = new StringBuilder("from `cc_plans` o ");
+			fromBuilder.append("join user u ON o.user_id = u.id ");
+			fromBuilder.append("left join cc_seller_product sp ON o.seller_product_id = sp.id ");
+			fromBuilder.append("left join dict d ON o.type = d.value ");
+			
+			LinkedList<Object> params = new LinkedList<Object>();
+			boolean needWhere = true;
+			
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, needWhere);
+//			needWhere = appendIfNotEmpty(fromBuilder, "o.type", type, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "o.user_id", userId, params, needWhere);
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+			
+			if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+			}
+			
+			if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.start_date >= ?");
+			params.add(startDate);
+			}
+			
+			if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.end_date <= ?");
+			params.add(endDate);
+			}
+			fromBuilder.append(" and o.type in ('"+Consts.MONTH_PLAN+"') GROUP BY o.seller_id,o.user_id, o.type, o.seller_product_id ,o.start_date,o.end_date order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
+			
+			if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+			
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	
 }

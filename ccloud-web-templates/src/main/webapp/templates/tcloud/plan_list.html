@@ -42,6 +42,8 @@
 		combo();
 	}).on("change", "#userId", function() {
 		combo();
+	}).on("change", "#sellerProductId", function() {
+		combo();
 	}).on("click", "#confirm", function() {
 		startDate = $('#start-date').val();
 		endDate = $('#end-date').val();
@@ -62,9 +64,9 @@
 	$("#show").select({
 		title: "选择查看方式",
 		items: [{
-			title: "显示业务员", value: "101204"
+			title: "业务员", value: "101204"
 		},{
-			title: "显示产品", value: "101205"
+			title: "产品", value: "101205"
 		}],
 		onChange: function(obj){
 			page = 1;

@@ -111,8 +111,20 @@ public class _PlansController extends JBaseCRUDController<Plans> {
         String type = getPara("type");
         String dateType = getPara("dateType");
         String startDate = "";
-		String endDate = "";
-		if(StrKit.notBlank(dateType)) {
+        String endDate = "";
+        if(StrKit.notBlank(dateType)) {
+        	int index = dateType.indexOf("-");
+        	startDate = dateType + "-01";
+        	Calendar cal = Calendar.getInstance();  
+        	//设置年份  
+        	cal.set(Calendar.YEAR,Integer.parseInt(dateType.substring(0,index)));  
+        	//设置月份  
+        	cal.set(Calendar.MONTH, Integer.parseInt(dateType.substring(index+1,dateType.length()))-1); 
+        	//获取某月最大天数  
+        	int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        	endDate = dateType + "-"+(lastDay);
+        }
+		/*if(StrKit.notBlank(dateType)) {
 			if(type.equals(Consts.MONTH_PLAN)) {
 				int index = dateType.indexOf("-");
 				startDate = dateType + "-01";
@@ -128,7 +140,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 				startDate = dateType + "-01-01";
 				endDate = dateType + "-12-31";
 			}
-		}
+		}*/
         Page<Plans> page = PlansQuery.me().paginate(getPageNumber(), getPageSize(),keyword, "cp.create_date", dataArea,type,startDate,endDate,dateType);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
@@ -602,7 +614,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	
 	@Before(Tx.class)
 	public void save() {
-		String userId = getPara("userId");
+		String[] userIds = getParaValues("userId");
 		String planType = getPara("planType");
 		String startDate = "";
 		String endDate = "";
@@ -628,34 +640,40 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 			endDate = getPara("endDate");
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		User us = UserQuery.me().findById(userId);
 		int num = Integer.parseInt(getPara("productNum"));
 		int inCnt = 0;
-		
-		for(int i = 1 ; i <= num ; i++) {
-			if(StrKit.isBlank(getPara("sellerProduct" + i))){
-				continue;
+		for(String  userId: userIds) {
+			User us = UserQuery.me().findById(userId);
+			for(int i = 1 ; i <= num ; i++) {
+				if(StrKit.isBlank(getPara("sellerProduct" + i))){
+					continue;
+				}
+				Plans plan = PlansQuery.me().findbySSEU(getPara("sellerProduct"+i),startDate,endDate,us.getId());
+				if(plan!=null) {
+					renderAjaxResultForError("已经存在产品："+SellerProductQuery.me().findById(getPara("sellerProduct"+i)).getCustomName()+"的计划");
+					return;
+				}
+				Plans plans = new Plans();
+				plans.setId(StrKit.getRandomUUID());
+				plans.setSellerId(sellerId);
+				plans.setUserId(us.getId());
+				plans.setType(planType);
+				plans.setSellerProductId(getPara("sellerProduct"+i));
+				plans.setPlanNum(new BigDecimal(getPara("planNum"+i)));
+				plans.setCompleteNum(new BigDecimal(0));
+				plans.setCompleteRatio(new BigDecimal(0));
+				try {
+					plans.setStartDate(sdf.parse(startDate));
+					plans.setEndDate(sdf.parse(endDate));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				plans.setDeptId(us.getDepartmentId());
+				plans.setDataArea(us.getDataArea());
+				plans.setCreateDate(new Date());
+				plans.save();
+				inCnt++;
 			}
-			Plans plans = new Plans();
-			plans.setId(StrKit.getRandomUUID());
-			plans.setSellerId(sellerId);
-			plans.setUserId(us.getId());
-			plans.setType(planType);
-			plans.setSellerProductId(getPara("sellerProduct"+i));
-			plans.setPlanNum(new BigDecimal(getPara("planNum"+i)));
-			plans.setCompleteNum(new BigDecimal(0));
-			plans.setCompleteRatio(new BigDecimal(0));
-			try {
-				plans.setStartDate(sdf.parse(startDate));
-				plans.setEndDate(sdf.parse(endDate));
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			plans.setDeptId(us.getDepartmentId());
-			plans.setDataArea(us.getDataArea());
-			plans.setCreateDate(new Date());
-			plans.save();
-			inCnt++;
 		}
 		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据");
 	}
