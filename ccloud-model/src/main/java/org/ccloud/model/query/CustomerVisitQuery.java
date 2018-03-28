@@ -93,7 +93,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature,String user, String subType, String status, String dataArea, String searchKey) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature,String user, String subType, String status, String dataArea, String dealerDataArea, String searchKey) {
 
 		boolean needwhere = false;
 		List<Object> params = new LinkedList<Object>();
@@ -109,6 +109,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("FROM cc_seller_customer c1 ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		appendIfNotEmptyWithLike(sql, "c1.data_area", dealerDataArea, params, true);
 		sql.append("GROUP BY c1.id) t1 ON csc.id = t1.id ");
 
 		if (StrKit.notBlank(searchKey)) {
@@ -266,7 +267,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 
-	public List<Record> findPhoto(String customerType, String customerName, String questionType, String data_area){
+	public List<Record> findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea){
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sql = new StringBuilder("SELECT ccv.id, u.realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
@@ -279,6 +280,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("FROM cc_seller_customer c1 ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		appendIfNotEmptyWithLike(sql, "c1.data_area", dealerDataArea, params, true);
 		sql.append("GROUP BY c1.id) t1 ON t1.id = csc.id ");
 
 		sql.append("LEFT JOIN `user` u ON u.id = ccv.user_id ");
