@@ -221,6 +221,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
             	if (i <= 0) {
             		return false;
             	}
+            	//审核通过
             	if (status == 1000) {
             		Record refund = SalesRefundInstockQuery.me().findMoreById(inStockId);
             		String customerId = refund.getStr("customer_id");
