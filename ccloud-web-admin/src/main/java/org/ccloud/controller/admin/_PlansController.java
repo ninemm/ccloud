@@ -253,7 +253,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		File file = getFile().getFile();
 		String month = getPara("start");
 		int index = month.indexOf("-");
-		String startDate = month + "-01";
+		String startDateM = month + "-01";
 		Calendar cal = Calendar.getInstance();  
 		//设置年份  
 		cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
@@ -261,7 +261,9 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))-1); 
 		//获取某月最大天数  
 		int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-		String endDate = month + "-"+(lastDay);
+		String endDateM = month + "-"+(lastDay);
+		String startDate  = getPara("startDate");
+		String endDate  = getPara("endDate");
 		//结束时间
 		try {
 			FileInputStream fis = new FileInputStream(file);  
@@ -270,6 +272,10 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 			Workbook workbook = WorkbookFactory.create(fs);
 			 Sheet sheet = workbook.getSheetAt(0);
 			 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			if(sdf.parse(startDate).before(sdf.parse(startDateM)) || sdf.parse(startDate).after(sdf.parse(endDateM))) {
+				renderAjaxResultForError("计划的开始时间不在计划月内");
+				return;
+			}
 			//设置单元格类型
 			 for(int i = 0;i<users.size() ; i++) {
 				 Cell cell = sheet.getRow(0).getCell(i+2);
@@ -577,10 +583,21 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	public void save() {
 		String[] userIds = getParaValues("userId");
 		String planType = getPara("planType");
-		String startDate = "";
-		String endDate = "";
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		if(planType.equals(Consts.MONTH_PLAN)) {
+		String month = getPara("month");
+		int index = month.indexOf("-");
+		String startDateM = month + "-01";
+		Calendar cal = Calendar.getInstance();  
+		//设置年份  
+		cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
+		//设置月份  
+		cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))-1); 
+		//获取某月最大天数  
+		int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+		String endDateM = month + "-"+(lastDay);
+		/*if(planType.equals(Consts.MONTH_PLAN)) {
 			String month = getPara("month");
 			int index = month.indexOf("-");
 			startDate = month + "-01";
@@ -599,8 +616,16 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		}else {
 			startDate = getPara("startDate");
 			endDate = getPara("endDate");
-		}
+		}*/
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			if(sdf.parse(startDate).before(sdf.parse(startDateM)) || sdf.parse(startDate).after(sdf.parse(endDateM))) {
+				renderAjaxResultForError("计划的开始时间不在计划月内");
+				return;
+			}
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
 		int num = Integer.parseInt(getPara("productNum"));
 		int inCnt = 0;
 		for(String  userId: userIds) {

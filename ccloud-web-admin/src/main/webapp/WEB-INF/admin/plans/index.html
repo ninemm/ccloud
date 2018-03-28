@@ -104,7 +104,17 @@
 				{field: "realname", title: "业务员名称", align: "center", width: '5%', edit: false},
 				{field: "custom_name", title: "计划产品", align: "center", width: '15%', edit: false},
 				{field: "planNum", title: "计划量（件）", align: "center", width: '5%', edit: false},
+				{field: "", title: "计划金额", align: "center", width: '5%',
+					formatter: function(value, row, rowIndex) {
+						return formatNumber(row.price*row.planNum);
+					},
+				 edit: false},
 				{field: "completeNum", title: "实际量（件）", align: "center", width: '5%', edit: false},
+				{field: "", title: "实际金额", align: "center", width: '5%',
+					formatter: function(value, row, rowIndex) {
+						return formatNumber(row.price*row.completeNum);
+					},
+				 edit: false},
 				{field: "complete_ratio", title: "完成情况", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						return value+"%";
@@ -122,7 +132,7 @@
 		    dateType =  $("#year option:selected").val();
 		}*/
 		type = "101202";
-		dateType =  $("#month option:selected").val();
+		dateType =  $("#startDate").val();
 		jQuery.mm.down("${CPATH}/admin/plans/downloading?type="+type+"&&k="+$("#search").val()+"&&dateType="+dateType);
 		window.event.returnValue=false; 
 	}
@@ -157,15 +167,9 @@
                     </div>
 				</div>-->
 				 <div class="col-sm-4">
-					<@shiro.hasPermission name="/admin/plans/uploading">
 						<a href="${CPATH}/admin/plans/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
-					</@shiro.hasPermission>
-					<@shiro.hasPermission name="/admin/plans/downloading">
 						<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</button>
-					</@shiro.hasPermission>
-					<@shiro.hasPermission name="/admin/plans/add">
 						<a href="${CPATH}/admin/plans/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增计划 </a>
-					</@shiro.hasPermission>
 				</div>
 				<div class="col-sm-4 monthType">
                     <label class="control-label col-sm-4">开始时间:</label>

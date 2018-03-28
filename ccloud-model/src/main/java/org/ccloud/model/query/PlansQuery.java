@@ -54,7 +54,7 @@ public class PlansQuery extends JBaseQuery {
 	
 	
 	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type,String startDate,String endDate,String dateType) {
-		String select = "SELECT cp.user_id,cp.type,cp.seller_product_id,cp.start_date,cp.end_date,cs.seller_name,u.realname,csp.custom_name ,sum(plan_num) as planNum, sum(complete_num) as completeNum ,cp.complete_ratio  ";
+		String select = "SELECT cp.user_id,cp.type,cp.seller_product_id,csp.price,cp.start_date,cp.end_date,cs.seller_name,u.realname,csp.custom_name ,sum(plan_num) as planNum, sum(complete_num) as completeNum ,cp.complete_ratio  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
 		fromBuilder.append("LEFT JOIN cc_seller cs on cs.id = cp.seller_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
@@ -71,7 +71,7 @@ public class PlansQuery extends JBaseQuery {
 		if(!type.equals("")) {
 			fromBuilder.append(" and cp.type = '"+type+"' ");
 			if(!type.equals(Consts.WEEK_PLAN) && StrKit.notBlank(dateType)) {
-				fromBuilder.append(" and cp.start_date >= '"+startDate+"' and cp.end_date <= '"+endDate+" 23:59:59' ");
+				fromBuilder.append(" and cp.start_date >= '"+startDate+"' and cp.start_date <= '"+endDate+" 23:59:59' ");
 			}
 		}
 		fromBuilder.append("and cp.data_area like '"+dataArea+"' ");
