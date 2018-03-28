@@ -3,12 +3,16 @@
 <#macro script_import>
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
-	<!-- bootstrapvalidator -->
+	<!-- bootstrap-datetimepicker -->
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<!-- bootstrap-datetimepicker -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
 </#macro>
 
 <#macro script>
@@ -16,15 +20,15 @@
 	var $form = $("#form");
 
 	$(function() {
-
+		jQuery.mm.initDatetimepicker('form', '#month', 'month', 'yyyy-MM', 3, 10, 3);
 		jQuery.mm.initValidator('#form', validatorFields)
 
 	});
 
 	var validatorFields = {
-		'userIds': {
+		'month': {
 			validators: {
-				notEmpty: { message: '负责人不能为空' },
+				notEmpty: { message: '计划周期不能为空' },
 			}
 		},
 		'file': {
@@ -45,6 +49,7 @@
 	});
 
 	function doSubmit(){
+		var start = $("#month").val();
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 			    var index = layer.load(1, {shade: false}); //0代表加载的风格，支持0-2
@@ -54,6 +59,7 @@
 			},
 			type : "post", 
 			dataType : "json", 
+			data:{"start":start},
 			success : function(data) { 
 			    layer.closeAll();
 				if(data.errorCode == 0) {
@@ -102,7 +108,13 @@
 					</div>
 				</div>
 				<div class="form-group col-sm-12 validata-box">
-					<label class="control-label col-sm-2">*上传文件:</label>
+					<label class="control-label col-sm-2">计划周期:</label>
+					<div class="input-group col-md-4 col-sm-4-offset-2" >
+						 <input id="month" class="form-control" type="text" value="${month!}" name="month" placeholder="活动开始日期" style="height:30px;">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2" style = "padding-top:0px;">*上传文件:</label>
 					<div class="input-group col-md-4 col-sm-10">
 						<input type="file" id="file" name="file" value="">
 					</div>

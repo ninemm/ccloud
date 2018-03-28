@@ -161,11 +161,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
-		List<String> headers = new ArrayList<String>();
-		headers.add("2018-01月月计划");
-		headers.add("开始时间：");
-		headers.add("结束时间：");
-		headers.add("计划类型(周计划/月计划/年计划)");
 		List<User> users = UserQuery.me().findByData(dataArea);
 	    // 声明一个工作薄
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -201,40 +196,14 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	    
 	    // 生成一个表格
 	    wb.setSheetName(0,"销售计划");
-	    // 创建表格标题行
-	    for(int i = 0 ;i<headers.size();i++ ) {
-	    	if(i<=3) {
-	    		HSSFRow newRow = sheet.createRow(i);
-	    		Cell cell = newRow.createCell(1);
-	    		cell.setCellValue(headers.get(i));
-	    		cell.setCellStyle(ztStyle);
-	    		if(i==1) {
-	    			Cell cell_01 = newRow.createCell(2);
-	    			cell_01.setCellValue(new Date(118,01,01));
-	    			cell_01.setCellStyle(ztStyle3);
-	    		}else if(i==2) {
-	    			Cell cell_02 = newRow.createCell(2);
-	    			cell_02.setCellValue(new Date(118,01,31));
-	    			cell_02.setCellStyle(ztStyle3);
-	    		}else if(i==3) {
-	    			Cell cell_03 = newRow.createCell(2);
-	    			cell_03.setCellValue("月计划");
-	    			cell_03.setCellStyle(ztStyle2);
-	    		}else {
-	    			Cell cell_0 = newRow.createCell(2);
-	    			cell_0.setCellValue("请将时间清空重新填入");
-	    			cell_0.setCellStyle(ztStyle2);
-	    		}
-	    	}
-	    }
 	    //模板例子
 	   
-	    HSSFRow row_0 = sheet.createRow(4);
+	    HSSFRow row_0 = sheet.createRow(0);
 	    for(int i = 0 ; i<users.size();i++) {
 	    	row_0.createCell(i+2).setCellValue(users.get(i).getId());
 	    	row_0.setZeroHeight(true);
 	    }
-	    HSSFRow row = sheet.createRow(5);
+	    HSSFRow row = sheet.createRow(1);
 	    Cell ce = row.createCell(1);
 	    ce.setCellValue("产品");
 	    ce.setCellStyle(ztStyle);
@@ -246,7 +215,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	   sheet.setColumnHidden((short)0,true);
 	    //插入需导出的数据
 	    for(int i=0;i<productRecords.size();i++){
-	    	HSSFRow rowP = sheet.createRow(i+6);
+	    	HSSFRow rowP = sheet.createRow(i+2);
 	        rowP.createCell(0).setCellValue(productRecords.get(i).getStr("sell_product_id"));
 	        Cell cell = rowP.createCell(1);
 	        cell.setCellValue(productRecords.get(i).getStr("custom_name")+" "+productRecords.get(i).getStr("valueName"));
@@ -278,18 +247,25 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	
 	public void uploading() {
 		int inCnt = 0;
-
+		int inNum = 0;
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
 		List<User> users = UserQuery.me().findByData(dataArea);
 		//开始时间
-		String startDate = "";
-		//结束时间
-		String endDate = "";
-		//计划类型
-		String type = "";
 		File file = getFile().getFile();
+		String month = getPara("start");
+		int index = month.indexOf("-");
+		String startDate = month + "-01";
+		Calendar cal = Calendar.getInstance();  
+		//设置年份  
+		cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
+		//设置月份  
+		cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))-1); 
+		//获取某月最大天数  
+		int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+		String endDate = month + "-"+(lastDay);
+		//结束时间
 		try {
 			FileInputStream fis = new FileInputStream(file);  
 			
@@ -298,33 +274,20 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 			 Sheet sheet = workbook.getSheetAt(0);
 			 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			//设置单元格类型
-			 Cell cell_01 = sheet.getRow(1).getCell(2);
-			 if(cell_01==null) {
-				 renderAjaxResultForError("开始时间不能为空！");
-					return;
-			 }
-			 startDate = sdf.format(HSSFDateUtil.getJavaDate(cell_01.getNumericCellValue()));
-			 Cell cell_02 = sheet.getRow(2).getCell(2);
-			 if(cell_02==null) {
-				 renderAjaxResultForError("结束时间不能为空！");
-					return;
-			 }
-			 endDate = sdf.format(HSSFDateUtil.getJavaDate(cell_02.getNumericCellValue()));
-			 if(sheet.getRow(3).getCell(2)==null) {
-				 renderAjaxResultForError("计划类型不能为空");
-					return;
-			 }
-			 type = sheet.getRow(3).getCell(2).getStringCellValue();
-			 Dict dict = DictQuery.me().findbyName(type);
 			 for(int i = 0;i<users.size() ; i++) {
-				 Cell cell = sheet.getRow(4).getCell(i+2);
+				 Cell cell = sheet.getRow(0).getCell(i+2);
 				 if(cell==null) {
 					 continue;
 				 }
 				 User us = UserQuery.me().findById(cell.getStringCellValue());
 				 for(int j = 0;j<productRecords.size();j++) {
-					String sellerProductId = sheet.getRow(j+6).getCell(0).getStringCellValue();
-					Cell cl = sheet.getRow(j+6).getCell(i+2);
+					String sellerProductId = sheet.getRow(j+2).getCell(0).getStringCellValue();
+					Plans plan = PlansQuery.me().findbySSEU(sellerProductId,startDate,endDate,us.getId());
+					if(plan!=null) {
+						inNum++;
+						continue;
+					}
+					Cell cl = sheet.getRow(j+2).getCell(i+2);
 					if(cl==null) {
 						continue;
 					}
@@ -336,7 +299,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 					plans.setId(StrKit.getRandomUUID());
 					plans.setSellerId(sellerId);
 					plans.setUserId(us.getId());
-					plans.setType(dict.getValue());
+					plans.setType("101202");
 					plans.setSellerProductId(sellerProductId);
 					plans.setPlanNum(new BigDecimal(cl.getStringCellValue()));
 					plans.setCompleteNum(new BigDecimal(0));
@@ -357,7 +320,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据");
+		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据,重复"+inNum+"条数据");
 	}
 	
 	public void downloading() throws UnsupportedEncodingException{
