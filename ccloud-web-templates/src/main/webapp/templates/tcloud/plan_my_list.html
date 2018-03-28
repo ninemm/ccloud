@@ -13,7 +13,28 @@
 		$(".plansShow").css('display','none');
 		combo();
 	});
-
+	$("#datetime-picker").datetimePicker({
+				times: function () {
+		          return [];
+		        }
+			});
+	$("#datetime-picker").click(function(){
+			$(".picker-items-col:nth-child(5)").hide();
+			$(".picker-items-col:nth-child(4)").hide();
+		});
+	$("#datetime-picker").change(function(){
+		var date3 = new Date($("#datetime-picker").val().replace(/-/g,"/"));	
+		$("#datetime-picker").val(date3.Format("yyyy-MM"));
+		date3.setDate(1);
+		$("#startDate").val(date3.Format("yyyy-MM-dd"));
+		 var currentMonth=date3.getMonth();
+		 var nextMonth=++currentMonth;
+		 var nextMonthFirstDay=new Date(date3.getFullYear(),nextMonth,1);
+		 var oneDay=1000*60*60*24;
+		 var date4 = new Date(nextMonthFirstDay-oneDay);
+		 $("#endDate").val(date4.Format("yyyy-MM-dd"));
+		 combo();
+	});
 	var cpLock = true;
 	var time;
 	var page = 1;
@@ -38,7 +59,7 @@
 		}
 	}).on("click", "#searchCancel", function() {
 		combo();
-	}).on("change", "#type", function() {
+	}).on("change", "#sellerProductId", function() {
 		combo();
 	}).on("click", "#confirm", function() {
 		startDate = $('#start-date').val();
@@ -56,6 +77,10 @@
 			title: "年计划", value: "101203"
 		}]
 	});*/
+	$("#sellerProductId").select({
+		title: "选择产品",
+		items: ${sellerProducts!}
+	});
 	$("#start-date").calendar({
 		maxDate: function() {
 			return $('#end-date').val()
@@ -92,8 +117,8 @@
 			"type": "101202",
 			"show":$("#show").data('values'),
 			"sellerProductId": $("#sellerProductId").data('values'),
-			"startDate": startDate,
-			"endDate": endDate
+			"startDate": $("#startDate").val(),
+			"endDate": $("#endDate").val()
 		}
 		Utils.ajax('${CPATH}/plans/myPlanList', params,
 			function(data) {
@@ -106,7 +131,6 @@
 				}
 		
 				$.each(data.planList, function(index, el) {
-					console.log(el);
 					$planList.append(newHtml);
 					var $newPlan = $planList.find(".plan-list-box:last");
 					$newPlan.find("#productName").text(el.custom_name)
@@ -162,17 +186,22 @@
 	<article id="my-order" class="ft14">
 		<header class="has-th-list weui-flex">
 			<div class="head-search select-area weui-flex__item">
-				<div class="weui-flex" style = "margin-left:auto;margin-right:auto;line-height:44px;color:#000;font-size:18px;">
-				销售计划列表
-					<!-- <div class="weui-flex__item">
-						<input type="text" id="type" class="weui-input" readonly placeholder="计划类型">
+				<div class="weui-flex">
+					<div class="weui-flex__item">
+						<input type="text" id="sellerProductId" placeholder="产品" class="weui-input" readonly>
 						<i class="icon-sort-desc"></i>
-					</div> -->
+					</div> 
+					 <div class="weui-flex__item">
+					 	<input type="hidden" class="weui-input fr" id="startDate" name="startDate" readonly="">
+					 	<input type="hidden" class="weui-input fr" id="endDate" name="endDate" readonly="">
+						<input type="text" class="weui-input fr" id='datetime-picker'  readonly="" placeholder="计划月份"/>
+						<i class="icon-sort-desc"></i>
+					</div> 
 				</div>
 			</div>
-			<div id="combin-filter-btn">
+			<!-- <div id="combin-filter-btn">
 				<i class="icon-th-list"></i>
-			</div>
+			</div> -->
 		</header>
 		<main>
 			<div class="ft12 planList">

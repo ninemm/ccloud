@@ -175,6 +175,21 @@ public class PlansController extends BaseFrontController {
 	}
 	
 	public void mPlans() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> sellerProducts = new ArrayList<>();
+		sellerProducts.add(all);
+		List<Plans> plans = PlansQuery.me().findbyDateArea(selectDataArea);
+		for(Plans plan : plans) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", plan.get("custom_name"));
+			item.put("value", plan.getSellerProductId());
+			sellerProducts.add(item);
+		}
+
+		setAttr("sellerProducts", JSON.toJSON(sellerProducts));
 		render("plan_my_list.html");
 	}
 	
@@ -185,8 +200,8 @@ public class PlansController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-
-		Page<Record> planList = PlansQuery.me().paginateForAppMyPlan(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, selectDataArea,user.getId());
+		String sellerProductId = getPara("sellerProductId");
+		Page<Record> planList = PlansQuery.me().paginateForAppMyPlan(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, selectDataArea,user.getId(),sellerProductId);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("planList", planList.getList());

@@ -179,7 +179,7 @@ public class PlansQuery extends JBaseQuery {
 	}
 	
 	public Page<Record> paginateForAppMyPlan(int pageNumber, int pageSize, String keyword,
-            String startDate, String endDate, String sellerId, String dataArea,String userId) {
+            String startDate, String endDate, String sellerId, String dataArea,String userId,String sellerProductId) {
 			String select = "select o.*, u.realname, d.name as typeName, sp.custom_name ";
 			StringBuilder fromBuilder = new StringBuilder("from `cc_plans` o ");
 			fromBuilder.append("join user u ON o.user_id = u.id ");
@@ -192,6 +192,7 @@ public class PlansQuery extends JBaseQuery {
 			needWhere = appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, needWhere);
 //			needWhere = appendIfNotEmpty(fromBuilder, "o.type", type, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "o.user_id", userId, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "o.seller_product_id", sellerProductId, params, needWhere);
 			needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 			
