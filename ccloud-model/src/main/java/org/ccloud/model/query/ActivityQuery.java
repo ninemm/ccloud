@@ -324,4 +324,11 @@ public class ActivityQuery extends JBaseQuery {
 		return Db.findFirst(sql);
 	}
 
+	public List<Record> findPhoto(String activityApplyId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT ccv.photo,ccv.create_date FROM cc_activity_apply caa");
+		fromBuilder.append(" LEFT JOIN cc_customer_visit ccv ON ccv.active_apply_id = caa.id");
+		fromBuilder.append(" WHERE caa.id = '"+activityApplyId+"' and ccv.photo!='null';");
+		return Db.find(fromBuilder.toString());
+	}
+
 }
