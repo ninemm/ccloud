@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro title>业务员销售统计</#macro>
+<#macro title>部门销售统计</#macro>
 <#macro css>
     .report {
         font-size: 0.7rem;
@@ -15,10 +15,28 @@
         left: 0;
         height: 0;
     }
+    
+    p { 
+    	margin:0
+		}
+		
+		.weui-tabbar {
+			position: fixed;
+		}
+
+		.overview-title span {
+			bottom: 0;
+		}
+
+		.weui-flex__item {
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
+		}    
 </#macro>
 
 <#macro css_import>
 <link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+<link rel="stylesheet" href="${CPATH}/static/bootstrap/css/bootstrap.min.css">
 </#macro>
 <#macro script_import>
 <script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
@@ -63,6 +81,12 @@
     	salesIndentChart.showLoading();    
 		Utils.ajax('${CPATH}/report/getDepartmentCountForSales', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#deptCount").height(300);
+		        } else {
+		        	$("#deptCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];
@@ -140,80 +164,17 @@
     }
     
     function productCount(params) {
-    	var product = document.getElementById('productCount');
-    	var productChart = echarts.init(product);
-    	productChart.showLoading();       
+    	$.showLoading();
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
-				productChart.hideLoading();
-				var orderTag = $("#orderTag").val();
-				var height = data.length;
-				$("#productCount").height(50 * height + 300);
-	            var productOption = {
-	                tooltip : {
-	                    trigger: 'axis'
-	                },
-	                legend: {
-	                    data:[],
-	                    textStyle : {
-	                        fontSize : 10
-	                    }
-	                },
-	                grid: {
-	                    left: '2%',
-	                    right: '17%',
-	                    bottom: 15,
-	                    top: 60,
-	                    containLabel: true
-	                },
-	                toolbox: {
-	                },
-	                calculable : true,
-	                xAxis : [
-	                {
-	                    show : false,
-	                    name : '数量/件',
-	                    type : 'value',
-	                    boundaryGap: [0, 0.01]
-	
-	                }
-	                ],
-	                yAxis : [
-	                {
-	                    show: false,
-	                    type : 'category',
-	                    data:['']
-	                }
-	                ],
-	                series : []
-	            };
-	            for (var i = 0; i < data.length; i++) {
-	               var count = data[i].productCount;
-		           if (orderTag == 'productCount') {
-		           		count = data[i].productCount;
-		           } else if (orderTag == 'totalAmount') {
-		           		count = data[i].totalAmount;
-		           } else {
-		           		count = data[i].orderCount;
-		           }		            
-	               productOption.legend.data.push(data[i].custom_name);
-	               productOption.series.push({
-	                name:data[i].custom_name,
-	                type:'bar',
-	                barWidth: 15,
-	                data:[count],
-	                label:{
-	                    normal:{
-	                        show:true,
-	                        position: 'right',
-	                        formatter: count + unit
-	                    }
-	                }
-	
-	              });
-	           }
-	        productChart.resize();
-	        productChart.setOption(productOption, true);
+				$.hideLoading();
+	            var length = data.length;
+	            var $tbody = $("#productCount tbody");
+	            $tbody.empty();
+	            $tbody.append("<tr><th width='60%' style='text-align:center'>产品</th><th width='20%' style='padding: 8px 0;text-align:center'>数量(件)</th><th width='20%' style='padding: 8px 0;text-align:center'>金额(元)</th></tr>");
+	            for(var i = 0; i < length; i++){
+	                $tbody.append("<tr><td>" + data[i].custom_name + "</td><td class='t-r'>" + (data[i].productCount).toFixed(2) + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
+	            }			
 		    }   		
 		);    	
     }    
@@ -533,11 +494,13 @@
 			<div class="weui-panel__hd">
 				<span class="overview-hd-title">产品统计</span>
 			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="productCount" style="height: 300px;">
-						
-					</div>
+			<div class="weui-cells weui-cells_form">
+				<div class="weui-cell" style="padding: 0">
+					<table class="table table-striped table-bordered" id="productCount">
+						<tbody>
+		
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>		
