@@ -217,7 +217,7 @@
 									</#list>
 								</#if>
 							</select> -->
-							<select class="form-control input-sm" name="userId" id="userId" multiple="multiple" >
+							<select class="form-control input-sm" name="userId" id="userId" multiple="multiple" style = "height:30px;">
 								<#if users??>
 									<#list users as user>
 										<option value="${(user.id)}">${(user.realname)}</option>
