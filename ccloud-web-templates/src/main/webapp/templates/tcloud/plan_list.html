@@ -242,6 +242,7 @@
 		}
 		var showType = $("#show").data('values');
 		if(showType == "101205"){
+			
 			showSellerProduct(params);
 			$(".userId").hide();
 			$(".sellerProductId").show();
@@ -256,21 +257,19 @@
 	function showBizUser(params){	
 		Utils.ajax('${CPATH}/plans/planList', params,
 			function(data) {
-				console.log(data);
 				$loading.hide();
 				if(data.planList.length == 0) {
 					if($('.planList').length == 0) $noMore.show();
 					loading = true;
 					return;
 				}
-		
 				$.each(data.planList, function(index, el) {
 					$planList.append(newHtml);
 					 var old = index-1;
 					var $newPlan = $planList.find(".plan-list-box:last");
 					var plans = data.planList[old];
 					
-					if((plans==null) || (plans.realname!=el.realname || 
+					if((plans==null) || (plans.user_id!=el.user_id || 
 							plans.typeName !=el.typeName || 
 							plans.start_date!=el.start_date || 
 							plans.end_date != el.end_date)){
@@ -301,17 +300,17 @@
 					loading = true;
 					return;
 				}
-		
 				$.each(data.planList, function(index, el) {
 					$planList.append(newHtml);
 					 var old = index-1;
 					var $newPlan = $planList.find(".plan-list-box:last");
 					var plans = data.planList[old];
 					
-					if((plans==null) || (plans.custom_name!=el.custom_name || 
+					if((plans==null) || (plans.seller_product_id!=el.seller_product_id || 
 							plans.typeName !=el.typeName || 
 							plans.start_date!=el.start_date || 
 							plans.end_date != el.end_date)){
+							console.log(el.custom_name);
 						$newPlan.find("#userName").text(el.custom_name);
 						$newPlan.find("#userId").val(el.seller_product_id);
 						$newPlan.find("#typeName").text(el.typeName);

@@ -34,7 +34,6 @@ import java.util.Map;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -52,8 +51,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.*;
-import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -322,7 +319,8 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		}
 		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据,重复"+inNum+"条数据");
 	}
-	
+	@RequiresPermissions(value = { "/admin/plans/downloading", "/admin/dealer/all",
+		"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException{
 		//计算行数
 		int num = 0;
@@ -544,8 +542,8 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		}
 		renderFile(new File(filePath));
 	}
-	
-	public void edit() {
+	@RequiresPermissions(value = { "/admin/plans/add"}, logical = Logical.OR)
+	public void add() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 

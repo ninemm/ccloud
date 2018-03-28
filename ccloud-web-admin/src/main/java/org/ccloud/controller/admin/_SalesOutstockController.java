@@ -540,13 +540,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		return isStockOut;
 	}
 
-	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
+	@RequiresPermissions(value = { "/admin/salesOutstock/download", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void download() {
 		render("download.html");
 	}
 
-	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
+	@RequiresPermissions(value = { "/admin/salesOutstock/download", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 		String tax = getPara("tax");

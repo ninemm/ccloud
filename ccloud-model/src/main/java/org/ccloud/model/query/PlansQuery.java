@@ -85,7 +85,7 @@ public class PlansQuery extends JBaseQuery {
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String userId, String type,
 	                                   String startDate, String endDate, String sellerId, String dataArea, String showType, String sellerProductId) {
-		String select = "select DISTINCT o.start_date,o.end_date,o.seller_product_id,o.user_id, u.realname, d.name as typeName, sp.custom_name ";
+		String select = "select o.start_date,o.end_date,o.seller_product_id,o.user_id, u.realname, d.name as typeName, sp.custom_name ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_plans` o ");
 		fromBuilder.append("join user u ON o.user_id = u.id ");
 		fromBuilder.append("left join cc_seller_product sp ON o.seller_product_id = sp.id ");
@@ -117,7 +117,11 @@ public class PlansQuery extends JBaseQuery {
 			fromBuilder.append(" and o.end_date <= ?");
 			params.add(endDate);
 		}
-		fromBuilder.append(" GROUP BY o.seller_id,o.user_id, o.type, o.seller_product_id ,o.start_date,o.end_date order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
+		if(showType != null && showType.equals(Consts.PLAN_SHOW_SELLER_PRODUCT)) {
+			fromBuilder.append(" GROUP BY o.seller_id,o.type, o.seller_product_id ,o.start_date,o.end_date order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
+		}else {
+			fromBuilder.append(" GROUP BY o.seller_id,o.user_id, o.type,o.start_date,o.end_date order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
+		}
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -149,7 +153,7 @@ public class PlansQuery extends JBaseQuery {
 				+ "left join cc_seller_product sp ON o.seller_product_id = sp.id "
 				+ "left join dict d ON o.type = d.value "
 				+ "where o.user_id = '"+userId+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"' "
-				+ "and o.seller_id = '"+sellerId+"' ORDER BY o.create_date desc";
+				+ "and o.seller_id = '"+sellerId+"' ORDER BY sp.custom_name";
 		return DAO.find(sql);
 	}
 	
@@ -166,7 +170,7 @@ public class PlansQuery extends JBaseQuery {
 				+ "join user u ON o.user_id = u.id "
 				+ "left join dict d ON o.type = d.value "
 				+ "where o.seller_product_id = '"+sellerProductId+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"' "
-				+ "and o.seller_id = '"+sellerId+"' ORDER BY o.create_date desc";
+				+ "and o.seller_id = '"+sellerId+"' ORDER BY u.realname";
 		return DAO.find(sql);
 	}
 	
