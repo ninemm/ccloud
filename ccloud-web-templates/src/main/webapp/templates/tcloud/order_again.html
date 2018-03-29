@@ -228,7 +228,8 @@ $(function() {
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
 							<div>
-								<input type="checkbox" name="receiveType" value="0" class="weui-agree__checkbox"> 是否账期
+								<input type="checkbox" name="receiveL"<#if order.receive_type == 0>checked</#if> class="weui-agree__checkbox"> 是否账期
+								<input type="hidden" name = "receiveType" value="${order.receive_type!}">
 							</div>
 						</div>
 					</div>
