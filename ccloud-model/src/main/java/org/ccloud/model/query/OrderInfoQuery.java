@@ -134,7 +134,7 @@ public class OrderInfoQuery extends JBaseQuery {
 		}
 		
 		if (StrKit.notBlank(keyword)) {
-			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or cc.customer_name like '%" + keyword + "%')");
+			needWhere = appendIfNotEmpty(fromBuilder, "o.order_sn", keyword, params, needWhere);
 		}
 		
 		if (StrKit.notBlank(startDate)) {
