@@ -54,7 +54,7 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		List<Map<String, Object>> region = new ArrayList<>();
@@ -262,7 +262,7 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refreshHistoryOrder() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> orderList = new Page<>();
 		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), selectDataArea);
@@ -312,7 +312,7 @@ public class CustomerController extends BaseFrontController {
 
 	public void historyOrder() {
 		
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerCustomerId = getPara("sellerCustomerId");
 
 		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), sellerCustomerId, selectDataArea);

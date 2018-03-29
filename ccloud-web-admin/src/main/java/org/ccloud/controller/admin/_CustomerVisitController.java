@@ -183,7 +183,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
 		setAttr("customerType", JSON.toJSON(customerTypeList));
 
-		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%", null);
+		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(), null);
 		List<Map<String, Object>> customerList = new ArrayList<>();
 		customerList.add(all);
 
@@ -213,7 +213,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 	public void getCustomer(){
 		String customerType = getPara("customerType");
-		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%", customerType);
+		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(), customerType);
 
 		List<Map<String, Object>> customerList = new ArrayList<>();
 		Map<String, Object> all = new HashMap<>();
