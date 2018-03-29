@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro title>销售排行</#macro>
+<#macro title>业务员排行</#macro>
 <#macro script_import>
     <script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
 </#macro>
@@ -29,12 +29,27 @@
 				var rank = $("#userRankAsc");
 				var descRank = $("#userRankDesc");
 	            var length = data.length;
+	           
+	           	var first = $(".img");
+	            first.html("");
+	            if(length>0){
+		            if(data[0].avatar==""){
+		            		first.append('<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}">');
+		            }else{
+			            first.append('<img src="'+data[0].avatar+'">');
+		            }
+	            }
 	            for(var i = 0; i < length; i++){
-		            	j = i + 1;
+		            	j = i + 1; 
+		            	if (i == 0) {
+		            			$("#firstName").html(data[i].realname);
+							$("#orderCount").html(data[i].orderCount);
+							$("#totalAmount").html("￥"+formatNumber(data[i].totalAmount));	            		
+		            	}
 		            	if(data[i].avatar==""){
-	    		            rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+formatNumber(data[i].productCount)+")件</span></div></div></div></div>");
+	    		            rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>   /   "+data[i].orderCount+"笔   /   "+formatNumber(data[i].productCount)+" 件</span></div></div></div></div>");
 		            	}else{
-			            	rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='"+data[i].avatar+"' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+formatNumber(data[i].productCount)+")件</span></div></div></div></div>");
+			            	rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='"+data[i].avatar+"' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>   /   "+data[i].orderCount+"笔   /   "+formatNumber(data[i].productCount)+" 件</span></div></div></div></div>");
 		            	}
 	            }
 			}
@@ -146,6 +161,27 @@
 
 <@layout>
 <article id="my">
+	<header class="user-box user-rank">
+		<div class="user-info">
+			<p class="seller ft16">冠军</p>
+			<p class="name" id="firstName"></p>
+		</div>
+		<div class="user-avatar img">
+		</div> 
+		<div class="user-statistics">
+			<div class="weui-flex">
+			<div class="weui-flex__item">
+				<h5>订单数</h5>
+				<h5 id="orderCount"></h5>
+			</div>
+			<div class="weui-flex__item"></div>
+			<div class="weui-flex__item">
+				<h5>订单金额</h5>
+				<h5 id="totalAmount"></h5>
+			</div>
+			</div>
+		</div>
+	</header>
     <div class="weui-panel weui-panel_access">
 		<div class="weui-panel__hd">
 			<span class="overview-hd-title wi">销售排行</span>
