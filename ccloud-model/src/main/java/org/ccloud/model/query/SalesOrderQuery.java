@@ -80,18 +80,25 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
 		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
 		if (StrKit.notBlank(activityId)) {
 			fromBuilder.append("LEFT JOIN (SELECT cs.order_id,ca.title, pc.activity_id FROM cc_sales_order_detail cs ");
 			fromBuilder.append("LEFT JOIN cc_product_composition pc ON cs.composite_id = pc.id ");
 			fromBuilder.append("LEFT JOIN cc_activity ca ON ca.id = pc.activity_id ");
 			fromBuilder.append("GROUP BY cs.order_id) t1 on t1.order_id = o.id ");
+
+			fromBuilder.append("LEFT JOIN (SELECT so.id, caa.activity_id FROM cc_sales_order so ");
+			fromBuilder.append("LEFT JOIN cc_activity_apply caa ON so.activity_apply_id = caa.id ");
+			fromBuilder.append(") t2 on t2.id = o.id ");
 		}
-		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "t1.activity_id", activityId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(activityId)) {
+			fromBuilder.append(" and (t1.activity_id = '" + activityId + "' or t2.activity_id = '" + activityId + "')");
 		}
 
 		if (StrKit.notBlank(startDate)) {
@@ -2088,7 +2095,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", selectDataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
@@ -2129,12 +2136,59 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	}
 //查找已下订单的业务员
-	public List<SalesOrder> findBySellerId(String sellerId,String dataArea){
+	public List<SalesOrder> findBySellerIdAndDataArea(String sellerId,String dataArea){
 		StringBuilder fromBuilder = new StringBuilder("select cs.biz_user_id, u.realname from cc_sales_order cs ");
 		fromBuilder.append("LEFT JOIN user u on u.id = cs.biz_user_id ");
-		fromBuilder.append("where cs.seller_id  ='"+sellerId+"' ");
-		fromBuilder.append("and cs.data_area  like '"+dataArea+"' ");
+//		fromBuilder.append("where cs.seller_id  ='"+sellerId+"' ");
+		fromBuilder.append("where cs.data_area  like '"+dataArea+"' ");
 		fromBuilder.append(" GROUP BY cs.biz_user_id");
 		return DAO.find(fromBuilder.toString());
+	}
+	
+	public Page<Record> _paginateForApp(int pageNumber, int pageSize, String keyword, String status,
+			String customerTypeId, String startDate, String endDate, String sellerId, String dataArea,String bizUserId) {
+		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee,s.is_print ";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_order` o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+		fromBuilder.append("left join act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock so on so.order_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_outstock s on s.id = so.outstock_id ");
+		fromBuilder.append("LEFT JOIN user u on u.id = o.biz_user_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.biz_user_id", bizUserId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+		
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%' or u.realname like '%" + keyword + "%')");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.create_date desc ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
  }

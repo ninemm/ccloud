@@ -519,8 +519,9 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String customerName = getPara("customer_name");
 		String questionType = getPara("question_type");
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea + "%");
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
 		if(imageList.size() == 0) renderAjaxResultForError();
 		else renderAjaxResultForSuccess();
 	}
@@ -531,9 +532,10 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String customerName = getPara("customer_name");
 		String questionType = getPara("question_type");
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		String domain = OptionQuery.me().findByKey("cdn_domain").getOptionValue();
-		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea + "%");
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
 
 		String zipFileName = "拜访图片.zip";
 

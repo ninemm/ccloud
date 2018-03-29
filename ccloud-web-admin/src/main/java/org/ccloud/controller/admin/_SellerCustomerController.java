@@ -82,8 +82,9 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea,sort,sortOrder, customerType);
+		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -399,7 +400,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
 				+ "customerInfo.xls";
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%","","", "");
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();

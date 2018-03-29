@@ -61,6 +61,7 @@ public class IndexController extends BaseFrontController {
 		
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		if (user != null) {
 			Dict order = DictQuery.me().findByKey("message_type", "order");
 			Page<Record> orderPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, order.getValue(), null, user.getId(), null);
@@ -82,7 +83,7 @@ public class IndexController extends BaseFrontController {
 			setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());
 			setAttr("customerVisitTotal",CustomerVisitQuery.me().getToDo(user.getUsername()).size());
 			setAttr("customerTotal",SellerCustomerQuery.me().getToDo(user.getUsername()).size());
-			setAttr("activityApplyTotal", ActivityApplyQuery.me().getToDo(user.getUsername()).size());
+			setAttr("activityApplyTotal", ActivityApplyQuery.me().getToDo(user.getUsername(), dealerDataArea).size());
 
 			List<User> userList = UserQuery.me().findByMobile(user.getMobile());
 			setSessionAttr("sellerListSize", userList.size());

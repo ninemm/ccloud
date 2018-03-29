@@ -125,9 +125,10 @@ public class CustomerVisitController extends BaseFrontController {
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void one() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null,null, null, null, selectDataArea, null);
+		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null,null, null, null, selectDataArea, dealerDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -143,10 +144,11 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void oneRefresh() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null,null, null, null, null, selectDataArea, null);
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null,null, null, null, null, selectDataArea, dealerDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -181,10 +183,11 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void refresh() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"),getPara("user"), getPara("level"), getPara("status"), selectDataArea, getPara("searchKey"));
+		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"),getPara("user"), getPara("level"), getPara("status"), selectDataArea, dealerDataArea, getPara("searchKey"));
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
