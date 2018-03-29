@@ -1,0 +1,52 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+	<script type="text/javascript" src="${CPATH}/static/plugins/bootstrap-treeview/js/bootstrap-treeview.js"></script>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+	<!-- <script src="${CPATH}/static/plugins/toastr/toastr.js"></script> -->
+</#macro> 
+
+<#macro css_import>
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-treeview/css/bootstrap-treeview.css">
+	<!-- <link rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css"> -->
+</#macro>
+
+<#macro script>
+	$(document).ready(function() {
+});
+
+</#macro>
+
+<@layout>
+<div style="padding: 10px;">
+	<div class="row">
+		<table class="table table-striped table-hover table-condensed text-center" >
+			<thead>
+				<tr>
+					<th>业务员</th>
+					<th>产品</th>
+					<th>计划数量(件)</th>
+					<th>完成数量(件)</th>
+					<th>完成比例</th>
+				</tr>
+			</thead>
+			<tbody>
+				<#list plansDetails as detail>
+					<tr>
+						<td>${detail.realname!}</td>
+						<td>${detail.custom_name!}</td>
+						<th>${detail.plan_num!}</th>
+						<td>${detail.complete_num}</td>
+						<#if detail.complete_ratio?? &&detail.complete_ratio gt 0 >
+							<td>${detail.complete_ratio?string('###.00')}%</td>
+						<#else>
+							<td>0.00%</td>
+						</#if>
+					</tr>
+				</#list>
+			</tbody>
+		</table>
+
+	</div>
+</div>	
+</@layout>
