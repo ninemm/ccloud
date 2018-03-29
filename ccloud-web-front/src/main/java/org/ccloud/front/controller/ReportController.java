@@ -26,6 +26,7 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.User;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
@@ -341,7 +342,8 @@ public class ReportController extends BaseFrontController {
 		String dayTag = getPara("dayTag");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String orderTag = getPara("orderTag");
-		String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString());
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, null, sellerId, orderTag, dataArea, null);
 		renderJson(record);
 	}
