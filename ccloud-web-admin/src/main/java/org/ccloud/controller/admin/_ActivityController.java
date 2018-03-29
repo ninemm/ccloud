@@ -548,7 +548,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public void getMidData() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 //		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();//测试数据
-		List<Expense> expenseList = MidDataUtil.getExpensesInfo("2018-02-15", "2018-03-01", "1", "5");
+		String[] date = DateUtils.getStartDateAndEndDateByType("month");
+		List<Expense> expenseList = MidDataUtil.getExpensesInfo(date[0], date[1], "1", Consts.GET_MID_DATA_TOTALROW);
 		List<Activity> acList = new ArrayList<>();
 		List<ExpenseDetail> dlist = new ArrayList<>();
 		for (Expense qyExpense : expenseList) {

@@ -293,7 +293,7 @@ public class Consts {
 	public static final String ACTIVITY_EXECUTE_TEMPLATE_RADIO = "103017"; //单选
 	public static final String ACTIVITY_EXECUTE_TEMPLATE_CHECKBOX= "103018"; //多选
 	
-	
+	public static final String GET_MID_DATA_TOTALROW = "100";//一次同步数据条数
 	
 	
 }
