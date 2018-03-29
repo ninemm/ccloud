@@ -16,7 +16,6 @@
 <#macro script>
 var flang = true;
 $(function() {
-	$(".startDate").append('开始时间'+' <span class="require">*</span>');
 	$("#datetime-picker").datetimePicker({
 				times: function () {
 		          return [];
@@ -40,12 +39,12 @@ $(function() {
 			$("#datetime-picker").val(date3.Format("yyyy-MM"));
 			date3.setDate(1);
 			$("#start-date").val(date3.Format("yyyy-MM-dd"));
-			 var currentMonth=date3.getMonth();
-			 var nextMonth=++currentMonth;
-			 var nextMonthFirstDay=new Date(date3.getFullYear(),nextMonth,1);
-			 var oneDay=1000*60*60*24;
-			 var date4 = new Date(nextMonthFirstDay-oneDay);
-			 $("#end-date").val(date4.Format("yyyy-MM-dd"));
+			var currentMonth=date3.getMonth();
+			var nextMonth=++currentMonth;
+			var nextMonthFirstDay=new Date(date3.getFullYear(),nextMonth,1);
+			var oneDay=1000*60*60*24;
+			var date4 = new Date(nextMonthFirstDay-oneDay);
+			$("#end-date").val(date4.Format("yyyy-MM-dd"));
 		}
 		if($("#typeId").val()==101203){
 			$("#datetime-picker").val(date3.Format("yyyy"));
@@ -106,11 +105,7 @@ $(function() {
 	addProduct();
 	$("#type").val("月计划");
 	$("#typeId").val("101202");
-	$(".startDate").html("");
-	$("#start-date").hide();
 	$("#datetime-picker").show();
-	$(".endDate").hide();
-	$(".startDate").append('计划月份'+' <span class="require">*</span>');
 	$("#datetime-picker").val(date2.Format("yyyy-MM"));
 	date2.setDate(1);
 	$("#start-date").val(date2.Format("yyyy-MM-dd"));
@@ -225,7 +220,7 @@ function doSubmit(){
 						title: data.message,
 						buttons: [
 							{ text: "查看计划", className: "default", onClick: function(){
-								location.href = "${CPATH}/plans/myPlans";
+								location.href = "${CPATH}/plans/mPlans";
 							}
 							},
 							{ text: "继续新增", className: "primary", onClick: function(){
@@ -267,11 +262,20 @@ function deleteTr(obj){
 				</div>
 				<div class="weui-cell">
 					<div class="weui-cell__bd">
-						<div class="order-customer-info-title startDate">
+						<div class="order-customer-info-title startDate">计划月份
+							<span class="require">*</span>
+						</div>
+						<i class="icon-sort-desc fr"></i>
+						<input type="text" class="weui-input fr" id='datetime-picker' name = "datetime-picker" style="display:none;" readonly=""/>
+					</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title startDate">开始时间
+							<span class="require">*</span>
 						</div>
 						<i class="icon-sort-desc fr"></i>
 						<input type="text" class="weui-input fr" id="start-date" name="start-date" readonly="">
-						<input type="text" class="weui-input fr" id='datetime-picker' style="display:none;" readonly=""/>
 					</div>
 				</div>
 				<div class="weui-cell endDate">

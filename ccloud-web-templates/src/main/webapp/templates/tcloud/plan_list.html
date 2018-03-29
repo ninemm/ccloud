@@ -3,7 +3,7 @@
 <#macro css>
 	#my-order {
 		position: absolute;
-		top: 44px;
+		top: 151px;
 		bottom: 0;
 		width: 100%;
 	}
@@ -131,9 +131,8 @@
 	//点击计划事件
 	function showPlans(el){
 		var typeName = $(el).find("#typeName").text();
-		var startDate = $(el).find("#startDate").text();
-		var endDate = $(el).find("#endDate").text();
 		var userId = $(el).find("#userId").val();
+		var plansId = $(el).find("#plansId").val();
 		if($(el).find(".plansShow").is(":hidden")){
 			$(el).find(".plansShow").html("");
 			$(el).find(".plansShow").show();
@@ -147,7 +146,7 @@
 				url:"${CPATH}/plans/getSellerProductPlans",
 				type:"post",
 				dataType:"json",
-				data:{"sellerProductId":userId,'typeName':typeName,'startDate':startDate,'endDate':endDate},
+				data:{"sellerProductId":userId,'typeName':typeName,'plansId':plansId },
 				success:function(data)
 				{	
 					var html = '<div class="weui-cell">'
@@ -192,10 +191,11 @@
 				url:"${CPATH}/plans/getPlans",
 				type:"post",
 				dataType:"json",
-				data:{"userId":userId,'typeName':typeName,'startDate':startDate,'endDate':endDate},
+				data:{"userId":userId,'typeName':typeName,'plansId':plansId},
 				success:function(data)
 				{	
 					var html = "";
+					console.log(data);
 					for (var i in data) {
 					 	html += '<div class="weui-cell">'
 								+'<div class="weui-cell__bd t-c" id="productName">'+data[i].custom_name
@@ -263,6 +263,8 @@
 					loading = true;
 					return;
 				}
+				var planAmount = 0;
+				var completeAmount = 0;
 				$.each(data.planList, function(index, el) {
 					$planList.append(newHtml);
 					 var old = index-1;
@@ -276,13 +278,22 @@
 						$newPlan.find("#userName").text(el.realname);
 						$newPlan.find("#userId").val(el.user_id);
 						$newPlan.find("#typeName").text(el.typeName);
+						$newPlan.find("#typeName").text(el.typeName);
+						$newPlan.find("#plansId").val(el.plans_id);
 						$newPlan.find("#startDate").text('开始时间：'+el.start_date);
 						$newPlan.find("#endDate").text('结束时间：'+el.end_date);
-						$(".plansShow").hide();
+						$newPlan.find("#planNumAmount").text('计划金额：'+el.AmountPlan);
+						$newPlan.find("#completeNumAmount").text('完成金额：'+el.AmountComplete);
+						$newPlan.find("#amountCompleteRatio").text('完成比例：'+(el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
+						$(".plansShow").hide();  
+						planAmount += el.AmountPlan;
+						completeAmount += el.AmountComplete;
 					}else{
 						$newPlan.hide();
 					}
 				});
+				$("#planAmount").text(planAmount.toFixed(2));
+				$("#completeAmount").text(completeAmount.toFixed(2));
 				page++;
 				loading = false;
 			}
@@ -294,10 +305,15 @@
 		Utils.ajax('${CPATH}/plans/planList', params,
 			function(data) {
 				$loading.hide();
-				console.log(data);
+				$("#planAmount").html("");
+				$("#completeAmount").html("");
+				var planAmount = 0;
+				var completeAmount = 0;
 				if(data.planList.length == 0) {
 					if($('.planList').length == 0) $noMore.show();
 					loading = true;
+					$("#planAmount").text(planAmount.toFixed(2));
+					$("#completeAmount").text(completeAmount.toFixed(2));
 					return;
 				}
 				$.each(data.planList, function(index, el) {
@@ -310,17 +326,24 @@
 							plans.typeName !=el.typeName || 
 							plans.start_date!=el.start_date || 
 							plans.end_date != el.end_date)){
-							console.log(el.custom_name);
 						$newPlan.find("#userName").text(el.custom_name);
 						$newPlan.find("#userId").val(el.seller_product_id);
+						$newPlan.find("#plansId").val(el.plans_id);
 						$newPlan.find("#typeName").text(el.typeName);
 						$newPlan.find("#startDate").text('开始时间：'+el.start_date);
 						$newPlan.find("#endDate").text('结束时间：'+el.end_date);
+						$newPlan.find("#planNumAmount").text('计划金额：'+el.AmountPlan);
+						$newPlan.find("#completeNumAmount").text('完成金额：'+el.AmountComplete);
+						$newPlan.find("#amountCompleteRatio").text('完成比例：'+(el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
 						$(".plansShow").hide();
+						planAmount += el.AmountPlan;
+						completeAmount += el.AmountComplete;
 					}else{
 						$newPlan.hide();
 					}
 				});
+				$("#planAmount").text(planAmount.toFixed(2));
+				$("#completeAmount").text(completeAmount.toFixed(2));
 				page++;
 				loading = false;
 			}
@@ -345,6 +368,23 @@
 </#macro>
 <@layout>
 <div class="weui-content">
+	<div class="report-top weui-flex">
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div class="border-right-1px">
+                <p class="ft16">计划金额</p>
+                <p class="ft14" id="planAmount"></p>
+            </div>
+        </div>
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div>
+                <p class="ft16">完成金额</p>
+                <p class="ft14" id="completeAmount"></p>
+            </div>
+        </div>
+        
+    </div>
 	<header>
 		<div class="weui-search-bar" id="SearchBar">
 			<form class="weui-search-bar__form">
@@ -396,6 +436,7 @@
 								<div class="customer_name">
 									<span id="userName"></span>
 									<input type = "hidden" id = "userId" value = ""/>
+									<input type = "hidden" id = "plansId" value = ""/>
 									<span class="fr orange ft12" id="typeName"></span>
 								</div>
 								<div class="weui-flex gray ft12 startEnd">
@@ -405,6 +446,17 @@
 									<span style="width:1rem" class="t-c">-</span>
 									<div class="weui-flex__item t-r">
 										<span id="endDate"></span>
+									</div>
+								</div>
+								<div class="weui-flex gray ft12 startEnd">
+									<div class="weui-flex__item">
+										<span id="planNumAmount" class="fr orange ft12"></span>
+									</div>
+									<div class="weui-flex__item t-r">
+										<span id="completeNumAmount" class="fr orange ft12"></span>
+									</div>
+									<div class="weui-flex__item t-r">
+										<span id="amountCompleteRatio" class="fr orange ft12"></span>
 									</div>
 								</div>
 							</div>

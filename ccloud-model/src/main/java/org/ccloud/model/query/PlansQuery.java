@@ -54,7 +54,7 @@ public class PlansQuery extends JBaseQuery {
 	
 	
 	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type,String startDate,String endDate,String dateType) {
-		String select = "SELECT cp.user_id,cp.type,cp.seller_product_id,csp.price,cp.start_date,cp.end_date,cs.seller_name,u.realname,csp.custom_name ,sum(plan_num) as planNum, sum(complete_num) as completeNum ,cp.complete_ratio  ";
+		String select = "SELECT cp.id,cp.user_id,cp.type,cp.seller_product_id,csp.price,cp.start_date,cp.end_date,cs.seller_name,u.realname,csp.custom_name ,sum(plan_num) as planNum, sum(complete_num) as completeNum ,cp.complete_ratio  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
 		fromBuilder.append("LEFT JOIN cc_seller cs on cs.id = cp.seller_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
@@ -68,11 +68,14 @@ public class PlansQuery extends JBaseQuery {
 		if(needWhere) {
 			fromBuilder.append("where 1=1 ");
 		}
-		if(!type.equals("")) {
+		/*if(!type.equals("")) {
 			fromBuilder.append(" and cp.type = '"+type+"' ");
 			if(!type.equals(Consts.WEEK_PLAN) && StrKit.notBlank(dateType)) {
 				fromBuilder.append(" and cp.start_date >= '"+startDate+"' and cp.start_date <= '"+endDate+" 23:59:59' ");
 			}
+		}*/
+		if(StrKit.notBlank(dateType)) {
+			fromBuilder.append("and cp.plans_month = '"+dateType+"-01 00:00:00' ");
 		}
 		fromBuilder.append("and cp.data_area like '"+dataArea+"' ");
 		fromBuilder.append("GROUP BY cp.seller_id,cp.user_id, cp.type, cp.seller_product_id ,cp.start_date,cp.end_date ");
@@ -85,42 +88,42 @@ public class PlansQuery extends JBaseQuery {
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String userId, String type,
 	                                   String startDate, String endDate, String sellerId, String dataArea, String showType, String sellerProductId) {
-		String select = "select o.start_date,o.end_date,o.seller_product_id,o.user_id, u.realname, d.name as typeName, sp.custom_name ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_plans` o ");
-		fromBuilder.append("join user u ON o.user_id = u.id ");
-		fromBuilder.append("left join cc_seller_product sp ON o.seller_product_id = sp.id ");
-		fromBuilder.append("left join dict d ON o.type = d.value ");
+		String select = "SELECT pd.*,d.name as typeName,u.realname,csp.custom_name,cp.start_date,cp.end_date,SUM(pd.plan_num*csp.price) as AmountPlan,SUM(pd.complete_num*csp.price) as AmountComplete  ";
+		StringBuilder fromBuilder = new StringBuilder("from cc_plans_detail pd ");
+		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id ");
+		fromBuilder.append("LEFT JOIN `user` u on u.id = pd.user_id ");
+		fromBuilder.append("left join dict d ON cp.type = d.value ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword, params, needWhere);
 		if(showType != null && showType.equals(Consts.PLAN_SHOW_SELLER_PRODUCT)) {
-			needWhere = appendIfNotEmpty(fromBuilder, "o.seller_product_id", sellerProductId, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "pd.seller_product_id", sellerProductId, params, needWhere);
 		}else {
-			needWhere = appendIfNotEmpty(fromBuilder, "o.user_id", userId, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "pd.user_id", userId, params, needWhere);
 		}
-		needWhere = appendIfNotEmpty(fromBuilder, "o.type", type, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cp.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "cp.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
 
 		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and o.start_date >= ?");
+			fromBuilder.append(" and cp.start_date >= ?");
 			params.add(startDate);
 		}
 
 		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and o.end_date <= ?");
+			fromBuilder.append(" and cp.end_date <= ?");
 			params.add(endDate);
 		}
 		if(showType != null && showType.equals(Consts.PLAN_SHOW_SELLER_PRODUCT)) {
-			fromBuilder.append(" GROUP BY o.seller_id,o.type, o.seller_product_id ,o.start_date,o.end_date order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
+			fromBuilder.append(" GROUP BY pd.seller_product_id,cp.id  order by cp.create_date desc ");
 		}else {
-			fromBuilder.append(" GROUP BY o.seller_id,o.user_id, o.type,o.start_date,o.end_date order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");
+			fromBuilder.append(" GROUP BY pd.user_id,cp.id order by cp.create_date desc ");
 		}
 
 		if (params.isEmpty())
@@ -146,31 +149,28 @@ public class PlansQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public List<Plans> findbyUserNameAndTypeNameAndStartDateAndEndDate(String userId,String typeName, String startDate,String endDate,String sellerId){
+	public List<Plans> findbyUserNameAndTypeNameAndPlanId(String userId,String typeName, String plansId){
 		String sql  = "select o.*,sp.custom_name "
-				+ "from `cc_plans` o "
-				+ "join user u ON o.user_id = u.id "
+				+ "from `cc_plans_detail` o "
 				+ "left join cc_seller_product sp ON o.seller_product_id = sp.id "
-				+ "left join dict d ON o.type = d.value "
-				+ "where o.user_id = '"+userId+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"' "
-				+ "and o.seller_id = '"+sellerId+"' ORDER BY sp.custom_name";
+				+ "where o.user_id = '"+userId+"' and o.plans_id = '"+plansId+"' "
+				+ " ORDER BY sp.custom_name";
 		return DAO.find(sql);
 	}
 	
 	public List<Plans> findbyDateArea(String dataArea){
 		String sql = "SELECT cp.*,csp.custom_name from cc_plans cp "
 				+ "LEFT JOIN cc_seller_product csp on csp.id = cp.seller_product_id "
-				+ "where cp.data_area like '"+dataArea+"' GROUP BY cp.start_date";
+				+ "where cp.data_area like '"+dataArea+"' GROUP BY cp.seller_product_id";
 		return DAO.find(sql);
 	}
 	
-	public List<Plans> findbySTSE(String sellerProductId,String typeName, String startDate,String endDate,String sellerId){
+	public List<Plans> findbySTSE(String sellerProductId,String typeName, String plansId){
 		String sql  = "select o.*,u.realname "
-				+ "from `cc_plans` o "
+				+ "from `cc_plans_detail` o "
 				+ "join user u ON o.user_id = u.id "
-				+ "left join dict d ON o.type = d.value "
-				+ "where o.seller_product_id = '"+sellerProductId+"' and d.name = '"+typeName+"' and o.start_date >= '"+startDate+"' and o.end_date <= '"+endDate+"' "
-				+ "and o.seller_id = '"+sellerId+"' ORDER BY u.realname";
+				+ "where o.seller_product_id = '"+sellerProductId+"' and o.plans_id = '"+plansId+"' "
+				+ " ORDER BY u.realname";
 		return DAO.find(sql);
 	}
 	
@@ -180,7 +180,7 @@ public class PlansQuery extends JBaseQuery {
 	
 	public Page<Record> paginateForAppMyPlan(int pageNumber, int pageSize, String keyword,
             String startDate, String endDate, String sellerId, String dataArea,String userId,String sellerProductId) {
-			String select = "select o.*, u.realname, d.name as typeName, sp.custom_name ";
+			String select = "select o.*, u.realname, d.name as typeName, sp.custom_name,SUM(o.plan_num*sp.price) AS planNumAmount,SUM(o.complete_num*sp.price) AS completeNumAmount ";
 			StringBuilder fromBuilder = new StringBuilder("from `cc_plans` o ");
 			fromBuilder.append("join user u ON o.user_id = u.id ");
 			fromBuilder.append("left join cc_seller_product sp ON o.seller_product_id = sp.id ");
@@ -206,7 +206,7 @@ public class PlansQuery extends JBaseQuery {
 			}
 			
 			if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and o.end_date <= ?");
+			fromBuilder.append(" and o.start_date <= ?");
 			params.add(endDate);
 			}
 			fromBuilder.append(" and o.type in ('"+Consts.MONTH_PLAN+"') GROUP BY o.seller_id,o.user_id, o.type, o.seller_product_id ,o.start_date,o.end_date order by o.start_date desc,o.complete_ratio desc, o.create_date desc ");

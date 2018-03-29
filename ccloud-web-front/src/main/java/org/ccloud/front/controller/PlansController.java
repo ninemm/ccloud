@@ -13,6 +13,8 @@ import com.jfinal.plugin.activerecord.Page;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.Plans;
+import org.ccloud.model.PlansDetail;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
@@ -56,35 +58,61 @@ public class PlansController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String type = getPara("typeId");
-		String startDate = getPara("start-date")+" 0:00:00";
-		String endDate = getPara("end-date")+" 23:59:59";
+		String datetimePicker = getPara("datetime-picker");
+		String startDate = getPara("start-date");
+//		try {
+//			if(sdf.parse(startDate).before(sdf.parse(startDateM)) || sdf.parse(startDate).after(sdf.parse(endDateM))) {
+//				renderAjaxResultForError("计划的开始时间不在计划月内");
+//				return;
+//			}
+//		} catch (ParseException e1) {
+//			e1.printStackTrace();
+//		}
+		String endDate = getPara("end-date");
 		String[] productIds = getParaValues("productId");
 		String[] productNum = getParaValues("productNum");
+		if(productNum==null) {
+			renderAjaxResultForError("计划的产品不能为空");
+			return;
+		}
+		Plans plans = new Plans();
+		String plansId = StrKit.getRandomUUID();
+		plans.setId(plansId);
+		plans.setSellerId(sellerId);
+		plans.setUserId(user.getId());
+		plans.setType(type);
+		try {
+			plans.setStartDate(( new SimpleDateFormat("yyyy-MM-dd")).parse(startDate));
+			plans.setEndDate(( new SimpleDateFormat("yyyy-MM-dd")).parse(endDate));
+			plans.setPlansMonth(( new SimpleDateFormat("yyyy-MM-dd")).parse(datetimePicker));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		plans.setDeptId(user.getDepartmentId());
+		plans.setDataArea(user.getDataArea());
+		plans.setCreateDate(new Date());
+		BigDecimal planAmount = new BigDecimal(0);
 		for(int i=0;i<productIds.length;i++) {
-			Plans plan = PlansQuery.me().findbySSEU(productIds[i],getPara("start-date"),getPara("end-date"),user.getId());
-			if(plan!=null) {
+			PlansDetail detail = PlansDetailQuery.me().findbySSEU(productIds[i],startDate,endDate,user.getId());
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(productIds[i]);
+			if(detail!=null) {
 				renderAjaxResultForError("已经存在产品："+SellerProductQuery.me().findById(productIds[i]).getCustomName()+"的计划");
 				return;
 			}
-			Plans plans = new Plans();
-			plans.setId(StrKit.getRandomUUID());
-			plans.setSellerId(sellerId);
-			plans.setUserId(user.getId());
-			plans.setType(type);
-			plans.setSellerProductId(productIds[i]);
-			plans.setPlanNum(new BigDecimal(productNum[i]));
-			try {
-				plans.setStartDate(( new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(startDate));
-				plans.setEndDate(( new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(endDate));
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			plans.setDeptId(user.getDepartmentId());
-			plans.setDataArea(user.getDataArea());
-			plans.setCreateDate(new Date());
-			plans.save();
 			
+			PlansDetail plansDetail = new PlansDetail();
+			plansDetail.setId(StrKit.getRandomUUID());
+			plansDetail.setPlansId(plansId);
+			plansDetail.setSellerProductId(productIds[i]);
+			plansDetail.setPlanNum(new BigDecimal(productNum[i]));
+			plansDetail.setCompleteNum(new BigDecimal(0));
+			plansDetail.setCompleteRatio(new BigDecimal(0));
+			plansDetail.setUserId(user.getId());
+			plansDetail.save();
+			planAmount =  planAmount.add(sellerProduct.getPrice().multiply(new BigDecimal(productNum[i])));  
 		}
+		plans.setPlanNum(planAmount);
+		plans.save();
 		renderAjaxResultForSuccess("新增成功");
 	}
 
@@ -100,19 +128,19 @@ public class PlansController extends BaseFrontController {
 		List<Map<String, Object>> sellerProducts = new ArrayList<>();
 		sellerProducts.add(all);
 		
-		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
-		for (Record record : userList) {
+		List<User> userList = UserQuery.me().findByData(selectDataArea);
+		for (User user : userList) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", record.get("realname"));
-			item.put("value", record.get("id"));
+			item.put("title", user.getRealname());
+			item.put("value", user.getId());
 			userIds.add(item);
 		}
 		
-		List<Plans> plans = PlansQuery.me().findbyDateArea(selectDataArea);
-		for(Plans plan : plans) {
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findbyDateArea(selectDataArea);
+		for(PlansDetail planDetail : plansDetails) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", plan.get("custom_name"));
-			item.put("value", plan.getSellerProductId());
+			item.put("title", planDetail.get("custom_name"));
+			item.put("value", planDetail.getSellerProductId());
 			sellerProducts.add(item);
 		}
 
@@ -144,20 +172,16 @@ public class PlansController extends BaseFrontController {
 	public void getPlans() {
 		String userId = getPara("userId");
 		String typeName = getPara("typeName");
-		String startDate = getPara("startDate").substring(5);
-		String endDate = getPara("endDate").substring(5);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		List<Plans> list = PlansQuery.me().findbyUserNameAndTypeNameAndStartDateAndEndDate(userId,typeName,startDate,endDate,sellerId);
+		String plansId = getPara("plansId");
+		List<Plans> list = PlansQuery.me().findbyUserNameAndTypeNameAndPlanId(userId,typeName,plansId);
 		renderJson(list);
 	}
 	
 	public void getSellerProductPlans() {
 		String sellerProductId = getPara("sellerProductId");
 		String typeName = getPara("typeName");
-		String startDate = getPara("startDate").substring(5);
-		String endDate = getPara("endDate").substring(5);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		List<Plans> list = PlansQuery.me().findbySTSE(sellerProductId,typeName,startDate,endDate,sellerId);
+		String plansId = getPara("plansId");
+		List<Plans> list = PlansQuery.me().findbySTSE(sellerProductId,typeName,plansId);
 		renderJson(list);
 	}
 
@@ -176,16 +200,17 @@ public class PlansController extends BaseFrontController {
 	
 	public void mPlans() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
 		List<Map<String, Object>> sellerProducts = new ArrayList<>();
 		sellerProducts.add(all);
-		List<Plans> plans = PlansQuery.me().findbyDateArea(selectDataArea);
-		for(Plans plan : plans) {
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findbyDateAreaAndUserId(selectDataArea,user.getId());
+		for(PlansDetail plansDetail : plansDetails) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", plan.get("custom_name"));
-			item.put("value", plan.getSellerProductId());
+			item.put("title", plansDetail.get("custom_name"));
+			item.put("value", plansDetail.getSellerProductId());
 			sellerProducts.add(item);
 		}
 
@@ -201,7 +226,7 @@ public class PlansController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerProductId = getPara("sellerProductId");
-		Page<Record> planList = PlansQuery.me().paginateForAppMyPlan(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, selectDataArea,user.getId(),sellerProductId);
+		Page<Record> planList = PlansDetailQuery.me().paginateForAppMyPlan(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, selectDataArea,user.getId(),sellerProductId);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("planList", planList.getList());

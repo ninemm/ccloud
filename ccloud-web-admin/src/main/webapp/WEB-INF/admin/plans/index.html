@@ -88,38 +88,39 @@
 		var fields =
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
-				{field: "", title: "计划类型", align: "center", width: '8%',
+				{field: "", title: "计划类型", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
 						if(row.type==101201) return "周计划";
 						else if(row.type==101202) return "月计划";
 						else  return "年计划";
 					},
 				 edit:false},
-				{field: "", title: "计划时间", align: "center", width: '10%',
-					formatter: function(value, row, rowIndex) {
-						return row.start_date+"--"+row.end_date;
-					},
-				 edit:false},
-				{field: "seller_name", title: "销售商名称", align: "center", width: '8%', edit: false},
+				{field: "start_date", title: "计划时间", align: "center", width: '8%', edit:false},
+				{field: "end_date", title: "计划时间", align: "center", width: '8%', edit:false},
+				{field: "seller_name", title: "销售商名称", align: "center", width: '15%', edit: false},
 				{field: "realname", title: "业务员名称", align: "center", width: '5%', edit: false},
-				{field: "custom_name", title: "计划产品", align: "center", width: '15%', edit: false},
-				{field: "planNum", title: "计划量（件）", align: "center", width: '5%', edit: false},
-				{field: "", title: "计划金额", align: "center", width: '5%',
+				{field: "", title: "计划金额", align: "center", width: '3%',
 					formatter: function(value, row, rowIndex) {
 						return formatNumber(row.price*row.planNum);
 					},
 				 edit: false},
-				{field: "completeNum", title: "实际量（件）", align: "center", width: '5%', edit: false},
-				{field: "", title: "实际金额", align: "center", width: '5%',
+				{field: "", title: "实际金额", align: "center", width: '3%',
 					formatter: function(value, row, rowIndex) {
 						return formatNumber(row.price*row.completeNum);
 					},
 				 edit: false},
-				{field: "complete_ratio", title: "完成情况", align: "center", width: '5%',
+				{field: "complete_ratio", title: "完成情况", align: "center", width: '3%',
 					formatter: function(value, row, rowIndex) {
 						return value+"%";
 					},
-				 edit: false}
+				 edit: false},
+				 {field: "", title: "操作", align: "center", width: '5%',
+				formatter: function(value, row, rowIndex) {
+					var strHtml = '<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a>';
+					return strHtml;
+				},
+				edit:false
+				}
 			];
 		return fields;
 	}
@@ -135,6 +136,14 @@
 		dateType =  $("#startDate").val();
 		jQuery.mm.down("${CPATH}/admin/plans/downloading?type="+type+"&&k="+$("#search").val()+"&&dateType="+dateType);
 		window.event.returnValue=false; 
+	}
+	function detail(id) {
+		layer.open({
+			title:"计划详细",
+			type: 2, 
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/plans/detail?plansId=' + id
+		}); 
 	}
 </#macro>
 
@@ -167,9 +176,15 @@
                     </div>
 				</div>-->
 				 <div class="col-sm-4">
+					<@shiro.hasPermission name="/admin/plans/uploading">
 						<a href="${CPATH}/admin/plans/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
+					</@shiro.hasPermission>
+					<!-- <@shiro.hasPermission name="/admin/plans/downloading">
 						<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</button>
+					</@shiro.hasPermission> -->
+					<@shiro.hasPermission name="/admin/plans/add">
 						<a href="${CPATH}/admin/plans/add?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增计划 </a>
+					</@shiro.hasPermission>
 				</div>
 				<div class="col-sm-4 monthType">
                     <label class="control-label col-sm-4">开始时间:</label>

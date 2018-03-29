@@ -3,7 +3,7 @@
 <#macro css>
 	#my-order {
 		position: absolute;
-		top: 44px;
+		top: 153px;
 		bottom: 0;
 		width: 100%;
 	}
@@ -122,14 +122,18 @@
 		}
 		Utils.ajax('${CPATH}/plans/myPlanList', params,
 			function(data) {
-				console.log(data);
 				$loading.hide();
+				$("#planAmount").html("");
+				$("#completeAmount").html("");
+				var planAmount = 0;
+				var completeAmount = 0;
 				if(data.planList.length == 0) {
 					if($('.planList').length == 0) $noMore.show();
 					loading = true;
+					$("#planAmount").text(planAmount.toFixed(2));
+					$("#completeAmount").text(completeAmount.toFixed(2));
 					return;
 				}
-		
 				$.each(data.planList, function(index, el) {
 					$planList.append(newHtml);
 					var $newPlan = $planList.find(".plan-list-box:last");
@@ -140,7 +144,11 @@
 					$newPlan.find("#completeNum").text(el.complete_num);
 					$newPlan.find("#completeRatio").text(el.complete_ratio+"%");
 					$(".plansShow").hide();
+					planAmount += el.planNumAmount;
+					completeAmount += el.completeNumAmount;
 				});
+				$("#planAmount").text(planAmount.toFixed(2));
+				$("#completeAmount").text(completeAmount.toFixed(2));
 				page++;
 				loading = false;
 			}
@@ -167,6 +175,23 @@
 </#macro>
 <@layout>
 <div class="weui-content">
+	<div class="report-top weui-flex">
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div class="border-right-1px">
+                <p class="ft16">计划金额</p>
+                <p class="ft14" id="planAmount"></p>
+            </div>
+        </div>
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div>
+                <p class="ft16">完成金额</p>
+                <p class="ft14" id="completeAmount"></p>
+            </div>
+        </div>
+        
+    </div>
 	<header>
 		<div class="weui-search-bar" id="SearchBar">
 			<form class="weui-search-bar__form">
