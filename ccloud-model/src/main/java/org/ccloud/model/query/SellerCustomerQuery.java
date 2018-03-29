@@ -610,4 +610,20 @@ public class SellerCustomerQuery extends JBaseQuery {
 		String sql = "select * from cc_seller_customer where seller_id = '"+sellerId+"' and is_enabled = 1";
 		return DAO.find(sql);
 	}
+
+	public int getMySellerNum(String selectDataArea) {
+		int count = 0;
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sql = new StringBuilder("SELECT count(*) as count FROM cc_user_join_customer cujc ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
+		boolean needwhere = true;
+		needwhere = appendIfNotEmptyWithLike(sql, "cujc.data_area", selectDataArea, params, needwhere);
+		needwhere = appendIfNotEmpty(sql, "csc.is_enabled", 1, params, needwhere);
+		Record record = Db.findFirst(sql.toString(), params.toArray());
+		if (record != null) {
+			count = record.getInt("count");
+		}
+		return count;
+	}
+
 }

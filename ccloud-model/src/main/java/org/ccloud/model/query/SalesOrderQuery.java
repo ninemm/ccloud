@@ -1362,7 +1362,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (StrKit.notBlank(orderTag)) {
 			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
 		} else {
-			fromBuilder.append("ORDER BY productCount desc ");
+			fromBuilder.append("ORDER BY totalAmount desc ");
 		}
 		
 		if (params.isEmpty())
@@ -2065,6 +2065,16 @@ public class SalesOrderQuery extends JBaseQuery {
 		String sql = "select u.id,u.realname from cc_sales_order o LEFT JOIN user u on u.id = o.biz_user_id where o.data_area like '"+dataArea+"' and o.status not in (1001,1002) and o.create_date>'"+startDate+"' and o.create_date< '"+endDate+"'";
 		return DAO.find(sql);
 	}
+	
+	public int findOrderCount(String dataArea,String startDate,String endDate){
+		int count = 0;
+		String sql = "select count(*) as count from cc_sales_order o where o.data_area like '"+dataArea+"' and o.status not in (1001,1002) and o.create_date >= '"+startDate+"' and o.create_date <= '"+endDate+"'";
+		Record record = Db.findFirst(sql);
+		if (record != null) {
+			count = record.getInt("count");
+		}
+		return count;
+	}	
 
 	public List<Record> findMoney(String startDate, String endDate, String keyword, String userId) {
 		StringBuilder fromBuilder=new StringBuilder("SELECT IFNULL(SUM(so.total_amount) , 0) - IFNULL(t1.amount , 0) totalAmount,so.customer_id ");
