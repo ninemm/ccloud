@@ -51,6 +51,10 @@
 				<div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
 			    <p class="weui-grid__label">销售报表</p>
 		    </a>
+		     <a href="${CPATH}/report/departmenUserRank" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-bar-chart"></i></div>
+                <p class="weui-grid__label">业务员排行</p>
+            	</a>
 		</div>
 		</@shiro.hasPermission>
 		<@shiro.hasPermission name="/report/userCharge">
@@ -68,6 +72,10 @@
                 <div class="weui-grid__icon"><i class="icon-bar-chart"></i></div>
                 <p class="weui-grid__label">销售排行</p>
             </a>
+             <a href="${CPATH}/report/departmenUserRank" class="weui-grid js_grid">
+                <div class="weui-grid__icon"><i class="icon-bar-chart"></i></div>
+                <p class="weui-grid__label">业务员排行</p>
+            	</a>
         </div>    
         <div class="weui-cells__title">
             <div class="weui-flex">
