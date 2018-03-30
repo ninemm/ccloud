@@ -209,7 +209,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);	
+		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
 				+ "receivables.xls";

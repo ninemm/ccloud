@@ -98,12 +98,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		boolean needwhere = false;
 		List<Object> params = new LinkedList<Object>();
 
-		String select  ="SELECT c.id, c.customer_name, c.contact, c.mobile, c.create_date, c.`status`, c.question_type ";
-		StringBuilder sql = new StringBuilder("FROM ( SELECT DISTINCT(ccv.id), cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type ");
-		sql.append("FROM cc_customer_visit ccv ");
+		String select  ="SELECT ccv.id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type ";
+		StringBuilder sql = new StringBuilder("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
-		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 
 		sql.append("LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
 		sql.append("FROM cc_seller_customer c1 ");
@@ -134,7 +132,6 @@ public class CustomerVisitQuery extends JBaseQuery {
 		needwhere = appendIfNotEmpty(sql, "ccv.status", status, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "ccv.user_id", user, params, needwhere);
 		sql.append("ORDER BY  ccv.create_date desc, ccv.`status` ");
-		sql.append(") AS c");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
 	}
 

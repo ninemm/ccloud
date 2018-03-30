@@ -473,7 +473,7 @@ public class ActivityController extends BaseFrontController {
 	}
 
 	public void refreshApply() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		String category = getPara("category");
 		String status = getPara("status");

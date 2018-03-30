@@ -185,7 +185,7 @@ public class _AdminController extends JBaseController {
 					String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%";
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, dataArea);
 				} else {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea() + "%");
 				}
 				String mobile = user.getMobile();
 				List<User> userList = UserQuery.me().findByMobile(mobile);
@@ -347,7 +347,7 @@ public class _AdminController extends JBaseController {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
 							DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
 				} else {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea() + "%");
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);

@@ -159,7 +159,7 @@ public class WxOauthController extends BaseFrontController {
 					String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, dataArea + "%");
 				} else {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea() + "%");
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);

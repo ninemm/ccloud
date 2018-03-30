@@ -248,7 +248,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		StringBuilder sql = new StringBuilder(
 				"FROM cc_user_join_customer cujc ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
-		sql.append("LEFT JOIN cc_customer c ON csc.customer_id = c.id ");
+		sql.append("JOIN cc_customer c ON csc.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_sales_outstock cso ON cujc.seller_customer_id = cso.customer_id ");
 		DateTime dateTime = new DateTime(new Date());
 		if ("2".equals(isOrdered)) {

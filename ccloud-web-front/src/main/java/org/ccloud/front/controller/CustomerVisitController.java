@@ -311,7 +311,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 	public void visitCustomerChoose() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
  		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -594,7 +594,7 @@ public class CustomerVisitController extends BaseFrontController {
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void trajectory() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		List<Map<String, Object>> users = new ArrayList<>();

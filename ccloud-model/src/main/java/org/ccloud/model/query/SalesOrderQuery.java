@@ -1078,14 +1078,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("SELECT (case ");
-		fromBuilder.append("when cc.`status`='1000' then '订单已审核' ");
-		fromBuilder.append("when cc.`status`='0' then '订单待审核' ");
-		fromBuilder.append("when cc.`status`='1001' then '订单取消'");
-		fromBuilder.append("when cc.`status`='1002' then '订单拒绝' ");
-		fromBuilder.append("when cc.`status`='2000' then '订单部分出库' ");
-		fromBuilder.append("when cc.`status`='2001' then '订单部分出库-订单关闭' ");
-		fromBuilder.append("when cc.`status`='3000' then '订单全部出库' ");
-		fromBuilder.append("when cc.`status`='3001' then '订单全部出库-订单关闭' ");
+		fromBuilder.append("when cc.`status`='1000' then '已审核' ");
+		fromBuilder.append("when cc.`status`='0' then '待审核' ");
+		fromBuilder.append("when cc.`status`='1001' then '已取消'");
+		fromBuilder.append("when cc.`status`='1002' then '已拒绝' ");
+		fromBuilder.append("when cc.`status`='2000' then '部分出库' ");
+		fromBuilder.append("when cc.`status`='2001' then '部分出库-订单关闭' ");
+		fromBuilder.append("when cc.`status`='3000' then '全部出库' ");
+		fromBuilder.append("when cc.`status`='3001' then '全部出库-订单关闭' ");
 		fromBuilder.append("else '暂无记录' ");
 		fromBuilder.append("end) as status, ");
 		fromBuilder.append("COUNT(cc.`status`) as count FROM cc_sales_order cc ");
@@ -2068,8 +2068,19 @@ public class SalesOrderQuery extends JBaseQuery {
 	
 	public int findOrderCount(String dataArea,String startDate,String endDate){
 		int count = 0;
-		String sql = "select count(*) as count from cc_sales_order o where o.data_area like '"+dataArea+"' and o.status not in (1001,1002) and o.create_date >= '"+startDate+"' and o.create_date <= '"+endDate+"'";
-		Record record = Db.findFirst(sql);
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("select count(*) as count from cc_sales_order o where o.status not in (1001,1002) ");
+		appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, false);
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ? ");
+			params.add(endDate);
+		}		
+		Record record = Db.findFirst(fromBuilder.toString(), params.toArray());
 		if (record != null) {
 			count = record.getInt("count");
 		}
@@ -2200,5 +2211,45 @@ public class SalesOrderQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> getUserRankZero(String startDate, String endDate, String dayTag, String sellerId,
+			String orderTag, String dataArea) {
+		if (dayTag != null) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(amount), 0) AS totalAmount, IFNULL(SUM(count), 0) AS productCount, ");
+		fromBuilder.append("IFNULL(orderCount,0) AS orderCount, u.realname, u.avatar, u.id FROM `user` u ");
+		fromBuilder.append("LEFT JOIN (SELECT SUM(cc.total_count) AS count, SUM(cc.total_amount) AS amount, cc.biz_user_id, ");
+		fromBuilder.append("COUNT(*) AS orderCount, cc.`status`, cc.create_date FROM cc_sales_order cc ");
+		fromBuilder.append("WHERE cc. STATUS NOT IN (1001, 1002) ");
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cc.create_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cc.create_date <= ? ");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY cc.biz_user_id ) t1 ON t1.biz_user_id = u.id ");
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " u.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+		fromBuilder.append("GROUP BY u.id ");
+		
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			fromBuilder.append("ORDER BY totalAmount desc ");
+		}
+		
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
  }
