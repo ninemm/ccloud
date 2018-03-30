@@ -157,7 +157,7 @@ $(function() {
 			'<div class="swiper-pagination"></div>' +
 			'</div>' +
 			'<p>名称：' + compositionName + '</p>' +
-			'<p>规格：' + compositionValueName + '</p>' +
+			'<p>主商品：<p>' + compositionValueName + '</p>' +
 			'<div>赠品：<p>' + subProduct + '</p>' + subsubProduct + '</div>',
 		  anim: 'scale',
 		  className: 'product-detail',
@@ -319,7 +319,6 @@ function initComposition(compositionList){
 			$newProductDetail.find("#compositionPrice").val(el.price);
 			$newProductDetail.find("#compositionId").val(el.parent_id);
 			
-			$newProductDetail.find("#compositionValueName").text(el.product_sp);
 
 			$newProductDetail.find("#compositionImage").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
 			$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
@@ -346,12 +345,15 @@ function initComposition(compositionList){
 			if (sub_smallCount != 0) {
 				sub_smallCountHtml = "" + sub_smallCount + el.sub_sunit + "";
 			}
-			$newProductDetail.find("#subProduct").text(el.product_name + ' ' + bigCountHtml + smallCountHtml);
+			$newProductDetail.find("#compositionValueName").text(el.product_name + ' ' + bigCountHtml + smallCountHtml);
+			if (el.is_gift == 0) {
+				$newProductDetail.find("#compositionValueName").append(el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml);
+			} else {
+				$newProductDetail.find("#subProduct").text(el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml);
+			}
 			if (el.activity_name) {
 				$newProductDetail.find("#activityName").append("活动: " + el.activity_name);
 			}
-			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +
-				"</p>");
 		}else{
 			var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
 			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);		
@@ -365,8 +367,17 @@ function initComposition(compositionList){
 			
 			if (sub_smallCount != 0) {
 				sub_smallCountHtml = "" + sub_smallCount + el.sub_sunit + "";
-			}			
-			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"</p>");
+			}
+			var html = $newProductDetail.find("#subProduct").html().trim();
+			if (el.is_gift == 0) { 
+				$newProductDetail.find("#compositionValueName").append(el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml);
+			} else {
+				if (html) {
+					$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"</p>");
+				} else {
+					$newProductDetail.find("#subProduct").append(""+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"");
+				}		
+			}
 		}
 
 	});
@@ -675,7 +686,7 @@ function order(){
 									<div class="weui-cell_access product-top-right">
 										<p class="product_name" id="compositionName"></p>
 										<div class="product_unit">
-											<p>规格：</p>
+											<p>主商品：</p>
 											<span id="compositionValueName"></span>
 										</div>
 										<span class="weui-cell__ft"></span>
