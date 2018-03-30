@@ -53,13 +53,13 @@ public class PlansQuery extends JBaseQuery {
 	
 	
 	
-	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type,String startDate,String endDate,String dateType) {
+	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type,String startDate,String endDate,String dateType,String sellerId) {
 		String select = "SELECT cp.id,cp.user_id,cp.type,cp.seller_product_id,cp.start_date,cp.end_date,cs.seller_name,t1.plansNum as planNumAmount, t1.completeNum as completeNumAmount ,t1.completeNum/t1.plansNum as completeRatio \r\n" + 
 				"  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
 		fromBuilder.append("LEFT JOIN cc_seller cs on cs.id = cp.seller_id ");
 		fromBuilder.append("LEFT JOIN (select pd.plans_id,SUM(pd.plan_num*csp.price) as plansNum, SUM(pd.complete_num*csp.price) as completeNum from cc_plans_detail pd LEFT JOIN cc_plans p on p.id = pd.plans_id ");
-		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id ) t1 on t1.plans_id = cp.id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id GROUP BY pd.plans_id ) t1 on t1.plans_id = cp.id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -79,8 +79,7 @@ public class PlansQuery extends JBaseQuery {
 		if(StrKit.notBlank(dateType)) {
 			fromBuilder.append("and cp.plans_month = '"+dateType+"-01 00:00:00' ");
 		}
-		fromBuilder.append("and cp.data_area like '"+dataArea+"' ");
-		fromBuilder.append("GROUP BY cp.seller_id,cp.user_id, cp.type ,cp.start_date,cp.end_date ");
+		fromBuilder.append("and cp.data_area like '"+dataArea+"' and cp.seller_id = '"+sellerId+"' ");
 		fromBuilder.append("order by cp.type,cp.start_date desc,cp.end_date desc ,cp.user_id");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

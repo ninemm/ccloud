@@ -105,6 +105,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
+        String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
         String type = getPara("type");
         String dateType = getPara("dateType");
         String startDate = "";
@@ -138,7 +139,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 				endDate = dateType + "-12-31";
 			}
 		}*/
-        Page<Plans> page = PlansQuery.me().paginate(getPageNumber(), getPageSize(),keyword, "cp.create_date", dataArea,type,startDate,endDate,dateType);
+        Page<Plans> page = PlansQuery.me().paginate(getPageNumber(), getPageSize(),keyword, "cp.create_date", dataArea,type,startDate,endDate,dateType,sellerId);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -431,7 +432,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 				PlansDetail detail = PlansDetailQuery.me().findbySSEU(getPara("sellerProduct"+i),startDate,endDate,userId);
 				SellerProduct sellerProduct = SellerProductQuery.me().findById(getPara("sellerProduct"+i));
 				if(detail!=null) {
-					renderAjaxResultForError("产品："+sellerProduct.getCustomName()+" 已经存在的计划");
+					renderAjaxResultForError("产品："+sellerProduct.getCustomName()+" 已经存在该月计划");
 					return;
 				}
 				PlansDetail plansDetail = new PlansDetail();

@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Plans;
 import org.ccloud.model.PlansDetail;
 
 import com.jfinal.kit.StrKit;
@@ -110,7 +109,7 @@ public class PlansDetailQuery extends JBaseQuery {
 				+ "where pd.seller_product_id = '"+sellerProductId+"' "
 				+ "and cp.start_date = '"+startDate+"' "
 				+ "and cp.end_date = '"+endDate+"' "
-				+ "and pd.user_id = '"+userId+"'";
+				+ "and pd.user_id = '"+userId+"'  GROUP BY pd.id";
 		return DAO.findFirst(sql);
 	}
 	
@@ -118,7 +117,7 @@ public class PlansDetailQuery extends JBaseQuery {
 		String sql = "SELECT pd.*,sp.custom_name,u.realname from cc_plans_detail pd "
 				+ "LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id "
 				+ "LEFT JOIN `user` u on u.id = pd.user_id "
-				+ " where pd.plans_id = '"+plansId+"'";
+				+ " where pd.plans_id = '"+plansId+"' ORDER BY pd.user_id";
 		return DAO.find(sql);
 	}
 	
@@ -141,11 +140,11 @@ public class PlansDetailQuery extends JBaseQuery {
 		}
 		return Db.find(fromBuilder.toString());
 	}
-	public List<PlansDetail> findbyDateArea(String dataArea){
+	public List<PlansDetail> findbyDateArea(String dataArea,String sellerId){
 		String sql = "SELECT pd.*,csp.custom_name from cc_plans_detail pd "
 				+ "LEFT JOIN cc_plans cp on cp.id = pd.plans_id "
 				+ "LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id "
-				+ "where cp.data_area like '"+dataArea+"' GROUP BY pd.seller_product_id";
+				+ "where cp.data_area like '"+dataArea+"' and cp.seller_id = '"+sellerId+"' GROUP BY pd.seller_product_id";
 		return DAO.find(sql);
 	}
 	
