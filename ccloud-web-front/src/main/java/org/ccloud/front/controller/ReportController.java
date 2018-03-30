@@ -319,7 +319,7 @@ public class ReportController extends BaseFrontController {
 		}
 	}
 	
-	//经销商下或部门下业务员排行榜(订单或打印)
+	//经销商下或部门下业务员排行榜(订单或打印 ps:剔除没下单用户)
 	public void getUserRank() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -348,7 +348,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
-	//经销商下或部门下业务员排行榜(出库)
+	//经销商下或部门下业务员排行榜(出库 ps:剔除没下单用户)
 	public void getUserRankByOutStock() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -363,6 +363,21 @@ public class ReportController extends BaseFrontController {
 		List<Record> record = SalesOrderQuery.me().getUserRankByOutStock(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea);
 		renderJson(record);
 	}
+	
+	//经销商下或部门下业务员排行榜(包含没下单用户)
+	public void getUserRankZero() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getPara("sellerId");
+//		if (StrKit.isBlank(sellerId)) {
+//			sellerId = getSessionAttr("sellerId");
+//		}
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea);
+		renderJson(record);
+	}	
 	
 	public void getGiftCountByUserMenu() {
 		String typeTag = getPara("typeTag");

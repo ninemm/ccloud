@@ -18,6 +18,9 @@
 		height: 100%;
 		line-height: 100%;
 	}
+	.activityName {
+		color: #ea6f5a;
+	}	
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
@@ -344,6 +347,9 @@ function initComposition(compositionList){
 				sub_smallCountHtml = "" + sub_smallCount + el.sub_sunit + "";
 			}
 			$newProductDetail.find("#subProduct").text(el.product_name + ' ' + bigCountHtml + smallCountHtml);
+			if (el.activity_name) {
+				$newProductDetail.find("#activityName").append("活动: " + el.activity_name);
+			}
 			$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +
 				"</p>");
 		}else{
@@ -688,6 +694,7 @@ function order(){
 									</div>
 								</div>
 								<div id="stock"></div>
+								<div id="activityName" class="activityName"></div>
 							</div>
 							<hr>
 							<div id="gift" class="weui-flex">

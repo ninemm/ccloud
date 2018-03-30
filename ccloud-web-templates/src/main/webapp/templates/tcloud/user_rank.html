@@ -22,19 +22,24 @@
 		$("#dayTag").val("today");
 	});
     function productAndRank(params) {
-		Utils.ajax('${CPATH}/report/getUserRank', params, 
+		Utils.ajax('${CPATH}/report/getUserRankZero', params, 
 			function(data){
 				$("#userRankAsc").empty();
 				$("#userRankDesc").empty();
 				var rank = $("#userRankAsc");
 				var descRank = $("#userRankDesc");
-	            var length = data.length;
+				var totalLength = data.length;
+	            var length = 0;
 	            var descLength = 0;
-	            if (length >= 10) {
+	            if (totalLength >= 10) {
 	            	length = 10;
+	            } else {
+	            	length = totalLength;
 	            }
-	            if (length >= 5) {
-	            	descLength = length - 5;
+	            if (totalLength >= 5) {
+	            	descLength = totalLength - 5;
+	            } else {
+	            	descLength = 0;
 	            }
 	            
 	            var first = $(".img");
@@ -50,7 +55,7 @@
 	            	if (i == 0) {
 	            		$("#firstName").html(data[i].realname);
 						$("#orderCount").html(data[i].orderCount);
-						$("#totalAmount").html("￥："+formatNumber(data[i].totalAmount));	            		
+						$("#totalAmount").html("￥ "+formatNumber(data[i].totalAmount));	            		
 	            	}
 	            	if(data[i].avatar==""){
     		            rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+formatNumber(data[i].productCount)+")件</span></div></div></div></div>");
@@ -59,7 +64,7 @@
 	            	}
 	            }
 	            var index = 1;
-	            for(var i = length-1; i >= descLength; i--){
+	            for(var i = totalLength-1; i >= descLength; i--){
 	            	if(data[i].avatar==""){
 	            		descRank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+index+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+formatNumber(data[i].productCount)+")件</span></div></div></div></div>");
 	            	}else{
