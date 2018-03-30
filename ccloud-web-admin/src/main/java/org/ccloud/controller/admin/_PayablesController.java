@@ -212,7 +212,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);	
+		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
 				+ "payables.xls";

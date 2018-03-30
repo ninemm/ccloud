@@ -1,6 +1,12 @@
 <#include "_inc/_layout.html"/>
 <#macro title>业务员销售报表</#macro>
 <#macro css>
+
+	a {
+	   color: #337ab7;
+	   text-decoration:none;
+	}
+
     .report {
         font-size: 0.7rem;
 	    position: absolute;
@@ -15,10 +21,32 @@
         left: 0;
         height: 0;
     }
+    
+    .report .weui-panel__hd.pro:after {
+        content:none;
+    }
+     
+    p { 
+    	margin:0
+		}
+		
+		.weui-tabbar {
+			position: fixed;
+		}
+
+		.overview-title span {
+			bottom: 0;
+		}
+
+		.weui-flex__item {
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
+		}     
 </#macro>
 
 <#macro css_import>
 <link rel="stylesheet" href="${CTPATH}/css/normalize.css">
+<link rel="stylesheet" href="${CPATH}/static/bootstrap/css/bootstrap.min.css">
 </#macro>
 <#macro script_import>
 <script type='text/javascript' src="${CTPATH}/js/echarts.min.js"></script>
@@ -133,175 +161,46 @@
     
     var unit = '件';
     function customerCount(params) {
-        var customerCount = document.getElementById('customerCount');
-        var customerCountChart = echarts.init(customerCount);
-        customerCountChart.showLoading();    
+    	$.showLoading();
 		Utils.ajax('${CPATH}/report/customerCount', params, 
 			function(data){
-				customerCountChart.hideLoading();
-				var orderTag = $("#orderTag").val();
-	            var crSeriesData = [];
-	            var legendData = [];
+				$.hideLoading();
 	            var length = data.length;
-	            var high = 40 * length + 100;
-	            if (high < 300) {
-	            	$("#customerCount").height(300);
-	            } else {
-	            	$("#customerCount").height(high);
-	            }
-	            if (length == 0) {
-	                crSeriesData.push({
-	                    name: '暂无数据',
-	                    value: 0
-	                });	            	
-	            }	
+	            var $tbody = $("#customerCount tbody");
+	            $tbody.empty();
+	            $tbody.append("<tr><th width='60%' style='text-align:center'>客户</th><th width='20%' style='padding: 8px 0;text-align:center'>数量(件)</th><th width='20%' style='padding: 8px 0;text-align:center'>金额(元)</th></tr>");
 	            for(var i = 0; i < length; i++){
-	            	legendData.push(data[i].customer_name)
-		           if (orderTag == 'productCount') {
-		                crSeriesData.push({
-		                    name: data[i].customer_name,
-		                    value: data[i].productCount
-		                });
-		           } else if (orderTag == 'totalAmount') {
-		                crSeriesData.push({
-		                    name: data[i].customer_name,
-		                    value: data[i].totalAmount
-		                });
-		           } else {
-		                crSeriesData.push({
-		                    name: data[i].customer_name,
-		                    value: data[i].orderCount
-		                });
-		           }	            	
-	            }
-				option = {
-				    tooltip: {
-				        trigger: 'item',
-				        formatter: "{a} <br/>{b}: {c}"+unit+"({d}%)"
-				    },
-				    legend: {
-				        orient: 'horizontal',
-				        data:legendData,
-				    },
-				    series: [
-				        {
-				            name:'数据来源',
-				            type:'pie',
-				            radius: ['40%', '60%'],
-				            avoidLabelOverlap: false,
-				            label: {
-				                normal: {
-				                    show: false,
-				                    position: 'center'
-				                },
-				                emphasis: {
-				                    show: true,
-				                    textStyle: {
-				                        fontSize: '15',
-				                        fontWeight: 'bold'
-				                    }
-				                }
-				            },
-				            labelLine: {
-				                normal: {
-				                    show: false
-				                }
-				            },
-				            data:crSeriesData
-				        }
-				    ]
-				};
-	            customerCountChart.resize();
-	            customerCountChart.setOption(option,true);
+	            	var fun = "getProduct('" + data[i].customerId + "')";
+	                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void(0);\">" + data[i].customer_name + "</a></td><td class='t-r'>" + (data[i].productCount).toFixed(2) + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
+	            }			
 			}
 		);     
     }
     
     function productCount(params) {
-        var productCount = document.getElementById('productCanve');
-        var productCountChart = echarts.init(productCanve);
-    	productCountChart.showLoading(); 
+    	$.showLoading();
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
-				productCountChart.hideLoading(); 
-				var orderTag = $("#orderTag").val();
-	            var crSeriesData = [];
-	            var legendData = [];
+				$.hideLoading();
 	            var length = data.length;
-	            var high = 65 * length + 100;
-	            if (high < 300) {
-	            	$("#productCanve").height(300);
-	            } else {
-	            	$("#productCanve").height(high);
-	            }	            
-	            if (length == 0) {
-	            	$("#productCanve").height(300);
-	                crSeriesData.push({
-	                    name: '暂无数据',
-	                    value: 0
-	                });	            	
-	            }
+	            var $tbody = $("#productCanve tbody");
+	            $tbody.empty();
+	            $tbody.append("<tr><th width='60%' style='text-align:center'>产品</th><th width='20%' style='padding: 8px 0;text-align:center'>数量(件)</th><th width='20%' style='padding: 8px 0;text-align:center'>金额(元)</th></tr>");
 	            for(var i = 0; i < length; i++){
-	            	legendData.push(data[i].custom_name)
-					if (orderTag == 'productCount') {
-					     crSeriesData.push({
-					         name: data[i].custom_name,
-					         value: data[i].productCount
-					     });
-					} else if (orderTag == 'totalAmount') {
-					     crSeriesData.push({
-					         name: data[i].custom_name,
-					         value: data[i].totalAmount
-					     });
-					} else {
-					     crSeriesData.push({
-					         name: data[i].custom_name,
-					         value: data[i].orderCount
-					     });
-					}
-	            }
-				option = {
-				    tooltip: {
-				        trigger: 'item',
-				        formatter: "{a} <br/>{b}: {c}"+unit+"({d}%)"
-				    },
-				    legend: {
-				        orient: 'horizontal',
-				        x: 'left',
-				        data:legendData
-				    },
-				    series: [
-				        {
-				            name:'数据来源',
-				            type:'pie',
-				            radius: ['40%', '60%'],
-				            avoidLabelOverlap: false,
-				            label: {
-				                normal: {
-				                    show: false,
-				                    position: 'center'
-				                },
-				                emphasis: {
-				                    show: true,
-				                    textStyle: {
-				                        fontSize: '10',
-				                        fontWeight: 'bold'
-				                    }
-				                }
-				            },
-				            labelLine: {
-				                normal: {
-				                    show: false
-				                }
-				            },
-				            data:crSeriesData
-				        }
-				    ]
-				};
-	            productCountChart.resize();
-	            productCountChart.setOption(option,true);
+	                $tbody.append("<tr><td>" + data[i].custom_name + "</td><td class='t-r'>" + (data[i].productCount).toFixed(2) + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
+	            }				
 			}
 		);    	
+    }
+    
+    function getProduct(customerId) {
+		var params = {
+			"dayTag":  $("#dayTag").val(),
+			"startDate": $("#startDay").val(),
+			"endDate" : $("#endDay").val(),
+			"customerId": customerId
+		}
+    	productCount(params);
     }
     
     function urlSelect(params, type){
@@ -522,7 +421,7 @@
 			</div>
 		</div>
 		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
+			<div class="weui-panel__hd pro">
 				<span class="overview-hd-title">客户订单统计</span> 
 				<!--<div>
 					<span class="briefly" onclick="dayTagSelect(this,'customer')">
@@ -533,17 +432,19 @@
 						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'customer')" readonly="">
 				</div>  -->
 			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="customerCount" style="height: 300px;">
-						
-					</div>
-					<a class="report-detail" onClick="cusDetail()">详情></a>
+			<div class="weui-cells weui-cells_form">
+				<div class="weui-cell" style="padding: 0">
+					<table class="table table-striped table-bordered" id="customerCount">
+						<tbody>
+		
+						</tbody>
+					</table>
 				</div>
 			</div>
+<!-- 			<a class="report-detail" onClick="cusDetail()">详情></a>		 -->
 		</div>
 		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
+			<div class="weui-panel__hd pro">
 				<span class="overview-hd-title">商品销售统计</span> 
 				<!--<div>
 					<span class="briefly" onclick="dayTagSelect(this,'product')">
@@ -554,14 +455,16 @@
 						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'product')" readonly="">
 				</div>-->
 			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="productCanve" style="height: 300px;">
-						
-					</div>
-					<a class="report-detail" onClick="proDetail()">详情></a>
+			<div class="weui-cells weui-cells_form">
+				<div class="weui-cell" style="padding: 0">
+					<table class="table table-striped table-bordered" id="productCanve">
+						<tbody>
+		
+						</tbody>
+					</table>
 				</div>
-			</div>
+<!-- 				<a class="report-detail" onClick="proDetail()">详情></a> -->
+			</div>			
 		</div>
 		<div class="weui-panel weui-panel_access margin-0">
 			<div class="weui-panel__hd"><span class="overview-hd-title">订单完成统计</span></div>

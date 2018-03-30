@@ -119,8 +119,10 @@ $(function() {
   checkIsAllGift();
   initCustomer();
 
-  var $receiveTypeName = $("#receiveTypeName");
-  $receiveTypeName.select({
+	var $receiveTypeName = $("#receiveTypeName");
+	$receiveTypeName.val("现结");
+	$receiveTypeName.attr('data-values', "1");
+	$receiveTypeName.select({
 		title: "收款方式",
 		items: [{
 			title: "现结", value: "1"
@@ -145,17 +147,17 @@ $(function() {
 			
 			var $remark = $("#remark");
 			var re = $remark.val();
-			if (data.values == '0' && re.indexOf("账期") == -1) {
-				$remark.val("账期 " + re);
-			} else if ((data.values != '0') && re.indexOf("账期") != -1) {
-				$remark.val(re.replace(/账期 /g, ""));
-			}
-			
+			if (data.values == '1' && re.indexOf("现结") == -1) {
+				re=re.replace(/账期/, "");
+				$remark.val("现结" + re);
+			}else{
+				re=re.replace(/现结/, "");
+				$remark.val("账期" + re);
+			} 
 			total();
 		}
 	});
-	$receiveTypeName.val("现结");
-	$receiveTypeName.attr('data-values', "1");
+	
 
 	$("#deliveryDate").calendar();
 
@@ -726,7 +728,7 @@ $(function() {
 				<section class="weui-panel weui-panel_access ft14 remark">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<textarea id="remark" name="remark" placeholder="备注说明（70字以内）"></textarea>
+							<textarea id="remark" name="remark" placeholder="备注说明（70字以内）">现结</textarea>
 						</div>
 					</div>
 				</section>

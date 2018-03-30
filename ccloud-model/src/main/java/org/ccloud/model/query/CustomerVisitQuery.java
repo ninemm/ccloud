@@ -93,22 +93,21 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature,String user, String subType, String status, String dataArea, String searchKey) {
+	public Page<Record> paginateForApp(int pageNumber, int pageSize, String id, String type, String nature,String user, String subType, String status, String dataArea, String dealerDataArea, String searchKey) {
 
 		boolean needwhere = false;
 		List<Object> params = new LinkedList<Object>();
 
-		String select  ="SELECT c.id, c.customer_name, c.contact, c.mobile, c.create_date, c.`status`, c.question_type ";
-		StringBuilder sql = new StringBuilder("FROM ( SELECT DISTINCT(ccv.id), cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type ");
-		sql.append("FROM cc_customer_visit ccv ");
+		String select  ="SELECT ccv.id, cc.customer_name, cc.contact, cc.mobile, ccv.create_date, ccv.`status`, ccv.question_type ";
+		StringBuilder sql = new StringBuilder("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
-		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 
 		sql.append("LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
 		sql.append("FROM cc_seller_customer c1 ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		appendIfNotEmptyWithLike(sql, "c1.data_area", dealerDataArea, params, true);
 		sql.append("GROUP BY c1.id) t1 ON csc.id = t1.id ");
 
 		if (StrKit.notBlank(searchKey)) {
@@ -133,7 +132,6 @@ public class CustomerVisitQuery extends JBaseQuery {
 		needwhere = appendIfNotEmpty(sql, "ccv.status", status, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "ccv.user_id", user, params, needwhere);
 		sql.append("ORDER BY  ccv.create_date desc, ccv.`status` ");
-		sql.append(") AS c");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
 	}
 
@@ -266,7 +264,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 
-	public List<Record> findPhoto(String customerType, String customerName, String questionType, String data_area){
+	public List<Record> findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea){
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sql = new StringBuilder("SELECT ccv.id, u.realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
@@ -279,6 +277,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("FROM cc_seller_customer c1 ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		appendIfNotEmptyWithLike(sql, "c1.data_area", dealerDataArea, params, true);
 		sql.append("GROUP BY c1.id) t1 ON t1.id = csc.id ");
 
 		sql.append("LEFT JOIN `user` u ON u.id = ccv.user_id ");

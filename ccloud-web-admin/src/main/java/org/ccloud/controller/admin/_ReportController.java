@@ -64,7 +64,7 @@ public class _ReportController extends JBaseController {
 		String startDate = getPara("startDate");
 		String warehouseId = getPara("warehouse_id");
 		String endDate = getPara("endDate");
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		Page<InventoryDetail> page=new Page<>();
@@ -102,7 +102,7 @@ public class _ReportController extends JBaseController {
 	
 	//产品总计
 	public void productTotalList() {
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		String sellerId = getPara("seller_id");

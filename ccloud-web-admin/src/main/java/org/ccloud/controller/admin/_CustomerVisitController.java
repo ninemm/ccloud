@@ -183,7 +183,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
 		setAttr("customerType", JSON.toJSON(customerTypeList));
 
-		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%", null);
+		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(), null);
 		List<Map<String, Object>> customerList = new ArrayList<>();
 		customerList.add(all);
 
@@ -213,7 +213,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 	public void getCustomer(){
 		String customerType = getPara("customerType");
-		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA)+ "%", customerType);
+		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(), customerType);
 
 		List<Map<String, Object>> customerList = new ArrayList<>();
 		Map<String, Object> all = new HashMap<>();
@@ -519,8 +519,9 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String customerName = getPara("customer_name");
 		String questionType = getPara("question_type");
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea + "%");
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
 		if(imageList.size() == 0) renderAjaxResultForError();
 		else renderAjaxResultForSuccess();
 	}
@@ -531,9 +532,10 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String customerName = getPara("customer_name");
 		String questionType = getPara("question_type");
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		String domain = OptionQuery.me().findByKey("cdn_domain").getOptionValue();
-		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea + "%");
+		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
 
 		String zipFileName = "拜访图片.zip";
 

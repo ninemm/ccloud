@@ -1,7 +1,7 @@
 <#include "../_inc/_layout.html"/>
 
 <#macro script_import>
-
+	<script type='text/javascript' src="${CTPATH}/js/jquery.cookie.js"></script>
 	<!-- bootstrap-table -->
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
@@ -41,6 +41,12 @@
 
 		var keyword = $('#search').val();
 		var customerType = $('#customer_type').val();
+		if(customerType!=null){
+			var date = new Date();
+			date.setTime(date.getTime()+2*60*1000);
+			$.cookie('customerType', customerType, { expires: date });
+		}
+		customerType=$.cookie('customerType');
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
@@ -155,6 +161,8 @@
 					strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
 				}
 				$("#customer_type").html(strHtml);
+				var aa = $.cookie('customerType');
+				$("#customer_type").val(aa);
 			}
 		});
 	}

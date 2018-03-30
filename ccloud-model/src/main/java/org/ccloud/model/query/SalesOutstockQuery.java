@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.Consts;
+import org.ccloud.model.Customer;
 import org.ccloud.model.Product;
 import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerProduct;
@@ -139,8 +140,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 				}
 				
 				//生成出库单时候生成二维码
-				generateQrcode(orderId,order,orderDetailList, sellerCode);
-
+				if (Consts.QRDEALERCODE.contains(sellerCode)) {
+					generateQrcode(orderId,order,orderDetailList, sellerCode);
+				}
 				SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, userId, date);// 已审核通过
 
 				return true;
@@ -420,7 +422,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public printAllNeedInfo findStockOutForPrint(final String id) {
 		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, cs.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
-		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id,so.order_qrcode_url, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
+		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,so.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id,so.order_qrcode_url, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sj on sj.outstock_id = o.id ");
@@ -617,10 +619,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 				String childFileName = DateUtils.dateString();
 				PathKit.getWebRootPath();
 				String imagePath = PathKit.getWebRootPath() + "/";
-				String newStr = imagePath.substring(0, imagePath.length()-6) + "admin/" + Consts.ORDER_QRCODE_PATH + childFileName ;
+				String newStr = imagePath + Consts.ORDER_QRCODE_PATH + childFileName ;
 
 				String orcodeImgUrl = Consts.ORDER_QRCODE_PATH + childFileName +"/" +  orcodeFileName;
-				stringBuilder.append(order.getStr("customer_id")).append("||" + orderSn).append("||" + order.getStr("contact") + "||");					
+				Customer customer = CustomerQuery.me().findSellerCustomerId(order.getStr("customer_id"));
+				stringBuilder.append(order.getStr("customer_id")).append("||" + orderSn).append("||" + customer.getCustomerName() + "||");					
 
 				
                for (Record orderDetail : orderDetailList) {
@@ -631,14 +634,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 				}
                QRcontent = stringBuilder.toString().substring(0, stringBuilder.length() -1);
 				Date date = new Date();
-				if (Consts.QRDEALERCODE.contains(sellerCode)) {
 					org.ccloud.utils.QRCodeUtils.genQRCode(QRcontent, newStr, orcodeFileName);
 	           		int i = SalesOrderQuery.me().updateQrcodeImgUrl(orcodeImgUrl, orderId, date);
 	           		if (i < 0) {
 						return false;
 					}
-				}
-				
 				return true;
 			}
 		});

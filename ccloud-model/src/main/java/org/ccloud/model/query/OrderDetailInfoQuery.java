@@ -80,8 +80,8 @@ public class OrderDetailInfoQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), orderId);
 	}
 
-	public List<Record> getOtherProductCount(String startDate, String endDate, String sellerId, String dayTag) {
-		if (dayTag != null) {
+	public List<Record> getOtherProductCount(String startDate, String endDate, String sellerId, String dayTag, String platformTag) {
+		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
 			endDate = date[1];
@@ -92,6 +92,7 @@ public class OrderDetailInfoQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmpty(fromBuilder, "co.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "co.platform_name", platformTag, params, needWhere);
 		
 		if (needWhere) {
 			fromBuilder.append("WHERE 1 = 1 ");
