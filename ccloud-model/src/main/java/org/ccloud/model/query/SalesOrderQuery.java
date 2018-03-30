@@ -456,7 +456,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
-		
+	
 		String select = "SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
 		
 		LinkedList<Object> params = new LinkedList<>();
@@ -467,11 +467,8 @@ public class SalesOrderQuery extends JBaseQuery {
 		sql.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
 		sql.append(" JOIN act_hi_actinst i on o.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append(" JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
-		sql.append(" WHERE i.DURATION_ is not null AND p.KEY_ not in (?,?,?) ");
-		
-		params.add(Consts.PROC_CUSTOMER_VISIT_REVIEW);
-		params.add(Consts.PROC_CUSTOMER_REVIEW);
-		params.add(Consts.PROC_ACTIVITY_APPLY_REVIEW);
+		String key = key();
+		sql.append(" WHERE i.DURATION_ is not null AND p.KEY_ in ("+key+") ");
 		if (StrKit.notBlank(username)) {
 			sql.append(" AND FIND_IN_SET(?, i.ASSIGNEE_)");
 			params.add(username);
@@ -481,7 +478,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 	}
 
-
+	public String key() {
+		String select="SELECT GROUP_CONCAT(\"'\",p.KEY_,\"'\") key_ FROM act_re_procdef p WHERE p.KEY_ NOT in('"+Consts.PROC_CUSTOMER_VISIT_REVIEW+"','";
+		select=select+Consts.PROC_CUSTOMER_REVIEW+"','"+Consts.PROC_ACTIVITY_APPLY_REVIEW+"')";
+		return Db.findFirst(select).getStr("key_");
+	}
+	
 	//我的客户类型
 	public Page<SalesOrder> findByCustomerType(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String userId, boolean ifGift) {
