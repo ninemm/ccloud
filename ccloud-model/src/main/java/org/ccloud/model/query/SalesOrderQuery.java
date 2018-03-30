@@ -1083,14 +1083,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("SELECT (case ");
-		fromBuilder.append("when cc.`status`='1000' then '订单已审核' ");
-		fromBuilder.append("when cc.`status`='0' then '订单待审核' ");
-		fromBuilder.append("when cc.`status`='1001' then '订单取消'");
-		fromBuilder.append("when cc.`status`='1002' then '订单拒绝' ");
-		fromBuilder.append("when cc.`status`='2000' then '订单部分出库' ");
-		fromBuilder.append("when cc.`status`='2001' then '订单部分出库-订单关闭' ");
-		fromBuilder.append("when cc.`status`='3000' then '订单全部出库' ");
-		fromBuilder.append("when cc.`status`='3001' then '订单全部出库-订单关闭' ");
+		fromBuilder.append("when cc.`status`='1000' then '已审核' ");
+		fromBuilder.append("when cc.`status`='0' then '待审核' ");
+		fromBuilder.append("when cc.`status`='1001' then '已取消'");
+		fromBuilder.append("when cc.`status`='1002' then '已拒绝' ");
+		fromBuilder.append("when cc.`status`='2000' then '部分出库' ");
+		fromBuilder.append("when cc.`status`='2001' then '部分出库-订单关闭' ");
+		fromBuilder.append("when cc.`status`='3000' then '全部出库' ");
+		fromBuilder.append("when cc.`status`='3001' then '全部出库-订单关闭' ");
 		fromBuilder.append("else '暂无记录' ");
 		fromBuilder.append("end) as status, ");
 		fromBuilder.append("COUNT(cc.`status`) as count FROM cc_sales_order cc ");

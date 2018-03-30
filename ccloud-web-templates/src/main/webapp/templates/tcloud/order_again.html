@@ -228,7 +228,7 @@ $(function() {
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
 							<div>
-								<input type="checkbox" name="receiveL"<#if order.receive_type == 0>checked</#if> class="weui-agree__checkbox"> 是否账期
+								<input type="checkbox" name="receiveL"<#if order.receive_type == 0>checked</#if> class="weui-agree__checkbox" disabled> 是否账期
 								<input type="hidden" name = "receiveType" value="${order.receive_type!}">
 							</div>
 						</div>
@@ -237,7 +237,7 @@ $(function() {
 				<section class="weui-panel weui-panel_access ft14 remark">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<textarea name="remark" placeholder="备注说明（70字以内）"></textarea>
+							<textarea name="remark" placeholder="备注说明（70字以内）"><#if order.receive_type == 0>账期<#else>现结</#if></textarea>
 						</div>
 					</div>
 				</section>

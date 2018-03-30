@@ -350,7 +350,7 @@ public class UserController extends BaseFrontController {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
 							DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
 				} else {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea() + "%");
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
