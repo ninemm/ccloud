@@ -575,12 +575,12 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	//我部门的产品
 	public Page<SalesOrder> findByDepartmentProduct(int pageNumber, int pageSize, String startDate, String endDate,
-			String keyword, String dataArea, boolean ifGift) {
+			String keyword, String dataArea, boolean ifGift, String sort, String order) {
 		String product_count="sd.product_count";
 		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
 		}
-		String select = "SELECT sp.custom_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(t1.count), 0)) / p.convert_relate),2) productCountTotal";
+		String select = "SELECT cs.seller_name,sp.custom_name,TRUNCATE(((IFNULL(sum("+product_count+"),0)-IFNULL(sum(t1.count), 0)) / p.convert_relate),2) productCountTotal";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
@@ -588,6 +588,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id=sp.seller_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sum(srid.product_count) count , srid.sell_product_id , sri.outstock_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON srid.refund_instock_id=sri.id ");
 		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
@@ -612,8 +613,10 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and "+keyword+" <= ?");
 			params.add(endDate);
 		}
-		fromBuilder.append("GROUP BY sp.id");
-		
+		fromBuilder.append("GROUP BY sp.id ");
+		if (!(sort==""||null==sort)) {
+			fromBuilder.append(" order by "+sort+" "+order);
+		}
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
