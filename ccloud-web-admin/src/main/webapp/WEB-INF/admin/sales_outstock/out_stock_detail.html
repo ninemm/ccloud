@@ -268,7 +268,7 @@
 					toastr.error(data.message,'操作失败');
 				}
 				setTimeout( function(){
-						l.stop();
+						window.history.back(-1);
 								}, 1 * 1000 );
 			},
 			error : function() {
