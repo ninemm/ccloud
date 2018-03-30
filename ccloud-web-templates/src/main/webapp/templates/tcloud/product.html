@@ -21,6 +21,33 @@
 	.activityName {
 		color: #ea6f5a;
 	}	
+	#compositionValueName {
+    padding: 0 0.25rem;
+    margin-left: 2.2rem;
+    margin-right: 0.8rem;
+	}
+	#compositionValueName div {
+		white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	}
+	.composition-detail {
+		padding-left: .5rem;
+	}
+	.main-good {
+		width:1.5rem;
+		height:1.5rem;
+		line-height:1.5rem;
+		font-size: .7rem;
+		text-align:center;
+		border-radius:50%;
+		background-color: #ea6f5a;
+		position: absolute;
+		color: #fff;
+		top:50%;
+		margin-top:-.75rem;
+		left: .5rem;
+	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
@@ -140,7 +167,7 @@ $(function() {
 	}).on("click", ".composition .product-top .weui-cell__ft, #compositionName", function () {
     	var $this = $(this).parents(".composition");
     	var compositionName = $this.find("#compositionName").text();
-    	var compositionValueName = $this.find("#compositionValueName").text();
+    	var compositionValueName = $this.find("#compositionValueName").html();
     	var subProduct = $this.find("#subProduct").text();
 			var subsubProduct = $this.find("#subsubProduct").html();
     	var product_image_list_store = $this.find("#product_image_list_store").val();
@@ -156,9 +183,12 @@ $(function() {
 			'<div class="swiper-wrapper">' + imageS + '</div>' +
 			'<div class="swiper-pagination"></div>' +
 			'</div>' +
-			'<p>名称：' + compositionName + '</p>' +
-			'<p>主商品：<p>' + compositionValueName + '</p>' +
-			'<div>赠品：<p>' + subProduct + '</p>' + subsubProduct + '</div>',
+			'<p>名称：' + 
+			'<div class="composition-detail">' + compositionName + '</div>' +
+			'</p>' +
+			'<p>主商品：</p>' +
+			'<div class="composition-detail">' + compositionValueName + '</div>' +
+			'<div>赠品：<div class="composition-detail">' + subProduct + '</div>' + subsubProduct + '</div>',
 		  anim: 'scale',
 		  className: 'product-detail',
 		  success: function () {
@@ -227,7 +257,7 @@ function initTags(tags) {
 	});
 
 	var mySwiper = new Swiper('.product-content .swiper-container', {
-		slidesPerView: 4,
+		width: $('#sidebar').width(),
 	})
 }
 
@@ -345,9 +375,9 @@ function initComposition(compositionList){
 			if (sub_smallCount != 0) {
 				sub_smallCountHtml = "" + sub_smallCount + el.sub_sunit + "";
 			}
-			$newProductDetail.find("#compositionValueName").text(el.product_name + ' ' + bigCountHtml + smallCountHtml);
+			$newProductDetail.find("#compositionValueName").html('<div>'+el.product_name + ' ' + bigCountHtml + smallCountHtml+'</div>');
 			if (el.is_gift == 0) {
-				$newProductDetail.find("#compositionValueName").append(el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml);
+				$newProductDetail.find("#compositionValueName").append('<div>'+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml+'</div>');
 			} else {
 				$newProductDetail.find("#subProduct").text(el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml);
 			}
@@ -370,7 +400,7 @@ function initComposition(compositionList){
 			}
 			var html = $newProductDetail.find("#subProduct").html().trim();
 			if (el.is_gift == 0) { 
-				$newProductDetail.find("#compositionValueName").append(el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml);
+				$newProductDetail.find("#compositionValueName").append('<div>'+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml+'</div>');
 			} else {
 				if (html) {
 					$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"</p>");
@@ -581,161 +611,160 @@ function order(){
 </#macro>
 
 <@layout>
-<div class="weui-content">
-	<div id="product">
-		<header>
-			<div class="weui-search-bar" id="searchBar">
-				<form class="weui-search-bar__form">
-					<div class="weui-search-bar__box">
-						<i class="weui-icon-search"></i> <input type="search"
-							class="weui-search-bar__input" id="searchInput" placeholder="搜索"
-							required=""> <a href="javascript:"
-							class="weui-icon-clear" id="searchClear"></a>
+	<div class="weui-content">
+		<div id="product">
+			<header>
+				<div class="weui-search-bar" id="searchBar">
+					<form class="weui-search-bar__form">
+						<div class="weui-search-bar__box">
+							<i class="weui-icon-search"></i>
+							<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+							<a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+						</div>
+						<label class="weui-search-bar__label" id="searchText">
+							<i class="weui-icon-search"></i>
+							<span>请输入商品名称</span>
+						</label>
+					</form>
+					<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+				</div>
+			</header>
+			<div class="product-content">
+				<div class="swiper-container t-c">
+					<div class="swiper-wrapper" id="tags">
+						<div class="swiper-slide active">全部</div>
 					</div>
-					<label class="weui-search-bar__label" id="searchText"> <i
-						class="weui-icon-search"></i> <span>请输入商品名称</span>
-					</label>
-				</form>
-				<a href="javascript:" class="weui-search-bar__cancel-btn"
-					id="searchCancel">取消</a>
-			</div>
-		</header>
-		<div class="product-content">
-			<div class="swiper-container t-c">
-				<div class="swiper-wrapper" id="tags">
-					<div class="swiper-slide active">全部</div>
+				</div>
+				<div class="product-inner-content">
+					<aside>
+						<div id="sidebar" class="menu-left">
+							<ul>
+
+							</ul>
+						</div>
+					</aside>
+					<article class="menu-right">
+						<div class="" style="display: none">
+							<section class="product_detail weui-panel weui-panel_access common">
+								<div>
+									<input type="hidden" id="sellProductId" value="">
+									<input type="hidden" id="productId" value="">
+									<input type="hidden" id="convert" value="">
+									<input type="hidden" id="bigPrice" value="">
+									<input type="hidden" id="smallPrice" value="">
+									<input type="hidden" id="bigUnit" value="">
+									<input type="hidden" id="smallUnit" value="">
+									<input type="hidden" id="bigCost" value="">
+									<input type="hidden" id="smallCost" value="">
+									<input type="hidden" id="bigAccountPrice" value="">
+									<input type="hidden" id="smallAccountPrice" value="">
+									<input type="hidden" id="isGift" value="0">
+									<input type="hidden" id="description" value="0">
+									<input type="hidden" id="product_image_list_store" value="">
+									<input type="hidden" id="product_sn" value="">
+									<div class="product-top">
+										<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
+										<div class="weui-cell_access product-top-right">
+											<p class="product_name" id="productName"></p>
+											<div class="product_unit">
+												<p>规格：</p>
+												<span id="valueName"></span>
+											</div>
+											<span class="weui-cell__ft"></span>
+										</div>
+									</div>
+									<div class="product_bUnit">
+										<span class="price" id="bigPriceSpan"></span>
+										<span class="unit" id="bigUnitSpan"></span>
+										<div class="spinner">
+											<div class="operate fl">
+												<i class="icon-minus2"></i>
+											</div>
+											<input type="number" min="0" value="0" class="fl" id="bigNum">
+											<div class="operate fl">
+												<i class="icon-plus2"></i>
+											</div>
+										</div>
+									</div>
+									<div class="product_mUnit">
+										<span class="price" id="smallPriceSpan"></span>
+										<span class="unit" id="smallUnitSpan"></span>
+										<div class="spinner">
+											<div class="operate fl">
+												<i class="icon-minus2"></i>
+											</div>
+											<input type="number" min="0" value="0" class="fl" id="smallNum">
+											<div class="operate fl">
+												<i class="icon-plus2"></i>
+											</div>
+										</div>
+									</div>
+									<div id="stock"></div>
+								</div>
+							</section>
+						</div>
+						<div class="" style="display: none">
+							<section class="product_detail weui-panel weui-panel_access composition">
+								<div>
+									<input type="hidden" id="compositionId" value="">
+									<input type="hidden" id="compositionPrice" value="">
+									<input type="hidden" id="product_image_list_store" value="">
+									<input type="hidden" id="product_sn" value="">
+									<div class="product-top">
+										<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
+										<div class="weui-cell_access product-top-right">
+											<p class="product_name" id="compositionName"></p>
+											<div class="product_unit">
+												<div class="main-good">主</div>
+												<div id="compositionValueName"></div>
+											</div>
+											<span class="weui-cell__ft"></span>
+										</div>
+									</div>
+									<div class="product_bUnit">
+										<span class="price" id="compositionPriceSpan"></span>
+										<div class="spinner">
+											<div class="operate fl">
+												<i class="icon-minus2"></i>
+											</div>
+											<input type="number" min="0" value="0" class="fl" id="compositionNum">
+											<div class="operate fl">
+												<i class="icon-plus2"></i>
+											</div>
+										</div>
+									</div>
+									<div id="stock"></div>
+									<div id="activityName" class="activityName"></div>
+								</div>
+								<hr>
+								<div id="gift" class="weui-flex">
+									<span>
+										<i class="icon-tags"></i>
+									</span>
+									<div class="weui-flex__item">
+										<p id="sub">
+											<span id="subProduct"> </span>
+										</p>
+										<p id="subsubProduct" class="none">
+										</p>
+									</div>
+								</div>
+							</section>
+						</div>
+					</article>
 				</div>
 			</div>
-			<div class="product-inner-content">
-				<aside>
-					<div id="sidebar" class="menu-left">
-						<ul>
-			
-						</ul>
-					</div>
-				</aside>		
-				<article class="menu-right">
-					<div class="" style="display: none">
-						<section class="product_detail weui-panel weui-panel_access common">
-							<div>
-								<input type="hidden" id="sellProductId" value="">
-								<input type="hidden" id="productId" value="">
-								<input type="hidden" id="convert" value="">
-								<input type="hidden" id="bigPrice" value="">
-								<input type="hidden" id="smallPrice" value="">
-								<input type="hidden" id="bigUnit" value="">
-								<input type="hidden" id="smallUnit" value="">
-								<input type="hidden" id="bigCost" value="">
-								<input type="hidden" id="smallCost" value="">
-								<input type="hidden" id="bigAccountPrice" value="">
-								<input type="hidden" id="smallAccountPrice" value="">
-								<input type="hidden" id="isGift" value="0">
-								<input type="hidden" id="description" value="0">
-								<input type="hidden" id="product_image_list_store" value="">
-								<input type="hidden" id="product_sn" value="">
-								<div class="product-top">
-									<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
-									<div class="weui-cell_access product-top-right">
-										<p class="product_name" id="productName"></p>
-										<div class="product_unit">
-											<p>规格：</p>
-											<span id="valueName"></span>
-										</div>
-										<span class="weui-cell__ft"></span>
-									</div>
-								</div>
-								<div class="product_bUnit">
-									<span class="price" id="bigPriceSpan"></span>
-									<span class="unit" id="bigUnitSpan"></span>
-									<div class="spinner">
-										<div class="operate fl">
-											<i class="icon-minus2"></i>
-										</div>
-										<input type="number" min="0" value="0" class="fl" id="bigNum">
-										<div class="operate fl">
-											<i class="icon-plus2"></i>
-										</div>
-									</div>
-								</div>
-								<div class="product_mUnit">
-									<span class="price" id="smallPriceSpan"></span>
-									<span class="unit" id="smallUnitSpan"></span>
-									<div class="spinner">
-										<div class="operate fl">
-											<i class="icon-minus2"></i>
-										</div>
-										<input type="number" min="0" value="0" class="fl" id="smallNum">
-										<div class="operate fl">
-											<i class="icon-plus2"></i>
-										</div>
-									</div>
-								</div>
-								<div id="stock"></div>
-							</div>
-						</section>
-					</div>
-					<div class="" style="display: none">
-						<section class="product_detail weui-panel weui-panel_access composition">
-							<div>
-								<input type="hidden" id="compositionId" value="">
-								<input type="hidden" id="compositionPrice" value="">
-								<input type="hidden" id="product_image_list_store" value="">
-								<input type="hidden" id="product_sn" value="">
-								<div class="product-top">
-									<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
-									<div class="weui-cell_access product-top-right">
-										<p class="product_name" id="compositionName"></p>
-										<div class="product_unit">
-											<p>主商品：</p>
-											<span id="compositionValueName"></span>
-										</div>
-										<span class="weui-cell__ft"></span>
-									</div>
-								</div>
-								<div class="product_bUnit">
-									<span class="price" id="compositionPriceSpan"></span>
-									<div class="spinner">
-										<div class="operate fl">
-											<i class="icon-minus2"></i>
-										</div>
-										<input type="number" min="0" value="0" class="fl" id="compositionNum">
-										<div class="operate fl">
-											<i class="icon-plus2"></i>
-										</div>
-									</div>
-								</div>
-								<div id="stock"></div>
-								<div id="activityName" class="activityName"></div>
-							</div>
-							<hr>
-							<div id="gift" class="weui-flex">
-								<span>
-									<i class="icon-tags"></i>
-								</span>
-								<div class="weui-flex__item">
-									<p id="sub">
-										<span id="subProduct"> </span>
-									</p>
-									<p id="subsubProduct" class="none">
-									</p>
-								</div>
-							</div>
-						</section>
-					</div>
-				</article>
-			</div>
-		</div>
 		</div>
 		<div class="weui-gallery" id="gallery">
 			<span class="weui-gallery__img" id="galleryImg"></span>
 			<div class="weui-gallery__opr">
 			</div>
 		</div>
-</div>
-<#include "_inc/_goback.html" />
-<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-	<p class="total bg-white weui-flex__item" id="totalNum"></p>
-	<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
-	<button id="placeOrder" class="place-order red-button white">下单</button>
-</footer>
+	</div>
+	<#include "_inc/_goback.html" />
+	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+		<p class="total bg-white weui-flex__item" id="totalNum"></p>
+		<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
+		<button id="placeOrder" class="place-order red-button white">下单</button>
+	</footer>
 </@layout>
