@@ -433,82 +433,77 @@
 </#macro>
 <@layout>
 	<div class="weui-content">
-	<div class="report">
-		<div class="weui-panel weui-panel_access report-header">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">${userName!}销售简报</span> <span class="briefly" onclick="dayTagSelect(this,'order')">
-					<p class="dayTagText">今日</p>
-					<i class="icon-angle-down"></i>
-				</span> 
-				<input type="hidden" id="dayTag">
-				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
-				<span class="overview-hd-segmenting fr"> - </span> 
-				<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
-			</div>
-			<div class="weui-panel__bd">
-				<div class="weui-flex overview-block">
-					<div class="weui-flex__item">
-						<div class="overview-title">
-							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
+		<div class="report">
+			<div class="weui-panel weui-panel_access report-header">
+				<div class="weui-panel__hd">
+					<span class="overview-hd-title">${userName!}销售简报</span>
+					<span class="briefly" onclick="dayTagSelect(this,'order')">
+						<p class="dayTagText">今日</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<input type="hidden" id="dayTag">
+					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'order')" readonly="">
+					<span class="overview-hd-segmenting fr"> - </span>
+					<input class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'order')" readonly="">
+				</div>
+				<div class="weui-panel__bd">
+					<div class="weui-flex overview-block">
+						<div class="weui-flex__item">
+							<div class="overview-title">
+								<img src="${CTPATH}/images/order.png">
+								<span>订单总数</span>
+							</div>
+							<div class="t-c">
+								<strong id="productCount"></strong>
+								<small id="totalCount"></small>
+							</div>
 						</div>
-						<div class="t-c">
-							<strong id="productCount"></strong> <small id="totalCount"></small>
-						</div>
-					</div>
-					<div class="weui-flex__item">
-						<div class="overview-title">
-							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
-						</div>
-						<div class="t-c">
-							<strong id="totalAmount"></strong>
+						<div class="weui-flex__item">
+							<div class="overview-title">
+								<img src="${CTPATH}/images/money.png">
+								<span>订单金额</span>
+							</div>
+							<div class="t-c">
+								<strong id="totalAmount"></strong>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">客户统计</span>
-			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd t-c ft16">
+					客户统计
+				</div>
+				<div class="weui-panel__bd report-area border-top-1px">
 					<div id="customerCount">
-						
+
 					</div>
 				</div>
 			</div>
-		</div>		
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd pro">
-				<span class="overview-hd-title">产品统计</span><!--<span class="briefly" onclick="dayTagSelect(this,'user')">
-				<p class="dayTagText">今日</p>
-					<i class="icon-angle-down"></i>
-				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
-				<span class="overview-hd-segmenting fr"> - </span> <input
-					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">-->
-			</div>
-			<div class="weui-cells weui-cells_form">
-				<div class="weui-cell" style="padding: 0">
-					<table class="table table-striped table-bordered" id="userCount">
-						<tbody>
-		
-						</tbody>
-					</table>
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd pro ft16 t-c">
+					产品统计
+				</div>
+				<div class="weui-cells weui-cells_form mg-0">
+					<div class="weui-cell" style="padding: 0">
+						<table class="table table-striped table-bordered mg-0" id="userCount">
+							<tbody>
+
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">赠品统计</span> 
-			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd t-c ft16">
+					赠品统计
+				</div>
+				<div class="weui-panel__bd report-area border-top-1px">
 					<div id="giftCount" style="height: 400px;">
-						
+
 					</div>
 				</div>
 			</div>
-		</div>		
 		</div>
 		<#include "_inc/_footer_nav.html" />
 	</div>
