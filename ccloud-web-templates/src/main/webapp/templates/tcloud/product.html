@@ -577,12 +577,11 @@ function total(){
 			total += el.smallNum * el.smallPrice;
 		}
 	});
-	
 	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 	$.each(compositionList, function(index, el) {
 		total += el.compositionNum * el.compositionPrice;
 	});
-	$("#totalNum").text("共" + (productList.length + compositionList.length) + "款,合计:" + total + "元")
+	$("#totalNum").text("共" + (productList.length + compositionList.length) + "款,合计:" + total.toFixed(2) + "元")
 
 } 
 
