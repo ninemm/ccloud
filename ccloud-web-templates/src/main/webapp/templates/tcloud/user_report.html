@@ -1,6 +1,11 @@
 <#include "_inc/_layout.html"/>
 <#macro title>业务员报表</#macro>
 <#macro css>
+	a {
+	   color: #337ab7;
+	   text-decoration:none;
+	}
+	
     .report {
         font-size: 0.7rem;
 	    position: absolute;
@@ -101,7 +106,8 @@
 	            $tbody.empty();
 	            $tbody.append("<tr><th width='60%' style='text-align:center'>客户名</th><th width='20%' style='padding: 8px 0;text-align:center'>数量(件)</th><th width='20%' style='padding: 8px 0;text-align:center'>金额(元)</th></tr>");
 	            for(var i = 0; i < length; i++){
-	                $tbody.append("<tr><td>" + data[i].customer_name + "</td><td class='t-r'>" + (data[i].productCount).toFixed(2) + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
+	            	var fun = "getProduct('" + data[i].customerId + "')";
+	                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void(0);\">" + data[i].customer_name + "</a></td><td class='t-r'>" + (data[i].productCount).toFixed(2) + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
 	            }				
 			}
 		);     
@@ -183,6 +189,26 @@
 <!-- 			giftCount(params2); -->
 <!-- 		} -->
     }
+    
+    function getProduct(customerId) {
+		var params = {
+			"dayTag":  $("#dayTag").val(),
+			"startDate": $("#startDay").val(),
+			"endDate" : $("#endDay").val() + ' 23:59:59',
+			"userId": '${(userId)!}',
+			"customerId": customerId
+		}
+		var params2 = {
+			"dayTag":  $("#dayTag").val(),
+    		"startDate": $("#startDay").val(),
+			"endDate": $("#endDay").val() + ' 23:59:59',
+			"userId": '${(userId)!}',
+			"customerId": customerId,
+			"isGift": 'true'
+		}					
+    	productCount(params);
+    	giftCount(params2);
+    }    
     
     function startDaySelect(obj,type) {
 		var params = {
