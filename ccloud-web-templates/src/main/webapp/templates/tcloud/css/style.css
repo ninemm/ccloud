@@ -2095,6 +2095,13 @@ input[name=sex] {
   color: #d4d4d4;
 }
 
+.read-more {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  color: #999;
+  font-size: .6rem;
+}
 
 /* 费用申请 */
 

@@ -1,0 +1,203 @@
+<#include "_inc/_layout.html"/>
+<#macro title>业务员排行</#macro>
+<#macro script_import>
+    <script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+</#macro>
+<#macro css>
+	.wi {
+		display: inline;
+		margin-right:.5rem;
+	}
+	.weui-media-box:before {
+		content: none;
+	}
+</#macro>
+
+<#macro script>
+	$(function() {
+		var params = {
+			"dayTag":  'today',
+		}
+		productAndRank(params);
+		$("#dayTag").val("today");
+	});
+    function productAndRank(params) {
+		Utils.ajax('${CPATH}/report/getDepartmenUserRank', params, 
+			function(data){
+				$("#userRankAsc").empty();
+				$("#userRankDesc").empty();
+				var rank = $("#userRankAsc");
+				var descRank = $("#userRankDesc");
+	            var length = data.length;
+	           
+	           	var first = $(".img");
+	            first.html("");
+	            if(length>0){
+		             if(data[0].avatar==null||data[0].avatar==null){
+		            		first.append('<img src="${(session._logined_user.avatar)!'${CTPATH}/images/avatar.png'}">');
+		            }else{
+			            first.append('<img src="'+data[0].avatar+'">');
+		            }
+	            }
+	            for(var i = 0; i < length; i++){
+		            	j = i + 1; 
+		            	if (i == 0) {
+		            			$("#firstName").html(data[i].realname);
+							$("#orderCount").html(data[i].orderCount);
+							$("#totalAmount").html("￥"+formatNumber(data[i].totalAmount));	            		
+		            	}
+		            	 if(data[i].avatar==null||data[i].avatar==""){
+	    		            rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>   /   "+data[i].orderCount+"笔   /   "+formatNumber(data[i].productCount)+" 件</span></div></div></div></div>");
+		            	}else{
+			            	rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='"+data[i].avatar+"' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>   /   "+data[i].orderCount+"笔   /   "+formatNumber(data[i].productCount)+" 件</span></div></div></div></div>");
+		            	}
+	            }
+			}
+		);    	
+    }
+    
+ 	function dayTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "今日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'today'
+			}
+			productAndRank(params); 
+            $(obj).find(".dayTagText").text('今日')
+            $("#dayTag").val('today');
+          }
+        }, {
+          text: "昨日",
+          onClick: function () {
+			var params = {
+				"dayTag": 'yesterday'
+			}
+          	productAndRank(params);
+            $(obj).find(".dayTagText").text('昨日')
+            $("#dayTag").val('yesterday');
+          }
+        }, {
+          text: "本周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'week'
+			}
+			productAndRank(params);   
+          	$(obj).find(".dayTagText").text('本周')
+          	$("#dayTag").val('week');
+          }
+        }, {
+          text: "上周",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastweek'
+			}
+          productAndRank(params);
+          $(obj).find(".dayTagText").text('上周')
+          $("#dayTag").val('lastweek');
+          }
+        }, {
+          text: "本月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'month'
+			}     
+			productAndRank(params);   
+         	$(obj).find(".dayTagText").text('本月')
+         	$("#dayTag").val('month');
+          }
+        }, {
+          text: "上月",
+          onClick: function () {
+			var params = {
+				"dayTag": 'lastmonth'
+			}         
+			productAndRank(params);
+          	$(obj).find(".dayTagText").text('上月')
+          	$("#dayTag").val('lastmonth');
+          }
+        }]
+      }); 	
+ 	}
+ 	
+ 	function orderSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "金额",
+          onClick: function () {
+			var params = {
+				"orderTag": 'totalAmount',
+				"dayTag": $("#dayTag").val()
+			}
+			productAndRank(params); 
+            $(obj).find(".orderTagText").text('金额')
+          }
+        }, {
+          text: "件数",
+          onClick: function () {
+			var params = {
+				"orderTag": 'productCount',
+				"dayTag": $("#dayTag").val()
+			}
+          	productAndRank(params);
+            $(obj).find(".orderTagText").text('件数')
+          }
+        }, {
+          text: "笔数",
+          onClick: function () {
+			var params = {
+				"orderTag": 'orderCount',
+				"dayTag": $("#dayTag").val()
+			}
+			productAndRank(params);   
+          	$(obj).find(".orderTagText").text('笔数')
+          }
+        }]
+      }); 	
+ 	}  	   	
+</#macro> 
+
+<@layout>
+<article id="my">
+	<header class="user-box user-rank">
+		<div class="user-info">
+			<p class="seller ft16">冠军</p>
+			<p class="name" id="firstName"></p>
+		</div>
+		<div class="user-avatar img">
+		</div> 
+		<div class="user-statistics">
+			<div class="weui-flex">
+			<div class="weui-flex__item">
+				<h5>订单数</h5>
+				<h5 id="orderCount"></h5>
+			</div>
+			<div class="weui-flex__item"></div>
+			<div class="weui-flex__item">
+				<h5>订单金额</h5>
+				<h5 id="totalAmount"></h5>
+			</div>
+			</div>
+		</div>
+	</header>
+    <div class="weui-panel weui-panel_access">
+		<div class="weui-panel__hd">
+			<span class="overview-hd-title wi">销售排行</span>
+			<span class="briefly" onclick="dayTagSelect(this)">
+				<input type="hidden" id="dayTag">
+				<p class="dayTagText">今日</p>
+				<i class="icon-angle-down ft14"></i>
+			</span>
+			<span class="briefly" onclick="orderSelect(this)">
+				<p class="orderTagText">金额</p>
+				<i class="icon-angle-down ft14"></i>
+			</span>
+		</div>
+		<div class="weui-panel__bd" id="userRankAsc">
+		</div>
+    </div>
+</article>
+<#include "_inc/_footer_nav.html" />
+</@layout>

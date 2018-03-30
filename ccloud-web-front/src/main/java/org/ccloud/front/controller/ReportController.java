@@ -26,8 +26,10 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.User;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DataAreaUtil;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.plugin.activerecord.Record;
@@ -50,6 +52,10 @@ public class ReportController extends BaseFrontController {
 
 	public void userRank() {
 		render("user_rank.html");
+	}
+	
+	public void departmenUserRank() {
+		render("departmen_user_rank.html");
 	}
 	
 	public void purchase() {
@@ -327,6 +333,22 @@ public class ReportController extends BaseFrontController {
 		String orderTag = getPara("orderTag");
 		String print = getPara("print");
 		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea, print);
+		renderJson(record);
+	}
+	
+	//业务员销售排行榜
+	public void getDepartmenUserRank() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dayTag = getPara("dayTag");
+		String sellerId = getPara("sellerId");
+//		if (StrKit.isBlank(sellerId)) {
+//			sellerId = getSessionAttr("sellerId");
+//		}
+		String orderTag = getPara("orderTag");
+		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
+		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea);
 		renderJson(record);
 	}
 	
