@@ -7,7 +7,10 @@
 </#macro>
 <#macro script>
 	function getback() {
-		window.location.href = '${CPATH}/order/myOrder?history=' + 1;	
+      var oldUrl = document.referrer;
+      var url = oldUrl.split("?history=1");
+      if(url[0].indexOf("myOrder") !=-1 || url[0].indexOf("outstock/index") !=-1  ) window.location.href = url[0] + '?history=1';
+      else window.location.href = url[0];
 	}
 </#macro>
 
