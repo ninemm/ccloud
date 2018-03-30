@@ -37,8 +37,10 @@
 						<td>${detail.custom_name!}</td>
 						<th>${detail.plan_num!}</th>
 						<td>${detail.complete_num}</td>
-						<#if detail.complete_ratio?? &&detail.complete_ratio gt 0 >
+						<#if detail.complete_ratio?? &&detail.complete_ratio gt 1 >
 							<td>${detail.complete_ratio?string('###.00')}%</td>
+						<#elseif detail.complete_ratio?? &&detail.complete_ratio gt 0 && detail.complete_ratio lt 1>
+							<td>${detail.complete_ratio}%</td>
 						<#else>
 							<td>0.00%</td>
 						</#if>

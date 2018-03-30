@@ -25,14 +25,6 @@
 	$("#datetime-picker").change(function(){
 		var date3 = new Date($("#datetime-picker").val().replace(/-/g,"/"));	
 		$("#datetime-picker").val(date3.Format("yyyy-MM"));
-		date3.setDate(1);
-		$("#startDate").val(date3.Format("yyyy-MM-dd"));
-		 var currentMonth=date3.getMonth();
-		 var nextMonth=++currentMonth;
-		 var nextMonthFirstDay=new Date(date3.getFullYear(),nextMonth,1);
-		 var oneDay=1000*60*60*24;
-		 var date4 = new Date(nextMonthFirstDay-oneDay);
-		 $("#endDate").val(date4.Format("yyyy-MM-dd"));
 		 combo();
 	});
 	var cpLock = true;
@@ -108,7 +100,7 @@
 
 		$loading.show();
 		$noMore.hide();
-	
+		var dd = $("#datetime-picker").val();
 		var params = {
 			"page": page,
 			"size": size,
@@ -116,9 +108,10 @@
 //			"type": $("#type").data('values'),
 			"type": "101202",
 			"show":$("#show").data('values'),
+			"datetimePicker" : $("#datetime-picker").val(),
 			"sellerProductId": $("#sellerProductId").data('values'),
-			"startDate": $("#startDate").val(),
-			"endDate": $("#endDate").val()
+			"startDate": startDate,
+			"endDate": endDate
 		}
 		Utils.ajax('${CPATH}/plans/myPlanList', params,
 			function(data) {
@@ -217,8 +210,6 @@
 						<i class="icon-sort-desc"></i>
 					</div> 
 					 <div class="weui-flex__item">
-					 	<input type="hidden" class="weui-input fr" id="startDate" name="startDate" readonly="">
-					 	<input type="hidden" class="weui-input fr" id="endDate" name="endDate" readonly="">
 						<input type="text" class="weui-input fr" id='datetime-picker'  readonly="" placeholder="计划月份"/>
 						<i class="icon-sort-desc"></i>
 					</div> 

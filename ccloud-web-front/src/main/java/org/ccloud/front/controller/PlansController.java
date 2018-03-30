@@ -84,7 +84,7 @@ public class PlansController extends BaseFrontController {
 		try {
 			plans.setStartDate(( new SimpleDateFormat("yyyy-MM-dd")).parse(startDate));
 			plans.setEndDate(( new SimpleDateFormat("yyyy-MM-dd")).parse(endDate));
-			plans.setPlansMonth(( new SimpleDateFormat("yyyy-MM-dd")).parse(datetimePicker));
+			plans.setPlansMonth(( new SimpleDateFormat("yyyy-MM")).parse(datetimePicker));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -226,7 +226,8 @@ public class PlansController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerProductId = getPara("sellerProductId");
-		Page<Record> planList = PlansDetailQuery.me().paginateForAppMyPlan(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, selectDataArea,user.getId(),sellerProductId);
+		String datetimePicker = getPara("datetimePicker");
+		Page<Record> planList = PlansDetailQuery.me().paginateForAppMyPlan(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, selectDataArea,user.getId(),sellerProductId,datetimePicker);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("planList", planList.getList());

@@ -248,14 +248,13 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 
 	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
 
-		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
-		for (Plans plan : plans) {
-			BigDecimal planNum = plan.getPlanNum();
-			BigDecimal completeNum = plan.getCompleteNum().subtract(productCount);
-			plan.setCompleteNum(completeNum);
-			plan.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
-			plan.setModifyDate(new Date());
-			if(!plan.update()){
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
+		for (PlansDetail plansDetail : plansDetails) {
+			BigDecimal planNum = plansDetail.getPlanNum();
+			BigDecimal completeNum = plansDetail.getCompleteNum().subtract(productCount);
+			plansDetail.setCompleteNum(completeNum);
+			plansDetail.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
+			if(!plansDetail.update()){
 				return  false;
 			}
 		}

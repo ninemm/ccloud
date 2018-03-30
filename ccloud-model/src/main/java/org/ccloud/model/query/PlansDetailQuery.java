@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.Consts;
+import org.ccloud.model.Plans;
 import org.ccloud.model.PlansDetail;
 
 import com.jfinal.kit.StrKit;
@@ -49,7 +50,7 @@ public class PlansDetailQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginateForAppMyPlan(int pageNumber, int pageSize, String keyword,
-            String startDate, String endDate, String sellerId, String dataArea,String userId,String sellerProductId) {
+            String startDate, String endDate, String sellerId, String dataArea,String userId,String sellerProductId,String datetimePicker) {
 			String select = "select o.*,cp.start_date,cp.end_date, u.realname, d.name as typeName, sp.custom_name,SUM(o.plan_num*sp.price) AS planNumAmount,SUM(o.complete_num*sp.price) AS completeNumAmount ";
 			StringBuilder fromBuilder = new StringBuilder("from `cc_plans_detail` o ");
 			fromBuilder.append("join user u ON o.user_id = u.id ");
@@ -71,6 +72,9 @@ public class PlansDetailQuery extends JBaseQuery {
 			fromBuilder.append(" where 1 = 1");
 			}
 			
+			if(StrKit.notBlank(datetimePicker)){
+				fromBuilder.append(" and cp.plans_month = '"+datetimePicker+"-01 00:00:00' ");
+			}
 			if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cp.start_date >= ?");
 			params.add(startDate);
@@ -78,7 +82,7 @@ public class PlansDetailQuery extends JBaseQuery {
 			
 			if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and cp.start_date <= ?");
-			params.add(endDate);
+			
 			}
 			fromBuilder.append(" and cp.type in ('"+Consts.MONTH_PLAN+"') GROUP BY cp.seller_id,o.user_id, cp.type, o.seller_product_id ,cp.start_date,cp.end_date order by cp.start_date desc,o.complete_ratio desc, cp.create_date desc ");
 			
@@ -150,6 +154,12 @@ public class PlansDetailQuery extends JBaseQuery {
 				+ "LEFT JOIN cc_plans cp on cp.id = pd.plans_id "
 				+ "LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id "
 				+ "where cp.data_area like '"+dataArea+"' and pd.user_id = '"+userId+"' GROUP BY pd.seller_product_id";
+		return DAO.find(sql);
+	}
+	
+	public List<PlansDetail> findBySales(String userId, String sellerProductId,String date) {
+		String sql = "select pd.* from cc_plans_detail pd LEFT JOIN cc_plans cp on cp.id = pd.plans_id "
+				+ "where pd.user_id = '"+userId+"' and pd.seller_product_id = '"+sellerProductId+"' and cp.start_date <= '"+date+"' and cp.end_date >= '"+date+"'";
 		return DAO.find(sql);
 	}
 }
