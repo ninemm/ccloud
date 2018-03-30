@@ -90,21 +90,17 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 	@Override
 	public void index() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		Seller seller = SellerQuery.me().findById(sellerId);
+		String dataArea = seller.get("data_area");
 		List<Seller> sellers = SellerQuery.me().findByDataArea(dataArea);
-		String sellerId = "";
-		if(sellers.size()>0) {
-			for(Seller seller:sellers) {
-				sellerId += "'"+seller.getId()+"',";
-			}
-		}else {
-			sellerId = "'"+getSessionAttr(Consts.SESSION_SELLER_ID)+"',";
-			sellers.add(SellerQuery.me().findById(getSessionAttr(Consts.SESSION_SELLER_ID).toString()));
+
+		List<Activity> actList = new ArrayList<Activity>();
+		for (Seller se : sellers) {
+			List<Activity> list = ActivityQuery.me().findBySellerId(se.getId());
+			actList.addAll(list);
 		}
-//		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-//		List<Activity> actList = ActivityQuery.me().findBySellerId(sellerId);
-		List<Activity> actList = ActivityQuery.me().findBySellerId(sellerId.substring(0, (sellerId.length()-1)));
-		
+
 		setAttr("startDate", date);
 		setAttr("endDate", date);
 		setAttr("actList", actList);
