@@ -341,11 +341,14 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String dayTag = getPara("dayTag");
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerId = getPara("sellerId");
+//		if (StrKit.isBlank(sellerId)) {
+//			sellerId = getSessionAttr("sellerId");
+//		}
 		String orderTag = getPara("orderTag");
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
-		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, null, sellerId, orderTag, dataArea, null);
+		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea);
 		renderJson(record);
 	}
 	
