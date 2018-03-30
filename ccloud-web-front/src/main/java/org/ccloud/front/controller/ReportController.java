@@ -336,6 +336,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
+	//业务员销售排行榜
 	public void getDepartmenUserRank() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
