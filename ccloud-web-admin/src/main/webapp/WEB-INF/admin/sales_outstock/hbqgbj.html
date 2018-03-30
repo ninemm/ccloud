@@ -44,7 +44,7 @@ var headerStr =
 		'<thead>' +
 		'<tr>' +
 			'<td class="text-center width8">发货单号</td>' +
-			'<td class="width8">{0}</td>' +
+			'<td class="width16">{0}</td>' +
 			'<td class="text-center width8">下单时间</td>' +
 			'<td colspan="2" class="width8">{1}</td>' +
 			'<td class="text-center width8">制单时间</td>' +
@@ -70,7 +70,7 @@ var headerStr =
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
 			'<td style="width:10%">购货价格</td>' +
-			'<td colspan="3" class="center2">条码</td>' +
+			'<td colspan="2" class="center2">条码</td>' +
 		'</tr>' +
 	'</thead>';
 
@@ -151,7 +151,7 @@ function queryPrintDetail(financePrint) {
                         });
 
                         let len = item.orderProductInfos.length;
-                        for (let i = len; i < 6; i++) {
+                        for (let i = len; i < 5; i++) {
                             content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
                         }
                     }
@@ -189,7 +189,7 @@ function queryPrintDetail(financePrint) {
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 6;
+                    defaultPageSize = 5;
                 });
 
                 $("#print-content").html(batchPrintContent);

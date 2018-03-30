@@ -268,7 +268,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		try {
 			plans.setStartDate(sdf.parse(startDate));
 			plans.setEndDate(sdf.parse(endDate));
-			plans.setPlansMonth(sdf.parse(month));
+			plans.setPlansMonth((new SimpleDateFormat("yyyy-MM")).parse(month));
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}

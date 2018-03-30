@@ -39,7 +39,7 @@ public class SellerQuery extends JBaseQuery {
 
 	public Seller findById(final String id) {
 		
-		StringBuilder sqlBuilder = new StringBuilder("select cc.*, d.dept_name as parent_name ");
+		StringBuilder sqlBuilder = new StringBuilder("select cc.*, d.dept_name as parent_name, d.data_area ");
 		sqlBuilder.append("from `cc_seller` cc ");
 		sqlBuilder.append("join `department` d on d.id = cc.dept_id ");
 		sqlBuilder.append("where cc.id = ?");

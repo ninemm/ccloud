@@ -96,7 +96,7 @@
         }).off("click", "#combin-filter .confirm-search-btn")
         .on("click", "#combin-filter .confirm-search-btn", function() {
             startDate = $('#start-date').val();
-            endDate = $('#end-date').val() + ' 23:59:59';
+            endDate = startDate + ' 23:59:59';
             setItemBykey("startDate", startDate);
             setItemBykey("endDate", endDate);
             refresh();
@@ -104,13 +104,13 @@
 
         $("#start-date").calendar({
             maxDate: function() {
-                return $('#end-date').val()
+                return $.today();
             }
         });
 
         $("#start-date").val($.today());
 
-        $("#end-date").calendar({
+        /*$("#end-date").calendar({
             minDate: function() {
                 var date = new Date($('#start-date').val().replace(/-/g,"/"));
                 date.setDate(date.getDate() - 1);
@@ -118,15 +118,14 @@
             }
         });
 
-        $("#end-date").val($.today());
+        $("#end-date").val($.today());*/
 
         $('#date').select({
             title: '选择时间',
             items: [{
                 title: '今天', value: '0'
-                },{title: "最近3天", value: "1"
-                },{title: "最近7天", value: "2"
-                },{title: "最近30天", value: "3"
+                },{title: "昨天", value: "1"
+                },{title: "前天", value: "2"
             }]
         })
         $('#customer').select({
@@ -141,17 +140,13 @@
         if(dateType == 0){
             startDate = $.today();
         }else if(dateType == 1){
-            date.setDate(date.getDate() - 3);
+            date.setDate(date.getDate() - 1);
             startDate = date.Format("yyyy-MM-dd");
         }else if(dateType == 2){
-            date.setDate(date.getDate() - 7);
-            startDate = date.Format("yyyy-MM-dd");
-        }else if(dateType == 3){
-            date.setDate(date.getDate() - 30);
+            date.setDate(date.getDate() - 2);
             startDate = date.Format("yyyy-MM-dd");
         }
-
-        endDate = $.today() + ' 23:59:59';
+        endDate = startDate + ' 23:59:59';
 
         refresh();
     }
@@ -263,10 +258,11 @@
 
 <article id="combin-filter">
     <div class="filter-item">
-        <div class="relative weui-flex" id="getDate">
+        <div class="relative weui-flex" style="padding: 0 0.5rem;" id="getDate">
+            <div>拜访日期：</div>
             <input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
-            <div style="width:1rem" class="t-c">—</div>
-            <input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+            <!--<div style="width:1rem" class="t-c">—</div>-->
+            <!--<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>-->
         </div>
     </div>
     <div id="list"></div>
