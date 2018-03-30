@@ -253,12 +253,13 @@ public class _ReportController extends JBaseController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,false);
+			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,false,sort,order);
 		}else {
-			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,false);
+			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,false,sort,order);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -275,12 +276,13 @@ public class _ReportController extends JBaseController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,true);
+			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,true,sort,order);
 		}else {
-			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,true);
+			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,true,sort,order);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
