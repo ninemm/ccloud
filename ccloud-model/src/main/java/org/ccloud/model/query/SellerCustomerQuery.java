@@ -131,7 +131,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
 		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
-		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
+//		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
 
 		if(StrKit.isBlank(customerTypeId)) {
 			fromBuilder.append(" LEFT ");
@@ -522,7 +522,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
 		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
-		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
+//		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
 
 		if(StrKit.isBlank(customerTypeId)) {
 			fromBuilder.append(" LEFT ");

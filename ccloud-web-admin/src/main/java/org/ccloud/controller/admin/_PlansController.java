@@ -329,8 +329,8 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据,重复"+inNum+"条数据");
 	}
 	
-	@RequiresPermissions(value = { "/admin/plans/add"}, logical = Logical.OR)
-	public void add() {
+	@RequiresPermissions(value = { "/admin/plans/edit"}, logical = Logical.OR)
+	public void edit() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
