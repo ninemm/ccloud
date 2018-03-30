@@ -96,7 +96,7 @@ public class PlansController extends BaseFrontController {
 			PlansDetail detail = PlansDetailQuery.me().findbySSEU(productIds[i],startDate,endDate,user.getId());
 			SellerProduct sellerProduct = SellerProductQuery.me().findById(productIds[i]);
 			if(detail!=null) {
-				renderAjaxResultForError("已经存在产品："+SellerProductQuery.me().findById(productIds[i]).getCustomName()+"的计划");
+				renderAjaxResultForError("已经存在产品："+SellerProductQuery.me().findById(productIds[i]).getCustomName()+" 的该月计划");
 				return;
 			}
 			

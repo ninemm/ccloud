@@ -271,10 +271,6 @@
 					var $newPlan = $planList.find(".plan-list-box:last");
 					var plans = data.planList[old];
 					
-					if((plans==null) || (plans.user_id!=el.user_id || 
-							plans.typeName !=el.typeName || 
-							plans.start_date!=el.start_date || 
-							plans.end_date != el.end_date)){
 						$newPlan.find("#userName").text(el.realname);
 						$newPlan.find("#userId").val(el.user_id);
 						$newPlan.find("#typeName").text(el.typeName);
@@ -288,9 +284,6 @@
 						$(".plansShow").hide();  
 						planAmount += el.AmountPlan;
 						completeAmount += el.AmountComplete;
-					}else{
-						$newPlan.hide();
-					}
 				});
 				$("#planAmount").text(planAmount.toFixed(2));
 				$("#completeAmount").text(completeAmount.toFixed(2));
@@ -321,26 +314,18 @@
 					 var old = index-1;
 					var $newPlan = $planList.find(".plan-list-box:last");
 					var plans = data.planList[old];
-					
-					if((plans==null) || (plans.seller_product_id!=el.seller_product_id || 
-							plans.typeName !=el.typeName || 
-							plans.start_date!=el.start_date || 
-							plans.end_date != el.end_date)){
-						$newPlan.find("#userName").text(el.custom_name);
-						$newPlan.find("#userId").val(el.seller_product_id);
-						$newPlan.find("#plansId").val(el.plans_id);
-						$newPlan.find("#typeName").text(el.typeName);
-						$newPlan.find("#startDate").text('开始时间：'+el.start_date);
-						$newPlan.find("#endDate").text('结束时间：'+el.end_date);
-						$newPlan.find("#planNumAmount").text('计划金额：'+el.AmountPlan);
-						$newPlan.find("#completeNumAmount").text('完成金额：'+el.AmountComplete);
-						$newPlan.find("#amountCompleteRatio").text('完成比例：'+(el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
-						$(".plansShow").hide();
-						planAmount += el.AmountPlan;
-						completeAmount += el.AmountComplete;
-					}else{
-						$newPlan.hide();
-					}
+					$newPlan.find("#userName").text(el.custom_name);
+					$newPlan.find("#userId").val(el.seller_product_id);
+					$newPlan.find("#plansId").val(el.plans_id);
+					$newPlan.find("#typeName").text(el.typeName);
+					$newPlan.find("#startDate").text('开始时间：'+el.start_date);
+					$newPlan.find("#endDate").text('结束时间：'+el.end_date);
+					$newPlan.find("#planNumAmount").text('计划金额：'+el.AmountPlan);
+					$newPlan.find("#completeNumAmount").text('完成金额：'+el.AmountComplete);
+					$newPlan.find("#amountCompleteRatio").text('完成比例：'+(el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
+					$(".plansShow").hide();
+					planAmount += el.AmountPlan;
+					completeAmount += el.AmountComplete;
 				});
 				$("#planAmount").text(planAmount.toFixed(2));
 				$("#completeAmount").text(completeAmount.toFixed(2));
