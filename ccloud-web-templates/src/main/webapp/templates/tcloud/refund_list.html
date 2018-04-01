@@ -146,8 +146,7 @@
 	
 					$main.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</section>");
 					var $newOrder = $main.find(".weui-panel:last");
-					
-					if(el.receive_type == 1) {
+					if(el.payment_type == 1) {
 						$newOrder.find("#receiveType").remove();
 					}
 					

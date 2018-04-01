@@ -132,7 +132,7 @@ public class RoleQuery extends JBaseQuery {
 	}
 
 	public List<Record> findBydeptAndGroup(String dataArea, String id) {
-		String data = dataArea + "%";
+		String data = dataArea.substring(0, dataArea.length()-1);
  		StringBuilder fromBuilder = new StringBuilder("select * ");
 		fromBuilder.append("from role r ");
 		fromBuilder.append("left join (SELECT gr.role_id FROM group_role_rel gr WHERE gr.group_id = ?) b ");

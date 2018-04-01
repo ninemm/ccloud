@@ -57,7 +57,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, sa.activity_apply_id, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
-		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
+		fromBuilder.append(" ,w.code as warehouseCode, cp.factor, sa.proc_inst_id, sa.id as order_id ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");
 		fromBuilder.append(" left join cc_sales_order sa on sa.id = co.order_id ");
@@ -644,6 +644,53 @@ public class SalesOutstockQuery extends JBaseQuery {
 		});
 		return isSave;  
 		
+	}
+
+	public Page<Record> _paginateForApp(int pageNumber, int pageSize, String keyword, String status,
+	                                    String customerTypeId, String startDate, String endDate, String sellerId, String dataArea,String bizUserId) {
+		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, so.id as order_id, so.proc_inst_id";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+
+		fromBuilder.append("left join cc_sales_order_join_outstock sojo on o.id = sojo.outstock_id ");
+		fromBuilder.append("left join cc_sales_order so on sojo.order_id = so.id ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", bizUserId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1 ");
+		}
+
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(
+					" and (o.outstock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.create_date desc ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
 }

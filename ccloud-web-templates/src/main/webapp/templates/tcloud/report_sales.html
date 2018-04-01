@@ -1,8 +1,11 @@
 <#include "_inc/_layout.html"/>
 <#macro title>业务员销售报表</#macro>
 <#macro css>
+	.weui-panel__hd {
+		font-size: .8rem;
+	}
 
-	a {
+	a,a:hover,a:focus {
 	   color: #337ab7;
 	   text-decoration:none;
 	}
@@ -15,11 +18,6 @@
 	    bottom: 50px;
 	    overflow: auto;
         -webkit-overflow-scrolling: touch;
-    }
-    
-    .report .weui-panel__hd:after {
-        left: 0;
-        height: 0;
     }
     
     .report .weui-panel__hd.pro:after {
@@ -129,19 +127,12 @@
 				        {
 				            name:'数据来源',
 				            type:'pie',
-				            radius: ['40%', '60%'],
+				            radius: ['0', '60%'],
 				            avoidLabelOverlap: false,
+				            selectedMode: 'single',
 				            label: {
 				                normal: {
-				                    show: false,
-				                    position: 'center'
-				                },
-				                emphasis: {
-				                    show: true,
-				                    textStyle: {
-				                        fontSize: '15',
-				                        fontWeight: 'bold'
-				                    }
+				                    position: 'inner'
 				                }
 				            },
 				            labelLine: {
@@ -379,51 +370,54 @@
 </#macro>
 <@layout>
 	<div class="weui-content">
-	<div class="report">
-		<div class="weui-panel weui-panel_access report-header">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">销售简报</span> 
-				<div>
-					<span class="briefly" onclick="dayTagSelect(this,'day')">
-						<p class="dayTagText">今日</p>
-						<i class="icon-angle-down"></i>
-					</span>
-					<span class="briefly" onclick="orderTagSelect(this,'order')">
-						<p class="orderTagText">件数</p>
-						<i class="icon-angle-down"></i>
-					</span>
-					<input type="hidden" id="dayTag">
-					<input type="hidden" id="orderTag">
-					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
-					<span class="overview-hd-segmenting fr"> — </span> 
-					<input class="weui-input begin-date fr t-r" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
-				</div>
-			</div>
-			<div class="weui-panel__bd">
-				<div class="weui-flex overview-block">
-					<div class="weui-flex__item border-right-1px">
-						<div class="overview-title">
-							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
-						</div>
-						<div class="t-c">
-							<strong id="productCount"></strong> <small id="totalCount"></small>
-						</div>
-					</div>
-					<div class="weui-flex__item">
-						<div class="overview-title">
-							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
-						</div>
-						<div class="t-c">
-							<strong id="totalAmount"></strong>
-						</div>
+		<div class="report">
+			<div class="weui-panel weui-panel_access report-header">
+				<div class="weui-panel__hd">
+					<span class="overview-hd-title">销售简报</span>
+					<div>
+						<span class="briefly" onclick="dayTagSelect(this,'day')">
+							<p class="dayTagText">今日</p>
+							<i class="icon-angle-down"></i>
+						</span>
+						<span class="briefly" onclick="orderTagSelect(this,'order')">
+							<p class="orderTagText">件数</p>
+							<i class="icon-angle-down"></i>
+						</span>
+						<input type="hidden" id="dayTag">
+						<input type="hidden" id="orderTag">
+						<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
+						<span class="overview-hd-segmenting fr"> — </span>
+						<input class="weui-input begin-date fr t-r" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
 					</div>
 				</div>
+				<div class="weui-panel__bd">
+					<div class="weui-flex overview-block">
+						<div class="weui-flex__item border-right-1px">
+							<div class="overview-title">
+								<img src="${CTPATH}/images/order.png">
+								<span>订单总数</span>
+							</div>
+							<div class="t-c">
+								<strong id="productCount"></strong>
+								<small id="totalCount"></small>
+							</div>
+						</div>
+						<div class="weui-flex__item">
+							<div class="overview-title">
+								<img src="${CTPATH}/images/money.png">
+								<span>订单金额</span>
+							</div>
+							<div class="t-c">
+								<strong id="totalAmount"></strong>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd pro">
-				<span class="overview-hd-title">客户订单统计</span> 
-				<!--<div>
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd pro t-c">
+					客户订单统计
+					<!--<div>
 					<span class="briefly" onclick="dayTagSelect(this,'customer')">
 					<p class="dayTagText">今日</p>
 						<i class="icon-angle-down"></i>
@@ -431,22 +425,22 @@
 					<span class="overview-hd-segmenting fr"> - </span> <input
 						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'customer')" readonly="">
 				</div>  -->
-			</div>
-			<div class="weui-cells weui-cells_form">
-				<div class="weui-cell" style="padding: 0">
-					<table class="table table-striped table-bordered" id="customerCount">
-						<tbody>
-		
-						</tbody>
-					</table>
 				</div>
+				<div class="weui-cells weui-cells_form mg-0">
+					<div class="weui-cell" style="padding: 0">
+						<table class="table table-striped table-bordered mg-0" id="customerCount">
+							<tbody>
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- 			<a class="report-detail" onClick="cusDetail()">详情></a>		 -->
 			</div>
-<!-- 			<a class="report-detail" onClick="cusDetail()">详情></a>		 -->
-		</div>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd pro">
-				<span class="overview-hd-title">商品销售统计</span> 
-				<!--<div>
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd pro t-c">
+					商品销售统计
+					<!--<div>
 					<span class="briefly" onclick="dayTagSelect(this,'product')">
 					<p class="dayTagText">今日</p>
 						<i class="icon-angle-down"></i>
@@ -454,53 +448,55 @@
 					<span class="overview-hd-segmenting fr"> - </span> <input
 						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'product')" readonly="">
 				</div>-->
-			</div>
-			<div class="weui-cells weui-cells_form">
-				<div class="weui-cell" style="padding: 0">
-					<table class="table table-striped table-bordered" id="productCanve">
-						<tbody>
-		
-						</tbody>
-					</table>
 				</div>
-<!-- 				<a class="report-detail" onClick="proDetail()">详情></a> -->
-			</div>			
-		</div>
-		<div class="weui-panel weui-panel_access margin-0">
-			<div class="weui-panel__hd"><span class="overview-hd-title">订单完成统计</span></div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="orderStatus" style="height: 300px;"></div>
+				<div class="weui-cells weui-cells_form mg-0">
+					<div class="weui-cell" style="padding: 0">
+						<table class="table table-striped table-bordered mg-0" id="productCanve">
+							<tbody>
+
+							</tbody>
+						</table>
+					</div>
+					<!-- 				<a class="report-detail" onClick="proDetail()">详情></a> -->
 				</div>
 			</div>
-		</div>		
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">退货统计</span>
-				<!--<div>
-					<span class="briefly" onclick="dayTagSelect(this,'refund')">
-					<p class="dayTagText">今日</p>
-						<i class="icon-angle-down"></i>
-					</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'refund')" readonly="">
-					<span class="overview-hd-segmenting fr"> - </span> <input
-						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'refund')" readonly="">
-				</div>-->
+			<div class="weui-panel weui-panel_access margin-0">
+				<div class="weui-panel__hd t-c">
+					订单完成统计
+				</div>
+				<div class="weui-panel__bd report-area border-top-1px">
+					<div class="ft14">
+						<div id="orderStatus" style="height: 300px;"></div>
+					</div>
+				</div>
 			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div class="weui-flex t-c">
-						<div class="weui-flex__item border-right-1px">
-							<p class="ft16">退货金额（元）</p>
-							<p class="ft24 orange" id="refundAmount"></p>
-						</div>
-						<div class="weui-flex__item">
-							<p class="ft16">退货数量（笔）</p>
-							<p class="ft24 orange" id="refundCount"></p>
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd t-c">
+					退货统计
+					<!--<div>
+				<span class="briefly" onclick="dayTagSelect(this,'refund')">
+				<p class="dayTagText">今日</p>
+					<i class="icon-angle-down"></i>
+				</span> <input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'refund')" readonly="">
+				<span class="overview-hd-segmenting fr"> - </span> <input
+					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'refund')" readonly="">
+			</div>-->
+				</div>
+				<div class="weui-panel__bd report-area border-top-1px">
+					<div class="weui-media-box ft14">
+						<div class="weui-flex t-c">
+							<div class="weui-flex__item border-right-1px">
+								<p class="ft16">退货金额（元）</p>
+								<p class="ft24 orange" id="refundAmount"></p>
+							</div>
+							<div class="weui-flex__item">
+								<p class="ft16">退货数量（笔）</p>
+								<p class="ft24 orange" id="refundCount"></p>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 		</div>
 		<#include "_inc/_footer_nav.html" />
 	</div>

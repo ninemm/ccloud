@@ -1,0 +1,187 @@
+<#include "_inc/_layout.html"/>
+<#macro title>出库单详细</#macro>
+<#macro css> </#macro>
+
+<#macro script>
+	function getback() {
+		var oldUrl = document.referrer;
+		var url = oldUrl.split("?history=1");
+		if(url[0].indexOf("outstock") !=-1 ) window.location.href = url[0] + '?history=1';
+		else window.location.href = url[0];
+	}
+	function out() {
+    	$.confirm({
+						title: "出库单出库",
+						text: '是否确认出库？',
+						onOK: function () {
+							Utils.openLoadingWin('出库中...');
+							$.get('${CPATH}/outstock/outStock?outstockId=' + '${(outstock.id)!}',
+								function(result) {
+									if (result.errorCode > 0) {
+									    $.toptip(result.message, 'error');
+									} else {
+										location.reload();
+										$.toptip(result.message, 'success');
+									}
+									Utils.closeLoadingWin();
+								}
+							);
+						}
+					});
+    	
+    }
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<div id="order-detail">
+		<main class="ft14">
+		<div class="weui-panel weui-panel_access">
+			<div class="ft16">
+				出库单状态 <a class="fr blue" href="${CPATH}/order/operateHistory?id=${(outstock.order_id)!}&proc_inst_id=${(outstock.proc_inst_id)!}">${(outstock.statusName)!}</a>
+			</div>
+			<div class="gray">
+				<p>客户名称: ${(outstock.customer_name)!}</p>
+				<p>出库单号: ${(outstock.outstock_sn)!}</p>
+				<p>生成时间: ${(outstock.create_date)!}</p>
+				<p>业务员: ${(outstock.realname)!}</p>
+			</div>
+			<hr>
+			<div class="ft14">
+				<#if outstock.receive_type = 0> <input type="checkbox"
+					name="if-account" checked disabled="disabled" class="weui-agree__checkbox"> <#else> <input
+					type="checkbox" name="if-account" disabled="disabled" class="weui-agree__checkbox">
+				</#if>是否账期
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="ft16">订单详情</div>
+			<#list outstockDetailList as outstockDetail>
+			<#if outstockDetail.is_gift??>
+				<#if outstockDetail.is_composite = 1>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == outstockDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>
+						<span class="ctag">组合</span>${(outstockDetail.custom_name)!}
+					</p>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(outstockDetail.product_price)?string(',###.##')} <span class="gray">（${(outstockDetail.price)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(outstockDetail.product_count
+							/ outstockDetail.convert_relate)?floor}${(outstockDetail.big_unit)!}</div>
+					</div>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(outstockDetail.product_price /
+								outstockDetail.convert_relate)?string(',###.##')} <span class="gray">（${(outstockDetail.price
+									/ outstockDetail.convert_relate)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(outstockDetail.product_count
+							% outstockDetail.convert_relate)}${(outstockDetail.small_unit)!}</div>
+					</div>
+				</div>				
+				<#elseif outstockDetail.is_gift = 1>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == outstockDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>
+						<span class="tag">赠品</span>${(outstockDetail.custom_name)!}
+					</p>
+					<div class="weui-flex__item t-r">${(outstockDetail.product_count
+						/ outstockDetail.convert_relate)?floor}${(outstockDetail.big_unit)!}</div>
+					<div class="weui-flex__item t-r">${(outstockDetail.product_count
+						% outstockDetail.convert_relate)}${(outstockDetail.small_unit)!}</div>
+				</div>
+				<#else>
+				<div class="todo-product-box">
+					<#list images! as list>
+						<#if list.productSn == outstockDetail.product_sn>
+							<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+							<#break>
+						</#if>
+					</#list>
+					<p>${(outstockDetail.custom_name)!}</p>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(outstockDetail.product_price)?string(',###.##')} <span class="gray">（${(outstockDetail.price)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(outstockDetail.product_count
+							/ outstockDetail.convert_relate)?floor}${(outstockDetail.big_unit)!}</div>
+					</div>
+					<div class="weui-flex">
+						<div class="weui-flex__item flex-grow2">
+							<div class="fl">
+								￥${(outstockDetail.product_price /
+								outstockDetail.convert_relate)?string(',###.##')} <span class="gray">（${(outstockDetail.price
+									/ outstockDetail.convert_relate)?string(',###.##')}）</span>
+							</div>
+						</div>
+						<div class="weui-flex__item t-r">${(outstockDetail.product_count
+							% outstockDetail.convert_relate)}${(outstockDetail.small_unit)!}</div>
+					</div>
+				</div>				
+				</#if> 
+			</#if> 
+			</#list>
+			<hr>
+			<div class="t-r ft14">
+				总计： <span class="red">${(outstock.total_amount)?string(',###.##')}元</span>
+			</div>
+		</div>
+		<div class="weui-panel weui-panel_access">
+			<div class="ft16">收货信息</div>
+			<div class="gray">
+				<p>
+					收货人：${(outstock.customer_name)!} <span class="fr">
+						${(outstock.cmobile)!}</span>
+				</p>
+				<p>地址详情：${(outstock.delivery_address)!}</p>
+			</div>
+			<hr>
+			<div class="ft16">
+				备注信息： <span class="ft14"> <#if outstock.remark??>
+					${(outstock.remark)!} <#else>无 </#if> </span>
+			</div>
+		</div>
+		<a class="weui-panel weui-panel_access block"
+			href="${CPATH}/order/operateHistory?id=${(outstock.order_id)!}&proc_inst_id=${(outstock.proc_inst_id)!}">
+			<div class="weui-cell weui-cell_access">
+				<div class="weui-cell__bd ft16">操作记录</div>
+				<span class="weui-cell__ft"></span>
+			</div>
+		</a> </main>
+		<div class="hidden-menu">
+			<ul>
+				<li><a href="${CPATH}/">首页<img src="${CTPATH}/images/home.png" alt=""></a></li>
+				<li><a onclick="getback()">返回<img src="${CTPATH}/images/goback.png" alt=""></a></li>
+			</ul>
+			<img src="${CTPATH}/images/add.png" alt="" id="button" class="fr">
+		</div>
+		<div class="layer"></div>
+		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+			<#if outstock.status == 0 >
+			<button onclick="out()" class="white-button-no-border weui-flex__item border-top-1px">出库</button>
+			<#else>
+			<button class="white-button-no-border weui-flex__item _submit_btn border-top-1px return_index">首页</button>
+			</#if>
+			<button onclick="getback()" class="red-button weui-flex__item">返回</button>
+		</footer>
+	</div>
+</div>
+</@layout>
