@@ -161,4 +161,30 @@ public class PlansDetailQuery extends JBaseQuery {
 				+ "where pd.user_id = '"+userId+"' and pd.seller_product_id = '"+sellerProductId+"' and cp.start_date <= '"+date+"' and cp.end_date >= '"+date+"'";
 		return DAO.find(sql);
 	}
+	
+	public List<Record> findBySellerId(String sellerId , String plansMonth){
+		StringBuilder fromBuilder = new StringBuilder("select pd.seller_product_id,sp.custom_name ");
+		fromBuilder.append("from cc_plans_detail pd ");
+		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id ");
+		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
+		if(StrKit.notBlank(plansMonth)){
+			fromBuilder.append("and cp.plans_month = '"+plansMonth+"' ");
+		}
+		fromBuilder.append("GROUP BY pd.seller_product_id ");
+		return Db.find(fromBuilder.toString());
+	}
+	//
+	public List<Record> findAllBySellerId(String sellerId , String plansMonth){
+		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.plans_month as plansMonth,cp.type,u.realname ");
+		fromBuilder.append("from cc_plans_detail pd ");
+		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
+		fromBuilder.append("`user` u on u.id = pd.user_id ");
+		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
+		if(StrKit.notBlank(plansMonth)){
+			fromBuilder.append("and cp.plans_month = '"+plansMonth+"' ");
+		}
+		fromBuilder.append("cp.id,pd.user_id, pd.seller_product_id ORDER BY cp.id,pd.user_id,pd.seller_product_id ");
+		return Db.find(fromBuilder.toString());
+	}
 }

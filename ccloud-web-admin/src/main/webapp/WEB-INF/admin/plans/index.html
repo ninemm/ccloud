@@ -178,9 +178,9 @@
 					<@shiro.hasPermission name="/admin/plans/uploading">
 						<a href="${CPATH}/admin/plans/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
 					</@shiro.hasPermission>
-					<!-- <@shiro.hasPermission name="/admin/plans/downloading">
+					<@shiro.hasPermission name="/admin/plans/downloading">
 						<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</button>
-					</@shiro.hasPermission> -->
+					</@shiro.hasPermission>
 					<@shiro.hasPermission name="/admin/plans/edit">
 						<a href="${CPATH}/admin/plans/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增计划 </a>
 					</@shiro.hasPermission>
