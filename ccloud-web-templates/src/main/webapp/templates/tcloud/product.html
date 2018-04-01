@@ -331,7 +331,7 @@ function productNum(){
 var compositionHtml = $(".composition").eq(0).html();
 function initComposition(compositionList){
 	if(compositionList.length > 0) {
-		$sidebar.append("<li id='composition'> 组合商品 <span class='goods-num'>8</span> </li>");
+		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'>8</span> </li>");
 		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
 	}
 	
@@ -577,12 +577,11 @@ function total(){
 			total += el.smallNum * el.smallPrice;
 		}
 	});
-	
 	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 	$.each(compositionList, function(index, el) {
 		total += el.compositionNum * el.compositionPrice;
 	});
-	$("#totalNum").text("共" + (productList.length + compositionList.length) + "款,合计:" + total + "元")
+	$("#totalNum").text("共" + (productList.length + compositionList.length) + "款,合计:" + total.toFixed(2) + "元")
 
 } 
 
