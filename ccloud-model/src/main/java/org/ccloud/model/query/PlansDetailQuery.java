@@ -63,7 +63,7 @@ public class PlansDetailQuery extends JBaseQuery {
 //			needWhere = appendIfNotEmpty(fromBuilder, "o.type", type, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "pd.user_id", userId, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "pd.seller_product_id", sellerProductId, params, needWhere);
-			needWhere = appendIfNotEmptyWithLike(fromBuilder, "cp.data_area", dataArea, params, needWhere);
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "pd.data_area", dataArea, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "cp.seller_id", sellerId, params, needWhere);
 			
 			if (needWhere) {
@@ -166,7 +166,7 @@ public class PlansDetailQuery extends JBaseQuery {
 		String sql = "SELECT pd.*,csp.custom_name from cc_plans_detail pd "
 				+ "LEFT JOIN cc_plans cp on cp.id = pd.plans_id "
 				+ "LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id "
-				+ "where cp.data_area like '"+dataArea+"' and cp.seller_id = '"+sellerId+"' GROUP BY pd.seller_product_id";
+				+ "where pd.data_area like '"+dataArea+"'  GROUP BY pd.seller_product_id";
 		return DAO.find(sql);
 	}
 	

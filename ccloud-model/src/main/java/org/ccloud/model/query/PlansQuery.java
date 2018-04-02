@@ -61,7 +61,7 @@ public class PlansQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN (select pd.plans_id,SUM(pd.plan_num*csp.price) as plansNum, SUM(pd.complete_num*csp.price) as completeNum from cc_plans_detail pd LEFT JOIN cc_plans p on p.id = pd.plans_id ");
 		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id GROUP BY pd.plans_id ) t1 on t1.plans_id = cp.id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
-
+		fromBuilder.append("LEFT JOIN cc_plans_detail pd on pd.plans_id = cp.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword, params, true);
@@ -79,8 +79,9 @@ public class PlansQuery extends JBaseQuery {
 		if(StrKit.notBlank(dateType)) {
 			fromBuilder.append("and cp.plans_month = '"+dateType+"-01 00:00:00' ");
 		}
-		fromBuilder.append("and cp.data_area like '"+dataArea+"' and cp.seller_id = '"+sellerId+"' ");
-		fromBuilder.append("order by cp.type,cp.start_date desc,cp.end_date desc ,cp.user_id");
+		fromBuilder.append("and pd.data_area like '"+dataArea+"' ");
+//		fromBuilder.append("and cp.seller_id = '"+sellerId+"' ");
+		fromBuilder.append("GROUP BY cp.id ORDER by cp.type,cp.start_date desc,cp.end_date desc ,cp.user_id");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -105,8 +106,8 @@ public class PlansQuery extends JBaseQuery {
 		}else {
 			needWhere = appendIfNotEmpty(fromBuilder, "pd.user_id", userId, params, needWhere);
 		}
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cp.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "cp.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "pd.data_area", dataArea, params, needWhere);
+//		needWhere = appendIfNotEmpty(fromBuilder, "cp.seller_id", sellerId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
@@ -162,7 +163,8 @@ public class PlansQuery extends JBaseQuery {
 	public List<Plans> findbyDateArea(String dataArea){
 		String sql = "SELECT cp.*,csp.custom_name from cc_plans cp "
 				+ "LEFT JOIN cc_seller_product csp on csp.id = cp.seller_product_id "
-				+ "where cp.data_area like '"+dataArea+"' GROUP BY cp.seller_product_id";
+				+ "LEFT JOIN cc_plans_detail pd on pd.plans_id = cp.id "
+				+ "where pd.data_area like '"+dataArea+"' GROUP BY cp.seller_product_id";
 		return DAO.find(sql);
 	}
 	
@@ -195,7 +197,7 @@ public class PlansQuery extends JBaseQuery {
 			needWhere = appendIfNotEmpty(fromBuilder, "o.user_id", userId, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "o.seller_product_id", sellerProductId, params, needWhere);
 			needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-			needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+//			needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 			
 			if (needWhere) {
 			fromBuilder.append(" where 1 = 1");

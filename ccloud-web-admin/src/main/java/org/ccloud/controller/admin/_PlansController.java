@@ -267,8 +267,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		plans.setSellerId(sellerId);
 		plans.setUserId(user.getId());
 		plans.setType("101202");
-		plans.setCompleteNum(new BigDecimal(0));
-		plans.setCompleteRatio(new BigDecimal(0));
 		try {
 			plans.setStartDate(sdf.parse(startDate));
 			plans.setEndDate(sdf.parse(endDate));
@@ -279,7 +277,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		plans.setDeptId(user.getDepartmentId());
 		plans.setDataArea(user.getDataArea());
 		plans.setCreateDate(new Date());
-		BigDecimal planAmount = new BigDecimal(0);
 		//结束时间
 		try {
 			FileInputStream fis = new FileInputStream(file);  
@@ -318,9 +315,9 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 					plansDetail.setCompleteNum(new BigDecimal(0));
 					plansDetail.setCompleteRatio(new BigDecimal(0));
 					plansDetail.setUserId(us.getId());
+					plansDetail.setDataArea(us.getDataArea());
 					plansDetail.save();
 					inCnt++;
-					planAmount =  planAmount.add(sellerProduct.getPrice().multiply(new BigDecimal(cl.getStringCellValue())));  
 				 }
 			 }
 		} catch (EncryptedDocumentException e) {
@@ -328,7 +325,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		plans.setPlanNum(planAmount);
 		plans.save();
 		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据,重复"+inNum+"条数据");
 	}
@@ -410,9 +406,9 @@ public void downloading() throws UnsupportedEncodingException{
     for(int i = 0;i < _sellerProductDetails.size(); i++) {
     	HSSFRow  row = sheet.createRow(i+2);
     	if( i>0 && _sellerProductDetails.get(i).get("type") .equals(_sellerProductDetails.get(i-1).get("type")) ) {
-	    	if(!_sellerProductDetails.get(i).get("plansMonth").equals(_sellerProductDetails.get(i-1).get("plansMonth")) || i+1 == _sellerProductDetails.size()
+    		end = i+1;
+	    	if(!_sellerProductDetails.get(i).get("plansMonth").equals(_sellerProductDetails.get(i-1).get("plansMonth"))  
 	    			) {
-	    		end = i+1;
 	    		Cell typeCell = row.createCell(0);
 	    		Cell startCell = row.createCell(1);
 	    		Cell endCell = row.createCell(2);
@@ -438,13 +434,8 @@ public void downloading() throws UnsupportedEncodingException{
     				sheet.addMergedRegion(regionE);
 	    		}
 	    		
-	    		if(i+1 == _sellerProductDetails.size()) {
-    				CellRangeAddress regionT = new CellRangeAddress((end-num),  end+1, 0, 0);
-	    			CellRangeAddress regionS = new CellRangeAddress((end-num),  end+1, 1, 1);
-	    			CellRangeAddress regionE = new CellRangeAddress((end-num),  end+1, 2, 2);
-	    			sheet.addMergedRegion(regionT);
-	    			sheet.addMergedRegion(regionS);
-	    			sheet.addMergedRegion(regionE);
+	    		if(i+1 == _sellerProductDetails.size() && num > 1) {
+    				
     			}
 	    		typeCell.setCellStyle(setBorder);
 	    		startCell.setCellStyle(setBorder);
@@ -471,6 +462,15 @@ public void downloading() throws UnsupportedEncodingException{
 	    		startCell.setCellStyle(setBorder);
 	    		endCell.setCellStyle(setBorder);
 	    		num++;
+	    		if(i+1 == _sellerProductDetails.size()) {
+	    			CellRangeAddress regionT = new CellRangeAddress((end-num+1),  end+1, 0, 0);
+	    			CellRangeAddress regionS = new CellRangeAddress((end-num+1),  end+1, 1, 1);
+	    			CellRangeAddress regionE = new CellRangeAddress((end-num+1),  end+1, 2, 2);
+	    			sheet.addMergedRegion(regionT);
+	    			sheet.addMergedRegion(regionS);
+	    			sheet.addMergedRegion(regionE);
+	    		}
+	    		
 	    	}
     	}else {
     		Cell typeCell = row.createCell(0);
@@ -492,6 +492,7 @@ public void downloading() throws UnsupportedEncodingException{
     		typeCell.setCellStyle(setBorder);
     		startCell.setCellStyle(setBorder);
     		endCell.setCellStyle(setBorder);
+    		
     	}
 		Cell uCell = row.createCell(3);
 		uCell.setCellValue(UserQuery.me().findById(_sellerProductDetails.get(i).get("user_id").toString()).getRealname());
@@ -596,8 +597,6 @@ public void downloading() throws UnsupportedEncodingException{
 		plans.setId(plansId);
 		plans.setSellerId(sellerId);
 		plans.setType(planType);
-		plans.setCompleteNum(new BigDecimal(0));
-		plans.setCompleteRatio(new BigDecimal(0));
 		try {
 			plans.setStartDate(sdf.parse(startDate));
 			plans.setEndDate(sdf.parse(endDate));
@@ -615,7 +614,6 @@ public void downloading() throws UnsupportedEncodingException{
 		}
 		int num = Integer.parseInt(getPara("productNum"));
 		int inCnt = 0;
-		BigDecimal planAmount = new BigDecimal(0);
 		for(String  userId: userIds) {
 			for(int i = 1 ; i <= num ; i++) {
 				if(StrKit.isBlank(getPara("sellerProduct" + i))){
@@ -627,6 +625,7 @@ public void downloading() throws UnsupportedEncodingException{
 					renderAjaxResultForError("产品："+sellerProduct.getCustomName()+" 已经存在该月计划");
 					return;
 				}
+				User us = UserQuery.me().findById(userId);
 				PlansDetail plansDetail = new PlansDetail();
 				plansDetail.setId(StrKit.getRandomUUID());
 				plansDetail.setPlansId(plansId);
@@ -636,12 +635,11 @@ public void downloading() throws UnsupportedEncodingException{
 				plansDetail.setCompleteRatio(new BigDecimal(0));
 				plansDetail.setUserId(userId);
 				plansDetail.setCreateDate(new Date());
+				plansDetail.setDataArea(us.getDataArea());
 				plansDetail.save();
 				inCnt++;
-				planAmount =  planAmount.add(sellerProduct.getPrice().multiply(new BigDecimal(getPara("planNum"+i))));  
 			}
 		}
-		plans.setPlanNum(planAmount);
 		plans.save();
 		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据");
 	}

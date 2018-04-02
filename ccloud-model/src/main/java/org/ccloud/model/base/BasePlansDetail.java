@@ -146,6 +146,14 @@ public abstract class BasePlansDetail<M extends BasePlansDetail<M>> extends JMod
 		return getStr("user_id");
 	}
 
+	public void setDataArea(java.lang.String dataArea) {
+		set("data_area", dataArea);
+	}
+
+	public java.lang.String getDataArea() {
+		return getStr("data_area");
+	}
+	
 	public void setCreateDate(java.util.Date createDate) {
 		set("create_date", createDate);
 	}

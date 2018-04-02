@@ -91,10 +91,8 @@ public class PlansController extends BaseFrontController {
 		plans.setDeptId(user.getDepartmentId());
 		plans.setDataArea(user.getDataArea());
 		plans.setCreateDate(new Date());
-		BigDecimal planAmount = new BigDecimal(0);
 		for(int i=0;i<productIds.length;i++) {
 			PlansDetail detail = PlansDetailQuery.me().findbySSEU(productIds[i],startDate,endDate,user.getId());
-			SellerProduct sellerProduct = SellerProductQuery.me().findById(productIds[i]);
 			if(detail!=null) {
 				renderAjaxResultForError("已经存在产品："+SellerProductQuery.me().findById(productIds[i]).getCustomName()+" 的该月计划");
 				return;
@@ -109,10 +107,9 @@ public class PlansController extends BaseFrontController {
 			plansDetail.setCompleteRatio(new BigDecimal(0));
 			plansDetail.setUserId(user.getId());
 			plansDetail.setCreateDate(new Date());
+			plansDetail.setDataArea(user.getDataArea());
 			plansDetail.save();
-			planAmount =  planAmount.add(sellerProduct.getPrice().multiply(new BigDecimal(productNum[i])));  
 		}
-		plans.setPlanNum(planAmount);
 		plans.save();
 		renderAjaxResultForSuccess("新增成功");
 	}
