@@ -233,4 +233,25 @@ public class StringUtils {
 		return uuid.substring(0, 8) + uuid.substring(9, 13) + uuid.substring(14, 18) + uuid.substring(19, 23) + uuid.substring(24);
 	}
 	
+	/**
+     * int型的String进行加减，不够位数的在前面补0
+     * @param intStr：int型的字符串
+     * @param addNum：需要加减的数字， 减则传负数
+     * @param len：保留长度位数字
+     * @return
+     */
+    public static String addIntStrAndFillZeros(String intStr, int addNum, int len) {
+        String result = "";
+        // 保留num的位数
+        // 0 代表前面补充0     
+        // num 代表长度为4     
+        // d 代表参数为正数型 
+        result = String.format("%0" + len + "d", Integer.parseInt(intStr) + addNum);
+        return result;
+    }
+    
+    public static void main(String[] args) {
+    	System.out.println(addIntStrAndFillZeros("0005", 5, 4));
+	}
+	
 }
