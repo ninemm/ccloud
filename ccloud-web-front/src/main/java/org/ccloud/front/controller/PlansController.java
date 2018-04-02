@@ -202,13 +202,14 @@ public class PlansController extends BaseFrontController {
 	
 	public void mPlans() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
 		List<Map<String, Object>> sellerProducts = new ArrayList<>();
 		sellerProducts.add(all);
-		List<PlansDetail> plansDetails = PlansDetailQuery.me().findbyDateAreaAndUserId(selectDataArea,user.getId());
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findbyDateAreaAndUserId(selectDataArea,user.getId(),sellerId);
 		for(PlansDetail plansDetail : plansDetails) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", plansDetail.get("custom_name"));

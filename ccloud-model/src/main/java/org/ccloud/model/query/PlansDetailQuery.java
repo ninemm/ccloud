@@ -48,6 +48,36 @@ public class PlansDetailQuery extends JBaseQuery {
 		});
 	}
 
+	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String sellerId, String dataArea,String userId,String sellerProductId,String plansId) {
+			
+			String select = "SELECT pd.*,sp.custom_name,u.realname  ";
+			StringBuilder fromBuilder = new StringBuilder("from cc_plans_detail pd ");
+			fromBuilder.append("LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id ");
+			fromBuilder.append("LEFT JOIN `user` u on u.id = pd.user_id ");
+			fromBuilder.append("left join cc_plans cp ON pd.plans_id = cp.id ");
+			
+			LinkedList<Object> params = new LinkedList<Object>();
+			boolean needWhere = true;
+			
+			needWhere = appendIfNotEmpty(fromBuilder, "cp.id", plansId, params, needWhere);
+//			needWhere = appendIfNotEmpty(fromBuilder, "o.type", type, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "pd.user_id", userId, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "pd.seller_product_id", sellerProductId, params, needWhere);
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "cp.data_area", dataArea, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "cp.seller_id", sellerId, params, needWhere);
+			
+			if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+			}
+			
+			fromBuilder.append(" GROUP BY pd.user_id ORDER BY pd.create_date desc ");
+			
+			if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+			
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	
 	public Page<Record> paginateForAppMyPlan(int pageNumber, int pageSize, String keyword,
             String startDate, String endDate, String sellerId, String dataArea,String userId,String sellerProductId,String datetimePicker) {
 			String select = "select o.*,cp.start_date,cp.end_date, u.realname, d.name as typeName, sp.custom_name,SUM(o.plan_num*sp.price) AS planNumAmount,SUM(o.complete_num*sp.price) AS completeNumAmount ";
@@ -64,7 +94,7 @@ public class PlansDetailQuery extends JBaseQuery {
 //			needWhere = appendIfNotEmpty(fromBuilder, "o.type", type, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "o.user_id", userId, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "o.seller_product_id", sellerProductId, params, needWhere);
-			needWhere = appendIfNotEmptyWithLike(fromBuilder, "cp.data_area", dataArea, params, needWhere);
+//			needWhere = appendIfNotEmptyWithLike(fromBuilder, "cp.data_area", dataArea, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "cp.seller_id", sellerId, params, needWhere);
 			
 			if (needWhere) {
@@ -113,14 +143,6 @@ public class PlansDetailQuery extends JBaseQuery {
 		return DAO.findFirst(sql);
 	}
 	
-	public List<PlansDetail> findByPlansId(String plansId){
-		String sql = "SELECT pd.*,sp.custom_name,u.realname from cc_plans_detail pd "
-				+ "LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id "
-				+ "LEFT JOIN `user` u on u.id = pd.user_id "
-				+ " where pd.plans_id = '"+plansId+"' ORDER BY pd.user_id";
-		return DAO.find(sql);
-	}
-	
 	public List<Record> findDataAreaAndDataType(String dataArea,String dateType,String type){
 		StringBuilder fromBuilder = new StringBuilder();
 		
@@ -148,11 +170,11 @@ public class PlansDetailQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}
 	
-	public List<PlansDetail> findbyDateAreaAndUserId(String dataArea,String userId){
+	public List<PlansDetail> findbyDateAreaAndUserId(String dataArea,String userId,String sellerId){
 		String sql = "SELECT pd.*,csp.custom_name from cc_plans_detail pd "
 				+ "LEFT JOIN cc_plans cp on cp.id = pd.plans_id "
 				+ "LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id "
-				+ "where cp.data_area like '"+dataArea+"' and pd.user_id = '"+userId+"' GROUP BY pd.seller_product_id";
+				+ "where cp.seller_id = '"+sellerId+"' and pd.user_id = '"+userId+"' GROUP BY pd.seller_product_id";
 		return DAO.find(sql);
 	}
 	
