@@ -3,7 +3,8 @@
 <#macro script_import>
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
-	<!-- bootstrapvalidator -->
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>	
 </#macro>
 
 <#macro css_import>
@@ -45,6 +46,7 @@
 	});
 
 	function doSubmit(){
+		var l = Ladda.create( document.querySelector( '.ladda-button' ) );	
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 			    var index = layer.load(1, {shade: false}); //0代表加载的风格，支持0-2
@@ -56,12 +58,16 @@
 			dataType : "json", 
 			success : function(data) { 
 			    layer.closeAll();
+				l.start();
 				if(data.errorCode == 0) {
 					//location.reload();
 					toastr.success(data.message, '操作成功');
 				} else {
 					toastr.error(data.message,'操作失败');
 				}
+				setTimeout( function(){
+						window.history.back(-1);
+				}, 2 * 1000 );
 			},
 			error : function() {
 			    layer.closeAll();
@@ -110,7 +116,7 @@
 			</div>
 		</form>
 		<div class="box-footer"> 
-			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat">导入</button>
+			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button">导入</button>
 			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 	</div>

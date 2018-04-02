@@ -6,14 +6,15 @@
  	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
  	<!-- <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-edit.js"></script> -->
  	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
-
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>	
 </#macro>
 
 <#macro css_import>
 
 	<!-- bootstrap-table-->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
-
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -118,20 +119,22 @@
 							};
 							orderItems.push(obj);
 						})
-			if(flang==true){			
+			if(flang==true){		
+				var l = Ladda.create( document.querySelector( '.ladda-button' ) );	
 				$.ajax({
 					url:"${CPATH}/admin/seller/savePro",
 					type:"post",
 					dataType:"json",
 					data : {orderItems : JSON.stringify(orderItems)},
 					success:function(data){
+						l.start();
 						if(data==true){
 							toastr.success(data.message, '添加成功');
 						}else{
 							toastr.error(data.message, '添加失败,请检查是否添加的产品已经存在！');
 						}
 						setTimeout( function(){
-						location.reload();
+						window.history.back(-1);
 								}, 2 * 1000 );
 					}
 				});
@@ -167,8 +170,8 @@
 <section class="content">
 	<div class="row content-row">
 		<div class="jp-left">
-			<a onclick="savePro()" class="btn btn-sm bg-olive btn-flat" ><i class="fa fa-check-square-o fa-1x"></i><span style="font-size:12px;"> 保存</span> </a>
-			<a onclick="javascript:history.go(-1)" class="btn btn-sm btn-primary btn-flat" ><i class="fa fa-reply fa-1x"></i> 返回 </a>
+			<button type="button" onclick="savePro()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">保存</button>
+			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/addProduct?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
