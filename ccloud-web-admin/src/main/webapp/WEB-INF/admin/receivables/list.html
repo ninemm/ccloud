@@ -97,7 +97,7 @@
 	
 	
 	function doSubmit(){
-		var l = Ladda.create( document.querySelector( '#save' ) );
+		var l = Ladda.create( document.querySelector( '.ladda-button' ) );	
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -110,12 +110,12 @@
 			type : "post", 
 			dataType : "json", 
 			success : function(data) {
+				l.start();
 				if(data.errorCode == 0) {
 					//location.reload();
 					var act_amount = $('input[name="act_amount"]').val();
 					balance_amount = balance_amount-act_amount;
 					toastr.success(data.message, '操作成功');
-					l.stop();
 				    $('#_receiving_table').bootstrapTable('refresh');
 				    $('.act_amount').val(0);
 				    if($('.balance_amount').val()==0){
@@ -125,6 +125,9 @@
 					toastr.error(data.message,'操作失败');
 					l.stop();
 				}
+				setTimeout( function(){
+						window.history.back(-1);
+								}, 2 * 1000 );
 			},
 			error : function() {
 				l.stop();
@@ -209,7 +212,7 @@
 		</form>
 		
 		<div class="box-footer">
-			<button type="button" onclick="doSubmit()" id="save" class="btn btn-sm bg-olive btn-flat">保存</button>
+			<button type="button" onclick="doSubmit()" id="save" class="btn btn-sm bg-olive btn-flat ladda-button">保存</button>
 			<input type="button" class="btn btn-sm bg-primary btn-flat" onclick="window.history.back()" value="返  回" hidefocus="true" />
 		</div>
 	</div>
