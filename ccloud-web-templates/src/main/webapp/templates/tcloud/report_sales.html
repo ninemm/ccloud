@@ -161,7 +161,7 @@
 	            $tbody.empty();
 	            $tbody.append("<tr><th width='60%' style='text-align:center'>客户</th><th width='20%' style='padding: 8px 0;text-align:center'>数量(件)</th><th width='20%' style='padding: 8px 0;text-align:center'>金额(元)</th></tr>");
 	            for(var i = 0; i < length; i++){
-	            	var fun = "getProduct('" + data[i].customerId + "')";
+	            	var fun = "getProduct('" + data[i].customerId + "'" + "," + "'" + data[i].customer_name + "')";
 	                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void(0);\">" + data[i].customer_name + "</a></td><td class='t-r'>" + (data[i].productCount).toFixed(2) + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
 	            }			
 			}
@@ -184,7 +184,8 @@
 		);    	
     }
     
-    function getProduct(customerId) {
+    function getProduct(customerId, name) {
+    	$(".productName").html(name + "商品销售统计");
 		var params = {
 			"dayTag":  $("#dayTag").val(),
 			"startDate": $("#startDay").val(),
@@ -438,7 +439,7 @@
 				<!-- 			<a class="report-detail" onClick="cusDetail()">详情></a>		 -->
 			</div>
 			<div class="weui-panel weui-panel_access">
-				<div class="weui-panel__hd pro t-c">
+				<div class="weui-panel__hd pro t-c productName">
 					商品销售统计
 					<!--<div>
 					<span class="briefly" onclick="dayTagSelect(this,'product')">
