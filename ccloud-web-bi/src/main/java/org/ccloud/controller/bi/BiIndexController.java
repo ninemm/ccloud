@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.ccloud.front.controller;
+package org.ccloud.controller.bi;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -26,7 +26,10 @@ import org.ccloud.utils.DateUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.joda.time.DateTime;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @RouterMapping(url = "/biIndex")
 public class BiIndexController extends BaseFrontController {
