@@ -273,7 +273,7 @@
                             <input type="text" class="weui-input" id="customer_name" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}"  placeholder="1-25个任意字母数字" required<#if type == "company"> readonly</#if>>
 			            </div>
 			        </div>
-			        <div class="weui-cell weui-cell_access">
+			        <!-- <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
 			                <div class="order-customer-info-title">
 			                    客户昵称&nbsp;&nbsp;
@@ -281,7 +281,8 @@
 			                </div>
 			                <input type="text" class="weui-input" id="nickname" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字" <#if type == "company"> readonly</#if>>
 			            </div>
-			        </div>
+			        </div> -->
+                    <input type="hidden" class="weui-input" id="nickname" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字">
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
 			                <div class="order-customer-info-title">
