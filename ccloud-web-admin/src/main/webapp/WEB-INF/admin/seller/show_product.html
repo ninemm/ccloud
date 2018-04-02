@@ -69,7 +69,7 @@
       			{field: "cgc_name", title: "产品类别", align: "center", width: '3%',edit:false},
       			{field: "custom_name", title: "产品自定义名称", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="text" size="40" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'"/>';
+					var strHtml = '<input type="text" size="40" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'" onblur="changeCustomName(this)"/>';
 					return strHtml;
 				},
       				edit:false},
@@ -243,9 +243,10 @@
 				dataType:"json",
 				data : {orderItems : JSON.stringify(orderItems)},
 				success:function(data){
-					if(data==true){
-						toastr.success(data.message, '修改成功');
-					}else{
+					if(data.errorCode == 0) {
+							//location.reload();
+							toastr.success( '操作成功');
+						}else{
 						toastr.error(data.message, '添加失败,请检查是否添加的产品已经存在！');
 					}
 					setTimeout( function(){
@@ -500,13 +501,13 @@
 	<div class="row content-row">
 		<form class="form-horizontal" action="${CPATH}/admin/seller/showProduct?c=${c!}&p=${p!}" method="post">
 			<div class="form-group">
-				<div class="col-sm-4">
+				<div class="col-sm-6">
 					<a onclick="getA()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 					<a onclick="upIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量上架 </a>
 					<a onclick="downIsenable()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-check-square-o"></i>批量下架 </a>
 					<a onclick="saveAll()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right"><i class="fa fa-check-square-o"></i>保存 </a>
 		 		</div>
-		 		<div class="col-sm-4">
+		 		<div class="col-sm-2">
 				</div>
 				<div class="col-sm-3">
 					<label class="control-label col-sm-4">名称:</label>
