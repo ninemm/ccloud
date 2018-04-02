@@ -579,26 +579,6 @@ public void downloading() throws UnsupportedEncodingException{
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String month = getPara("month");
-		/*if(planType.equals(Consts.MONTH_PLAN)) {
-			String month = getPara("month");
-			int index = month.indexOf("-");
-			startDate = month + "-01";
-			Calendar cal = Calendar.getInstance();  
-			//设置年份  
-			cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
-			//设置月份  
-			cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))-1); 
-			//获取某月最大天数  
-			int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-			endDate = month + "-"+(lastDay);
-		}else if(planType.equals(Consts.YEAR_PLAN)) {
-			String year = getPara("year");
-			startDate = year + "-01-01";
-			endDate = year + "-12-31";
-		}else {
-			startDate = getPara("startDate");
-			endDate = getPara("endDate");
-		}*/
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
 //		try {
@@ -653,6 +633,7 @@ public void downloading() throws UnsupportedEncodingException{
 				plansDetail.setCompleteNum(new BigDecimal(0));
 				plansDetail.setCompleteRatio(new BigDecimal(0));
 				plansDetail.setUserId(userId);
+				plansDetail.setCreateDate(new Date());
 				plansDetail.save();
 				inCnt++;
 				planAmount =  planAmount.add(sellerProduct.getPrice().multiply(new BigDecimal(getPara("planNum"+i))));  

@@ -108,6 +108,7 @@ public class PlansController extends BaseFrontController {
 			plansDetail.setCompleteNum(new BigDecimal(0));
 			plansDetail.setCompleteRatio(new BigDecimal(0));
 			plansDetail.setUserId(user.getId());
+			plansDetail.setCreateDate(new Date());
 			plansDetail.save();
 			planAmount =  planAmount.add(sellerProduct.getPrice().multiply(new BigDecimal(productNum[i])));  
 		}
