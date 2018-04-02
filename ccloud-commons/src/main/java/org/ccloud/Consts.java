@@ -106,7 +106,7 @@ public class Consts {
 	public static final String DEPT_HQ_LEVEL = "0";//珈研部门等级
 
 	public static final String SALES_ORDER_SN = "100001";//订单流水每日起始数
-	public static final String SALES_OUT_STOCK_SN = "100001";//出库单单流水每日起始数
+	public static final String SALES_OUT_STOCK_SN = "0001";//出库单单流水每日起始数
 	public static final String PURCHASE_IN_STOCK_SN = "100001";//采购入库单单流水每日起始数
 
 

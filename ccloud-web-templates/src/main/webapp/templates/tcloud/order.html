@@ -475,9 +475,12 @@ $(function() {
 		if (factor != '') {
 			total = total * factor;
 		}
+
+		total = total.toFixed(2);
+
 		$("#total").val(total);
 		$("#totalNum").val(totalNum);
-		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + formatNumber(total) + "元")
+		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
 	} 
 
 	var flg = true;

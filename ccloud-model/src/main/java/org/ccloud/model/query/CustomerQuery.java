@@ -103,10 +103,16 @@ public class CustomerQuery extends JBaseQuery {
 		return list;
 	}
 
+	@Deprecated
 	public Customer findByCustomerNameAndMobile(String customerName, String mobile) {
 		return DAO.doFindFirst("customer_name = ? and mobile = ?", customerName, mobile);
 	}
 
+	public Customer findByCustomerMobile(String mobile) {
+		return DAO.doFindFirst("mobile = ?", mobile);
+	}
+
+	@Deprecated
 	public Integer findByNameAndMobile(String name, String mobile) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -114,6 +120,17 @@ public class CustomerQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder(" select count(1) ");
 		sqlBuilder.append(" from `cc_customer` c ");
 		needWhere = appendIfNotEmpty(sqlBuilder, "c.customer_name", name, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.mobile", mobile, params, needWhere);
+
+		return Db.queryInt(sqlBuilder.toString(), params.toArray());
+	}
+
+	public Integer findByMobile(String mobile) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		StringBuilder sqlBuilder = new StringBuilder(" select count(1) ");
+		sqlBuilder.append(" from `cc_customer` c ");
 		needWhere = appendIfNotEmpty(sqlBuilder, "c.mobile", mobile, params, needWhere);
 
 		return Db.queryInt(sqlBuilder.toString(), params.toArray());

@@ -309,7 +309,7 @@ function total(){
 		var $el = $(el);
 		total += $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
 	});
-	$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
+	$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total.toFixed(2) + "元")
 
 } 
 
