@@ -115,7 +115,7 @@
 				 edit: false},
 				 {field: "", title: "操作", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a>';
+					var strHtml = '<a class="btn btn-xs btn-primary btn-flat" onclick="detailPlans(\''+row.id+'\')" >详细</a>';
 					return strHtml;
 				},
 				edit:false
@@ -136,12 +136,12 @@
 		jQuery.mm.down("${CPATH}/admin/plans/downloading?type="+type+"&&k="+$("#search").val()+"&&dateType="+dateType);
 		window.event.returnValue=false; 
 	}
-	function detail(id) {
+	function detailPlans(id) {
 		layer.open({
 			title:"计划详细",
 			type: 2, 
 			area: ['70%', '80%'],
-			content: '${CPATH}/admin/plans/detail?plansId=' + id
+			content: '${CPATH}/admin/plans/detailPlans?plansId=' + id
 		}); 
 	}
 </#macro>

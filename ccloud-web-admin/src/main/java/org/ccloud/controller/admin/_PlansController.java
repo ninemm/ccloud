@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,7 @@ import org.ccloud.model.query.PlansQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.UserQuery;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -644,12 +646,54 @@ public void downloading() throws UnsupportedEncodingException{
 		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据");
 	}
 	
-	public void detail() {
+	public void detailPlans() {
 		String plansId = getPara("plansId");
-		List<PlansDetail> plansDetails = PlansDetailQuery.me().findByPlansId(plansId);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		List<Map<String, Object>> productItems = new ArrayList<>();
+		productItems.add(all);
+		for(Record record : productRecords) {
+			
+			Map<String, Object> item = new HashMap<>();
+			
+			String sellerProductId = record.get("sell_product_id");
+			item.put("title", record.getStr("custom_name"));
+			item.put("value", sellerProductId);
 
-		setAttr("plansDetails", plansDetails);
+			productItems.add(item);
+		}
+		
+		List<Record> users = PlansDetailQuery.me().findUserBySellerId(sellerId, "");
+		List<Map<String, Object>> userItems = new ArrayList<>();
+		userItems.add(all);
+		for(Record record : users) {
+			
+			Map<String, Object> item = new HashMap<>();
+			
+			String userId = record.get("user_id");
+			item.put("title", record.getStr("realname"));
+			item.put("value", userId);
 
-		render("detail.html");
+			userItems.add(item);
+		}
+		
+		setAttr("productItems",JSON.toJSON(productItems));
+		setAttr("userItems",JSON.toJSON(userItems));
+		setAttr("plansId",plansId);
+		 render("detail.html");
+	}
+	public void detail() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String plansId = getPara("plansId");
+		String userId = getPara("userId");
+		String sellerProductId = getPara("sellerProductId");
+		String keyword = getPara("keyword");
+		Page<Record> page = PlansDetailQuery.me().paginate(getPageNumber(), getPageSize(),keyword,sellerId, dataArea,userId,sellerProductId,plansId);
+        Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+        renderJson(map);
 	}
 }

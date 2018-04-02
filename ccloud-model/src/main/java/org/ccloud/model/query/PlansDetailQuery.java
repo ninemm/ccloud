@@ -70,7 +70,7 @@ public class PlansDetailQuery extends JBaseQuery {
 			fromBuilder.append(" where 1 = 1");
 			}
 			
-			fromBuilder.append(" GROUP BY pd.user_id ORDER BY pd.create_date desc ");
+			fromBuilder.append("  ORDER BY pd.create_date desc ");
 			
 			if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -220,6 +220,19 @@ public class PlansDetailQuery extends JBaseQuery {
 			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");
 		}
 		fromBuilder.append("GROUP BY cp.id,pd.user_id ORDER BY cp.id,pd.user_id ");
+		return Db.find(fromBuilder.toString());
+	}
+	
+	public List<Record> findUserBySellerId(String sellerId , String plansMonth){
+		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.start_date as startDate,cp.end_date as endDate,cp.plans_month as plansMonth,cp.type,u.realname ");
+		fromBuilder.append("from cc_plans_detail pd ");
+		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
+		fromBuilder.append("LEFT JOIN `user` u on u.id = pd.user_id ");
+		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
+		if(StrKit.notBlank(plansMonth)){
+			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");
+		}
+		fromBuilder.append("GROUP BY pd.user_id ORDER BY pd.user_id ");
 		return Db.find(fromBuilder.toString());
 	}
 }
