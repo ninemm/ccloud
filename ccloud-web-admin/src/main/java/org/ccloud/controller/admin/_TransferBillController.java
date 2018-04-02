@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -104,7 +105,18 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 			setAttr("transferBill", transferBill);
 
 			List<Record> findBySeller = WarehouseQuery.me().findBySeller(transferBill.getToWarehouseId());
-			setAttr("slist", findBySeller);
+			List<Map<String, Object>> list = new ArrayList<>();
+			 for (Record record : findBySeller) {
+				 if (record.getStr("department_id")!=null) {
+					List<Department> Department = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(record.getStr("department_id"));
+					Department dept = Department.get(0);
+					Map<String, Object> map = new HashMap<>();
+					map.put("seller_name", dept.getStr("seller_name"));
+					map.put("sellerId", dept.getStr("seller_id"));
+					list.add(map);
+				 }
+			}
+			setAttr("slist", list);
 		}
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(userId);
 		setAttr("wlist", wlist);
@@ -168,7 +180,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 								.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] + "].product_count"));
 
 						transferBillDetail.setSellerProductId(productId);
-						transferBillDetail.setProductCount(Integer.parseInt(productCount));
+						transferBillDetail.setProductCount(new BigDecimal(productCount));
 						transferBillDetail.setTransferBillId(transferBill.getId());
 						transferBillDetail.setId(StrKit.getRandomUUID());
 						transferBillDetail.setDeptId(transferBill.getDeptId());
@@ -200,7 +212,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 						String productCount = StringUtils
 								.getArrayFirst(map.get("transferBillDetailList[" + i + "].product_count"));
 						transferBillDetail.setSellerProductId(productId);
-						transferBillDetail.setProductCount(Integer.parseInt(productCount));
+						transferBillDetail.setProductCount(new BigDecimal(productCount));
 						transferBillDetail.setTransferBillId(transferBill.getId());
 						transferBillDetail.setId(StrKit.getRandomUUID());
 						transferBillDetail.setDeptId(transferBill.getDeptId());
