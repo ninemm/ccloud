@@ -120,9 +120,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 						outstockId = StrKit.getRandomUUID();
 						warehouseId = orderDetail.getStr("warehouse_id");
 						String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
-						// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
+						// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 0001(流水号)
 						outstockSn = "SS" + sellerCode + order.getStr("typeCode") 
-								+ DateUtils.format("yyMMdd", date) + OrderSO.substring(2);
+								+ DateUtils.format("yyMMdd", date) + OrderSO;
 						SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
 						SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
 					}
@@ -284,9 +284,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 			SN = Consts.SALES_OUT_STOCK_SN;
 		} else {
 			String outstockSn = sales.getOutstockSn();
-			outstockSn=outstockSn.substring(0,15)+"10"+outstockSn.substring(15);
 			String endSN = StringUtils.substringSN(Consts.SALES_OUT_STOCK_SN,outstockSn );
-			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+			SN = StringUtils.addIntStrAndFillZeros(endSN, 1, 4);
+//			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
 	}
