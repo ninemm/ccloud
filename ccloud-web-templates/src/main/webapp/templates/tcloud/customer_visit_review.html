@@ -142,7 +142,7 @@
     }
 
     function agree() {
-       if($("#review_location").val().length==0) {
+       if($.trim($("#review_location").val()).length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
         }
@@ -167,7 +167,7 @@
 	}
 
 	function refuse() {
-        if($("#review_location").val().length==0) {
+        if($.trim($("#review_location").val()).length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
         }
