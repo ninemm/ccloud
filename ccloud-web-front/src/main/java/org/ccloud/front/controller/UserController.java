@@ -171,6 +171,7 @@ public class UserController extends BaseFrontController {
 		String action = getPara(0, "index");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		
 		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
 		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
@@ -179,7 +180,7 @@ public class UserController extends BaseFrontController {
 		setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());
 		setAttr("customerVisitTotal",CustomerVisitQuery.me().getToDo(user.getUsername()).size());
 		setAttr("customerTotal",SellerCustomerQuery.me().getToDo(user.getUsername()).size());
-		setAttr("activityApplyTotal", ActivityApplyQuery.me().getToDo(user.getUsername()).size());
+		setAttr("activityApplyTotal", ActivityApplyQuery.me().getToDo(user.getUsername(), dealerDataArea).size());
 		
 		render(String.format("user_center_%s.html", action));
 	}
@@ -350,7 +351,7 @@ public class UserController extends BaseFrontController {
 					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
 							DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
 				} else {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea());
+					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea() + "%");
 				}
 			}
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);

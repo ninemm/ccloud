@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.Consts;
+import org.ccloud.model.Customer;
 import org.ccloud.model.Product;
 import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerProduct;
@@ -56,7 +57,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select o.*, sa.biz_user_id as order_user, sa.create_date as order_date, sa.activity_apply_id, cs.customer_kind, c.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile ");
-		fromBuilder.append(" ,w.code as warehouseCode, cp.factor ");
+		fromBuilder.append(" ,w.code as warehouseCode, cp.factor, sa.proc_inst_id, sa.id as order_id ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_sales_order_join_outstock co ON co.outstock_id = o.id ");
 		fromBuilder.append(" left join cc_sales_order sa on sa.id = co.order_id ");
@@ -119,10 +120,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 						outstockId = StrKit.getRandomUUID();
 						warehouseId = orderDetail.getStr("warehouse_id");
 						String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
-						// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
+						// 销售出库单：SS + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 0001(流水号)
 						outstockSn = "SS" + sellerCode + order.getStr("typeCode") 
-								+ DateUtils.format("yyMMdd", date) + OrderSO.substring(2);
-
+								+ DateUtils.format("yyMMdd", date) + OrderSO;
 						SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
 						SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
 					}
@@ -139,8 +139,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 				}
 				
 				//生成出库单时候生成二维码
-				generateQrcode(orderId,order,orderDetailList, sellerCode);
-
+				if (Consts.QRDEALERCODE.contains(sellerCode)) {
+					generateQrcode(orderId,order,orderDetailList, sellerCode);
+				}
 				SalesOrderQuery.me().updateConfirm(orderId, Consts.SALES_ORDER_AUDIT_STATUS_PASS, userId, date);// 已审核通过
 
 				return true;
@@ -282,8 +283,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 		if (sales == null || StringUtils.isBlank(sales.getOutstockSn())) {
 			SN = Consts.SALES_OUT_STOCK_SN;
 		} else {
-			String endSN = StringUtils.substringSN(Consts.SALES_OUT_STOCK_SN, sales.getOutstockSn());
-			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+			String outstockSn = sales.getOutstockSn();
+			String endSN = StringUtils.substringSN(Consts.SALES_OUT_STOCK_SN,outstockSn );
+			SN = StringUtils.addIntStrAndFillZeros(endSN, 1, 4);
+//			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
 	}
@@ -420,7 +423,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public printAllNeedInfo findStockOutForPrint(final String id) {
 		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, cs.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
-		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,o.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id,so.order_qrcode_url, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
+		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,so.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id,so.order_qrcode_url, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sj on sj.outstock_id = o.id ");
@@ -617,10 +620,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 				String childFileName = DateUtils.dateString();
 				PathKit.getWebRootPath();
 				String imagePath = PathKit.getWebRootPath() + "/";
-				String newStr = imagePath.substring(0, imagePath.length()-6) + "admin/" + Consts.ORDER_QRCODE_PATH + childFileName ;
+				String newStr = imagePath + Consts.ORDER_QRCODE_PATH + childFileName ;
 
 				String orcodeImgUrl = Consts.ORDER_QRCODE_PATH + childFileName +"/" +  orcodeFileName;
-				stringBuilder.append(order.getStr("customer_id")).append("||" + orderSn).append("||" + order.getStr("contact") + "||");					
+				Customer customer = CustomerQuery.me().findSellerCustomerId(order.getStr("customer_id"));
+				stringBuilder.append(order.getStr("customer_id")).append("||" + orderSn).append("||" + customer.getCustomerName() + "||");					
 
 				
                for (Record orderDetail : orderDetailList) {
@@ -631,19 +635,63 @@ public class SalesOutstockQuery extends JBaseQuery {
 				}
                QRcontent = stringBuilder.toString().substring(0, stringBuilder.length() -1);
 				Date date = new Date();
-				if (Consts.QRDEALERCODE.contains(sellerCode)) {
 					org.ccloud.utils.QRCodeUtils.genQRCode(QRcontent, newStr, orcodeFileName);
 	           		int i = SalesOrderQuery.me().updateQrcodeImgUrl(orcodeImgUrl, orderId, date);
 	           		if (i < 0) {
 						return false;
 					}
-				}
-				
 				return true;
 			}
 		});
 		return isSave;  
 		
+	}
+
+	public Page<Record> _paginateForApp(int pageNumber, int pageSize, String keyword, String status,
+	                                    String customerTypeId, String startDate, String endDate, String sellerId, String dataArea,String bizUserId) {
+		String select = "select o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, ct.name as customerTypeName, so.id as order_id, so.proc_inst_id";
+		StringBuilder fromBuilder = new StringBuilder("from `cc_sales_outstock` o ");
+		fromBuilder.append("left join cc_seller_customer cc ON o.customer_id = cc.id ");
+		fromBuilder.append("left join cc_customer c on cc.customer_id = c.id ");
+		fromBuilder.append("left join cc_customer_type ct on o.customer_type_id = ct.id ");
+
+		fromBuilder.append("left join cc_sales_order_join_outstock sojo on o.id = sojo.outstock_id ");
+		fromBuilder.append("left join cc_sales_order so on sojo.order_id = so.id ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", bizUserId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1 ");
+		}
+
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(
+					" and (o.outstock_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%')");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" order by o.create_date desc ");
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
 }

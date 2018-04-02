@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro title>业务员销售统计</#macro>
+<#macro title>业务经理报表</#macro>
 <#macro css>
     .report {
         font-size: 0.7rem;
@@ -87,9 +87,6 @@
 		           salesObj[data[i].realname] = data[i].id;
 		       	}
 				option = {
-				    title: {
-				        text: '业务员',
-				    },				
 				    tooltip: {
 				        trigger: 'axis',
 				        axisPointer: {
@@ -105,13 +102,51 @@
 				        containLabel: true
 				    },
 				    xAxis: {
-				    	show : false,
 				        type: 'value',
 				        boundaryGap: [0, 0.01]
 				    },
 				    yAxis: {
 				        type: 'category',
-				        data: yData
+				        data: yData,
+				        axisLabel:{
+				            interval: 0,
+				            formatter:function(params){
+				            	if (!params) {
+				            		params = "暂无数据";
+				            	}
+							    var newParamsName = "";// 最终拼接成的字符串
+							    var paramsNameNumber = params.length;// 实际标签的个数
+							    var provideNumber = 4;// 每行能显示的字的个数
+							    var rowNumber = Math.ceil(paramsNameNumber / provideNumber);// 换行的话，需要显示几行，向上取整
+							    /**
+							     * 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
+							     */
+							    // 条件等同于rowNumber>1
+							    if (paramsNameNumber > provideNumber) {
+							        /** 循环每一行,p表示行 */
+							        for (var p = 0; p < rowNumber; p++) {
+							            var tempStr = "";// 表示每一次截取的字符串
+							            var start = p * provideNumber;// 开始截取的位置
+							            var end = start + provideNumber;// 结束截取的位置
+							            // 此处特殊处理最后一行的索引值
+							            if (p == rowNumber - 1) {
+							                // 最后一次不换行
+							                tempStr = params.substring(start, paramsNameNumber);
+							            } else {
+							                // 每一次拼接字符串并换行
+							                tempStr = params.substring(start, end) + "\n";
+							            }
+							            newParamsName += tempStr;// 最终拼成的字符串
+							        }
+							
+							    } else {
+							        // 将旧标签的值赋给新标签
+							        newParamsName = params;
+							    }
+							    //将最终的字符串返回
+							    return newParamsName				            
+				            }
+				        }				        
 				    },
 				    series: [
 		            {
@@ -144,6 +179,12 @@
     	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getSellerCountMenu', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#dealerCount").height(300);
+		        } else {
+		        	$("#dealerCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];
@@ -161,9 +202,6 @@
 		       	}
 		
 				option = {
-				    title: {
-				        text: '直营商',
-				    },				
 				    tooltip: {
 				        trigger: 'axis',
 				        axisPointer: {
@@ -179,13 +217,51 @@
 				        containLabel: true
 				    },
 				    xAxis: {
-				    	show : false,
 				        type: 'value',
 				        boundaryGap: [0, 0.01]
 				    },
 				    yAxis: {
 				        type: 'category',
-				        data: yData
+				        data: yData,
+				        axisLabel:{
+				            interval: 0,
+				            formatter:function(params){
+				            	if (!params) {
+				            		params = "暂无数据";
+				            	}				            
+							    var newParamsName = "";// 最终拼接成的字符串
+							    var paramsNameNumber = params.length;// 实际标签的个数
+							    var provideNumber = 4;// 每行能显示的字的个数
+							    var rowNumber = Math.ceil(paramsNameNumber / provideNumber);// 换行的话，需要显示几行，向上取整
+							    /**
+							     * 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
+							     */
+							    // 条件等同于rowNumber>1
+							    if (paramsNameNumber > provideNumber) {
+							        /** 循环每一行,p表示行 */
+							        for (var p = 0; p < rowNumber; p++) {
+							            var tempStr = "";// 表示每一次截取的字符串
+							            var start = p * provideNumber;// 开始截取的位置
+							            var end = start + provideNumber;// 结束截取的位置
+							            // 此处特殊处理最后一行的索引值
+							            if (p == rowNumber - 1) {
+							                // 最后一次不换行
+							                tempStr = params.substring(start, paramsNameNumber);
+							            } else {
+							                // 每一次拼接字符串并换行
+							                tempStr = params.substring(start, end) + "\n";
+							            }
+							            newParamsName += tempStr;// 最终拼成的字符串
+							        }
+							
+							    } else {
+							        // 将旧标签的值赋给新标签
+							        newParamsName = params;
+							    }
+							    //将最终的字符串返回
+							    return newParamsName				            
+				            }
+				        }				        
 				    },
 				    series: [
 		            {
@@ -217,6 +293,12 @@
     	salesIndentChart.showLoading();    
 		Utils.ajax('${CPATH}/report/getGiftCountByUserMenu', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#giftCount").height(300);
+		        } else {
+		        	$("#giftCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];
@@ -233,9 +315,6 @@
 		       	}
 		
 				option = {
-				    title: {
-				        text: '业务员',
-				    },				
 				    tooltip: {
 				        trigger: 'axis',
 				        axisPointer: {
@@ -243,7 +322,7 @@
 				        }
 				    },
 				    legend: {
-				        data: yData,
+				        data: yData.reverse(),
 				        x: 'left'
 				    },
 				    grid: {
@@ -256,7 +335,46 @@
 				    },
 				    yAxis: {
 				        type: 'category',
-				        data: yData
+				        data: yData,
+				        axisLabel:{
+				            interval: 0,
+				            formatter:function(params){
+				            	if (!params) {
+				            		params = "暂无数据";
+				            	}				            
+							    var newParamsName = "";// 最终拼接成的字符串
+							    var paramsNameNumber = params.length;// 实际标签的个数
+							    var provideNumber = 4;// 每行能显示的字的个数
+							    var rowNumber = Math.ceil(paramsNameNumber / provideNumber);// 换行的话，需要显示几行，向上取整
+							    /**
+							     * 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
+							     */
+							    // 条件等同于rowNumber>1
+							    if (paramsNameNumber > provideNumber) {
+							        /** 循环每一行,p表示行 */
+							        for (var p = 0; p < rowNumber; p++) {
+							            var tempStr = "";// 表示每一次截取的字符串
+							            var start = p * provideNumber;// 开始截取的位置
+							            var end = start + provideNumber;// 结束截取的位置
+							            // 此处特殊处理最后一行的索引值
+							            if (p == rowNumber - 1) {
+							                // 最后一次不换行
+							                tempStr = params.substring(start, paramsNameNumber);
+							            } else {
+							                // 每一次拼接字符串并换行
+							                tempStr = params.substring(start, end) + "\n";
+							            }
+							            newParamsName += tempStr;// 最终拼成的字符串
+							        }
+							
+							    } else {
+							        // 将旧标签的值赋给新标签
+							        newParamsName = params;
+							    }
+							    //将最终的字符串返回
+							    return newParamsName				            
+				            }
+				        }				        
 				    },
 				    series: [
 		            {
@@ -288,6 +406,12 @@
     	salesIndentChart.showLoading();
 		Utils.ajax('${CPATH}/report/getGiftCountBySellerMenu', params, 
 			function(data){
+				var high = 40 * data.length + 100;
+		        if (high < 300) {
+		        	$("#dealerGiftCount").height(300);
+		        } else {
+		        	$("#dealerGiftCount").height(high);
+		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
 		        var yData = [];
@@ -304,9 +428,6 @@
 		       	}
 		
 				option = {
-				    title: {
-				        text: '直营商',
-				    },				
 				    tooltip: {
 				        trigger: 'axis',
 				        axisPointer: {
@@ -314,7 +435,7 @@
 				        }
 				    },
 				    legend: {
-				        data: yData,
+				        data: yData.reverse(),
 				        x: 'left'
 				    },
 				    grid: {
@@ -327,7 +448,46 @@
 				    },
 				    yAxis: {
 				        type: 'category',
-				        data: yData
+				        data: yData,
+				        axisLabel:{
+				            interval: 0,
+				            formatter:function(params){
+				            	if (!params) {
+				            		params = "暂无数据";
+				            	}				            
+							    var newParamsName = "";// 最终拼接成的字符串
+							    var paramsNameNumber = params.length;// 实际标签的个数
+							    var provideNumber = 4;// 每行能显示的字的个数
+							    var rowNumber = Math.ceil(paramsNameNumber / provideNumber);// 换行的话，需要显示几行，向上取整
+							    /**
+							     * 判断标签的个数是否大于规定的个数， 如果大于，则进行换行处理 如果不大于，即等于或小于，就返回原标签
+							     */
+							    // 条件等同于rowNumber>1
+							    if (paramsNameNumber > provideNumber) {
+							        /** 循环每一行,p表示行 */
+							        for (var p = 0; p < rowNumber; p++) {
+							            var tempStr = "";// 表示每一次截取的字符串
+							            var start = p * provideNumber;// 开始截取的位置
+							            var end = start + provideNumber;// 结束截取的位置
+							            // 此处特殊处理最后一行的索引值
+							            if (p == rowNumber - 1) {
+							                // 最后一次不换行
+							                tempStr = params.substring(start, paramsNameNumber);
+							            } else {
+							                // 每一次拼接字符串并换行
+							                tempStr = params.substring(start, end) + "\n";
+							            }
+							            newParamsName += tempStr;// 最终拼成的字符串
+							        }
+							
+							    } else {
+							        // 将旧标签的值赋给新标签
+							        newParamsName = params;
+							    }
+							    //将最终的字符串返回
+							    return newParamsName				            
+				            }
+				        }					        
 				    },
 				    series: [
 		            {
@@ -600,90 +760,119 @@
 </#macro>
 <@layout>
 	<div class="weui-content">
-	<div class="report">
-		<div class="weui-panel weui-panel_access report-header">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">销售简报</span> <span class="briefly" onclick="dayTagSelect(this,'day')">
-					<p class="dayTagText">今日</p>
-					<i class="icon-angle-down"></i>
-				</span>
-				<span class="briefly" onclick="orderTagSelect(this,'order')">
-					<p class="orderTagText">件数</p>
-					<i class="icon-angle-down"></i>
-				</span>
-				<input type="hidden" id="orderTag">	
-				<input type="hidden" id="dayTag">
-				<input type="hidden" id="typeTag">
-				<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
-				<span class="overview-hd-segmenting fr"> — </span> 
-				<input class="weui-input begin-date fr t-r" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
-			</div>
-			<div class="weui-panel__bd">
-				<div class="weui-flex overview-block">
-					<div class="weui-flex__item">
-						<div class="overview-title">
-							<img src="${CTPATH}/images/order.png"> <span>订单总数</span>
+		<div class="report">
+			<div class="weui-panel weui-panel_access report-header">
+				<div class="weui-panel__hd">
+					<span class="overview-hd-title">销售简报</span>
+					<span class="briefly" onclick="dayTagSelect(this,'day')">
+						<p class="dayTagText">今日</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<span class="briefly" onclick="orderTagSelect(this,'order')">
+						<p class="orderTagText">件数</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<input type="hidden" id="orderTag">
+					<input type="hidden" id="dayTag">
+					<input type="hidden" id="typeTag">
+					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
+					<span class="overview-hd-segmenting fr"> — </span>
+					<input class="weui-input begin-date fr t-r" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
+				</div>
+				<div class="weui-panel__bd">
+					<div class="weui-flex overview-block">
+						<div class="weui-flex__item">
+							<div class="overview-title">
+								<img src="${CTPATH}/images/order.png">
+								<span>订单总数</span>
+							</div>
+							<div class="t-c">
+								<strong id="productCount"></strong>
+								<small id="totalCount"></small>
+							</div>
 						</div>
-						<div class="t-c">
-							<strong id="productCount"></strong> <small id="totalCount"></small>
-						</div>
-					</div>
-					<div class="weui-flex__item">
-						<div class="overview-title">
-							<img src="${CTPATH}/images/money.png"> <span>订单金额</span>
-						</div>
-						<div class="t-c">
-							<strong id="totalAmount"></strong>
+						<div class="weui-flex__item">
+							<div class="overview-title">
+								<img src="${CTPATH}/images/money.png">
+								<span>订单金额</span>
+							</div>
+							<div class="t-c">
+								<strong id="totalAmount"></strong>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">业务员统计</span> 
-				<span class="briefly" onclick="typeSelect(this,'day')">
-					<p class="typeText">订单</p>
-					<i class="icon-angle-down"></i>
-				</span> 
-				<!--<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd">
+					<p class="ft16 t-c">业务员统计</p>
+					<span class="briefly" onclick="typeSelect(this,'day')">
+						<p class="typeText">订单</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<!--<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
 				<span class="overview-hd-segmenting fr"> - </span> <input
 					class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">  -->
-			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="userCount" style="height: 300px;">
-						
+				</div>
+				<div class="weui-panel__bd report-area border-top-1px relative">
+					<div class="weui-media-box ft14">
+						<div id="userCount" style="height: 300px;">
+
+						</div>
+					</div>
+					<div class="read-more">
+						点击柱子可查看详情
 					</div>
 				</div>
 			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="dealerCount" style="height: 300px;">
-						
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd">
+					<p class="ft16 t-c">直营商统计</p>
+					<!--<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'user')" readonly="">
+					<span class="overview-hd-segmenting fr"> - </span> <input
+						class="weui-input begin-date fr" type="text" id="startDay" onchange="startDaySelect(this,'user')" readonly="">  -->
+				</div>
+				<div class="weui-panel__bd report-area  border-top-1px relative">
+					<div class="weui-media-box ft14">
+						<div id="dealerCount" style="height: 300px;">
+
+						</div>
+					</div>
+					<div class="read-more">
+						点击柱子可查看详情
 					</div>
 				</div>
-			</div>			
-		</div>
-		<div class="weui-panel weui-panel_access">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">赠品统计</span>
 			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="giftCount" style="height: 300px;">
-						
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd t-c ft16">
+					业务员赠品统计
+				</div>
+				<div class="weui-panel__bd report-area  border-top-1px relative">
+					<div class="weui-media-box ft14">
+						<div id="giftCount" style="height: 300px;">
+
+						</div>
+					</div>
+					<div class="read-more">
+						点击柱子可查看详情
 					</div>
 				</div>
 			</div>
-			<div class="weui-panel__bd report-area">
-				<div class="weui-media-box ft14">
-					<div id="dealerGiftCount" style="height: 300px;">
-						
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd t-c ft16">
+					直营商赠品统计
+				</div>
+				<div class="weui-panel__bd report-area  border-top-1px relative">
+					<div class="weui-media-box ft14">
+						<div id="dealerGiftCount" style="height: 300px;">
+
+						</div>
+					</div>
+					<div class="read-more">
+						点击柱子可查看详情
 					</div>
 				</div>
-			</div>			
-		</div>		
+			</div>
 		</div>
 		<#include "_inc/_footer_nav.html" />
 	</div>

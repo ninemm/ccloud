@@ -64,7 +64,7 @@ public class _ReportController extends JBaseController {
 		String startDate = getPara("startDate");
 		String warehouseId = getPara("warehouse_id");
 		String endDate = getPara("endDate");
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		Page<InventoryDetail> page=new Page<>();
@@ -102,7 +102,7 @@ public class _ReportController extends JBaseController {
 	
 	//产品总计
 	public void productTotalList() {
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		String sellerId = getPara("seller_id");
@@ -253,12 +253,13 @@ public class _ReportController extends JBaseController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,false);
+			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,false,sort,order);
 		}else {
-			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,false);
+			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,false,sort,order);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -275,12 +276,13 @@ public class _ReportController extends JBaseController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
 		Page<SalesOrder> page=new Page<>();
 		if(null==getPara("sortName[offset]")) {
-			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,true);
+			page =SalesOrderQuery.me().findByDepartmentProduct(1, Integer.MAX_VALUE,startDate,endDate,keyword, dataArea,true,sort,order);
 		}else {
-			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,true);
+			page = SalesOrderQuery.me().findByDepartmentProduct(getPageNumber(), getPageSize(),startDate,endDate,keyword, dataArea,true,sort,order);
 		}
 		
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());

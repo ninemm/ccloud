@@ -4,7 +4,6 @@
 	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
 	<script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
-	<script type="text/javascript" src="${CTPATH}/js/comm.js"></script>
 </#macro>
 <#macro title>再来一单</#macro>
 <#macro css> 
@@ -102,12 +101,12 @@ $(function() {
 		$.each(products, function(index, el) {
 			var $el = $(el);
 			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
-			count = parseInt($el.find("#bigNum").val()) + (parseInt($el.find("#smallNum").val())/parseInt($el.find("#convert").val())).toFixed(2)*1;
-			$("#totalCount").val(count);
+			count = count + parseInt($el.find("#bigNum").val()) + (parseInt($el.find("#smallNum").val())/parseInt($el.find("#convert").val())).toFixed(2)*1;
+			
 			$el.find("#rowTotal").val(rowTotal);
 			total += rowTotal;
 		});
-
+		$("#totalCount").val(count);
 		$("#total").val(${order.total_amount!});
 		$("#totalNum").text("共" + (products.length) + "款,合计:" + formatNumber(${order.total_amount!}) + "元")
 	
@@ -228,7 +227,8 @@ $(function() {
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
 							<div>
-								<input type="checkbox" name="receiveType" value="0" class="weui-agree__checkbox"> 是否账期
+								<input type="checkbox" name="receiveL"<#if order.receive_type == 0>checked</#if> class="weui-agree__checkbox" disabled> 是否账期
+								<input type="hidden" name = "receiveType" value="${order.receive_type!}">
 							</div>
 						</div>
 					</div>
@@ -236,7 +236,7 @@ $(function() {
 				<section class="weui-panel weui-panel_access ft14 remark">
 					<div class="weui-cell weui-cell_access">
 						<div class="weui-cell__bd">
-							<textarea name="remark" placeholder="备注说明（70字以内）"></textarea>
+							<textarea name="remark" placeholder="备注说明（70字以内）"><#if order.receive_type == 0>账期<#else>现结</#if></textarea>
 						</div>
 					</div>
 				</section>

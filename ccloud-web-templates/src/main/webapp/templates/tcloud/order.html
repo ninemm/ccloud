@@ -4,7 +4,6 @@
 	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
 	<script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
-	<script type="text/javascript" src="${CTPATH}/js/comm.js"></script>
 </#macro>
 <#macro title>提交订单</#macro>
 <#macro css> 
@@ -476,9 +475,12 @@ $(function() {
 		if (factor != '') {
 			total = total * factor;
 		}
+
+		total = total.toFixed(2);
+
 		$("#total").val(total);
 		$("#totalNum").val(totalNum);
-		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + formatNumber(total) + "元")
+		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
 	} 
 
 	var flg = true;

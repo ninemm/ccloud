@@ -1,7 +1,7 @@
 <#include "../_inc/_layout.html"/>
 
 <#macro script_import>
-
+	<script type='text/javascript' src="${CTPATH}/js/jquery.cookie.js"></script>
 	<!-- bootstrap-table -->
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
@@ -37,14 +37,16 @@
 		$table.bootstrapTable('refresh');
 	});
 
-	function editor(url){
-	   window.location.href = url;
-	}
-
 	var initParams = function(params) {
 
 		var keyword = $('#search').val();
 		var customerType = $('#customer_type').val();
+		if(customerType!=null){
+			var date = new Date();
+			date.setTime(date.getTime()+2*60*1000);
+			$.cookie('customerType', customerType, { expires: date });
+		}
+		customerType=$.cookie('customerType');
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
@@ -94,7 +96,7 @@
 				{field: "action", title: "操作", align: "center", width: '20%',
 					formatter: function(value, row, rowIndex) {
 						var url = '${CPATH}/admin/sellerCustomer/edit?id=' + row.id + '&c=${c!}&p=${p!}';
-						var strHtml = '<a onclick="editor(\''+url+'\')" class="btn btn-xs bg-olive btn-flat">编辑</a> ';
+						var strHtml = '<a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a> ';
 						if(row.is_enabled == 1){
 							strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="enable(\''+row.id+'\'' + ',0' + ')" >停用</a>';
 						} else {
@@ -159,6 +161,8 @@
 					strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
 				}
 				$("#customer_type").html(strHtml);
+				var aa = $.cookie('customerType');
+				$("#customer_type").val(aa);
 			}
 		});
 	}

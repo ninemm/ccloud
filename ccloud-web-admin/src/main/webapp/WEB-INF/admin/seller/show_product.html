@@ -468,8 +468,9 @@
 					data : {id : id},
 					success:function(data){
 						var url = data.qrcode_url;
+						console.log(url);
 						$(".modal-body").html("");
-						var html = '<img src="'+url.substring(url.indexOf('\ccloud-web-admin')-1,url.length)+'" alt="二维码" class="jp-grids-photos img-responsive">'
+						var html = '<img src="'+url.substring(url.indexOf('qrcode')-1,url.length)+'" alt="二维码" class="jp-grids-photos img-responsive">'
 						$(".modal-body").append(html);
 					}
 				});

@@ -138,8 +138,11 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		for(int i = 0; i < page.getList().size(); i++) {
 			actAmount = actAmount.add(page.getList().get(i).getActAmount());
 		}
-		balance_amount = (purchaseInstock.getTotalAmount().subtract(actAmount)).toString();
-		
+		if (purchaseInstock==null) {
+			balance_amount = payables.getBalanceAmount().toString();
+		}else {
+			balance_amount = (purchaseInstock.getTotalAmount().subtract(actAmount)).toString();
+		}
 		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
 	
@@ -212,7 +215,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		}
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);	
+		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
 				+ "payables.xls";

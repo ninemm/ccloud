@@ -16,7 +16,10 @@
     .report .weui-panel__hd:after {
         left: 0;
         height: 0;
-    }
+		}
+		.pro:after {
+			content:none;
+		}
     p { 
     	margin:0
 		}
@@ -95,26 +98,31 @@
     function startDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59'
+			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
+			"platformTag" : $("#platformTag").val()
 		}
+		$("#dayTag").val("");
 		urlSelect(params,type); 
     }
     
     function endDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
-			"endDate": $(obj).val() + ' 23:59:59'
+			"endDate": $(obj).val() + ' 23:59:59',
+			"platformTag" : $("#platformTag").val()
 		}
+		$("#dayTag").val("");
 		urlSelect(params,type); 
     }    
     
- 	function dayTagSelect(obj,type) {
+    function dayTagSelect(obj,type) {
       $.actions({
         actions: [{
           text: "今日",
           onClick: function () {
 			var params = {
-				"dayTag": 'today'
+				"dayTag": 'today',
+				"platformTag" : $("#platformTag").val()
 			}
 			urlSelect(params,type); 
             $(obj).find(".dayTagText").text('今日')
@@ -124,7 +132,8 @@
           text: "昨日",
           onClick: function () {
 			var params = {
-				"dayTag": 'yesterday'
+				"dayTag": 'yesterday',
+				"platformTag" : $("#platformTag").val()
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
@@ -134,7 +143,8 @@
           text: "本周",
           onClick: function () {
 			var params = {
-				"dayTag": 'week'
+				"dayTag": 'week',
+				"platformTag" : $("#platformTag").val()
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
@@ -144,7 +154,8 @@
           text: "上周",
           onClick: function () {
 			var params = {
-				"dayTag": 'lastweek'
+				"dayTag": 'lastweek',
+				"platformTag" : $("#platformTag").val()
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
@@ -154,7 +165,8 @@
           text: "本月",
           onClick: function () {
 			var params = {
-				"dayTag": 'month'
+				"dayTag": 'month',
+				"platformTag" : $("#platformTag").val()
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
@@ -164,11 +176,57 @@
           text: "上月",
           onClick: function () {
 			var params = {
-				"dayTag": 'lastmonth'
+				"dayTag": 'lastmonth',
+				"platformTag" : $("#platformTag").val()
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
           	$("#dayTag").val("lastmonth");
+          }
+        }]
+      });    
+    } 
+    
+ 	function platformTagSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "全部",
+          onClick: function () {
+			var params = {
+				"platformTag": '',
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val()
+			}
+			urlSelect(params,type); 
+            $(obj).find(".platformTagText").text('全部')
+            $("#platformTag").val("");
+          }
+        }, {
+          text: "阿里",
+          onClick: function () {
+			var params = {
+				"platformTag": '阿里',
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val()
+			}     
+			urlSelect(params,type);    
+         	$(obj).find(".platformTagText").text('阿里')
+         	$("#platformTag").val("阿里");
+          }
+        }, {
+          text: "丹露",
+          onClick: function () {
+			var params = {
+				"platformTag": '丹露',
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val()
+			}     
+			urlSelect(params,type);    
+         	$(obj).find(".platformTagText").text('丹露')
+         	$("#platformTag").val("丹露");
           }
         }]
       }); 	
@@ -186,6 +244,11 @@
 						<i class="icon-angle-down"></i>
 					</span>
 					<input type="hidden" id="dayTag">
+					<span class="briefly" onclick="platformTagSelect(this,'ali')">
+						<p class="platformTagText">全部</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<input type="hidden" id="platformTag">
 					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
 					<span class="overview-hd-segmenting fr"> — </span>
 					<input class="weui-input begin-date fr t-r" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
@@ -216,18 +279,18 @@
 			</div>
 		</div>
 		<div class="weui-panel weui-panel_access weui-flex__item">
-			<div class="weui-panel__hd">
-				<span class="overview-hd-title">商品销售统计</span>
+			<div class="weui-panel__hd pro ft16 t-c">
+				商品销售统计
 			</div>
-			<div class="weui-cells weui-cells_form">
+			<div class="weui-cells weui-cells_form mg-0">
 				<div class="weui-cell" style="padding: 0">
-					<table class="table table-striped table-bordered" id="product_body">
+					<table class="table table-striped table-bordered mg-0" id="product_body">
 						<tbody>
-		
+
 						</tbody>
 					</table>
 				</div>
-				</div>
+			</div>
 		</div>
 	</div>
 	<#include "_inc/_footer_nav.html" />

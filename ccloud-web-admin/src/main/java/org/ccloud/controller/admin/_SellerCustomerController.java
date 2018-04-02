@@ -82,7 +82,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType);
 		List<Record> customerList = page.getList();
@@ -190,7 +190,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		boolean isChecked = (isCustomerReview != null && isCustomerReview) ? true : false;
 		//当是经销商管理员修改时
 		if(isSuperAdmin || isDealerAdmin || !isChecked) {
-			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+			Customer persiste = CustomerQuery.me().findByCustomerMobile(customer.getMobile());
 
 			if (persiste != null) {
 				customer.setId(persiste.getId());
@@ -296,7 +296,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		} else {
 			// 检查客户是否存在
-			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+			Customer persiste = CustomerQuery.me().findByCustomerMobile(customer.getMobile());
 
 			if (persiste != null) {
 				customer.setId(persiste.getId());
@@ -400,7 +400,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
 				+ "customerInfo.xls";
 
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
 		List<Record> customerList = page.getList();
 
@@ -491,8 +491,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 					break;
 				}
 				// 检查客户是否存在
-				Customer customer = CustomerQuery.me().findByCustomerNameAndMobile(excel.getCustomerName(),
-						excel.getMobile());
+				Customer customer = CustomerQuery.me().findByCustomerMobile(excel.getMobile());
 
 				if (customer == null) {
 					customer = new Customer();
@@ -769,7 +768,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			if (customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
+				Customer persiste = CustomerQuery.me().findByCustomerMobile(customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 

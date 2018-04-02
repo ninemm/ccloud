@@ -54,7 +54,7 @@ public class CustomerController extends BaseFrontController {
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		List<Record> userList = UserQuery.me().findNextLevelsUserList(selectDataArea);
 		List<Map<String, Object>> region = new ArrayList<>();
@@ -101,10 +101,11 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refresh() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 		boolean visitAdd = SecurityUtils.getSubject().isPermitted("/admin/customerVisit/add");
 		boolean salesOrderAdd = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/add");
 		boolean salesOrder = SecurityUtils.getSubject().isPermitted("/admin/salesOrder");
@@ -112,14 +113,15 @@ public class CustomerController extends BaseFrontController {
 		
 		Page<Record> customerList = new Page<>();
 		String customerOrderCount = "0";
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		if (StrKit.notBlank(getPara("region"))) {
 			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
-			Record r = SellerCustomerQuery.me().getOrderNumber(dataArea, getPara("customerType"), "0", getPara("searchKey"));
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
+			Record r = SellerCustomerQuery.me().getOrderNumber(dataArea,dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
 			if (r != null)customerOrderCount = r.getStr("orderCount");
 		} else {
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
-			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea, getPara("customerType"), "0", getPara("searchKey"));
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea,dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
+			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea,dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
 			if (r != null)customerOrderCount = r.getStr("orderCount");
 		}
 
@@ -277,7 +279,7 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refreshHistoryOrder() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Page<Record> orderList = new Page<>();
 		orderList = SalesOrderQuery.me().findBySellerCustomerId(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("sellerCustomerId"), selectDataArea);
@@ -327,7 +329,7 @@ public class CustomerController extends BaseFrontController {
 
 	public void historyOrder() {
 		
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA) + "%";
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerCustomerId = getPara("sellerCustomerId");
 
 		Page<Record> orderList = SalesOrderQuery.me().findBySellerCustomerId(getPageNumber(), getPageSize(), sellerCustomerId, selectDataArea);
@@ -687,7 +689,7 @@ public class CustomerController extends BaseFrontController {
 			if(customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
+				Customer persiste = CustomerQuery.me().findByCustomerMobile(customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 
@@ -932,7 +934,7 @@ public class CustomerController extends BaseFrontController {
 		boolean updated;
 
 		// 查看客户库是否存在这个客户
-		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+		Customer persist = CustomerQuery.me().findByCustomerMobile(customer.getMobile());
 
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()

@@ -138,11 +138,17 @@ function initProduct(){
 			
 			$newProductDetail.find("#bigNum").val(el.bigNum);
 			$newProductDetail.find("#smallNum").val(el.smallNum);
-	
-			//是否赠品
-			var $isGift = $newProductDetail.find("#isGift");
-			var $addGift = $newProductDetail.find("#addGift");
 			
+			$newProductDetail.find('#isGift').prev().attr('for','isGift'+el.productId)
+				.end().attr('id','isGift'+el.productId);
+			$newProductDetail.find('#addGift').next().attr('for','addGift'+el.productId)
+				.end().attr('id','addGift'+el.productId);
+
+			//是否赠品
+			var $isGift = $newProductDetail.find("[id^=isGift]");
+			var $addGift = $newProductDetail.find("[id^=addGift]");
+			
+
 			if(el.isGift == 1) {
 				$isGift.attr('checked','checked');
 				$addGift.attr('disabled', 'true');
@@ -198,7 +204,7 @@ function initProduct(){
 			//赠品
 			var sub = el.subProduct[0];
 			if(sub.sellProductId != ""){
-				$newProductDetail.find("#addGift").attr("checked",'true').trigger("change");
+				$newProductDetail.find("[id^=addGift]").attr("checked",'true').trigger("change");
 
 				//默认
 				if($newProductDetail.find("#sellProductId").val() == sub.sellProductId){
@@ -292,7 +298,7 @@ function total(){
 	var total = 0;
 	$.each(products, function(index, el) {
 		var $el = $(el);
-		if($el.find("#isGift").is(':checked') == false) {
+		if($el.find("[id^=isGift]").is(':checked') == false) {
 			total += $el.find("#bigNum").val() * $el.find("#bigPrice").val();
 			total += $el.find("#smallNum").val() * $el.find("#smallPrice").val();
 		}
@@ -303,7 +309,7 @@ function total(){
 		var $el = $(el);
 		total += $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
 	});
-	$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
+	$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total.toFixed(2) + "元")
 
 } 
 
@@ -324,7 +330,7 @@ function productChange(obj){
 }
 
 function getProduct($el){
-	var isGift = $el.find("#isGift").is(':checked') == true ? 1 : 0;
+	var isGift = $el.find("[id^=isGift]").is(':checked') == true ? 1 : 0;
 	
 	var productNameGift = "";
 	var valueNameGift = "";
@@ -347,7 +353,7 @@ function getProduct($el){
 	var smallNumGift = "";
 	
 	//赠品
-	var flag = $el.find("#addGift").is(':checked');
+	var flag = $el.find("[id^=addGift]").is(':checked');
 	if(isGift == 0 && flag){
 
 		var giftNum = $el.find("#giftNum").val();
@@ -473,7 +479,7 @@ function order(){
 					<p>规格：</p>
 					<span id="valueName"></span>
 					<div class="fr">
-						<span class="no-bg">是否赠品</span>
+						<label class="no-bg" for="isGift">是否赠品</label>
 						<input type="checkbox" name="isGift" id="isGift" value="1" class="weui-agree__checkbox">
 					</div>
 				</div>
@@ -522,7 +528,7 @@ function order(){
 					<input type="hidden" id="giftBigPrice" value="" >
 					<div>
 						<input type="checkbox" name="add-gift" id="addGift" class="weui-agree__checkbox">
-						<span>添加赠品</span>
+						<label for="addGift">添加赠品</label>
 					</div>
 					<div style="display:none" class="select-area">
 						<div class="goods">

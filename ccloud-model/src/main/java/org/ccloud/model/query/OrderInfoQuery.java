@@ -114,7 +114,7 @@ public class OrderInfoQuery extends JBaseQuery {
 
 	public Record getCountInfo(String keyword, String startDate, String endDate, String platformName,
 			String status, String receiveType, String dayTag, String sellerId) {
-		if (dayTag != null) {
+		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
 			endDate = date[1];
@@ -134,7 +134,7 @@ public class OrderInfoQuery extends JBaseQuery {
 		}
 		
 		if (StrKit.notBlank(keyword)) {
-			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or cc.customer_name like '%" + keyword + "%')");
+			needWhere = appendIfNotEmpty(fromBuilder, "o.order_sn", keyword, params, needWhere);
 		}
 		
 		if (StrKit.notBlank(startDate)) {

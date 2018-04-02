@@ -76,11 +76,12 @@ public class TodoController extends BaseFrontController {
 	public void activityApply() {
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String username = user.getUsername();
 
-		List<Record> list = ActivityApplyQuery.me().getToDo(username);
+		List<Record> list = ActivityApplyQuery.me().getToDo(username, dealerDataArea);
 		if(list.size() !=0 )setAttr("todoList", list);
-		Page <Record> historyList = ActivityApplyQuery.me().getHisProcessList(getPageNumber(), getPageSize(), Consts.PROC_ACTIVITY_APPLY_REVIEW, username);
+		Page <Record> historyList = ActivityApplyQuery.me().getHisProcessList(getPageNumber(), getPageSize(), Consts.PROC_ACTIVITY_APPLY_REVIEW, username, dealerDataArea);
 		if(historyList.getList().size() != 0) setAttr("historyList", historyList);
 
 		setAttr("username", username);
@@ -216,8 +217,9 @@ public class TodoController extends BaseFrontController {
 
 	public void activityHistoryRefresh() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String username = user.getUsername();
-		Page <Record> historyList = ActivityApplyQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), Consts.PROC_ACTIVITY_APPLY_REVIEW, username);
+		Page <Record> historyList = ActivityApplyQuery.me().getHisProcessList(getParaToInt("pageNumber"), getParaToInt("pageSize"), Consts.PROC_ACTIVITY_APPLY_REVIEW, username, dealerDataArea);
 		StringBuilder html = new StringBuilder();
 		for(Record activityApply : historyList.getList()) {
 			html.append(

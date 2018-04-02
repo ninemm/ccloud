@@ -20,7 +20,7 @@
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/exif.js"></script>
-    <script type="text/javascript" src="${CTPATH}/js/comm.js"></script>
+    <script type="text/javascript" src="${CTPATH}/js/lrz.bundle.js"></script>
 </#macro>
 
 <#macro script>
@@ -35,16 +35,16 @@
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 
     function isValid(){
-        if($("#customer_name").val().length==0) {$.toptip('客户名称不能为空', 1000, 'error'); return false;}
-        if($("#contact").val().length==0) {$.toptip('联系人不能为空', 1000, 'error'); return false;}
-        if($("#mobile").val().length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
+        if($.trim($("#customer_name").val()).length==0) {$.toptip('客户名称不能为空', 1000, 'error'); return false;}
+        if($.trim($("#contact").val()).length==0) {$.toptip('联系人不能为空', 1000, 'error'); return false;}
+        if($.trim($("#mobile").val()).length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
         //if(/^1[34578]\d{9}$/.test($("#mobile").val())==false){$.toptip('联系电话不正确', 1000, 'error'); return false;}
         if(/^[0-9]*$/.test($("#mobile").val())==false){$.toptip('联系电话存在非数字', 1000, 'error'); return false;}
 
-        if($("#customer_type").val().length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
-        if($("#delivery-address").val().length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
-        if($("#address").val().length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
-        if($("#lng").val().length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
+        if($.trim($("#customer_type").val()).length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
+        if($.trim($("#delivery-address").val()).length==0) {$.toptip('配送地址不能为空', 1000, 'error'); return false;}
+        if($.trim($("#address").val()).length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
+        if($.trim($("#lng").val()).length==0) {$.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); return false;}
         return true;
     }
 
@@ -109,6 +109,23 @@
                 doSubmit();
             });
         });
+        document.querySelector("#uploaderInput").addEventListener("change", function () {
+            lrz(this.files[0])
+                .then(function (rst) {
+                    if ($("#uploaderFiles")[0].children.length + 1 > count) {
+                        $.alert("最多上传3张图片");
+                        return false;
+                    }
+                    imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name});
+                    $("#pic").val(JSON.stringify(imageArr));
+                    var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
+                    $uploaderFiles.append(str);
+                    $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
+                })
+                .catch(function (err) {
+                    alert('失败');
+                })
+            });
         
         if($("#delivery-address").val().length == 2) $("#delivery-address").val('');
 
@@ -133,14 +150,6 @@
                  $('#customerTypeIds').val(custTypeIds);
              }
          });
-
-        uploadImages($("#uploaderInput"), $uploaderFiles, $picNum,
-            function(blob, x, imageArr) {
-                $("#pic").val(JSON.stringify(imageArr));
-                var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
-                $uploaderFiles.append(str);
-            }
-        )
 
     var index; //第几张图片
         $uploaderFiles.on("click", "li", function() {
@@ -264,7 +273,7 @@
                             <input type="text" class="weui-input" id="customer_name" name="customer.customer_name" value="${(sellerCustomer.customer_name)!}"  placeholder="1-25个任意字母数字" required<#if type == "company"> readonly</#if>>
 			            </div>
 			        </div>
-			        <div class="weui-cell weui-cell_access">
+			        <!-- <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
 			                <div class="order-customer-info-title">
 			                    客户昵称&nbsp;&nbsp;
@@ -272,7 +281,8 @@
 			                </div>
 			                <input type="text" class="weui-input" id="nickname" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字" <#if type == "company"> readonly</#if>>
 			            </div>
-			        </div>
+			        </div> -->
+                    <input type="hidden" class="weui-input" id="nickname" name="sellerCustomer.nickname" value="${(sellerCustomer.nickname)!}" placeholder="1-25个任意字母数字">
 			        <div class="weui-cell weui-cell_access">
 			            <div class="weui-cell__bd">
 			                <div class="order-customer-info-title">
