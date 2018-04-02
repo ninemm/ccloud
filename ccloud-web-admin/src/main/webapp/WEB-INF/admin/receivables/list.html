@@ -126,7 +126,7 @@
 					l.stop();
 				}
 				setTimeout( function(){
-						window.history.back(-1);
+						l.stop();
 								}, 2 * 1000 );
 			},
 			error : function() {
@@ -212,8 +212,8 @@
 		</form>
 		
 		<div class="box-footer">
-			<button type="button" onclick="doSubmit()" id="save" class="btn btn-sm bg-olive btn-flat ladda-button">保存</button>
-			<input type="button" class="btn btn-sm bg-primary btn-flat" onclick="window.history.back()" value="返  回" hidefocus="true" />
+			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">保 存</button>
+			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 	</div>
 	<div class="box">

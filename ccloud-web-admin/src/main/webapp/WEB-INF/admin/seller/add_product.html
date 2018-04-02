@@ -14,7 +14,7 @@
 
 	<!-- bootstrap-table-->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
-
+	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -170,8 +170,8 @@
 <section class="content">
 	<div class="row content-row">
 		<div class="jp-left">
-			<a onclick="savePro()" class="btn btn-sm bg-olive btn-flat ladda-button"><i class="fa fa-check-square-o fa-1x"></i><span style="font-size:12px;"> 保存</span> </a>
-			<a onclick="javascript:history.go(-1)" class="btn btn-sm btn-primary btn-flat" ><i class="fa fa-reply fa-1x"></i> 返回 </a>
+			<button type="button" onclick="savePro()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">保存</button>
+			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 		<form class="form-horizontal" style="float: right" action="${CPATH}/admin/addProduct?c=${c!}&p=${p!}" method="post">
 			<div class="input-group input-group-sm">
