@@ -196,14 +196,7 @@
 					<encoding>utf-8</encoding>
 					<packagingExcludes>WEB-INF/web.xml</packagingExcludes>
 					<overlays>
-						<overlay>
-							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-bi</artifactId>
-						</overlay>
-						<overlay>
-							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-member</artifactId>
-						</overlay>
+
 						<overlay>
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-core</artifactId>
@@ -219,6 +212,14 @@
 						<overlay>
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-templates</artifactId>
+						</overlay>
+						<overlay>
+							<groupId>org.ccloud</groupId>
+							<artifactId>ccloud-web-bi</artifactId>
+						</overlay>
+						<overlay>
+							<groupId>org.ccloud</groupId>
+							<artifactId>ccloud-web-member</artifactId>
 						</overlay>
 					</overlays>
 				</configuration>
