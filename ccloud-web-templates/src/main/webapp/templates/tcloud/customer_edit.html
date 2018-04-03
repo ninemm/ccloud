@@ -110,7 +110,7 @@
             });
         });
         document.querySelector("#uploaderInput").addEventListener("change", function () {
-            lrz(this.files[0])
+            lrz(this.files[0], {width: 1024})
                 .then(function (rst) {
                     if ($("#uploaderFiles")[0].children.length + 1 > count) {
                         $.alert("最多上传3张图片");

@@ -255,6 +255,7 @@
     //搜索框叉掉和取消时，先清input值，再调用接口
     function searchCancel() {
         $("#searchInput")[0].value = "";
+        setItemBykey("keyword", $("#searchInput").val());
         refresh();
     }
 </#macro>
