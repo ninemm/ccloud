@@ -50,7 +50,7 @@ public class PlansDetailQuery extends JBaseQuery {
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String sellerId, String dataArea,String userId,String sellerProductId,String plansId) {
 			
-			String select = "SELECT pd.*,sp.custom_name,u.realname  ";
+			String select = "SELECT pd.*,sp.custom_name,u.realname ";
 			StringBuilder fromBuilder = new StringBuilder("from cc_plans_detail pd ");
 			fromBuilder.append("LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id ");
 			fromBuilder.append("LEFT JOIN `user` u on u.id = pd.user_id ");
@@ -70,7 +70,7 @@ public class PlansDetailQuery extends JBaseQuery {
 			fromBuilder.append(" where 1 = 1");
 			}
 			
-			fromBuilder.append("  ORDER BY pd.create_date desc ");
+			fromBuilder.append("  ORDER BY pd.user_id,pd.seller_product_id ");
 			
 			if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -234,5 +234,13 @@ public class PlansDetailQuery extends JBaseQuery {
 		}
 		fromBuilder.append("GROUP BY pd.user_id ORDER BY pd.user_id ");
 		return Db.find(fromBuilder.toString());
+	}
+	
+	public List<PlansDetail> findbyDateAreaAndPlansId(String dataArea,String plansId){
+		String sql = "SELECT pd.*,csp.custom_name from cc_plans_detail pd "
+				+ "LEFT JOIN cc_plans cp on cp.id = pd.plans_id "
+				+ "LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id "
+				+ "where pd.data_area like '"+dataArea+"' and pd.plans_id = '"+plansId+"' GROUP BY pd.seller_product_id";
+		return DAO.find(sql);
 	}
 }

@@ -647,20 +647,18 @@ public void downloading() throws UnsupportedEncodingException{
 	public void detailPlans() {
 		String plansId = getPara("plansId");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
-		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+//		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findbyDateAreaAndPlansId(selectDataArea,plansId);
 		List<Map<String, Object>> productItems = new ArrayList<>();
 		productItems.add(all);
-		for(Record record : productRecords) {
-			
+		for(PlansDetail plansDetail : plansDetails) {
 			Map<String, Object> item = new HashMap<>();
-			
-			String sellerProductId = record.get("sell_product_id");
-			item.put("title", record.getStr("custom_name"));
-			item.put("value", sellerProductId);
-
+			item.put("title", plansDetail.get("custom_name"));
+			item.put("value", plansDetail.getSellerProductId());
 			productItems.add(item);
 		}
 		
@@ -677,7 +675,6 @@ public void downloading() throws UnsupportedEncodingException{
 
 			userItems.add(item);
 		}
-		
 		setAttr("productItems",JSON.toJSON(productItems));
 		setAttr("userItems",JSON.toJSON(userItems));
 		setAttr("plansId",plansId);

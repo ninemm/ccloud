@@ -96,20 +96,25 @@
 						else  return "年计划";
 					},
 				 edit:false},
-				{field: "start_date", title: "计划时间", align: "center", width: '8%', edit:false},
-				{field: "end_date", title: "计划时间", align: "center", width: '8%', edit:false},
+				{field: "", title: "计划月份", align: "center", width: '8%',
+					formatter: function(value, row, rowIndex) {
+						return row.plans_month.substring(0,7);
+					},
+				 edit: false},
+				{field: "start_date", title: "开始时间", align: "center", width: '8%', edit:false},
+				{field: "end_date", title: "结束时间", align: "center", width: '8%', edit:false},
 				{field: "seller_name", title: "销售商名称", align: "center", width: '15%', edit: false},
 				{field: "", title: "计划金额", align: "center", width: '3%',
 					formatter: function(value, row, rowIndex) {
 						return formatNumber(row.planNumAmount);
 					},
 				 edit: false},
-				{field: "", title: "实际金额", align: "center", width: '3%',
+				{field: "", title: "完成金额", align: "center", width: '3%',
 					formatter: function(value, row, rowIndex) {
 						return formatNumber(row.completeNumAmount);
 					},
 				 edit: false},
-				{field: "complete_ratio", title: "完成情况", align: "center", width: '3%',
+				{field: "complete_ratio", title: "完成率", align: "center", width: '3%',
 					formatter: function(value, row, rowIndex) {
 						return (row.completeRatio*100).toFixed(2)+"%";
 					},
