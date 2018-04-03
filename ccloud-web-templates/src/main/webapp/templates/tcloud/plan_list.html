@@ -278,9 +278,9 @@
 						$newPlan.find("#plansId").val(el.plans_id);
 						$newPlan.find("#startDate").text('开始时间：'+el.start_date);
 						$newPlan.find("#endDate").text('结束时间：'+el.end_date);
-						$newPlan.find("#planNumAmount").text('计划金额：'+el.AmountPlan);
-						$newPlan.find("#completeNumAmount").text('完成金额：'+el.AmountComplete);
-						$newPlan.find("#amountCompleteRatio").text('完成比例：'+(el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
+						$newPlan.find("#planNumAmount").text(el.AmountPlan);
+						$newPlan.find("#completeNumAmount").text(el.AmountComplete);
+						$newPlan.find("#amountCompleteRatio").text((el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
 						$(".plansShow").hide();  
 						planAmount += el.AmountPlan;
 						completeAmount += el.AmountComplete;
@@ -320,9 +320,9 @@
 					$newPlan.find("#typeName").text(el.typeName);
 					$newPlan.find("#startDate").text('开始时间：'+el.start_date);
 					$newPlan.find("#endDate").text('结束时间：'+el.end_date);
-					$newPlan.find("#planNumAmount").text('计划金额：'+el.AmountPlan);
-					$newPlan.find("#completeNumAmount").text('完成金额：'+el.AmountComplete);
-					$newPlan.find("#amountCompleteRatio").text('完成比例：'+(el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
+					$newPlan.find("#planNumAmount").text(el.AmountPlan);
+					$newPlan.find("#completeNumAmount").text(el.AmountComplete);
+					$newPlan.find("#amountCompleteRatio").text((el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
 					$(".plansShow").hide();
 					planAmount += el.AmountPlan;
 					completeAmount += el.AmountComplete;
@@ -434,14 +434,14 @@
 									</div>
 								</div>
 								<div class="weui-flex gray ft12 startEnd">
-									<div class="weui-flex__item">
-										<span id="planNumAmount" class="fr orange ft12"></span>
+									<div class="weui-flex__item">计划金额：
+										<span id="planNumAmount" class="fr red ft12"></span>
 									</div>
-									<div class="weui-flex__item t-r">
-										<span id="completeNumAmount" class="fr orange ft12"></span>
+									<div class="weui-flex__item t-r">完成金额：
+										<span id="completeNumAmount" class="fr red ft12"></span>
 									</div>
-									<div class="weui-flex__item t-r">
-										<span id="amountCompleteRatio" class="fr orange ft12"></span>
+									<div class="weui-flex__item t-r">完成比例:
+										<span id="amountCompleteRatio" class="fr red ft12"></span>
 									</div>
 								</div>
 							</div>
