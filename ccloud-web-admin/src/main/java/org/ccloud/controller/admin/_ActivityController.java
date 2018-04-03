@@ -1113,7 +1113,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 //		map.put("ResourceID", "");
 		if (YxActivity.getStr("invest_type").equals(Consts.INVES_PUBLICK)) {
 			//公关赞助
-			map.put("CostType",YxActivity.getInt("CostType"));
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
 			map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
 			map.put("CustomerName",YxActivity.getStr("CustomerName"));
 			map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
@@ -1132,7 +1132,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 //			map.put("GiftPhoto","");
 		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CONSUMPTION_CULTIVATION)) {
 			//消费培育
-			map.put("CostType",YxActivity.getInt("CostType"));
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
 			map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
 			map.put("CustomerName",YxActivity.getStr("CustomerName"));
 			map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
@@ -1164,8 +1164,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
 			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
 //			map.put("ChannelID",);
-			map.put("CostType",YxActivity.getInt("CostType"));
-			map.put("Num",YxActivity.getInt("Num"));
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
+			map.put("Num",Integer.parseInt(YxActivity.getStr("Num")));
 			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 			map.put("InvestState",2);
 			map.put("ResourceFlag",1);
@@ -1175,7 +1175,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 //			map.put("ExecuteNum",);
 //			map.put("ExecuteSize","");
 //			map.put("ExecuteRemark","");
-			map.put("WriteOffNum",YxActivity.getInt("Num"));
+			map.put("WriteOffNum",Integer.parseInt(YxActivity.getStr("Num")));
 //			map.put("WriteOffSize","");
 			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 			map.put("CreateManName",YxActivity.getStr("CreateManName"));
@@ -1187,15 +1187,15 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			map.put("CountyName",YxActivity.getStr("CountyName"));
 			map.put("CustomerName",YxActivity.getStr("CustomerName"));
 //			map.put("ChannelID",);
-			map.put("ShopVisitCount",YxActivity.getInt("ShopVisitCount"));
-			map.put("ShopXCJHCount",YxActivity.getInt("ShopVisitCount"));
+			map.put("ShopVisitCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
+			map.put("ShopXCJHCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
 			map.put("ResourceFlag",1);
 //			map.put("SignPhotoId","");
-			map.put("CostType",YxActivity.getInt("CostType"));
-			map.put("ShowType",YxActivity.getInt("ShowType"));
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
+			map.put("ShowType",Integer.parseInt(YxActivity.getStr("ShowType")));
 			map.put("BeginTime",YxActivity.getStr("BeginTime"));
 			map.put("EndTime",YxActivity.getStr("EndTime"));
-			map.put("InvestDay",YxActivity.getInt("InvestDay"));
+			map.put("InvestDay",Integer.parseInt(YxActivity.getStr("InvestDay")));
 			map.put("InvestType",1);
 //			map.put("Remark","");
 			map.put("GrantAmount",YxActivity.getBigDecimal("GrantAmount"));
@@ -1212,7 +1212,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CUSTOMER_VISITE)) {
 			//终端客情
 			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ChannelID",YxActivity.getInt("ChannelID"));
+			map.put("ChannelID",Integer.parseInt(YxActivity.getStr("ChannelID")));
 			map.put("InvestState",2);
 //			map.put("CancleReason","");
 			map.put("ResourceFlag",1);
@@ -1228,8 +1228,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
 			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
 			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-			map.put("ShopVisitCount",YxActivity.getInt("ShopVisitCount"));
-			map.put("ShopXCJHCount",YxActivity.getInt("ShopVisitCount"));
+			map.put("ShopVisitCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
+			map.put("ShopXCJHCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
 //			map.put("OrderMan",);
 			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
 			map.put("CityName",YxActivity.getStr("CityName"));
@@ -1247,7 +1247,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 			map.put("InvestState",2);
 			map.put("ResourceFlag",1);
-			map.put("CostType",YxActivity.getInt("CostType"));
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
 			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 			map.put("CreateManName",YxActivity.getStr("CreateManName"));
 			map.put("CreateTime",YxActivity.getStr("CreateTime"));
@@ -1269,7 +1269,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			map.put("InvestState",2);
 			map.put("ResourceFlag",1);
 //			map.put("CommodityID",);
-			map.put("CostType",YxActivity.getInt("CostType"));
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
 //			map.put("ExecuteRemark","");
 			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
 			map.put("CreateManName",YxActivity.getStr("CreateManName"));
