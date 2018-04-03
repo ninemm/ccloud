@@ -25,7 +25,7 @@
 <#macro script>
 	$("#brand_option").select2();
 	var $table = $("#_seller_product_table");
-		
+	var checkFlang = true;
 	$(function() {
 	
 		var url = '${CPATH}/admin/seller/showProduct';
@@ -69,7 +69,7 @@
       			{field: "cgc_name", title: "产品类别", align: "center", width: '3%',edit:false},
       			{field: "custom_name", title: "产品自定义名称", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="text" size="40" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'" onblur="changeCustomName(this)"/>';
+					var strHtml = '<input type="text" size="40" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'" onblur="changeCustomName(this)"/><input type="hidden"  name="_custom_name" id="_custom_name" value="'+row.custom_name+'" />';
 					return strHtml;
 				},
       				edit:false},
@@ -190,6 +190,10 @@
 	
 	
 	function saveAll(){
+		if(checkFlang == false){
+			toastr.error('自定义产品名有重复，请重新填写!');
+			return;
+		}
 		var l = Ladda.create( document.querySelector( '.ladda-button' ) );
 		l.start();
 		var orderItems = new Array();
@@ -279,6 +283,33 @@
 								}, 2 * 1000 );
 				}
 			});
+	}
+	
+	function changeCustomName(obj){
+		var customName = $(obj).val();
+		if(customName == ""){
+			toastr.error('产品名不能为空');
+			checkFlang = false;
+		}
+		var cpsName = $(obj).parent().parent().find('td').eq(5).text();
+		var customName1 = $(obj).parent().parent().find('td').eq(4).find("#_custom_name").val();
+		if(customName != customName1){
+			$.ajax({
+					url:"${CPATH}/admin/seller/checkCustomName",
+					type:"post",
+					dataType:"json",
+					async : false,
+					data : {"customName" : customName,"cpsName":cpsName},
+					success:function(data){
+						if(data>0){
+							toastr.error(data.message, '该产品名已经存在，请重新录入');
+							checkFlang = false;
+						}else{
+							checkFlang = true;
+						}
+					}
+				});
+		}
 	}
 	
 	function changeMoney(obj){
