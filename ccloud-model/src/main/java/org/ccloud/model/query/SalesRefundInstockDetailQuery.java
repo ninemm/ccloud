@@ -130,10 +130,14 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		detail.setRefundInstockId(instockId);
 		detail.setSellProductId(record.getStr("sell_product_id"));
 		Integer convert = record.getInt("convert_relate");
-		Integer productCount = Integer.valueOf(bigCount) * Integer.valueOf(convert) + Integer.valueOf(smallCount);
 		BigDecimal productPrice = record.getBigDecimal("product_price");
-		BigDecimal productAmount = new BigDecimal(productCount).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
-				.multiply(productPrice);
+		Integer productCount = Integer.valueOf(bigCount) * Integer.valueOf(convert) + Integer.valueOf(smallCount);
+//		BigDecimal productAmount = new BigDecimal(productCount).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+//				.multiply(productPrice);		
+		BigDecimal smallPrice = productPrice.divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal bigAmount = new BigDecimal(bigCount).multiply(productPrice);
+		BigDecimal smallAmount = new BigDecimal(smallCount).multiply(smallPrice);
+		BigDecimal productAmount = bigAmount.add(smallAmount);
 		Integer isGift = record.getInt("is_gift");
 		Integer isComposite = record.getInt("is_composite");
 		
