@@ -873,14 +873,14 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
 			List<Record> list= ActivityQuery.me().findPhoto(activityApplyId);
 			String ScenePhoto="";
-			if (list!=null) {
-				ScenePhoto=addPhoto(list);
-				if (ScenePhoto==null) {
-					renderAjaxResultForError("加入核销失败!");
-					return;
-				}
-				ScenePhoto=ScenePhoto.substring(1, ScenePhoto.length()-1);
-			}
+//			if (list!=null) {
+//				ScenePhoto=addPhoto(list);
+//				if (ScenePhoto==null) {
+//					renderAjaxResultForError("加入核销失败!");
+//					return;
+//				}
+//				ScenePhoto=ScenePhoto.substring(1, ScenePhoto.length()-1);
+//			}
 			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
 			Long shopId = addCustomer(YxActivity.getStr("customerId"));
 			if (shopId==null) {
@@ -1109,7 +1109,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public Map<String, Object> jointMap(Record YxActivity) {
 		Map<String, Object>map=new HashMap<>();
 		String[] FlowIDNO = YxActivity.getStr("FlowIDNO").split("\\.");
-		map.put("FlowIDNO",Integer.getInteger(FlowIDNO[FlowIDNO.length-1]) );
+		map.put("FlowIDNO",Integer.parseInt(FlowIDNO[FlowIDNO.length-1]) );
 //		map.put("ResourceID", "");
 		if (YxActivity.getStr("invest_type").equals(Consts.INVES_PUBLICK)) {
 			//公关赞助
