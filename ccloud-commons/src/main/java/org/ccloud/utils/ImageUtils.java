@@ -215,41 +215,25 @@ public class ImageUtils {
 				int srcImgHeight = srcImg.getHeight(null);
 				double bili;
 
-				if(srcImgWidth > 480){
-
-					bili=480 / (double) srcImgWidth;
-					srcImgWidth = 480;
-					srcImgHeight = (int) (srcImgHeight*bili);
-
-				}else{
-					if(srcImgHeight > 640){
-
-						bili=640 / (double) srcImgHeight;
-						srcImgHeight = 640;
-						srcImgWidth = (int) (srcImgWidth*bili);
-
-					}
-				}
-
 				BufferedImage bufImg = new BufferedImage(srcImgWidth, srcImgHeight, BufferedImage.TYPE_INT_RGB);
 				Graphics2D g = bufImg.createGraphics();
 				g.drawImage(srcImg, 0, 0, srcImgWidth, srcImgHeight, null);
 
-				Font font = new Font("宋体", Font.PLAIN, 24);
+				Font font = new Font("宋体", Font.PLAIN, 48);
 				g.setColor(markContentColor);
 				g.setFont(font);
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.7f));
 
-				int x = srcImgWidth - getWatermarkLength(content3, g) - 20;
-				int y = srcImgHeight - 20;
+				int x = srcImgWidth - getWatermarkLength(content3, g) - 40;
+				int y = srcImgHeight - 40;
 				g.drawString(content3, x, y);
 
-				x = srcImgWidth - getWatermarkLength(content2, g) - 20;
-				y = srcImgHeight - 65;
+				x = srcImgWidth - getWatermarkLength(content2, g) - 40;
+				y = srcImgHeight - 125;
 				g.drawString(content2, x, y);
 
-				x = srcImgWidth - getWatermarkLength(content1, g) - 20;
-				y = srcImgHeight - 110;
+				x = srcImgWidth - getWatermarkLength(content1, g) - 40;
+				y = srcImgHeight - 205;
 				g.drawString(content1, x, y);
 
 				g.dispose();

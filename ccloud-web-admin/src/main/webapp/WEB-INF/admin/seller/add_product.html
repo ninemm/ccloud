@@ -113,6 +113,7 @@
 		  	var obj = {
 								"productId": $(this).find('td').eq(0).find("input").val(),
 								"custom_name": $(this).find('td').eq(1).find("input").val(),
+								"qrcode_url":  $(this).find('td').eq(2).text(),
 								"price": $(this).find('td').eq(3).find("input").eq(1).val(),
 								"is_enable": $(this).find('td').eq(6).find("select").val(),
 								"order_list": $(this).find('td').eq(7).find("input").val(),
@@ -121,18 +122,20 @@
 						})
 			if(flang==true){		
 				var l = Ladda.create( document.querySelector( '.ladda-button' ) );	
+				l.start();
 				$.ajax({
 					url:"${CPATH}/admin/seller/savePro",
 					type:"post",
 					dataType:"json",
 					data : {orderItems : JSON.stringify(orderItems)},
 					success:function(data){
-						l.start();
-						if(data==true){
-							toastr.success(data.message, '添加成功');
+						if(data.errorCode == 0) {
+							//location.reload();
+							toastr.success(data.message, '操作成功');
 						}else{
 							toastr.error(data.message, '添加失败,请检查是否添加的产品已经存在！');
 						}
+						l.stop();
 						setTimeout( function(){
 						window.history.back(-1);
 								}, 2 * 1000 );

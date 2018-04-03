@@ -1515,9 +1515,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			needWhere = appendIfNotEmpty(fromBuilder, " cs.seller_id", sellerId, params, needWhere);
 		}
 		if (needWhere) {
-			fromBuilder.append(" where cs.status not in (1001,1002) and cc.is_gift = 1");
+			fromBuilder.append(" where cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		} else {
-			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1");
+			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		}
 		
 		if (StrKit.notBlank(print)) {
@@ -1720,9 +1720,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		if (needWhere) {
-			fromBuilder.append(" where cs.status not in (1001,1002) and cc.is_gift = 1");
+			fromBuilder.append(" where cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		} else {
-			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1");
+			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		}
 		
 		if (StrKit.notBlank(print)) {
@@ -2144,6 +2144,10 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and o.create_date <= ?");
 			params.add(endDate);
+		}
+		
+		if(StrKit.isBlank(status)) {
+			fromBuilder.append(" and o.status not in ('"+Consts.SALES_ORDER_STATUS_CANCEL+"','"+Consts.SALES_ORDER_STATUS_REJECT+"') ");
 		}
 
 		if (params.isEmpty())
