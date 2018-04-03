@@ -191,10 +191,6 @@
 					<overlays>
 						<overlay>
 							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-bi</artifactId>
-						</overlay>
-						<overlay>
-							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-core</artifactId>
 						</overlay>
 						<!-- <overlay>
@@ -208,6 +204,10 @@
 						<overlay>
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-templates</artifactId>
+						</overlay>
+						<overlay>
+							<groupId>org.ccloud</groupId>
+							<artifactId>ccloud-web-bi</artifactId>
 						</overlay>
 					</overlays>
 				</configuration>
