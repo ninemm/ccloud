@@ -337,7 +337,7 @@
 	function salesClick(param) {
 		var tag = $("#dayTag").val();
 		var startDate = $("#startDay").val();
-		var endDate = $("#endDay").val();		
+		var endDate = $("#endDay").val() + ' 23:59:59';		
 	    if (typeof param.seriesIndex != 'undefined') {
 	        window.location.href = "${(CPATH)}/report/userReportDetail?userId=" + salesObj[param.name] + "&userName=" + param.name + "&dayTag=" + tag + "&startDate=" + startDate + "&endDate=" + endDate; 
 	    }
@@ -348,7 +348,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
 				"deptId": deptObj[param.name]
 			}
 	    	productCount(params);
@@ -375,6 +375,7 @@
 			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
 			"orderTag": $("#orderTag").val()
 		}
+		$("#dayTag").val("");
 		urlSelect(params,type); 
     }
     
@@ -384,6 +385,7 @@
 			"endDate": $(obj).val() + ' 23:59:59',
 			"orderTag": $("#orderTag").val()
 		}
+		$("#dayTag").val("");
 		urlSelect(params,type); 
     }    
     
@@ -467,7 +469,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
 				"orderTag": 'productCount'
 			}
 			urlSelect(params,type); 
@@ -481,7 +483,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": 'totalAmount'
 			}
           	urlSelect(params,type);
@@ -495,7 +497,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',			
 				"orderTag": 'orderCount'
 			}
 			urlSelect(params,type);   
@@ -512,7 +514,7 @@
 		<div class="report">
 			<div class="weui-panel weui-panel_access report-header">
 				<div class="weui-panel__hd">
-					<span class="overview-hd-title">销售简报</span>
+					<span class="overview-hd-title">部门销售报表</span>
 					<span class="briefly" onclick="dayTagSelect(this,'day')">
 						<p class="dayTagText">今日</p>
 						<i class="icon-angle-down"></i>
@@ -585,7 +587,7 @@
 			</div>
 			<div class="weui-panel weui-panel_access">
 				<div class="weui-panel__hd ft16 t-c">
-					业务员统计
+					部门业务员统计
 				</div>
 				<div class="weui-panel__bd report-area border-top-1px relative">
 					<div class="weui-media-box ft14">
