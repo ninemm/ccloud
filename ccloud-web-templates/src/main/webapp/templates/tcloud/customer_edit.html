@@ -49,7 +49,7 @@
     }
 
     $(function() {
-        initWxConfig('${appId!}', ${timestamp}, '${nonceStr!}', '${signature!}');
+        initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
         <#if !sellerCustomer?? || !sellerCustomer.lat?? >
             wxReadyGetLocation(

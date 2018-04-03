@@ -54,7 +54,7 @@
 
     $(function() {
 
-        initWxConfig('${appId!}', ${timestamp}, '${nonceStr!}', '${signature!}');
+        initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
         wxReadyGetLocation(
             function(lng, lat, addComp, address) {
