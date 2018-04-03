@@ -108,6 +108,13 @@
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-web-bi</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+			<scope>compile</scope>
+		</dependency>
 		<!-- <dependency>
 			<groupId>org.ccloud</groupId>
 			<artifactId>ccloud-web-auth</artifactId>
@@ -193,6 +200,10 @@
 						<overlay>
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-front</artifactId>
+						</overlay>
+						<overlay>
+							<groupId>org.ccloud</groupId>
+							<artifactId>ccloud-web-bi</artifactId>
 						</overlay>
 						<overlay>
 							<groupId>org.ccloud</groupId>

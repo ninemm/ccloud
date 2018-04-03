@@ -479,11 +479,6 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							}
 						}
 					}else{
-							SellerProduct product = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString());
-							if(product!=null && !sellerProduct.getCustomName().equals(issellerProducts.getCustomName())) {
-								renderAjaxResultForError("产品名重复");
-								return;
-							}
 							if(issellerProducts.getQrcodeUrl()!=null){
 								File file = new File(issellerProducts.getQrcodeUrl());
 								file.delete();
@@ -923,6 +918,14 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			result = true;
 		}
 		renderJson(result);
+	}
+	
+	//前台检查产品名是否重复--通过产品名和规格进行查询
+	public void checkCustomName() {
+		String cpsName = getPara("cpsName");
+		String customName = getPara("customName");
+		List<SellerProduct> products = SellerProductQuery.me().checkSellerProduct(customName, getSessionAttr(Consts.SESSION_SELLER_ID).toString(),cpsName);
+		renderJson(products.size());
 	}
 }
 
