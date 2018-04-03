@@ -1510,9 +1510,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			needWhere = appendIfNotEmpty(fromBuilder, " cs.seller_id", sellerId, params, needWhere);
 		}
 		if (needWhere) {
-			fromBuilder.append(" where cs.status not in (1001,1002) and cc.is_gift = 1");
+			fromBuilder.append(" where cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		} else {
-			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1");
+			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		}
 		
 		if (StrKit.notBlank(print)) {
@@ -1715,9 +1715,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		if (needWhere) {
-			fromBuilder.append(" where cs.status not in (1001,1002) and cc.is_gift = 1");
+			fromBuilder.append(" where cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		} else {
-			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1");
+			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		}
 		
 		if (StrKit.notBlank(print)) {
