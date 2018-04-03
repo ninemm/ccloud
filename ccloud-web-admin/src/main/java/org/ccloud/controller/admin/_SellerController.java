@@ -427,13 +427,18 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			final SellerProduct sellerProducts= getModel(SellerProduct.class);
 			String ds = getPara("orderItems");
 			boolean result=false;
+			int count = 0;
+			int errCount = 0;
 			JSONArray jsonArray = JSONArray.parseArray(ds);
 			List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
 			for (SellerProduct sellerProduct : imageList) {
+				//前台传给后台的产品规格
+				  String cpsName = sellerProduct.getQrcodeUrl();
 				  SellerProduct issellerProducts = SellerProductQuery.me().findById(sellerProduct.getId());
 					if(issellerProducts==null){
-						SellerProduct product = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString());
-						if(product!=null) {
+						List<SellerProduct> products = SellerProductQuery.me().checkSellerProduct(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString(),cpsName);
+						if(products.size()>0) {
+							errCount++;
 							continue;
 						}else {
 							String Id = StrKit.getRandomUUID();
@@ -468,16 +473,12 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							QRCodeUtils.genQRCode(contents, imagePath, fileName);
 							sellerProducts.setQrcodeUrl(imagePath+"\\"+fileName);
 							result=sellerProducts.save();
+							count++;
 							if(result == false){
 								break;
 							}
 						}
 					}else{
-							SellerProduct product = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString());
-							if(product!=null && !sellerProduct.getCustomName().equals(issellerProducts.getCustomName())) {
-								renderAjaxResultForError("产品名重复");
-								return;
-							}
 							if(issellerProducts.getQrcodeUrl()!=null){
 								File file = new File(issellerProducts.getQrcodeUrl());
 								file.delete();
@@ -509,7 +510,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 							}
 					}
 			}
-			renderJson(result);
+			renderAjaxResultForSuccess("成功添加"+count+"条商品，有"+errCount+"条商品重复");
 		}		
 			
 	
@@ -917,6 +918,14 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			result = true;
 		}
 		renderJson(result);
+	}
+	
+	//前台检查产品名是否重复--通过产品名和规格进行查询
+	public void checkCustomName() {
+		String cpsName = getPara("cpsName");
+		String customName = getPara("customName");
+		List<SellerProduct> products = SellerProductQuery.me().checkSellerProduct(customName, getSessionAttr(Consts.SESSION_SELLER_ID).toString(),cpsName);
+		renderJson(products.size());
 	}
 }
 

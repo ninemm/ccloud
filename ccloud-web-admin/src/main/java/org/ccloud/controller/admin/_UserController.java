@@ -672,10 +672,11 @@ public class _UserController extends JBaseCRUDController<User> {
 	//验证用户名不能重复
 	public void checkUserName(){
 		//用户名唯一
-		String username = getPara("username");
+		String username = getPara("user.username");
 		String userId = getPara("userId");
+		Map<String, Boolean> map = new HashMap<>();
 		boolean result = true;
-		if(!StringUtils.isBlank(userId)) {
+		if(StringUtils.isBlank(userId)) {
 			User user = UserQuery.me()._findUserByUsername(username);
 			if(user!=null) {
 				result = false;
@@ -691,6 +692,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				}
 			}
 		}
-		renderJson(result);
+		map.put("valid", result);
+		renderJson(map);
 	}
 }

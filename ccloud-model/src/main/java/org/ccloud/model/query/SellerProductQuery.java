@@ -281,4 +281,16 @@ public class SellerProductQuery extends JBaseQuery {
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
+	
+	public List<SellerProduct> checkSellerProduct(String customName,String sellerId,String cpsName) {
+		String sql = "SELECT * from (" + 
+				"SELECT csp.seller_id, csp.custom_name,GROUP_CONCAT(distinct cgs.`name` order by css.id) AS cps_name " + 
+				"from cc_seller_product csp  " + 
+				"LEFT JOIN cc_product cp on cp.id = csp.product_id " + 
+				"LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id " + 
+				"LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id " + 
+				"LEFT JOIN cc_goods_specification css on css.id = cgs.goods_specification_id " + 
+				"GROUP BY csp.id) t1 where t1.custom_name = '"+customName+"' and t1.seller_id = '"+sellerId+"' and  t1.cps_name ='"+cpsName+"'";
+		return DAO.find(sql);
+	}
 }

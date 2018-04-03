@@ -107,18 +107,17 @@ function queryPrintDetail(financePrint) {
         async: false,
         success: function(data) {
             if (data && data.rows) {
+                var curDate = new Date().Format("yyyy-MM-dd hh:mm");
+                $.each(data.rows,
+                function(index, item) {
                      var f1 = 0;
 				     var f2 = 0;
                      var l1 = 0;
                      var d1 = 0;
 				     var d2 = 0;
                      var content = '<tbody>';
-				     var content1 = "";
+                     var content1 = "";
 				     var content2 = "";
-                var curDate = new Date().Format("yyyy-MM-dd hh:mm");
-                $.each(data.rows,
-                function(index, item) {
-                    var content = '<tbody>';
                      let saleMoney = 0;                     
                     if (item.orderProductInfos) {
                         $.each(item.orderProductInfos,
