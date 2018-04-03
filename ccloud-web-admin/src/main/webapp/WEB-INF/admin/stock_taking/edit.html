@@ -203,7 +203,7 @@
 			success: function(data) {
 				if(data!=""){
 					 for(var i=0; i<data.length; i++){
-					 	addNew();
+					 	addTr("#dataTable", pList, pOptionArr);
 					 	var sellerProductId = data[i].sellerProductId;
 						var obj=$('#dataTable tbody').find("tr:last>td>select.pro-slc2"); 
 						obj.val(sellerProductId).trigger("change");

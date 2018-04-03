@@ -17,11 +17,14 @@ package org.ccloud.core;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections4.MapUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.render.AjaxResult;
 import org.ccloud.core.render.JCaptchaRender;
@@ -370,6 +373,24 @@ public class JBaseController extends Controller {
 				return putRet.key;
 		}
 		return null;
+	}
+	
+	@Override
+	public Map<String, String[]> getParaMap() {
+		Map<String, String[]> params = super.getParaMap();
+		if(MapUtils.isEmpty(params)) 
+			return null;
+		
+		for (Iterator<Entry<String, String[]>> iterator = params.entrySet().iterator(); iterator.hasNext();) {
+    		Entry<String, String[]> entry = iterator.next();
+    		String[] arr = entry.getValue();
+    		if(arr != null && arr.length > 0) {
+    			for (int i = 0; i < arr.length; i++) {
+    				arr[i] = StrKit.isBlank(arr[i]) ? null : arr[i].trim();
+    			}
+    		}
+		}
+		return params;
 	}
 
 }

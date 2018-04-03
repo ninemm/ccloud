@@ -163,7 +163,7 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 	}
 
 	private boolean checkCustomerNameAndMobile(Customer customer) {
-		Integer cnt = CustomerQuery.me().findByNameAndMobile(customer.getCustomerName(), customer.getMobile());
+		Integer cnt = CustomerQuery.me().findByMobile(customer.getMobile());
 		if (cnt > 1) {
 			return false;
 		}

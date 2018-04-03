@@ -114,12 +114,12 @@ public abstract class BaseTransferBillDetail<M extends BaseTransferBillDetail<M>
 		return getStr("seller_product_id");
 	}
 
-	public void setProductCount(java.lang.Integer productCount) {
+	public void setProductCount(java.math.BigDecimal productCount) {
 		set("product_count", productCount);
 	}
 
-	public java.lang.Integer getProductCount() {
-		return getInt("product_count");
+	public java.math.BigDecimal getProductCount() {
+		return get("product_count");
 	}
 
 	public void setOrderList(java.lang.Integer orderList) {
