@@ -103,6 +103,12 @@
 				stringLength: { max: 15, message: '企业微信号最大长度是15字符，请重新输入' }
 			}
 		},
+		'seller.seller_code': {
+			validators: {
+				notEmpty: { message: '带*的企业微信号不能为空' },
+				regexp:{regexp:/^[A-Z\d]{8}$/, message:'销售编码必须大写字母或数字，长度是8字符，请重新输入' }
+			}
+		},
 		'seller.product_type_store': {
 			validators: {
 				notEmpty: { message: '产品类型不能为空' },
