@@ -79,9 +79,9 @@
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
         wxReadyGetLocation(
-            function(lng, lat, addComp, address) {
-                lng = lng.toFixed(6);
-                lat = lat.toFixed(6);
+            function(longitude, latitude, addComp, address) {
+                lng = longitude.toFixed(6);
+                lat = latitude.toFixed(6);
                 center = new BMap.Point(lng, lat);
                 map.centerAndZoom(center, 15);
                 map.enableScrollWheelZoom(true);
@@ -159,6 +159,7 @@
         var url = "${CPATH}/customerVisit/trajectoryRefresh?userId=" + $("#customer")[0].dataset.values + "&startDate=" + startDate + "&endDate=" + endDate;
         $.get(url, function(result){
             map.clearOverlays();//清除所有标注
+            $("#list").empty();
             if(result.length>0) {
                 center = new BMap.Point(result[0].lng, result[0].lat);//坐标点
                 map.centerAndZoom(center, 15);
