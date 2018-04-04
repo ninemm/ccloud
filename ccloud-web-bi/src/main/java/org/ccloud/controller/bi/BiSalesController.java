@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.ccloud.front.controller;
+package org.ccloud.controller.bi;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

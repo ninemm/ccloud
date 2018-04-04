@@ -54,7 +54,7 @@
 
     $(function() {
 
-        initWxConfig('${appId!}', ${timestamp}, '${nonceStr!}', '${signature!}');
+        initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
         wxReadyGetLocation(
             function(lng, lat, addComp, address) {
@@ -72,7 +72,23 @@
 
         $(document).on("click", "#customer_name", function () {
 	        window.location.href = '${CPATH}/customerVisit/visitCustomerChoose';
-	    });
+	    }).on('change', '#uploaderInput', function () {
+            lrz(this.files[0], {width: 1024} )
+                .then(function (rst) {
+                    if ($("#uploaderFiles")[0].children.length + 1 > count) {
+                    $.alert("最多上传3张图片");
+                    return false;
+                }
+                imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name});
+                $("#pic").val(JSON.stringify(imageArr));
+                var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
+                $uploaderFiles.append(str);
+                $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
+            })
+            .catch(function (err) {
+                alert('失败');
+            })
+        });
 	
 	    $("#question_type").select({
 	        title: "请选择问题类型",
@@ -109,24 +125,6 @@
 		        }
 	        });
 		}
-
-        document.querySelector("#uploaderInput").addEventListener("change", function () {
-            lrz(this.files[0])
-            .then(function (rst) {
-                if ($("#uploaderFiles")[0].children.length + 1 > count) {
-                    $.alert("最多上传3张图片");
-                    return false;
-                }
-                imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name});
-                $("#pic").val(JSON.stringify(imageArr));
-                var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
-                $uploaderFiles.append(str);
-                $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
-            })
-            .catch(function (err) {
-                alert('失败');
-            })
-        });
 
 
         var index; //第几张图片

@@ -321,7 +321,7 @@
 	function salesClick(param) {
 		var tag = $("#dayTag").val();
 		var startDate = $("#startDay").val();
-		var endDate = $("#endDay").val();		
+		var endDate = $("#endDay").val() + ' 23:59:59';			
 	    if (typeof param.seriesIndex != 'undefined') {
 	        window.location.href = "${(CPATH)}/report/userReportDetail?userId=" + salesObj[param.name] + "&userName=" + param.name + "&dayTag=" + tag + "&startDate=" + startDate + "&endDate=" + endDate; 
 	    }
@@ -351,7 +351,8 @@
 			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
 			"sellerId": '${(sellerId)!}',
 			"isGift": 'true'
-		}		
+		}
+		$("#dayTag").val("");
 		urlSelect(params,params2,type); 
     }
     
@@ -366,7 +367,8 @@
 			"endDate": $(obj).val() + ' 23:59:59',
 			"sellerId": '${(sellerId)!}',
 			"isGift": 'true'
-		}		
+		}
+		$("#dayTag").val("");	
 		urlSelect(params,params2,type); 
     }    
     

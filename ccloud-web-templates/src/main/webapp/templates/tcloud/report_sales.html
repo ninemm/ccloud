@@ -58,12 +58,14 @@
     $(".begin-date").val($.today());
     $("#dayTag").val("today");
     $("#orderTag").val("productCount");
+    $("#typeTag").val("order");
     var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';  
 	var params = {
 		"dayTag":  'today',
 		"startDate": startDate,
-		"endDate" : endDate
+		"endDate" : endDate,
+		"typeTag": $("#typeTag").val()
 	}  
  	orderAmount(params);
  	refundCount(params);
@@ -73,7 +75,7 @@
   })
   
     function orderAmount(params) {
-		Utils.ajax('${CPATH}/report/orderAmount', params, 
+		Utils.ajax('${CPATH}/report/orderAmountMenu', params, 
 			function(data){
 				$("#productCount").html(data.productCount+"件/");
 				$("#totalCount").html(data.orderCount+"笔");
@@ -153,7 +155,7 @@
     var unit = '件';
     function customerCount(params) {
     	$.showLoading();
-		Utils.ajax('${CPATH}/report/customerCount', params, 
+		Utils.ajax('${CPATH}/report/customerCountMenu', params, 
 			function(data){
 				$.hideLoading();
 	            var length = data.length;
@@ -170,7 +172,7 @@
     
     function productCount(params) {
     	$.showLoading();
-		Utils.ajax('${CPATH}/report/productCount', params, 
+		Utils.ajax('${CPATH}/report/productCountMenu', params, 
 			function(data){
 				$.hideLoading();
 	            var length = data.length;
@@ -190,7 +192,8 @@
 			"dayTag":  $("#dayTag").val(),
 			"startDate": $("#startDay").val(),
 			"endDate" : $("#endDay").val(),
-			"customerId": customerId
+			"customerId": customerId,
+			"typeTag": $("#typeTag").val()
 		}
     	productCount(params);
     }
@@ -221,16 +224,20 @@
     function startDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).val(),
-			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59'
+			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
+			"typeTag": $("#typeTag").val()
 		}
+		$("#dayTag").val("");
 		urlSelect(params,type); 
     }
     
     function endDaySelect(obj,type) {
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
-			"endDate": $(obj).val() + ' 23:59:59'
+			"endDate": $(obj).val() + ' 23:59:59',
+			"typeTag": $("#typeTag").val()
 		}
+		$("#dayTag").val("");
 		urlSelect(params,type); 
     }    
     
@@ -241,7 +248,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'today',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type); 
             $(obj).find(".dayTagText").text('今日')
@@ -252,7 +260,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'yesterday',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
@@ -263,7 +272,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'week',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
@@ -274,7 +284,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastweek',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
@@ -285,7 +296,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'month',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
@@ -296,7 +308,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastmonth',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val()
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
@@ -314,8 +327,9 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),
-				"orderTag": 'productCount'
+				"endDate" : $("#endDay").val() + ' 23:59:59',
+				"orderTag": 'productCount',
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type); 
 			getUnit("productCount");
@@ -328,8 +342,9 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
-				"orderTag": 'totalAmount'
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
+				"orderTag": 'totalAmount',
+				"typeTag": $("#typeTag").val()
 			}
           	urlSelect(params,type);
           	getUnit("totalAmount");
@@ -342,8 +357,9 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
-				"orderTag": 'orderCount'
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
+				"orderTag": 'orderCount',
+				"typeTag": $("#typeTag").val()
 			}
 			urlSelect(params,type);   
 			getUnit("orderCount");
@@ -352,7 +368,56 @@
           }
         }]
       }); 	
- 	} 	
+ 	}
+ 	
+ 	function typeSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "订单",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
+				"orderTag": $("#orderTag").val(),
+				"typeTag": 'order'
+			}
+			urlSelect(params,type); 
+            $(obj).find(".typeText").text('订单')
+            $("#typeTag").val("order");
+          }
+        }, {
+          text: "打印",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',			
+				"orderTag": $("#orderTag").val(),
+				"print" : 'true',
+				"typeTag": 'print'
+			}
+          	urlSelect(params,type);
+            $(obj).find(".typeText").text('打印')
+            $("#typeTag").val("print");
+          }
+        }, {
+          text: "出库",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
+				"orderTag": $("#orderTag").val(),
+				"typeTag": 'outStock'
+			}
+			urlSelect(params,type);   
+          	$(obj).find(".typeText").text('出库')
+          	$("#typeTag").val("outStock");
+          }
+        }]
+      });
+ 	}  	
  	
 	function cusDetail(param) {
 		var tag = $("#dayTag").val();
@@ -374,18 +439,23 @@
 		<div class="report">
 			<div class="weui-panel weui-panel_access report-header">
 				<div class="weui-panel__hd">
-					<span class="overview-hd-title">销售简报</span>
+					<span class="overview-hd-title">销售报表</span>
 					<div>
 						<span class="briefly" onclick="dayTagSelect(this,'day')">
 							<p class="dayTagText">今日</p>
 							<i class="icon-angle-down"></i>
 						</span>
-						<span class="briefly" onclick="orderTagSelect(this,'order')">
-							<p class="orderTagText">件数</p>
+<!-- 						<span class="briefly" onclick="orderTagSelect(this,'order')"> -->
+<!-- 							<p class="orderTagText">件数</p> -->
+<!-- 							<i class="icon-angle-down"></i> -->
+<!-- 						</span> -->
+						<span class="briefly" onclick="typeSelect(this,'day')">
+							<p class="typeText">订单</p>
 							<i class="icon-angle-down"></i>
 						</span>
 						<input type="hidden" id="dayTag">
 						<input type="hidden" id="orderTag">
+						<input type="hidden" id="typeTag">
 						<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
 						<span class="overview-hd-segmenting fr"> — </span>
 						<input class="weui-input begin-date fr t-r" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
