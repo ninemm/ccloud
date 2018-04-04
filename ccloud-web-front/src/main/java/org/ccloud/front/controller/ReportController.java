@@ -43,6 +43,7 @@ public class ReportController extends BaseFrontController {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		String startDate = date + " 00:00:00";
 		String endDate =  date + " 23:59:59";
+
 		int orderCount = SalesOrderQuery.me().findOrderCount(selectDataArea, startDate, endDate);
 		int customerCount = SellerCustomerQuery.me().getMySellerNum(selectDataArea);
 		setAttr("orderNum", orderCount);

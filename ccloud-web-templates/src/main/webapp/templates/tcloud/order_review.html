@@ -2,10 +2,23 @@
 <#macro title>订单审核</#macro>
 
 <#macro css>
-	.p-l-15 {
-		overflow: hidden;
-		padding-bottom:.2rem;
-	}
+    .orderDetail {
+    position:relative;
+    margin-bottom: .5rem;
+    }
+    .orderDetail .icon-trash-o{
+    position: absolute;
+    left: .8rem;
+    font-size: 24px;
+    z-index: 100;
+    }
+    .todo-product-box img{
+    transform: translateY(-20%);
+    }
+    .p-l-15 {
+    overflow: hidden;
+    padding-bottom:.2rem;
+    }
 </#macro>
 <#macro script>
 	$(function() {
@@ -88,7 +101,17 @@
           total();
 	  }).on("click", ".operate:last-child", function () { //增加商品数量
     	  total();
-	  });
+	  }).on("click", ".icon-trash-o", function() {
+		var _this = $(this);
+		$.confirm("确认删除商品？",
+				function() {
+					_this.parents(".orderDetail").remove();
+					total();
+				},
+				function() {
+				}
+			);
+		});
 	});
 	var comment = '';
 	var refuseReson = '';
@@ -113,7 +136,7 @@
 				if (res.errorCode == 0) {
 					location.href = '${CPATH}/todo/order'
 				} else {
-					$.alert(res.message);
+					$.toptip(res.message, 'error');
 				}
 				layer.closeAll();
 			}
@@ -121,11 +144,15 @@
 	};
 	
 	function doPass(){
+		var str = checkEdit();
+		if(str != ''){
+			$.toptip(str, 'warning');
+			return false;
+		}
 		layer.open({
 			type: 2,
 			content: '保存中...'
 		});
-		checkEdit();
 		$("#form").ajaxSubmit({
 			beforeSubmit: function() {
 				return true
@@ -137,7 +164,7 @@
 				if (res.errorCode == 0) {
 					location.href = '${CPATH}/todo/order'
 				} else {
-					$.alert(res.message);
+					$.toptip(res.message, 'error');
 				}
 			},
 			error : function() {
@@ -149,19 +176,35 @@
 	
 	function checkEdit(){
 		var $orderDetail = $(".orderDetail");
-		
+		var str = '';
+
 		$.each($orderDetail, function(index, el){
 			var $el = $(el);
-			if(parseFloat($el.find("#bigPrice").val()) != parseFloat($el.find("#bigPriceSpan").val())
-				|| parseFloat($el.find("#bigNum").val()) != parseFloat($el.find("#bigNumSpan").val())
-				|| parseFloat($el.find("#smallPrice").val()) != parseFloat($el.find("#smallPriceSpan").val())
-				|| parseFloat($el.find("#smallNum").val()) != parseFloat($el.find("#smallNumSpan").val()))
-			{
-				$("#edit").val(1);
-				return false;
-			};
+			if($el.find("#sellProductId").val() == undefined){
+				if(parseFloat($el.find("#bigPrice").val()) != parseFloat($el.find("#bigPriceSpan").val())
+					|| parseFloat($el.find("#bigNum").val()) != parseFloat($el.find("#bigNumSpan").val())
+					|| parseFloat($el.find("#smallPrice").val()) != parseFloat($el.find("#smallPriceSpan").val())
+					|| parseFloat($el.find("#smallNum").val()) != parseFloat($el.find("#smallNumSpan").val())
+					)
+				{
+					$("#edit").val(1);
+					return false;
+				}
+			} else if($el.find("#sellProductId").val() != '') {
+				if(parseFloat($el.find("#smallNum").val()) > 0 || parseFloat($el.find("#bigNum").val()) > 0){
+					$("#edit").val(1);
+					return false;
+				}else{
+					str = "增加商品时数量不能为0(" + $el.find("#productName").val() + ")";
+					return false;
+				}
+			} else if($el.find("#sellProductId").val() == '') {
+					str = "请选择要增加的商品";
+					return false;
+			}
 			
-		})
+		});
+		return str;
 	}
 	
 	function total() {
@@ -190,7 +233,80 @@
 		$("#total").val(total);
 		$("#totalSpan").text(total + "元")
 		$("#totalNum").val(allTotalAmount);
-	} 
+	}
+
+	var sellerProductInfoMap = ${sellerProductInfoMap!};
+	var sellerProductItems = ${sellerProductItems!};
+	var newHtml = $("#orderDetailDemo").html();
+	$("#orderDetailDemo").remove();
+	var $orderDetailList = $("#orderDetailList");
+	var $position = $("#position");
+
+	function addProduct() {
+		$position .before('<div class="orderDetail">' + newHtml + '</div>' );
+		var $newProductDetail = $orderDetailList.find(".orderDetail:last");
+		$newProductDetail.find("#productSelect").select({
+			title: "选择商品",
+			items: sellerProductItems,
+			onChange: function(obj){
+				var $orderDetial = $(this)[0].$input.parents(".orderDetail");
+				var product = sellerProductInfoMap[obj.values].columns;
+
+				selectProduct($orderDetial, product)
+			}
+		});
+	}
+
+	function selectProduct($orderDetial, product){
+
+		$orderDetial.find("#sellProductId").val(product.sell_product_id);
+		$orderDetial.find("#productId").val(product.product_id);
+		$orderDetial.find("#convert").val(product.convert_relate);
+		$orderDetial.find("#productName").val(product.custom_name);
+
+		var bigPrice = product.price;
+		var convert = product.convert_relate;
+		var smallPrice = (bigPrice / convert).toFixed(2);
+
+		var bigAccountPrice = product.account_price;
+		var smallAccountPrice = (bigAccountPrice / convert).toFixed(2);
+
+		$orderDetial.find("#bigPriceSpanSpan").text('(' + bigPrice + ')');
+		$orderDetial.find("#smallPriceSpanSpan").text('(' + smallPrice + ')');
+		$orderDetial.find("#bigUnit").val(product.big_unit);
+		$orderDetial.find("#smallUnit").val(product.small_unit);
+		$orderDetial.find("#bigUnitSpan").text(product.big_unit);
+		$orderDetial.find("#smallUnitSpan").text(product.small_unit);
+
+		$orderDetial.find("#bigPrice").val(bigPrice);
+		$orderDetial.find("#smallPrice").val(smallPrice);
+		$orderDetial.find("#bigPriceSpan").val(bigPrice);
+		$orderDetial.find("#smallPriceSpan").val(smallPrice);
+
+		<#if order.receive_type = 0>
+			$orderDetial.find("#bigPrice").val(bigAccountPrice);
+			$orderDetial.find("#smallPrice").val(smallAccountPrice);
+		<#else>
+			$orderDetial.find("#bigPrice").val(bigPrice);
+			$orderDetial.find("#smallPrice").val(smallPrice);
+		</#if>
+
+		//是否赠品
+		var $isGift = $orderDetial.find("#isGift");
+		var $gift = $orderDetial.find("#gift");
+
+		$gift.change(function() {
+			if($gift.is(':checked')) {
+				$isGift.val(1);
+			}else{
+				$isGift.val(0);
+			}
+			total();
+		});
+
+		total();
+	}
+
 </#macro>
 
 <@layout>
@@ -216,15 +332,12 @@
 	          <p>业务员&nbsp;${(order.realname)!}</p>
 	        </div>
 	        <hr>
-	        <div class="ft14">
-	          <#if order.receive_type = 0>
-	            <input type="checkbox" name="if-account" checked disabled="disabled" class="weui-agree__checkbox">
-	            <#else>
-	              <input type="checkbox" name="if-account" disabled="disabled" class="weui-agree__checkbox">
-	          </#if>是否账期
-	        </div>
+			<div class="ft14">
+				<#if order.receive_type = 0> <span class="tag" >账期</span> </#if>
+				<#if order.member_id ??><span class="tag" >终端下单</span> </#if>
+			</div>
 	      </div>
-	      <div class="weui-panel weui-panel_access">
+	      <div class="weui-panel weui-panel_access" id="orderDetailList">
 	        <div class="ft14">
 	          订单详情
 	        </div>
@@ -371,7 +484,96 @@
 		          </#if>
 	          </div>
 	        </#list>
-	        <hr>
+
+	          <div class="orderDetail" id="orderDetailDemo">
+				  <i class="icon-trash-o gray"></i>
+                  <input type="hidden" name="addSellProductId" id="sellProductId" value="">
+                  <input type="hidden" name="addProductId" id="productId" value="">
+                  <input type="hidden" name="addConvert" id="convert" value="">
+				  <input type="hidden" name="addIsGift" id="isGift" value="0">
+                  <input type="hidden" name="addRowTotal" id="rowTotal" value="">
+                  <input type="hidden" name="addProductName" id="productName" value="">
+				  <input type="hidden" name="addBigUnit" id="bigUnit" value="">
+	              <input type="hidden" name="addSmallUnit" id="smallUnit" value="">
+		              <div class="modify_price todo-product-box">
+						  <img src="" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+						  <div class="select-area">
+						  <div class="goods">
+							<input type="text" class="choose-good weui-input" placeholder="选择商品" id="productSelect" readonly>
+							<i class="icon-sort-desc"></i>
+							<input type="checkbox" name="addGift" id="gift" value="1" class="weui-agree__checkbox fr" >
+							<span class="no-bg fr" style="margin-right: .2rem;">是否赠品</span>
+						  </div>
+						  </div>
+		                <div class="p-l-15">
+		                  <div class="weui-flex__item">
+		                    <div class="fl">
+									<input type="hidden" name="addBigPriceSpan" id="bigPriceSpan" value="0">
+								<#if isEdit>
+		                        	<input type="number" name="addBigPrice" id="bigPrice" value="0">
+								<#else>
+									<input type="number" name="addBigPrice" id="bigPrice" value="0" readonly>
+								</#if>
+
+		                      <span class="gray" id="bigPriceSpanSpan" >（0）</span>
+		                    </div>
+		                  </div>
+		                  <div class="weui-flex__item t-r relative">
+
+														<div class="spinner">
+															<div class="operate fl">
+																<i class="icon-minus2"></i>
+															</div>
+															<input type="number" class="fl" name="addBigNum" id="bigNum" value="1">
+															<div class="operate fl">
+																<i class="icon-plus2"></i>
+															</div>
+														</div>
+
+		                    <span id="bigUnitSpan">&nbsp;</span>
+		                  </div>
+		                </div>
+		                <div class="p-l-15">
+		                  <div class="weui-flex__item">
+		                    <div class="fl">
+                                    <input type="hidden" name="addSmallPriceSpan" id="smallPriceSpan" value="0">
+                                <#if isEdit>
+                                    <input type="number" name="addSmallPrice" id="smallPrice" value="0">
+                                <#else>
+                                    <input type="number" name="addSmallPrice" id="smallPrice" value="0" readonly>
+                                </#if>
+
+		                      <span class="gray" id="smallPriceSpanSpan">（0）</span>
+		                    </div>
+		                  </div>
+		                  <div class="weui-flex__item t-r relative">
+
+													<div class="spinner">
+														<div class="operate fl">
+															<i class="icon-minus2"></i>
+														</div>
+														<input type="number" class="fl" name="addSmallNum" id="smallNum" value="0">
+														<div class="operate fl">
+															<i class="icon-plus2"></i>
+														</div>
+													</div>
+
+		                    <span id="smallUnitSpan">&nbsp;</span>
+		                  </div>
+		                </div>
+		              </div>
+			</div>
+
+			<#if isEdit>
+			<section class="weui-panel weui-panel_access" id="position">
+				<div class="weui-cell weui-cell_access t-c ft14">
+					<p class="width-100 blue" onclick="addProduct()">
+						<i class="icon-plus-circle"></i>添加产品</p>
+				</div>
+			</section>
+			</#if>
+
+	        <hr id="totalHr">
 	        <div class="t-r ft14">
 	          总计：       <span class="red" id="totalSpan">${(order.total_amount)?string(',###.##')}元</span>
 	        	<input type="hidden" name="totalNum" id="totalNum" value="${(order.total_count)!}">

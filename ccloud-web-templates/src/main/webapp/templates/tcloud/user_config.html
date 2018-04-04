@@ -87,6 +87,26 @@
 		    }]
 	    });
     }
+	
+	$("#myQR").click(function() {
+		Utils.ajax('${CPATH}/user/getQrcode', '',
+			function(data){
+
+			layer.open({
+				type: 1,
+				title: ['我的二维码',
+				'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+				],
+				content: '<img src=\'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + data.ticket +  '\' />' ,
+				anim: 'scale',
+				className: 'service',
+				btn: '关闭'
+			});
+	
+		}
+	);
+
+	});
 </#macro>
 
 <@layout>
@@ -97,6 +117,14 @@
 				<p>账号</p>
 			</div>
 			<div class="weui-cell__ft">${(user.username)!}</div>
+		</a>
+	</div>
+	<div class="weui-cells">
+		<a class="weui-cell weui-cell_access" id ="myQR">
+			<div class="weui-cell__bd">
+				<p>我的二维码</p>
+			</div>
+			<div class="weui-cell__ft"></div>
 		</a>
 	</div>
 	<div class="weui-cells">

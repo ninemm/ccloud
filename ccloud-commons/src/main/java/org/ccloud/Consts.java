@@ -169,6 +169,7 @@ public class Consts {
 	public static final String OPTION_WEB_PROC_ACTIVITY_APPLY = "web_proc_activity_apply_";//申请活动审核开关设置
 	public static final String OPTION_DATA_UPLOAD_CUSTOMER_TYPE = "data_upload_customer_type_";//数据上传类型配置
 	public static final String OPTION_WEB_PROC_PLANS_LIMIT = "web_proc_plans_limit_";//计划起止日期配置
+	public static final String OPTION_WEB_MEMBER_NUMBER_LIMIT = "web_member_number_limit_";//数据上传类型配置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 
 	public static final String OPTION_ON = "true";
@@ -258,14 +259,27 @@ public class Consts {
 	
 	public static final String PROC_CUSTOMER_REVIEW = "_customer_review";				// 客户审核
 	public static final String PROC_CUSTOMER_VISIT_REVIEW = "_customer_visit_review";	// 拜访审核
-	public static final String PROC_ORDER_REVIEW = "_order_review";						// 餐饮直供
-	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审
-	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审
-	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				// 订单3审
-	public static final String PROC_ORDER_REVIEW_FOUR = "_order_review_4";				// 订单1审（直营总监）
-	public static final String PROC_ORDER_REVIEW_FIVE = "_order_review_5";				// 订单2审（直营总监：财务）
 	public static final String PROC_ACTIVITY_APPLY_REVIEW = "_activity_apply_review";	// 活动审核
-	
+
+	//业务员下单
+	public static final String PROC_ORDER_REVIEW = "_order_review";						// 订单3审(账务→订单审核人→财务)
+	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审(订单审核人)
+	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审(订单审核人→财务)
+	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				//(暂未使用(准备做驳回流程))
+	public static final String PROC_ORDER_REVIEW_FOUR = "_order_review_4";				// 订单1审(直营总监)
+	public static final String PROC_ORDER_REVIEW_FIVE = "_order_review_5";				// 订单2审(直营总监→财务)
+
+	//终端下单(跟业务员下单对应,加一个业务员审核)
+	public static final String PROC_MEMBER = "_member";
+	public static final String PROC_MEMBER_ORDER_REVIEW = "_member_order_review";					// 终端订单4审(业务员→账务→订单审核人→财务)
+	public static final String PROC_MEMBER_ORDER_REVIEW_ZERO = "_member_order_review_0";			// 终端订单1审(业务员)
+	public static final String PROC_MEMBER_ORDER_REVIEW_ONE = "_member_order_review_1";				// 终端订单2审(业务员→订单审核人)
+	public static final String PROC_MEMBER_ORDER_REVIEW_TWO = "_member_order_review_2";				// 终端订单3审(业务员→订单审核人→财务)
+	public static final String PROC_MEMBER_ORDER_REVIEW_THREE = "_member_order_review_3";			//(暂未使用(准备做驳回流程))
+	public static final String PROC_MEMBER_ORDER_REVIEW_FOUR = "_member_order_review_4";		    // 终端订单2审(业务员→直营总监)
+	public static final String PROC_MEMBER_ORDER_REVIEW_FIVE = "_member_order_review_5";			// 终端订单3审(业务员→直营总监→财务)
+
+
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
 	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
 	
@@ -288,5 +302,7 @@ public class Consts {
 	public static final String PLAN_SHOW_SELLER_PRODUCT = "101205"; // 按产品方式显示
 	
 	public static final String WAREHOUSE_IDS_IS_NULL = "1";//当用户没有分配仓库时且不是经管时返回空值的仓库ID
-	
+
+	public static final String COOKIE_LOGINED_MEMBER = "member";
+	public static final String SESSION_LOGINED_MEMBER = "_logined_member";
 }

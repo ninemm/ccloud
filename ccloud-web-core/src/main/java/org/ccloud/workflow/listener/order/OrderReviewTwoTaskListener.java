@@ -37,15 +37,19 @@ public class OrderReviewTwoTaskListener implements TaskListener {
 		List<Task> taskList = processEngine.getTaskService().createTaskQuery().executionId(executeInstanceId).list();
 
 		if (taskList != null && taskList.size() == 0) {// 订单审核人
-			String managerName = "";
-			User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
-			if (orderReviewer != null) {
-				managerName = orderReviewer.getUsername();
-			}
+			List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
 
-			task.setAssignee(managerName);
-			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), orderReviewer.getId(), user.getDepartmentId(),
-					user.getDataArea(), orderId);
+			String orderReviewUserName = "";
+			for (User u : orderReviewers) {
+				if (StrKit.notBlank(orderReviewUserName)) {
+					orderReviewUserName = orderReviewUserName + ",";
+				}
+
+				orderReviewUserName += u.getStr("username");
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核",  user.getId(), u.getStr("id"),
+						user.getDepartmentId(), user.getDataArea(), orderId);
+			}
+			task.setAssignee(orderReviewUserName);
 		} else if (taskList != null && taskList.size() > 0) {
 
 			List<HistoricTaskInstance> list = processEngine.getHistoryService().createHistoricTaskInstanceQuery()

@@ -101,7 +101,11 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refresh() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 		boolean visitAdd = SecurityUtils.getSubject().isPermitted("/admin/customerVisit/add");
 		boolean salesOrderAdd = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/add");
 		boolean salesOrder = SecurityUtils.getSubject().isPermitted("/admin/salesOrder");
@@ -112,12 +116,12 @@ public class CustomerController extends BaseFrontController {
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		if (StrKit.notBlank(getPara("region"))) {
 			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			Record r = SellerCustomerQuery.me().getOrderNumber(dataArea, dealerDataArea,  getPara("customerType"), "0", getPara("searchKey"));
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
+			Record r = SellerCustomerQuery.me().getOrderNumber(dataArea,dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
 			if (r != null)customerOrderCount = r.getStr("orderCount");
 		} else {
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea, dealerDataArea,  getPara("customerType"), "0", getPara("searchKey"));
+			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea,dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
+			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea,dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
 			if (r != null)customerOrderCount = r.getStr("orderCount");
 		}
 
@@ -132,6 +136,19 @@ public class CustomerController extends BaseFrontController {
 			html.append("		</div>\n");
 			html.append("		<div class=\"weui-flex__item customer-href\">\n");
 			html.append("			<div class=\"weui-flex\">\n");
+
+			if (StrKit.notBlank(customer.getStr("member_id")) && customer.getInt("memberOrderStatus") == 1) {
+				html.append("				<a onClick=\"memberOrderClose('" + customer.getStr("member_id") + "', '" + customer.getStr("customer_name") + "')\" class=\"weui-flex__item\">\n");
+				html.append("					<p><i class=\"icon-cart-arrow-down red\"></i></p>\n");
+				html.append("					<p>会员</p>\n");
+				html.append("				</a>\n");
+			}else if (StrKit.notBlank(customer.getStr("member_id")) && customer.getInt("memberOrderStatus") == 0) {
+				html.append("				<a onClick=\"memberOrderOpen('" + customer.getStr("member_id") + "', '" + customer.getStr("customer_name") + "')\" class=\"weui-flex__item\">\n");
+				html.append("					<p><i class=\"icon-cart-arrow-down gray\"></i></p>\n");
+				html.append("					<p>会员</p>\n");
+				html.append("				</a>\n");
+			}
+
 			html.append("				<a href=\"tel:" + customer.getStr("mobile") + "\" class=\"weui-flex__item\">\n");
 			html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
 			html.append("					<p>电话</p>\n");
@@ -837,19 +854,55 @@ public class CustomerController extends BaseFrontController {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-		
+
 		if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
-			
-			if (manager == null) {
-				return "没有设置审核主管";
+
+			List<User> managers = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+			if (managers == null || managers.size() == 0) {
+				return "您没有配置审核人，请联系管理员";
 			}
+
+			String managerUserName = "";
+			for (User u : managers) {
+				if (StrKit.notBlank(managerUserName)) {
+					managerUserName = managerUserName + ",";
+				}
+
+				managerUserName += u.getStr("username");
+
+				Message message = new Message();
+				message.setFromUserId(user.getId());
+				message.setToUserId(u.getId());
+				message.setDeptId(user.getDepartmentId());
+				message.setDataArea(user.getDataArea());
+				message.setSellerId(sellerId);
+				message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
+				message.setTitle(sellerCustomer.getCustomer().getCustomerName());
+				message.setObjectId(customerId);
+				message.setIsRead(Consts.NO_READ);
+				message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
+
+				Object customerVO = param.get("customerVO");
+				if (customerVO == null && isEnable == 0) {
+					message.setContent("新增待审核");
+				} else if(customerVO == null && isEnable == 1) {
+					message.setContent("停用待审核");
+				} else if( isEnable == 2) {
+					message.setContent("导入待审核");
+				} else {
+					List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
+					if (list != null)
+						message.setContent(JsonKit.toJson(list));
+				}
+				MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+			}
+			param.put("manager", managerUserName);
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 			
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
-			param.put("manager", manager.getUsername());
+
 			param.put("isEnable", isEnable);
 
-			
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerId, defKey, param);
 
@@ -862,33 +915,7 @@ public class CustomerController extends BaseFrontController {
 		
 		if (!isUpdated)
 			return "操作失败";
-		
-		Message message = new Message();
-		message.setFromUserId(user.getId());
-		message.setToUserId(manager.getId());
-		message.setDeptId(user.getDepartmentId());
-		message.setDataArea(user.getDataArea());
-		message.setSellerId(sellerId);
-		message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
-		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
-		message.setObjectId(customerId);
-		message.setIsRead(Consts.NO_READ);
-		message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
-		
-		Object customerVO = param.get("customerVO");
-		if (customerVO == null && isEnable == 0) {
-			message.setContent("新增待审核");
-		} else if(customerVO == null && isEnable == 1) {
-			message.setContent("停用待审核");
-		} else if( isEnable == 2) {
-			message.setContent("导入待审核");
-		} else {
-			List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
-			if (list != null)
-				message.setContent(JsonKit.toJson(list));
-		}
-		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
-		
+
 		return "";
 	}
 
@@ -1197,4 +1224,39 @@ public class CustomerController extends BaseFrontController {
 		else renderAjaxResultForError(isUpdate);
 
 	}
+
+	public void memberOrderClose() {
+		String member_id = getPara("member_id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
+
+		MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().checkExists(member_id, seller.getId(), user.getId());
+
+		Date date = new Date();
+		memberJoinSeller.setStatus(0);
+		memberJoinSeller.setUnableDate(date);
+		memberJoinSeller.setModifyDate(date);
+		memberJoinSeller.update();
+
+		renderAjaxResultForSuccess("停用终端下单成功");
+	}
+
+	public void memberOrderOpen() {
+		String member_id = getPara("member_id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
+
+		MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().checkExists(member_id, seller.getId(), user.getId());
+
+		Date date = new Date();
+		memberJoinSeller.setStatus(1);
+		memberJoinSeller.setModifyDate(date);
+		memberJoinSeller.update();
+
+		renderAjaxResultForSuccess("启用终端下单成功");
+	}
+
+
 }
