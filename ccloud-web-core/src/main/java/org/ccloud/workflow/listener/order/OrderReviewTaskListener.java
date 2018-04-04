@@ -62,10 +62,19 @@ public class OrderReviewTaskListener implements TaskListener {
 			int size = list.size();
 
 			if (size == 1) {// 订单审核人
-				User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
-				task.setAssignee(orderReviewer.getUsername());
-				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), orderReviewer.getId(), user.getDepartmentId(),
-						user.getDataArea(), orderId);
+				List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
+
+				String orderReviewUserName = "";
+				for (User u : orderReviewers) {
+					if (StrKit.notBlank(orderReviewUserName)) {
+						orderReviewUserName = orderReviewUserName + ",";
+					}
+
+					orderReviewUserName += u.getStr("username");
+					OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核",  user.getId(), u.getStr("id"),
+							user.getDepartmentId(), user.getDataArea(), orderId);
+				}
+				task.setAssignee(orderReviewUserName);
 			} else if (size == 2) {// 财务
 				String treasurerUserName = "";
 				List<Record> treasurers = OrderReviewUtil.getTreasurer(

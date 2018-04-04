@@ -108,9 +108,8 @@
             $.confirm("您确定要新增客户吗？","新增客户", function() {
                 doSubmit();
             });
-        });
-        document.querySelector("#uploaderInput").addEventListener("change", function () {
-            lrz(this.files[0])
+        }).on('change', '#uploaderInput', function () {
+            lrz(this.files[0], {width: 1024})
                 .then(function (rst) {
                     if ($("#uploaderFiles")[0].children.length + 1 > count) {
                         $.alert("最多上传3张图片");

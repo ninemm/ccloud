@@ -407,13 +407,15 @@ public class CustomerVisitController extends BaseFrontController {
 			return ;
 		}
 
-		if (isChecked != null && isChecked)
-			updated = startProcess(customerVisit);
+		String result = "";
+		if (isChecked != null && isChecked) {
+			result = startProcess(customerVisit);
+		}
 		 
-		if (updated)
+		if (StrKit.isBlank(result))
 			renderAjaxResultForSuccess("操作成功");
 		else 
-			renderAjaxResultForError("操作失败");
+			renderAjaxResultForError(result);
 	}
 
 	public void visitCustomerInfo() {
@@ -522,25 +524,36 @@ public class CustomerVisitController extends BaseFrontController {
 			renderAjaxResultForError("操作失败");
 	}
 
-	private boolean startProcess(CustomerVisit customerVisit) {
+	private String startProcess(CustomerVisit customerVisit) {
 
 		//CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
-		boolean isUpdated = true;
 		Boolean isCustomerVisit = true;
 
 		Map<String, Object> param = new HashMap<>();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-		
-		if (manager == null)
-			return false;
 		
 		if (isCustomerVisit != null && isCustomerVisit.booleanValue()) {
 
-			String defKey = Consts.PROC_CUSTOMER_VISIT_REVIEW;
+			List<User> managers = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+			if (managers == null || managers.size() == 0) {
+				return "您没有配置审核人，请联系管理员";
+			}
+
+			String managerUserName = "";
+			for (User u : managers) {
+				if (StrKit.notBlank(managerUserName)) {
+					managerUserName = managerUserName + ",";
+				}
+
+				managerUserName += u.getStr("username");
+				sendMessage(sellerId, customerVisit.getQuestionDesc(), user.getId(), u.getId(), user.getDepartmentId(), user.getDataArea()
+						, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName(),customerVisit.getId());
+			}
+			param.put("manager", managerUserName);
 			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
-			param.put("manager", manager.getUsername());
+
+			String defKey = Consts.PROC_CUSTOMER_VISIT_REVIEW;
 
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerVisit.getId(), defKey, param);
@@ -550,15 +563,12 @@ public class CustomerVisitController extends BaseFrontController {
 //			customerVisit.setStatus(0);
 		}
 		
-		isUpdated = customerVisit.saveOrUpdate();
+
+		if (!customerVisit.saveOrUpdate())
+			return "新增拜访错误";
+
 		
-		if (!isUpdated)
-			return false;
-		
-		sendMessage(sellerId, customerVisit.getQuestionDesc(), user.getId(), manager.getId(), user.getDepartmentId(), user.getDataArea()
-				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName(),customerVisit.getId());
-		
-		return isUpdated;
+		return "";
 	}
 
 	private List<Map<String, String>> getVisitTypeList() {

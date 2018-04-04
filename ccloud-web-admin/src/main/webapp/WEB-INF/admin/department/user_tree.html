@@ -15,7 +15,7 @@
 	var $saveBtn = $("#save_btn");
 	var $rootNodeId = 0;
 	$(document).ready(function() {
-		jQuery.mm.initTreeView('#tree', JSON.parse('${treeData!}'));
+		jQuery.mm.initMultiTreeView('#tree', JSON.parse('${treeData!}'));
 	});
 	$saveBtn.click(function() {
 		$saveBtn.attr("disabled", "disabled");
@@ -38,6 +38,11 @@
 				}
 			}
 		});
+		if (userIds.length > 230) {// 不能超过七个人
+			$saveBtn.removeAttr("disabled");
+			layer.alert("不能超过七个审核人，请重新选择!", {icon: 2});
+			return ;
+		}
 		if(parent.flg == 0){
 			parent.$("#order_reviewer_id").val(userIds);
 			parent.$("#order_reviewer").val(userNames);

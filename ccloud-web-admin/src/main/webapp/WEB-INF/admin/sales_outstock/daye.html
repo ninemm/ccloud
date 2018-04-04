@@ -223,7 +223,7 @@ function queryPrintDetail(financePrint) {
                     var c = '</tbody></table>';
 				    c = content1 + content2;
 
-                    headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '送');
+                    headerInfoContent = $.format(headerInfo, '总部', '送');
 
                     let placeOrderMan = item.placeOrderMan;
                     let placeOrderPhone = item.placeOrderPhone;

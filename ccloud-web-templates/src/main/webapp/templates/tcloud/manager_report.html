@@ -516,7 +516,7 @@
 	function salesClick(param) {
 		var tag = $("#dayTag").val();
 		var startDate = $("#startDay").val();
-		var endDate = $("#endDay").val();		
+		var endDate = $("#endDay").val() + ' 23:59:59';		
 	    if (typeof param.seriesIndex != 'undefined') {
 	        window.location.href = "${(CPATH)}/report/userReportDetail?userId=" + salesObj[param.name] + "&userName=" + param.name + "&dayTag=" + tag + "&startDate=" + startDate + "&endDate=" + endDate; 
 	    }
@@ -525,7 +525,7 @@
 	function sellerClick(param) {
 		var tag = $("#dayTag").val();
 		var startDate = $("#startDay").val();
-		var endDate = $("#endDay").val();		
+		var endDate = $("#endDay").val() + ' 23:59:59';		
 	    if (typeof param.seriesIndex != 'undefined') {
 	        window.location.href = "${(CPATH)}/report/sellerReportDetail?sellerId=" + sellerObj[param.name] + "&sellerName=" + param.name + "&dayTag=" + tag + "&startDate=" + startDate + "&endDate=" + endDate; ; 
 	    }
@@ -658,7 +658,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
 				"orderTag": 'productCount',
 				"typeTag": $("#typeTag").val()
 			}
@@ -673,7 +673,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": 'totalAmount',
 				"typeTag": $("#typeTag").val()
 			}
@@ -688,7 +688,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',			
 				"orderTag": 'orderCount',
 				"typeTag": $("#typeTag").val()
 			}
@@ -719,7 +719,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
 				"orderTag": $("#orderTag").val(),
 				"typeTag": 'order'
 			}
@@ -733,7 +733,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": $("#orderTag").val(),
 				"print" : 'true',
 				"typeTag": 'print'
@@ -748,7 +748,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": $("#orderTag").val(),
 				"typeTag": 'outStock'
 			}

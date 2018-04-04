@@ -292,7 +292,11 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					String bizUserId = transferBillInfo.getBizUserId();
 					// 先处理调出仓库的总账
 					Inventory outInventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(outSellerId,outProductId, outWarehouseId);
-					outInventory.setOutCount(outInventory.getOutCount().add(outProductCount));
+					if (null==outInventory.getOutCount()) {
+						outInventory.setOutCount(outProductCount);
+					}else {
+						outInventory.setOutCount(outInventory.getOutCount().add(outProductCount));
+					}
 					outInventory.setOutPrice(outInventory.getInPrice());
 					outInventory.setOutAmount(outInventory.getOutCount().multiply(outInventory.getInPrice()));
 					outInventory.setBalanceCount(outInventory.getBalanceCount().subtract(outProductCount));

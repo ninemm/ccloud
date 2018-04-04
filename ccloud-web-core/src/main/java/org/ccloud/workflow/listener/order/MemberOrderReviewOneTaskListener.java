@@ -46,15 +46,19 @@ public class MemberOrderReviewOneTaskListener implements TaskListener {
 			int size = list.size();
 
 			if (size == 1) {// 订单审核人
-				String orderReviewerName = "";
-				User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
-				if (orderReviewer != null) {
-					orderReviewerName = orderReviewer.getUsername();
-				}
+				List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
 
-				task.setAssignee(orderReviewerName);
-				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), orderReviewer.getId(),user.getDepartmentId(),
-						user.getDataArea(), orderId);
+				String orderReviewUserName = "";
+				for (User u : orderReviewers) {
+					if (StrKit.notBlank(orderReviewUserName)) {
+						orderReviewUserName = orderReviewUserName + ",";
+					}
+
+					orderReviewUserName += u.getStr("username");
+					OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核",  user.getId(), u.getStr("id"),
+							user.getDepartmentId(), user.getDataArea(), orderId);
+				}
+				task.setAssignee(orderReviewUserName);
 			}
 		}
 	}

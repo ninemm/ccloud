@@ -1,39 +1,5 @@
 package org.ccloud.front.controller;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.activiti.engine.task.Comment;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.ccloud.Consts;
-import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Message;
-import org.ccloud.model.SalesOrder;
-import org.ccloud.model.SellerProduct;
-import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.MessageQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.OutstockPrintQuery;
-import org.ccloud.model.query.SalesOrderDetailQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SalesOutstockQuery;
-import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.vo.ImageJson;
-import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DateUtils;
-import org.ccloud.utils.StringUtils;
-import org.ccloud.wechat.WechatJSSDKInterceptor;
-import org.ccloud.workflow.listener.order.OrderReviewUtil;
-import org.ccloud.workflow.service.WorkFlowService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Maps;
@@ -44,6 +10,24 @@ import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import org.activiti.engine.task.Comment;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
+import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.*;
+import org.ccloud.model.query.*;
+import org.ccloud.model.vo.ImageJson;
+import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.StringUtils;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
+import org.ccloud.workflow.listener.order.OrderReviewUtil;
+import org.ccloud.workflow.service.WorkFlowService;
+
+import java.sql.SQLException;
+import java.util.*;
 
 
 /**
@@ -433,13 +417,22 @@ public class OrderController extends BaseFrontController {
 
 		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 
-			User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
-			if (orderReviewer == null) {
+			List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
+			if (orderReviewers == null || orderReviewers.size() == 0) {
 				return "您没有配置审核人,请联系管理员";
 			}
-			param.put("manager", orderReviewer.getUsername());
-			toUserId = orderReviewer.getId();
-			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
+
+			String orderReviewUserName = "";
+			for (User u : orderReviewers) {
+				if (StrKit.notBlank(orderReviewUserName)) {
+					orderReviewUserName = orderReviewUserName + ",";
+				}
+
+				orderReviewUserName += u.getStr("username");
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核",  user.getId(), u.getStr("id"),
+						user.getDepartmentId(), user.getDataArea(), orderId);
+			}
+			param.put("manager", orderReviewUserName);
 		}
 
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
