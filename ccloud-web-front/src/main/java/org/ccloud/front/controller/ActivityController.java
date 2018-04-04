@@ -41,7 +41,6 @@ import org.ccloud.workflow.service.WorkFlowService;
 public class ActivityController extends BaseFrontController {
 
 	public void index() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
 		for(int i = 0; i <activityRecords.size();i++){
@@ -511,6 +510,8 @@ public class ActivityController extends BaseFrontController {
 			return "申请取消";
 		if (status == Consts.ACTIVITY_APPLY_STATUS_REJECT)
 			return "审核拒绝";
+		if (status == Consts.ACTIVITY_APPLY_STATUS_VERIFICATION)
+			return "活动结束";
 		if (status == Consts.ACTIVITY_APPLY_STATUS_END)
 			return "活动结束";
 
@@ -576,6 +577,7 @@ public class ActivityController extends BaseFrontController {
 			else if (apply.getStr("status").equals("1")) html.append("已通过\n");
 			else if (apply.getStr("status").equals("2")) html.append("已撤回\n");
 			else if (apply.getStr("status").equals("3")) html.append("已拒绝\n");
+			else if (apply.getStr("status").equals("4")) html.append("待核销\n");
 			else html.append("结束\n");
 			String expenseDetailName = "";
 			if(StrKit.notBlank(apply.getStr("expenseDetailName"))) {
