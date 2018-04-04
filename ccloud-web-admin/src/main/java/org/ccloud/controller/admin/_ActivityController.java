@@ -876,7 +876,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			if (list!=null) {
 				ScenePhoto=addPhoto(list);
 				if (ScenePhoto==null) {
-					renderAjaxResultForError("加入核销失败!");
+					renderAjaxResultForError("同步图片失败!");
 					return;
 				}
 				ScenePhoto=ScenePhoto.substring(1, ScenePhoto.length()-1);
@@ -884,7 +884,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
 			Long shopId = addCustomer(YxActivity.getStr("customerId"));
 			if (shopId==null) {
-				renderAjaxResultForError("加入核销失败!");
+				renderAjaxResultForError("同步客户失败!");
 				return;
 			}
 			Map<String, Object> map = jointMap(YxActivity);
