@@ -171,16 +171,16 @@
 					var html = '<div class="weui-cell">'
 								+'<div class="weui-cell__bd weui-flex t-c">'
 								+'<div class="weui-flex__item">'
-								+'<p>业务员</p>'
+								+'<p style = "font-size:12px;">业务员</p>'
 								+'</div>'
 								+'<div class="weui-flex__item">'
-								+'<p>计划数量</p>'
+								+'<p style = "font-size:12px;">计划数量</p>'
 								+'</div>'
 								+'<div class="weui-flex__item">'
-								+'<p>完成数量</p>'
+								+'<p style = "font-size:12px;">完成数量</p>'
 								+'</div>'
 								+'<div class="weui-flex__item">'
-								+'<p>完成比率</p>'
+								+'<p style = "font-size:12px;">完成比率</p>'
 								+'</div>'
 								+'</div>'
 								+'</div>';
@@ -188,16 +188,16 @@
 					 	html += '<div class="weui-cell">'
 								+'<div class="weui-cell__bd weui-flex t-c">'
 								+'<div class="weui-flex__item">'
-								+'<p id="userName">'+data[i].realname+'</p>'
+								+'<p id="userName" style = "font-size:12px;">'+data[i].realname+'</p>'
 								+'</div>'
 								+'<div class="weui-flex__item">'
-								+'<p id="planNum">'+data[i].plan_num+'</p>'
+								+'<p id="planNum" style = "font-size:12px;">'+data[i].plan_num+'</p>'
 								+'</div>'
 								+'<div class="weui-flex__item">'
-								+'<p id="completeNum">'+data[i].complete_num+'</p>'
+								+'<p id="completeNum" style = "font-size:12px;">'+data[i].complete_num+'</p>'
 								+'</div>'
 								+'<div class="weui-flex__item">'
-								+'<p id="completeRatio" style = "color:red;font-size:18px;font-weight:bold;">'+data[i].complete_ratio+'%</p>'
+								+'<p id="completeRatio" style = "color:red;font-size:12px;font-weight:bold;">'+data[i].complete_ratio+'%</p>'
 								+'</div>'
 								+'</div>'
 								+'</div>';
@@ -216,22 +216,22 @@
 					var html = "";
 					for (var i in data) {
 					 	html += '<div class="weui-cell">'
-								+'<div class="weui-cell__bd t-c" id="productName">'+data[i].custom_name
+								+'<div class="weui-cell__bd t-c" id="productName" style = "font-size:13px;">'+data[i].custom_name
 								+'</div>'
 								+'</div>'
 								+'<div class="weui-cell">'
 								+'<div class="weui-cell__bd weui-flex t-c">'
 								+'<div class="weui-flex__item">'
-								+'<p>计划数量</p>'
-								+'<p id="planNum">'+data[i].plan_num+'</p>'
+								+'<p style = "font-size:12px;">计划数量</p>'
+								+'<p id="planNum" style = "font-size:12px;">'+data[i].plan_num+'</p>'
 								+'</div>'
 								+'<div class="weui-flex__item">'
-								+'<p>完成数量</p>'
-								+'<p id="completeNum">'+data[i].complete_num+'</p>'
+								+'<p style = "font-size:12px;">完成数量</p>'
+								+'<p id="completeNum" style = "font-size:12px;">'+data[i].complete_num+'</p>'
 								+'</div>'
 								+'<div class="weui-flex__item">'
-								+'<p>完成比率</p>'
-								+'<p id="completeRatio" style = "color:red;font-size:18px;font-weight:bold;">'+data[i].complete_ratio+'%</p>'
+								+'<p style = "font-size:12px;">完成比率</p>'
+								+'<p id="completeRatio" style = "color:red;font-size:12px;font-weight:bold;">'+data[i].complete_ratio+'%</p>'
 								+'</div>'
 								+'</div>'
 								+'</div>';
@@ -438,11 +438,11 @@
 					<div class="weui-cells mg-0" onclick="showPlans(this)">
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
-								<div class="customer_name">
-									<span id="userName"></span>
+								<div class="customer_name" style = "font-weight:545;">
+									<span id="userName" style = "font-size:16px;"></span>
 									<input type = "hidden" id = "userId" value = ""/>
 									<input type = "hidden" id = "plansId" value = ""/>
-									<span class="fr orange ft12" id="typeName"></span>
+									<span class="fr orange ft12" id="typeName" ></span>
 								</div>
 								<div class="weui-flex gray ft12 startEnd">
 									<div class="weui-flex__item">
@@ -454,14 +454,14 @@
 									</div>
 								</div>
 								<div class="weui-flex gray ft12 startEnd">
-									<div class="weui-flex__item">计划金额：
-										<span id="planNumAmount" class="fr red ft10" style = "float:none;"></span>
+									<div class="weui-flex__item" >计划金额：
+										<span id="planNumAmount" class="fr red ft12" style = "float:none;"></span>
 									</div>
 									<div class="weui-flex__item t-r">完成金额：
-										<span id="completeNumAmount" class="fr red ft10" style = "float:none;"></span>
+										<span id="completeNumAmount" class="fr red ft12" style = "float:none;"></span>
 									</div>
 									<div class="weui-flex__item t-r">完成比例：
-										<span id="amountCompleteRatio" class="fr red ft10" style = "float:none;"></span>
+										<span id="amountCompleteRatio" class="fr red ft12" style = "float:none;"></span>
 									</div>
 								</div>
 							</div>
