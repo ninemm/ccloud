@@ -50,7 +50,7 @@ public class PlansQuery extends JBaseQuery {
 	
 	
 	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type,String startDate,String endDate,String dateType,String sellerId) {
-		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
+		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM" ); 
 		String str = sdf.format(new Date());
 		String select = "SELECT cp.id,cp.plans_month,cp.user_id,cp.type,cp.seller_product_id,cp.start_date,cp.end_date,cs.seller_name,t1.plansNum as planNumAmount, t1.completeNum as completeNumAmount ,t1.completeNum/t1.plansNum as completeRatio \r\n" + 
 				"  ";
@@ -77,7 +77,7 @@ public class PlansQuery extends JBaseQuery {
 		if(StrKit.notBlank(dateType)) {
 			fromBuilder.append("and cp.plans_month = '"+dateType+"-01 00:00:00' ");
 		}else {
-			fromBuilder.append("and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' ");
+			fromBuilder.append("and cp.plans_month = '"+str+"-01 00:00:00' ");
 		}
 		fromBuilder.append("and pd.data_area like '"+dataArea+"' ");
 //		fromBuilder.append("and cp.seller_id = '"+sellerId+"' ");
@@ -90,7 +90,7 @@ public class PlansQuery extends JBaseQuery {
 
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String userId, String type,
 	                                   String startDate, String endDate, String sellerId, String dataArea, String showType, String sellerProductId, String datetimePicker) {
-		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
+		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM" ); 
 		String str = sdf.format(new Date());
 		String select = "SELECT pd.*,d.name as typeName,u.realname,csp.custom_name,cp.start_date,cp.end_date,SUM(pd.plan_num*csp.price) as AmountPlan,SUM(pd.complete_num*csp.price) as AmountComplete  ";
 		StringBuilder fromBuilder = new StringBuilder("from cc_plans_detail pd ");
@@ -127,7 +127,7 @@ public class PlansQuery extends JBaseQuery {
 		if(StrKit.notBlank(datetimePicker)){
 			fromBuilder.append(" and cp.plans_month = '"+datetimePicker+"-01 00:00:00' ");
 		}else {
-			fromBuilder.append("and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' ");
+			fromBuilder.append("and cp.plans_month = '"+str+"-01 00:00:00' ");
 		}
 		if(showType != null && showType.equals(Consts.PLAN_SHOW_SELLER_PRODUCT)) {
 			fromBuilder.append(" GROUP BY pd.seller_product_id,cp.id  order by cp.create_date desc ");

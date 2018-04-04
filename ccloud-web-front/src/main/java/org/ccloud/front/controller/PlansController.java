@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +67,6 @@ public class PlansController extends BaseFrontController {
 			renderAjaxResultForError("未在定制化中配置销售计划的起止时间");
 			return;
 		}
-		String[] time = ti.split("-");
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
 //		try {
@@ -89,19 +89,33 @@ public class PlansController extends BaseFrontController {
 		plans.setSellerId(sellerId);
 		plans.setUserId(user.getId());
 		plans.setType(type);
+		int index = datetimePicker.indexOf("-");
+		String day = datetimePicker +"-"+ti;
+		Calendar cal = Calendar.getInstance();  
+		//设置年份  
 		try {
-			int index = datetimePicker.indexOf("-");
-			String months = datetimePicker.substring(index+1,datetimePicker.length());
-			String year = datetimePicker.substring(0, index);
-			if(months.equals("01")) {
-				startDate = (Integer.parseInt(year)-1)+"-12-"+time[0];
+			if(StrKit.notBlank(ti)) {
+				cal.setTime(sdf.parse(day));
+				cal.set(Calendar.YEAR,Integer.parseInt(datetimePicker.substring(0,index)));  
+				plans.setStartDate(sdf.parse(day));
+				//设置月份  
+				cal.set(Calendar.MONTH, Integer.parseInt(datetimePicker.substring(index+1,datetimePicker.length()))-1); 
+				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+				endDate= sdf.format(cal.getTime());//获得前一天
+				startDate =  datetimePicker+"-"+ti;
+				plans.setEndDate(sdf.parse(endDate));
+				plans.setPlansMonth(sd.parse(datetimePicker));
 			}else {
-				startDate = year+"-"+(Integer.parseInt(months)-1)+"-"+time[0];
+				startDate = datetimePicker + "-01";
+				cal.setTime(sdf.parse(datetimePicker + "-01"));
+				cal.set(Calendar.YEAR,Integer.parseInt(datetimePicker.substring(0,index)));  
+				plans.setStartDate(sdf.parse(startDate));
+				//设置月份  
+				cal.set(Calendar.MONTH, Integer.parseInt(datetimePicker.substring(index+1,datetimePicker.length()))); 
+				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+				endDate= sdf.format(cal.getTime());//获得前一天
+				plans.setEndDate(sdf.parse(endDate));
 			}
-			endDate =  datetimePicker+"-"+time[1];
-			plans.setStartDate(sdf.parse(startDate));
-			plans.setEndDate(sdf.parse(endDate));
-			plans.setPlansMonth(sd.parse(datetimePicker));
 		} catch (ParseException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
