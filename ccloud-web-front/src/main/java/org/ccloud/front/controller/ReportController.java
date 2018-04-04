@@ -157,7 +157,8 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String userId = getPara("userId");
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, null, userId, dataArea, orderTag);
+		String print = getPara("print");
+		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, null, userId, dataArea, orderTag, print);
 		renderJson(record);
 	}
 	
