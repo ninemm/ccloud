@@ -57,7 +57,7 @@ public class PlansQuery extends JBaseQuery {
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
 		fromBuilder.append("LEFT JOIN cc_seller cs on cs.id = cp.seller_id ");
 		fromBuilder.append("LEFT JOIN (select pd.plans_id,SUM(pd.plan_num*csp.price) as plansNum, SUM(pd.complete_num*csp.price) as completeNum from cc_plans_detail pd LEFT JOIN cc_plans p on p.id = pd.plans_id ");
-		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id GROUP BY pd.plans_id ) t1 on t1.plans_id = cp.id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id where pd.data_area like '"+dataArea+"'  GROUP BY pd.plans_id ) t1 on t1.plans_id = cp.id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = cp.user_id ");
 		fromBuilder.append("LEFT JOIN cc_plans_detail pd on pd.plans_id = cp.id ");
 		LinkedList<Object> params = new LinkedList<Object>();

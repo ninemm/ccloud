@@ -31,7 +31,8 @@
 	var time;
 	var page = 1;
 	var size = 10;
-
+	var planAmount = 0;
+	var completeAmount = 0;
 	$(document).on("compositionstart", "#searchInput", function() {
 		cpLock = false;
 	}).on("compositionend", "#searchInput", function() {
@@ -98,10 +99,14 @@
 			var showType = $("#show").data('values');
 			$(".planList").html("");
 			if(showType == "101205"){
+				planAmount = 0;
+				completeAmount = 0;
 				showSellerProduct(params);
 				$(".userId").hide();
 				$(".sellerProductId").show();
 			}else{
+				planAmount = 0;
+				completeAmount = 0;
 				showBizUser(params);
 				$(".userId").show();
 				$(".sellerProductId").hide();
@@ -278,8 +283,6 @@
 					loading = true;
 					return;
 				}
-				var planAmount = 0;
-				var completeAmount = 0;
 				$.each(data.planList, function(index, el) {
 					$planList.append(newHtml);
 					 var old = index-1;
@@ -315,8 +318,7 @@
 				$loading.hide();
 				$("#planAmount").html("");
 				$("#completeAmount").html("");
-				var planAmount = 0;
-				var completeAmount = 0;
+				
 				if(data.planList.length == 0) {
 					if($('.planList').length == 0) $noMore.show();
 					loading = true;
