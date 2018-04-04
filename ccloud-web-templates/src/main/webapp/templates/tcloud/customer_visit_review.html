@@ -47,7 +47,10 @@
 <#macro script>
 
     var $gallery1 = $("#gallery1"), $galleryImg1 = $("#galleryImg1");
-    var $uploaderFiles1 = $('#uploaderFiles1');
+    var $uploaderFiles1 = $('.uploaderFiles1');
+
+    var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+    var $uploaderFiles = $('#uploaderFiles');
 
     $(function(){
         var index;
@@ -60,13 +63,22 @@
         $gallery1.on("click", function() {
             $gallery1.fadeOut(100);
         });
+
+        var index;
+        $uploaderFiles.on("click", "li", function() {
+            index = $(this).index();
+            $galleryImg.attr("style", this.getAttribute("style"));
+            $gallery.fadeIn(100);
+        });
+
+        $gallery.on("click", function() {
+            $gallery.fadeOut(100);
+        });
     });
 
     var imageArr = [];
     var count = 3;
     var $picNum = $('#weui-uploader__info');
-    var $uploaderFiles = $('#uploaderFiles');
-    var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 
     var Orientation = null;
     var MAX_HEIGHT = 1000;
@@ -97,7 +109,7 @@
                     $.alert("最多上传3张图片");
                     return false;
                 }
-                imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name });
+                imageArr.push({"pic":rst.base64, "picname":rst.origin.name });
                 $("#pic").val(JSON.stringify(imageArr));
                 var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
                 $uploaderFiles.append(str);
@@ -106,18 +118,6 @@
             .catch(function (err) {
                 alert('失败');
             })
-        });
-        
-
-        var index; //第几张图片
-        $(document).on("click", ".uploaderFiles li", function() {
-            index = $(this).index();
-            $galleryImg.attr("style", this.getAttribute("style"));
-            $gallery.fadeIn(100);
-        });
-
-        $gallery.on("click", function() {
-            $gallery.fadeOut(100);
         });
 
         //删除图片  删除图片的代码也贴出来。
@@ -312,7 +312,7 @@
                            			<span class="weui-uploader__info">${list.remark}</span>
                            			<hr style="border:1px dashed #0000fff"/>
                   						 <div class="weui-uploader__bd">
-                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
+                       					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
 				                            <#if (customerVisit.imageList) ??>
 			                                <#list customerVisit.imageList as bean>
 		                            			<#if (list.orderList == bean.orderList)>
@@ -326,7 +326,7 @@
                            		</#list>
                           		<#else> 
                          				<div class="weui-uploader__bd">
-                      					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
+                      					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
 	                            		<#list customerVisit.imageList as bean>
 		                                   	<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
 		                                </#list>
