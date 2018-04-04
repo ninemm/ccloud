@@ -876,10 +876,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			if (list!=null) {
 				ScenePhoto=addPhoto(list);
 				if (ScenePhoto==null) {
-					renderAjaxResultForError("同步图片失败!");
-					return;
+					ScenePhoto="";
+//					renderAjaxResultForError("同步图片失败!");
+//					return;
+				}else {
+					ScenePhoto=ScenePhoto.substring(1, ScenePhoto.length()-1);
 				}
-				ScenePhoto=ScenePhoto.substring(1, ScenePhoto.length()-1);
 			}
 			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
 			Long shopId = addCustomer(YxActivity.getStr("customerId"));
