@@ -99,7 +99,7 @@ public class PlansController extends BaseFrontController {
 				cal.set(Calendar.YEAR,Integer.parseInt(datetimePicker.substring(0,index)));  
 				plans.setStartDate(sdf.parse(day));
 				//设置月份  
-				cal.set(Calendar.MONTH, Integer.parseInt(datetimePicker.substring(index+1,datetimePicker.length()))-1); 
+				cal.set(Calendar.MONTH, Integer.parseInt(datetimePicker.substring(index+1,datetimePicker.length()))); 
 				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
 				endDate= sdf.format(cal.getTime());//获得前一天
 				startDate =  datetimePicker+"-"+ti;

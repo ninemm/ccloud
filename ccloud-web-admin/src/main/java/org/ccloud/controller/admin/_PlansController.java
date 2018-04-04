@@ -260,10 +260,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
-		if(StrKit.isBlank(ti)) {
-			renderAjaxResultForError("未在定制化中配置销售计划的起止时间");
-			return;
-		}
 		//开始时间
 		File file = getFile().getFile();
 		String month = getPara("start");
@@ -631,7 +627,7 @@ public void downloading() throws UnsupportedEncodingException{
 				cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
 				plans.setStartDate(sdf.parse(day));
 				//设置月份  
-				cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))-1); 
+				cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
 				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
 				endDate= sdf.format(cal.getTime());//获得前一天
 				startDate =  month+"-"+ti;
@@ -669,7 +665,7 @@ public void downloading() throws UnsupportedEncodingException{
 					renderAjaxResultForError("产品："+sellerProduct.getCustomName()+" 已经存在该月计划");
 					return;
 				}
-				if(StrKit.isBlank(getPara("planNum"+i))) {
+				if(getPara("planNum"+i).equals("0")) {
 					renderAjaxResultForError("产品："+sellerProduct.getCustomName()+" 数量不能为0");
 					return;
 				}
