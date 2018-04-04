@@ -60,6 +60,7 @@ import org.ccloud.model.PlansDetail;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.PlansDetailQuery;
 import org.ccloud.model.query.PlansQuery;
 import org.ccloud.model.query.SellerProductQuery;
@@ -256,6 +257,14 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
 		List<User> users = UserQuery.me().findByData(dataArea);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
+		if(StrKit.isBlank(ti)) {
+			renderAjaxResultForError("未在定制化中配置销售计划的起止时间");
+			return;
+		}
+		String[] time = ti.split("-");
 		//开始时间
 		File file = getFile().getFile();
 		String month = getPara("start");
@@ -268,10 +277,20 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		plans.setUserId(user.getId());
 		plans.setType("101202");
 		try {
+			int index = month.indexOf("-");
+			String months = month.substring(index+1,month.length());
+			String year = month.substring(0, index);
+			if(months.equals("01")) {
+				startDate = (Integer.parseInt(year)-1)+"-12-"+time[0];
+			}else {
+				startDate = year+"-"+(Integer.parseInt(months)-1)+"-"+time[0];
+			}
+			endDate =  month+"-"+time[1];
 			plans.setStartDate(sdf.parse(startDate));
 			plans.setEndDate(sdf.parse(endDate));
-			plans.setPlansMonth((new SimpleDateFormat("yyyy-MM")).parse(month));
+			plans.setPlansMonth(sd.parse(month));
 		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		plans.setDeptId(user.getDepartmentId());
@@ -294,7 +313,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 				 for(int j = 0;j<productRecords.size();j++) {
 					PlansDetail detail = PlansDetailQuery.me().findbySSEU(getPara("sellerProduct"+i),startDate,endDate,us.getId());
 					String sellerProductId = sheet.getRow(j+2).getCell(0).getStringCellValue();
-					SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
 					if(detail!=null) {
 						inNum++;
 						continue;
@@ -582,6 +600,14 @@ public void downloading() throws UnsupportedEncodingException{
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String month = getPara("month");
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
+		if(StrKit.isBlank(ti)) {
+			renderAjaxResultForError("未在定制化中配置销售计划的起止时间");
+			return;
+		}
+		String[] time = ti.split("-");
+		endDate = month +"-"+ (Integer.parseInt(time[1])-1);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
 //		try {
@@ -598,20 +624,26 @@ public void downloading() throws UnsupportedEncodingException{
 		plans.setSellerId(sellerId);
 		plans.setType(planType);
 		try {
+			int index = month.indexOf("-");
+			String months = month.substring(index+1,month.length());
+			String year = month.substring(0, index);
+			if(months.equals("01")) {
+				startDate = (Integer.parseInt(year)-1)+"-12-"+time[0];
+			}else {
+				startDate = year+"-"+(Integer.parseInt(months)-1)+"-"+time[0];
+			}
+			endDate =  month+"-"+time[1];
 			plans.setStartDate(sdf.parse(startDate));
 			plans.setEndDate(sdf.parse(endDate));
-		} catch (ParseException e) {
-			e.printStackTrace();
+			plans.setPlansMonth(sd.parse(month));
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		plans.setDeptId(user.getDepartmentId());
 		plans.setDataArea(user.getDataArea());
 		plans.setCreateDate(new Date());
 		plans.setUserId(user.getId());
-		try {
-			plans.setPlansMonth(sd.parse(month));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
 		int num = Integer.parseInt(getPara("productNum"));
 		int inCnt = 0;
 		for(String  userId: userIds) {

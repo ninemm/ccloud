@@ -13,7 +13,20 @@
 		$(".plansShow").css('display','none');
 		combo();
 	});
-
+	$("#datetime-picker").datetimePicker({
+				times: function () {
+		          return [];
+		        }
+			});
+	$("#datetime-picker").click(function(){
+			$(".picker-items-col:nth-child(5)").hide();
+			$(".picker-items-col:nth-child(4)").hide();
+		});
+	$("#datetime-picker").change(function(){
+		var date3 = new Date($("#datetime-picker").val().replace(/-/g,"/"));	
+		$("#datetime-picker").val(date3.Format("yyyy-MM"));
+		 combo();
+	});
 	var cpLock = true;
 	var time;
 	var page = 1;
@@ -76,6 +89,7 @@
 				"keyword": $("#searchInput").val(),
 				"userId": $("#userId").data('values'),
 //				"type": $("#type").data('values'),
+				"datetimePicker" : $("#datetime-picker").val(),
 				"type": "101202",
 				"show":$("#show").data('values'),
 				"startDate": startDate,
@@ -236,6 +250,7 @@
 //			"type": $("#type").data('values'),
 			"type": "101202",
 			"show":$("#show").data('values'),
+			"datetimePicker" : $("#datetime-picker").val(),
 			"sellerProductId": $("#sellerProductId").data('values'),
 			"startDate": startDate,
 			"endDate": endDate
@@ -406,11 +421,15 @@
 						<input type="text" id="show" placeholder="显示方式" class="weui-input" readonly>
 						<i class="icon-sort-desc"></i>
 					</div>
+					<div class="weui-flex__item">
+						<input type="text" class="weui-input fr" id='datetime-picker'  readonly="" placeholder="计划月份"/>
+						<i class="icon-sort-desc"></i>
+					</div> 
 				</div>
 			</div>
-			<div id="combin-filter-btn">
+			<!-- <div id="combin-filter-btn">
 				<i class="icon-th-list"></i>
-			</div>
+			</div> -->
 		</header>
 		<main>
 			<div class="ft12 planList">

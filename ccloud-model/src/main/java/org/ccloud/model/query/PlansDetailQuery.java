@@ -15,6 +15,8 @@
  */
 package org.ccloud.model.query;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -80,6 +82,8 @@ public class PlansDetailQuery extends JBaseQuery {
 	
 	public Page<Record> paginateForAppMyPlan(int pageNumber, int pageSize, String keyword,
             String startDate, String endDate, String sellerId, String dataArea,String userId,String sellerProductId,String datetimePicker) {
+			SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
+			String str = sdf.format(new Date());
 			String select = "select o.*,cp.start_date,cp.end_date, u.realname, d.name as typeName, sp.custom_name,SUM(o.plan_num*sp.price) AS planNumAmount,SUM(o.complete_num*sp.price) AS completeNumAmount ";
 			StringBuilder fromBuilder = new StringBuilder("from `cc_plans_detail` o ");
 			fromBuilder.append("join user u ON o.user_id = u.id ");
@@ -103,8 +107,10 @@ public class PlansDetailQuery extends JBaseQuery {
 			
 			if(StrKit.notBlank(datetimePicker)){
 				fromBuilder.append(" and cp.plans_month = '"+datetimePicker+"-01 00:00:00' ");
+			}else {
+				fromBuilder.append("and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' ");
 			}
-			if (StrKit.notBlank(startDate)) {
+			/*if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cp.start_date >= ?");
 			params.add(startDate);
 			}
@@ -112,7 +118,7 @@ public class PlansDetailQuery extends JBaseQuery {
 			if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and cp.start_date <= ?");
 			
-			}
+			}*/
 			fromBuilder.append(" and cp.type in ('"+Consts.MONTH_PLAN+"') GROUP BY cp.seller_id,o.user_id, cp.type, o.seller_product_id ,cp.start_date,cp.end_date order by cp.start_date desc,o.complete_ratio desc, cp.create_date desc ");
 			
 			if (params.isEmpty())
@@ -171,10 +177,14 @@ public class PlansDetailQuery extends JBaseQuery {
 	}
 	
 	public List<PlansDetail> findbyDateAreaAndUserId(String dataArea,String userId,String sellerId){
+		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
+		String str = sdf.format(new Date());
 		String sql = "SELECT pd.*,csp.custom_name from cc_plans_detail pd "
 				+ "LEFT JOIN cc_plans cp on cp.id = pd.plans_id "
 				+ "LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id "
-				+ "where cp.seller_id = '"+sellerId+"' and pd.user_id = '"+userId+"' GROUP BY pd.seller_product_id";
+				+ "where cp.seller_id = '"+sellerId+"' and pd.user_id = '"+userId+"' "
+				+ "and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' "
+				+ " GROUP BY pd.seller_product_id";
 		return DAO.find(sql);
 	}
 	

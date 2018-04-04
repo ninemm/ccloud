@@ -59,6 +59,16 @@ public class PlansController extends BaseFrontController {
 		String type = getPara("typeId");
 		String datetimePicker = getPara("datetime-picker");
 		String startDate = getPara("start-date");
+		String endDate = getPara("end-date");
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
+		if(StrKit.isBlank(ti)) {
+			renderAjaxResultForError("未在定制化中配置销售计划的起止时间");
+			return;
+		}
+		String[] time = ti.split("-");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
 //		try {
 //			if(sdf.parse(startDate).before(sdf.parse(startDateM)) || sdf.parse(startDate).after(sdf.parse(endDateM))) {
 //				renderAjaxResultForError("计划的开始时间不在计划月内");
@@ -67,7 +77,6 @@ public class PlansController extends BaseFrontController {
 //		} catch (ParseException e1) {
 //			e1.printStackTrace();
 //		}
-		String endDate = getPara("end-date");
 		String[] productIds = getParaValues("productId");
 		String[] productNum = getParaValues("productNum");
 		if(productNum==null) {
@@ -81,11 +90,21 @@ public class PlansController extends BaseFrontController {
 		plans.setUserId(user.getId());
 		plans.setType(type);
 		try {
-			plans.setStartDate(( new SimpleDateFormat("yyyy-MM-dd")).parse(startDate));
-			plans.setEndDate(( new SimpleDateFormat("yyyy-MM-dd")).parse(endDate));
-			plans.setPlansMonth(( new SimpleDateFormat("yyyy-MM")).parse(datetimePicker));
-		} catch (ParseException e) {
-			e.printStackTrace();
+			int index = datetimePicker.indexOf("-");
+			String months = datetimePicker.substring(index+1,datetimePicker.length());
+			String year = datetimePicker.substring(0, index);
+			if(months.equals("01")) {
+				startDate = (Integer.parseInt(year)-1)+"-12-"+time[0];
+			}else {
+				startDate = year+"-"+(Integer.parseInt(months)-1)+"-"+time[0];
+			}
+			endDate =  datetimePicker+"-"+time[1];
+			plans.setStartDate(sdf.parse(startDate));
+			plans.setEndDate(sdf.parse(endDate));
+			plans.setPlansMonth(sd.parse(datetimePicker));
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		plans.setDeptId(user.getDepartmentId());
 		plans.setDataArea(user.getDataArea());
@@ -159,7 +178,8 @@ public class PlansController extends BaseFrontController {
 		String endDate = getPara("endDate");
 		String showType = getPara("show");
 		String sellerProductId = getPara("sellerProductId");
-		Page<Record> planList = PlansQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, userId, type, startDate, endDate, sellerId, selectDataArea,showType,sellerProductId);
+		String datetimePicker = getPara("datetimePicker"); 
+		Page<Record> planList = PlansQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword, userId, type, startDate, endDate, sellerId, selectDataArea,showType,sellerProductId,datetimePicker);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("planList", planList.getList());
