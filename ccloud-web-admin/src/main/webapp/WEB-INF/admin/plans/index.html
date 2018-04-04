@@ -33,7 +33,6 @@
 
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM', 3, 10, 3);
-		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM', 2, 4, 2);
 		jQuery.mm.initEditTable('#plans_table', url, initParams, initFields(), null);
 		$(".monthType").show();
 		/*$(".monthType").hide();
@@ -84,6 +83,15 @@
 		};
 		return param;
 	};
+	
+	var validatorFields = {
+		'startDate': {
+			validators: {
+				date : { format : 'yyyy-MM', message : '日期格式不正确' }
+			}
+		}
+	};
+	
 
 	var initFields = function() {
 		var fields =

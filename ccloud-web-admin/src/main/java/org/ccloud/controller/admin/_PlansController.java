@@ -515,7 +515,6 @@ public void downloading() throws UnsupportedEncodingException{
 		Cell uCell = row.createCell(3);
 		uCell.setCellValue(UserQuery.me().findById(_sellerProductDetails.get(i).get("user_id").toString()).getRealname());
 		uCell.setCellStyle(setBorder);
-		//周计划导出
 		 for(int  j= 0;j < details.size();j++) {
     		Cell p0Cell = row.createCell(2*(j+2)+j);
     		Cell p1Cell = row.createCell(2*(j+2)+j+1);
@@ -523,7 +522,7 @@ public void downloading() throws UnsupportedEncodingException{
 	    	 for(int k = 0; k < sellerProductDetails.size();k++) {
     			 if(sellerProductDetails.get(k).getStr("seller_product_id").equals(details.get(j).getStr("seller_product_id")) 
     					 && sellerProductDetails.get(k).getStr("user_id").equals(_sellerProductDetails.get(i).get("user_id"))
-//    					 && sellerProductDetails.get(k).get("type").equals(sellerProductDetails.get(i).get("type"))
+    					 && sellerProductDetails.get(k).get("plans_id").equals(sellerProductDetails.get(i).get("plans_id"))
     					 && sellerProductDetails.get(k).get("plansMonth").equals(_sellerProductDetails.get(i).get("plansMonth"))) {
     				 p0Cell.setCellValue(sellerProductDetails.get(k).getStr("plan_num"));
     				 p1Cell.setCellValue(sellerProductDetails.get(k).getStr("complete_num"));
