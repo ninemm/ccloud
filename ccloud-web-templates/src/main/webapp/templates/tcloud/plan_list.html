@@ -214,7 +214,6 @@
 				success:function(data)
 				{	
 					var html = "";
-					console.log(data);
 					for (var i in data) {
 					 	html += '<div class="weui-cell">'
 								+'<div class="weui-cell__bd t-c" id="productName">'+data[i].custom_name
@@ -456,13 +455,13 @@
 								</div>
 								<div class="weui-flex gray ft12 startEnd">
 									<div class="weui-flex__item">计划金额：
-										<span id="planNumAmount" class="fr red ft12"></span>
+										<span id="planNumAmount" class="fr red ft10" style = "float:none;"></span>
 									</div>
 									<div class="weui-flex__item t-r">完成金额：
-										<span id="completeNumAmount" class="fr red ft12"></span>
+										<span id="completeNumAmount" class="fr red ft10" style = "float:none;"></span>
 									</div>
-									<div class="weui-flex__item t-r">完成比例:
-										<span id="amountCompleteRatio" class="fr red ft12"></span>
+									<div class="weui-flex__item t-r">完成比例：
+										<span id="amountCompleteRatio" class="fr red ft10" style = "float:none;"></span>
 									</div>
 								</div>
 							</div>
