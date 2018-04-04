@@ -172,7 +172,7 @@
     
     function productCount(params) {
     	$.showLoading();
-		Utils.ajax('${CPATH}/report/productCount', params, 
+		Utils.ajax('${CPATH}/report/productCountMenu', params, 
 			function(data){
 				$.hideLoading();
 	            var length = data.length;
