@@ -114,7 +114,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		if(!sellerId.equals("")) {
 			fromBuilder.append(" and o.seller_id = '"+sellerId+"' ");
 		}
-		fromBuilder.append(" and ( o.order_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) order by o.create_date desc");
+		
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and ( o.order_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' )");
+		}
+		
+		fromBuilder.append(" order by o.create_date desc");
 
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
