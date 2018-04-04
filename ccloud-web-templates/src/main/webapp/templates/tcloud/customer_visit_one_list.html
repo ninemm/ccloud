@@ -94,19 +94,24 @@
         <main id="visitList" class="infinite">
             <#if visitList??>
                 <#list visitList.list as visit>
-                    <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}&one=1">
-                        <div class="weui-cell__bd ft14">
-                            <p>${(visit.customer_name)!}</p>
-                            <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
-                                <span class="fr">${(visit.create_date)!}</span>
-                            </p>
-                            <p>活动类型：
-                                <span class="orange">${DICT_NAME(visit.question_type)}</span>
-                                <span class="green fr">${DICT_NAME(visit.status)}</span>
-                            </p>
-                        </div>
-                        <span class="weui-cell__ft"></span>
-                    </a>
+                    <#if visit.status! == "100104">
+	                    <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/customerVisitWaiting?id=${(visit.id)!}&one=1">
+                   <#else>
+                  		 <a class="weui-cell weui-cell_access" href="${(CPATH)}/customerVisit/detail?id=${(visit.id)!}&one=1">
+                    </#if>
+	                        <div class="weui-cell__bd ft14">
+	                            <p>${(visit.customer_name)!}</p>
+	                            <p class="gray ft12">${(visit.contact)!}/${(visit.mobile)!}
+	                                <span class="fr">${(visit.create_date)!}</span>
+	                            </p>
+	                            <p>活动类型：
+	                                <span class="orange">${DICT_NAME(visit.question_type)}</span>
+	                                <span class="green fr">${DICT_NAME(visit.status)}</span>
+	                            </p>
+	                        </div>
+	                        <span class="weui-cell__ft"></span>
+	                    </a>
+	                 
                 </#list>
             </#if>
             <#if visitList??>

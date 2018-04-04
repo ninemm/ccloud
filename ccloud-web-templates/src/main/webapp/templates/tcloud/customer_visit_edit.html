@@ -19,14 +19,13 @@
     var orgCustomerList = {};
     var customerSelect = [];
     var problemSelect = [];
-
+	var count = 3;
     var imageArr = [];
-    var count = 3;
     var $form = $("#form");
     var $picNum = $('.weui-uploader__info');
-    var $uploaderFiles = $("#uploaderFiles");
+    var $uploaderFiles = $(".uploaderFiles");
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
-
+	var numImage = 0;
     var Orientation = null;
     var MAX_HEIGHT = 1000;
 
@@ -64,7 +63,6 @@
                 $('#location').val(address);
             }
         )
-
         $("#length").text($("#question_desc").val().length + '/' + 70);
         $(document).on("input", "#question_desc", function() {
             $("#length").text($("#question_desc").val().length + '/' + 70);
@@ -72,25 +70,34 @@
 
         $(document).on("click", "#customer_name", function () {
 	        window.location.href = '${CPATH}/customerVisit/visitCustomerChoose';
-	    }).on('change', '#uploaderInput', function () {
-            lrz(this.files[0], {width: 1024} )
-                .then(function (rst) {
-                    if ($("#uploaderFiles")[0].children.length + 1 > count) {
-                    $.alert("最多上传3张图片");
+    }).on("change", ".uploaderInput", function () {
+        var $this = $(this);
+        var files = this.files;
+        var arrNum = imageArr.length;
+        var num = 1 + $this.parent().prev().find("li").length;
+
+        lrz(this.files[0], {width: 1024} )
+            .then(function (rst) {
+                if (num > count) {
+                    $.alert("最多上传三张图片");
                     return false;
                 }
-                imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name});
+                if($("#activity_title").val()!=null){
+                    imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":$this.parent().parent().parent().find("#orderList").val()});
+                }else{
+                    imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":"0"});
+                }
                 $("#pic").val(JSON.stringify(imageArr));
                 var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
-                $uploaderFiles.append(str);
+                $this.parent().prev().append(str);
                 $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
             })
             .catch(function (err) {
                 alert('失败');
             })
         });
-	
-	    $("#question_type").select({
+
+    $("#question_type").select({
 	        title: "请选择问题类型",
 	        multi: false,
 	        items: JSON.parse('${problem}'),
@@ -114,11 +121,66 @@
 		        		if(data.activityRecords!='[]'){
 						$("#activity_title").select({
 							title: "选择活动",
-							multi: true,
+							multi: false,
 							items: JSON.parse(data.activityRecords),
 							onClose: function(obj) {
 							    var activityIds = obj.data.values;
-							    $('#activity_id').val(activityIds);
+							    $('#activity_apply_id').val(activityIds);
+							  	var activityApplyId = $('#activity_apply_id').val();
+								if(activityApplyId){
+									$.ajax({
+								        url: "${CPATH}/customerVisit/getActivityExecute",
+								        data: {
+								            "activityApplyId": activityApplyId
+								        },
+								        dataType: "json",
+								        success: function(data) {
+								        		var activityExecute = data.activityExecute;
+								        		
+								        		if(activityExecute.length>0){
+									        		
+								        			$(".imageActivityExecute").hide();
+								        			$(".imgeInfo").hide();
+								        			var imageLists = data.imgeLists;
+								        			var domain = data.domain;
+								        			$(".imgeActivity").html("");
+								        			if(imageLists!=null){
+									        			numImage = imageLists.length;
+								        			}
+								        			for(var i = 0 ; i < activityExecute.length ; i++){
+								        				var html = "";
+								        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
+						                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
+							                           for(var j = 0 ; j < numImage ; j++){
+							                           		console.log(imageLists[j].orderList +"--"+ activityExecute[i].orderList)
+							                            	if(imageLists[j].orderList == activityExecute[i].orderList){
+								                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imageLists[j].savePath+')"></li>';
+							                           			imageArr.push({"pic":imageLists[j].originalPath, "picname":imageLists[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imageLists[j].savePath});
+							                            	}
+							                            }
+								                        if(numImage==0 || (imageLists[imageLists.length-1].orderList != activityExecute[i].orderList && i == (activityExecute.length-1))){
+						                                	html +='</ul>'
+							                                	+'<div class="weui-uploader__input-box">'
+							                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
+							                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
+							                                	+'</div></div></div>';
+							                                	$("#activity_execute_id").val(activityExecute[i].id);
+								                          }else{
+								                          	html +='</ul></div></div>';
+								                          }
+														 $(".imgeActivity").append(html);
+								        				
+								        			}
+								        			var maxOrderList = data.maxOrderList;
+								        			if(numImage != null && imageLists!=null){
+									        			if(imageLists.length>0 && activityExecute.length == maxOrderList){
+									        				$("._submit_btn").hide();
+									        			}
+								        			}
+								        		}
+								        }
+							        });
+								}
 							}
 						});
 		        		}
@@ -126,10 +188,12 @@
 	        });
 		}
 
-
         var index; //第几张图片
-        $uploaderFiles.on("click", "li", function() {
+        var $uploaderFiles ;
+        $(document).on("click", ".uploaderFiles li", function() {
+            _index = $(this).index()+numImage;
             index = $(this).index();
+            $uploaderFiles = $(this).parent();
             $galleryImg.attr("style", this.getAttribute("style"));
             $gallery.fadeIn(100);
         });
@@ -139,11 +203,11 @@
         });
 
         //删除图片  删除图片的代码也贴出来。
-        $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+        $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
-            $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
-            imageArr.splice(index, 1);
-            $("#pic").val(JSON.stringify(imageArr));
+            $uploaderFiles.parent().parent().find('.weui-uploader__info').text($uploaderFiles.children.length + '/' + count);
+            imageArr.splice(_index, 1);
+            $(".pic").val(JSON.stringify(imageArr));
         });
 
     });
@@ -159,19 +223,69 @@
         //    return false;
         //}
 
+       /*if($("#location").val().length==0) {
+            $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
+            return false;
+        }*/
+        /*if(imageArr.length == 0){
+        	 $.toptip('照片不能为空', 3000, 'error'); 
+            return false;
+        }*/
+
+        $.confirm("您确定要新增拜访吗？","新增拜访", function() {
+            doSubmit();
+        });
+    }
+    
+    function noSubmit(){
+    	if($("#problem_id").val().length==0) {
+            $.toptip('问题类型不能为空', 3000, 'error');
+            return false;
+        }
+
+        /*if($("#question_desc").val().length==0) {
+            $.toptip('备注描述不能为空', 3000, 'error'); 
+            return false;
+        }*/
+
         if($.trim($("#location").val()).length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
         }
 
-        $.confirm("您确定要新增拜访吗？","新增拜访", function() {
-            doSubmit();
+        $.confirm("您确定要新增补录吗？","新增补录", function() {
+            doNoSubmit();
         });
     }
 
     function doSubmit() {
         $.ajax({
             url: '${CPATH}/customerVisit/save',
+            method: 'post',
+            dataType: 'json',
+            data: $form.serialize(),
+            beforeSend: function() {
+                
+                $('._submit_btn').attr('disabled', true);
+                Utils.openLoadingWin('保存中...');
+            },
+            success: function(res) {
+                Utils.closeLoadingWin();
+                if (res.errorCode == 0) {
+                    location.href = '${CPATH}/customerVisit';
+                } else {
+                    $.alert(res.message);
+                }
+            },
+            error: function(res) {
+                Utils.closeLoadingWin();
+            }
+        });
+    }
+    
+    function doNoSubmit() {
+        $.ajax({
+            url: '${CPATH}/customerVisit/saveB',
             method: 'post',
             dataType: 'json',
             data: $form.serialize(),
@@ -204,8 +318,7 @@
                 $("#lat").val(lat.toFixed(6));
                 $('#location-span').text(address);
                 $('#location').val(address);
-            }
-        )
+        });
     }
 </#macro>
 <@layout>
@@ -261,7 +374,8 @@
 						<div class="order-customer-info-title">
 							活动&nbsp;&nbsp;&nbsp;
 						</div>
-						<input id="activity_id"  name="activity_id" type="hidden" />
+						<input id="activity_apply_id"  name="activity_apply_id" type="hidden" />
+						<input id="activity_execute_id"  name="activity_execute_id" type="hidden" />
 						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" readonly>
                     </div>
                     <span class="weui-cell__ft"></span>
@@ -295,16 +409,15 @@
             <section class="weui-cells weui-cells_form">
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
-                        <div class="weui-uploader">
+                        <div class="weui-uploader imgeActivity">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
-                                <div class="weui-uploader__info">0/3</div>
                             </div>
-                            <div class="weui-uploader__bd">
-                                <ul class="weui-uploader__files" id="uploaderFiles"></ul>
+                            <div class="weui-uploader__bd imageActivityExecute">
+                                <ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>
                                 <div class="weui-uploader__input-box">
-                                    <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="" capture="camera">
-                                    <input type="hidden" name="pic" id="pic">
+                                    <input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">
+                                    <input type="hidden" name="pic" id="pic" class="pic">
                                 </div>
                             </div>
                         </div>
@@ -326,6 +439,7 @@
     <#include "_inc/_goback.html" />
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
         <button class="red-button width-100 _submit_btn" onclick="submit()" href="">提交</button>
+        <button class="white-button width-100 _submit_btn" onclick="noSubmit()" href="" style = "color:#666;">稍后补录</button>
     </footer>
 </div>
 </@layout>

@@ -41,6 +41,10 @@ public class DateUtils {
     
     public static final String DEFAULT_UNSECOND_FORMATTER = "yyyy-MM-dd HH:mm";
     
+    public static final String DEFAULT_MID_FORMATTER = "yyyy/MM/dd HH:mm:ss";
+
+    public static final String DEFAULT_MID_FORMATTER_TWO = "yyyy-MM-dd'T'HH:mm:ss";
+    
 	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	static SimpleDateFormat dateSdf = new SimpleDateFormat("yyyyMMdd");
 

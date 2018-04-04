@@ -1,0 +1,218 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+	<script type="text/javascript" src="${CPATH}/static/plugins/bootstrap-treeview/js/bootstrap-treeview.js"></script>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+</#macro> 
+
+<#macro css_import>
+	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-treeview/css/bootstrap-treeview.css">
+	<!-- <link rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css"> -->
+</#macro>
+
+<#macro script>
+	var newTrIdx = 0;
+	var _activityExecteId = '${(activityExecteId)!}';
+	var activityExecuteTemplates = ${(activityExecuteTemplates)!};
+	var num = 0;
+	var $tbody = $("#table tbody");
+	var templateList = new Array();
+	var TL = new Array();
+	TL = localStorage.getItem("template");
+	$(document).ready(function() {
+		$("#activityExecteId").val(_activityExecteId);
+		//编辑时显示模板
+		/*if(TL!=null){
+			$.ajax({
+				url:"${CPATH}/admin/activity/getActivityExecuteTemplate",
+				type:"post",
+				dataType:"json",
+				data:{"activityExecteId":_activityExecteId},
+				success:function(data)
+				{
+					for (var i = 0; i < data.length; i++) {
+						template = {
+							activityExecteId : data[i].activityExecteId,
+							activityExecteTemplateId : data[i].id,
+							templateValue : data[i].template_value,
+							templateValueType : data[i].template_value_type,
+							templateValueTypeValue : data[i].template_value_opt
+						}
+						templateList.push(template);	
+					}
+				}
+			});
+		}*/
+	});
+	if(TL!=null){
+		$.each(JSON.parse(TL),function(index,item){
+			template = {
+					activityExecteId : item.activityExecteId,
+					activityExecteTemplateId : item.activityExecteTemplateId,
+					templateValue : item.templateValue,
+					templateValueType : item.templateValueType,
+					templateValueTypeValue : item.templateValueTypeValue
+				}
+			templateList.push(template);
+			if(item.activityExecteId == _activityExecteId){
+				addActivityExTpl(item);
+			}
+		});
+	}else{
+		$.ajax({
+				url:"${CPATH}/admin/activity/getActivityExecuteTemplate",
+				type:"post",
+				dataType:"json",
+				data:{"activityExecteId":_activityExecteId},
+				success:function(data)
+				{
+					for (var i = 0; i < data.length; i++) {
+						addActivityExTp(data[i]);
+					}
+				}
+			});
+	}
+	
+	function addActivityExTpl(el){
+		var newTrHtml = $tbody.find("tr:first").html();
+		newTrIdx = newTrIdx + 1;
+		var newTrId = 'tr' + newTrIdx;
+		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+		var $newTr = $("#" + newTrId);
+		<!--添加validate -->
+		var remarkName = "templateValue" + newTrIdx;
+		$newTr.find("#activityExecteTemplateId").attr("name","activityExecteTemplateId"+newTrIdx);
+		$newTr.find("#activityExecteTemplateId").val(el.activityExecteTemplateId);
+		$newTr.find("#templateValue").attr("name", "templateValue" + newTrIdx);
+		$newTr.find("#templateValue").val(el.templateValue);
+		$newTr.find("#templateValueType").attr("name","templateValueType" + newTrIdx);
+		$newTr.find("#templateValueType").val(el.templateValueType);
+		$newTr.find("#templateValueType").find("option[value='"+el.template_value_type+"']").attr("selected",true);
+		$newTr.find("#templateValueTypeValue").attr("name","templateValueTypeValue" + newTrIdx);
+		$newTr.find("#templateValueTypeValue").val(el.templateValueTypeValue);
+		num++;
+	}
+	
+	function addActivityExTp(el){
+		var newTrHtml = $tbody.find("tr:first").html();
+		newTrIdx = newTrIdx + 1;
+		var newTrId = 'tr' + newTrIdx;
+		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+		var $newTr = $("#" + newTrId);
+		<!--添加validate -->
+		var remarkName = "templateValue" + newTrIdx;
+		$newTr.find("#activityExecteTemplateId").attr("name","activityExecteTemplateId"+newTrIdx);
+		$newTr.find("#activityExecteTemplateId").val(el.id);
+		$newTr.find("#templateValue").attr("name", "templateValue" + newTrIdx);
+		$newTr.find("#templateValue").val(el.template_value);
+		$newTr.find("#templateValueType").attr("name","templateValueType" + newTrIdx);
+		$newTr.find("#templateValueType").val(el.template_value_type);
+		$newTr.find("#templateValueType").find("option[value='"+el.template_value_type+"']").attr("selected",true);
+		$newTr.find("#templateValueTypeValue").attr("name","templateValueTypeValue" + newTrIdx);
+		$newTr.find("#templateValueTypeValue").val(el.template_value_opt);
+		num++;
+	}
+	
+	function addActivityExT(){
+		var newTrHtml = $tbody.find("tr:first").html();
+		newTrIdx = newTrIdx + 1;
+		var newTrId = 'tr' + newTrIdx;
+		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+		var $newTr = $("#" + newTrId);
+		<!--添加validate -->
+		var remarkName = "templateValue" + newTrIdx;
+		$newTr.find("#activityExecteTemplateId").attr("name","activityExecteTemplateId"+newTrIdx);
+		$newTr.find("#templateValue").attr("name", "templateValue" + newTrIdx);
+		$newTr.find("#templateValueType").attr("name","templateValueType" + newTrIdx);
+		$newTr.find("#templateValueTypeValue").attr("name","templateValueTypeValue" + newTrIdx);
+		num++;
+	}
+	
+	//删除
+	function deleteTr(obj){
+		var $tr = $(obj).parent().parent();
+		var trIndex = $tr.attr("id").replace("tr", "");
+		$tr.remove();
+	}
+	function addTemplate(){
+		
+	}
+	function doSubmit(){
+		$.each(templateList,function(index,item){
+			if(item.activityExecteId ==  $("#activityExecteId").val()){
+				templateList.splice(index,1);
+			}
+		})
+		for(var i = 1 ; i <= num ; i++){
+			var tr = 'tr' + i;
+			var trId = document.getElementById(""+tr+"");
+			if(trId){
+				template = {
+					activityExecteId : $("#activityExecteId").val(),
+					activityExecteTemplateId : $("#"+tr+"").find("#activityExecteTemplateId").val(),
+					templateValue : $("#"+tr+"").find("#templateValue").val(),
+					templateValueType : $("#"+tr+"").find("#templateValueType").find("option:selected").val(),
+					templateValueTypeValue : $("#"+tr+"").find("#templateValueTypeValue").val()
+				}
+				templateList.push(template);		
+			}
+		}
+		localStorage.setItem("template", JSON.stringify(templateList));
+		console.log(templateList);
+		parent.setTemplate();
+	}
+	
+</#macro>
+
+<@layout>
+<div style="padding: 10px;">
+	 <table id="table" class="table table-bordered table-hover text-center" width="100%" name="row">
+			<thead>
+				<tr>
+					<th width="2%"></th>
+					<th width="18%">内容</th>
+					<th width="30%">展现形式</th>
+					<th width="50%">选项</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="hide">
+					<td>
+						<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
+					</td>
+					<td>
+						<input type="text" name = "templateValue" id="templateValue" value="" placeholder="例子：长/宽/高"/>
+						<input type="hidden" name = "activityExecteId" id="activityExecteId" value=""/>
+						<input type="hidden" name = "activityExecteTemplateId" id="activityExecteTemplateId" value=""/>
+					</td>
+					<td>
+						<div class = "validata-box" style="padding-left:35%;">
+							<select name = "templateValueType" id = "templateValueType" >
+								<#list dicts as dict>
+									<option value="${(dict.value)}">${(dict.name)}</option>
+								</#list>
+							</select>
+						</div>
+					</td>
+					<td>
+						<div class = "validata-box">
+							<input type="text" id="templateValueTypeValue" name="templateValueTypeValue" value="" placeholder="多个选项值用逗号表示"/>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td>
+						<button class="btn btn-xs btn-info" onclick="addActivityExT()" ><span class="glyphicon glyphicon-plus"></span></button>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+</div>
+		<div class="box-footer"> 
+			<input type = "hidden" id = "num" value = ""/>
+			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right"><span class="ladda-label">提交</span></button>
+			<!-- <input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" /> -->
+		</div>
+</@layout>

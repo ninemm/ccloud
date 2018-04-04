@@ -273,6 +273,14 @@ public abstract class BaseActivity<M extends BaseActivity<M>> extends JModel<M> 
 	public Integer getIsPublish() {
 		return getInt("is_publish");
 	}
+	
+	public void setIsLimit(Integer isLimit) {
+		set("is_limit", isLimit);
+	}
+
+	public Integer getIsLimit() {
+		return getInt("is_limit");
+	}
 
 	public void setCreateDate(java.util.Date createDate) {
 		set("create_date", createDate);

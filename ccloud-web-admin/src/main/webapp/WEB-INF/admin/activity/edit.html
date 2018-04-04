@@ -13,6 +13,8 @@
     <script src="${CPATH}/static/plugins/city-picker/js/city-picker.js"></script>
     <script src="${CPATH}/static/ladda/spin.min.js"></script>
 	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
+	<script src="${CPATH}/static/plugins/jquery/jquery.metadata.js"></script>
+ 	<script src="${CPATH}/static/tinymce/tinymce.min.js"></script>
 	
 </#macro>
 
@@ -25,6 +27,7 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 	<!-- cityPicker -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/city-picker/css/city-picker.css">
+	<link rel="stylesheet" href="${CPATH}/static/plugins/goods/goods.css">
 	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 	
 </#macro>
@@ -48,48 +51,72 @@
 }
 </#macro>
 <#macro script>
+	$(function(){
+	 	if($(".category").val() == 101002){
+			$(".investType").show();
+			$(".visitNum").show();
+			$("#expendDetail").show();
+			$(".investNum").hide();
+		}else{
+			$(".investType").hide();
+			$(".investNum").show();
+			$(".visitNum").hide();
+			$("#expendDetail").hide();
+			$(InputsWrapper).empty();
+		}
+	});
+	var MaxInputs       = 15; //maximum input boxes allowed  
+	var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID  
+	var AddButton       = $("#AddMoreFileBox"); //Add button ID  
+	var templateList = new Array();
+	var _templateList = new Array();
+	var x = InputsWrapper.length; //initlal text box count 
+	<#if activity??>
+		$("#expendHead").empty();
+		<#if activity.investType == "101101" || activity.investType == "101102" || activity.investType == "101103" || activity.investType == "101106">
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr>');
+		<#elseif activity.investType == "101104">
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th></tr>');
+		<#elseif activity.investType == "101105">
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th></tr>');
+			$(".needs").select2({
+				width: "100%",
+				language: "zh-CN"
+			});	
+			$(".product").select2({
+				data: ${productOptionList},
+				width: "100%",
+				language: "zh-CN"
+			});			
+		<#elseif activity.investType == "101107">
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th></tr>');
+			$(".product").select2({
+				data: ${productOptionList},
+				width: "100%",
+				language: "zh-CN"
+			});						
+		</#if>	
+		<#list expenseList! as list>
+		$('#product_${list_index}').val(['${list.item2}']).trigger('change');
+		</#list>	
+	</#if>
 	
 	var $form = $("#form");
 	var $city = $('#cityPicker');
 	var data = {url: '', alt: ''};
 	var result = false;
-	$("#invest_type").select2({
-		width: '100%'
-	});
-	$("#customer_type_store_option").select2({
-		width: '100%'
-	});
-	$("#customerType").select2({
-		width: '100%'
-	});
+	$("#customer_type_store_option").select2();
+	$("#customerType").select2({width: "100%"});
 	$(function() {
-		if($(".category").val()==101002){
+		if($(".category").val() == 101002){
 			$(".investType").show();
 			$(".visitNum").show();
-			var list = $("#invest_type").select2("val");
-			if (list != null && list.length > 0) {
-			for(var i =0;i<list.length;i++){
-				if(list[i]==101101 || list[i]==101102 || list[i]==101103 ||list[i]==101104 ||list[i]==101105 ||list[i]==101106 ){
-					result = true;
-					break;
-				}else{
-					result = false;
-				}
-			}
-			if(result == true ){
-				$(".investAmount").show();
-			}else{
-				$(".investAmount").hide();
-			}
-		}else{
-			$(".investAmount").hide();
-		}
+			$("#expendDetail").show();
 		}else{
 			$(".investType").hide();
 			$(".visitNum").hide();
 			$(".investAmount").hide();
 		}
-		
 		jQuery.mm.initValidator('#form', validatorFields)
 		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
@@ -98,7 +125,7 @@
 			async: false,
 			data:{"id":'${(activity.id)!}'},
 			success: function(data){
-				var optionsHtml = '<option value="0" >---请选择---</option>';
+				var optionsHtml = '';
 				if(data.length && data.length>=1){
 					for(var i in data){
 						if (data[i].isvalid == 0 ) {
@@ -130,23 +157,6 @@
 			}
 		});
 		
-		
-		$.ajax({
-			url:"${CPATH}/admin/activity/getInvestType",
-			type:"post",
-			dataType:"json",
-			success:function(data)
-			{
-				for (var i = 0; i < data.length; i++) {
-					if (data[i].isvalid == 0 ) {
-						$("#invest_type").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
-					} else {
-						$("#invest_type").append("<option value=" + data[i].id + " selected >" + data[i].name + "</option>");
-					}
-				}
-			}
-		});
-		
 		$city.citypicker({
             simple: true,
             responsive: true,
@@ -154,38 +164,97 @@
             city: '${(areaList[1])!}',
             district: '${(areaList[2])!}',
         });
+        
+        //编辑时显示执行步骤
+        $.ajax({
+			url:"${CPATH}/admin/activity/getActivityExecute",
+			type:"post",
+			dataType:"json",
+			data:{"activityId":'${(activity.id)!}'},
+			success:function(data)
+			{
+				for (var i = 0; i < data.length; i++) {
+					addActivityExecute(data[i]);
+					$.ajax({
+						url:"${CPATH}/admin/activity/getActivityExecuteTemplate",
+						type:"post",
+						dataType:"json",
+						async : false,
+						data:{"activityExecteId":data[i].id},
+						success:function(data)
+						{
+							for (var i = 0; i < data.length; i++) {
+								template = {
+									activityExecteId : data[i].activity_execute_id,
+									activityExecteTemplateId : data[i].id,
+									templateValue : data[i].template_value,
+									templateValueType : data[i].template_value_type,
+									templateValueTypeValue : data[i].template_value_opt
+								}
+								_templateList.push(template);	
+							}
+						}
+					});
+				}
+				localStorage.setItem("template", JSON.stringify(_templateList));
+			}
+		});
+        
 		
 	});
 	
 	$(document).on("change", ".category", function() {
-		if($(".category").val()==101002){
+		if($(".category").val() == 101002){
 			$(".investType").show();
 			$(".visitNum").show();
+			$("#expendDetail").show();
+			$(".investNum").hide();
 		}else{
 			$(".investType").hide();
+			$(".investNum").show();
 			$(".visitNum").hide();
+			$("#expendDetail").hide();
+			$(InputsWrapper).empty();
 		}
 	});
 	
 	$(document).on("change", ".investType", function() {
-		var list = $("#invest_type").select2("val");
+		var choose = $("#invest_type").val();
 		
-		if (list != null && list.length > 0) {
-			for(var i =0;i<list.length;i++){
-				if(list[i]==101101 || list[i]==101102 || list[i]==101103 ||list[i]==101104 ||list[i]==101105 ||list[i]==101106 ){
-					result = true;
-					break;
-				}else{
-					result = false;
-				}
-			}
-			if(result == true ){
-				$(".investAmount").show();
-			}else{
-				$(".investAmount").hide();
-			}
-		}else{
-			$(".investAmount").hide();
+		$("#InputsWrapper").empty();
+		$("#expendHead").empty();
+		if (choose == 101101) {
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr></data.length>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_PR', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');
+		} else if (choose == 101102) {
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_raise', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
+		} else if (choose == 101103) {
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_AD', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');		
+		} else if (choose == 101104) {
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">展示形式</th><th id="name3">投入数量</th><th id="name4">申请金额</th>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');		
+		} else if (choose == 101105) {
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');
+			$(".needs").select2();
+			$(".product").select2({
+				data: ${productOptionList},
+				width: "100%",
+				language: "zh-CN"
+			});			
+		} else if (choose == 101106) {
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">申请金额</th></tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_gift', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
+		} else if (choose == 101107) {
+			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th></tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><tr>');
+			$(".product").select2({
+				data: ${productOptionList},
+				width: "100%",
+				language: "zh-CN"
+			});						
 		}
 	});
 	
@@ -206,11 +275,6 @@
 				notEmpty: { message: '活动编码不能为空' }
 			}
 		},
-		'customerTy':{
-			validators: {
-				notEmpty: { message: '客户类型不能为空' }
-			}
-		},
 		'startDate': {
 			validators: {
 				notEmpty: { message: '活动开始时间不能为空' }
@@ -219,11 +283,6 @@
 		'endDate': {
 			validators: {
 				notEmpty: { message: '活动结束时间不能为空' }
-			}
-		},
-		'activity.total_customer_num': {
-			validators: {
-				notEmpty: { message: '参加活动的上限不能为空' }
 			}
 		},
 		'activity.category': {
@@ -249,15 +308,45 @@
 		    content: '${CPATH}/admin/attachment/_choose_layer',
 		    end:function(){
 		    	if(''!=data.url && null != data.url){
-		    		$("#imageDiv").append("<li style='display:inline;margin-right:15px;'><div class='imgDiv' style='width: 30%; height: 200px;max-width:300px'><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"><div class='delete'></div></div></li>");
+		    		$("#imageDiv").append("<li><div class='imgDiv'><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"><div class='delete'></div></div></li>");
 		    		data.url = "";
 	    		}
 		    }
 		});
 	}
 	
+	function showType(el){
+		var typeCode = $(el).val();
+		if (typeCode == 102032) {
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_publish', 'select')}');
+		} else if(typeCode == 102033) {
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_shop', 'select')}');
+		} else if(typeCode == 102034) {
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_retail', 'select')}');
+		} else if(typeCode == 102035) {
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_sell', 'select')}');
+		} else if(typeCode == 102036) {
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_catering', 'select')}');
+		} else if(typeCode == 102037) {
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_dm', 'select')}');
+		} else {
+			$(el).parent().parent().find("td:eq(2)").find("select").empty();
+			$(el).parent().parent().find("td:eq(2)").find("select").append('${DICT_BOX('display_CER', 'select')}');
+		}
+	}
+	
 	function doSubmit(){
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
+		if($(".category").val()==101002 && list==""){
+			alert("投入类型不能为空！");
+			return;
+		}
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
 		var listc = $("#customerType").select2("val");
@@ -265,11 +354,7 @@
 		if (listc != null && listc.length > 0) {
 			cIds = listc.toString();
 		}
-		var list = $("#invest_type").select2("val");
-		var ids = "";
-		if (list != null && list.length > 0) {
-			ids = list.toString();
-		}
+		var templateInfo = localStorage.getItem("ExecuteTemplate");
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
@@ -280,16 +365,16 @@
 				return validate.isValid()
 			},
 			type : "post", 
-			data : {
-				"investType":ids,"customerType":cIds},
+			data : {"customerType":cIds,"templateList":templateList},
 			dataType : "json", 
 			success : function(data) { 
 				if(data.errorCode == 0) {
 					toastr.success(data.message, '操作成功');
-					setTimeout( function(){
+					 setTimeout( function(){
 						l.stop();
 						location.href = '${CPATH}/admin/activity/index';
-								}, 1 * 1000 );
+								}, 1 * 1000 ); 
+					localStorage.clear();
 				} else {
 					l.stop();
 					toastr.error(data.message,'操作失败');
@@ -300,6 +385,124 @@
 				alert("信息提交错误");
 			}
 		});
+	}
+	
+	//标志
+	var newTrIdx = 0;
+	function addActivityEx(){
+		var $tbody = $("#table tbody");
+		var newTrHtml = $tbody.find("tr:first").html();
+		newTrIdx = newTrIdx + 1;
+		$("#num").val(newTrIdx);
+		var newTrId = 'tr' + newTrIdx;
+		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+		var $newTr = $("#" + newTrId);
+		<!--添加validate -->
+		var remarkName = "remark" + newTrIdx;
+		$newTr.find("#remark").attr("name", remarkName);
+		$newTr.find("#orderList").attr("name","orderList" + newTrIdx);
+		$newTr.find("#activityExecteId").attr("name","activityExecteId"+newTrIdx);
+		$newTr.find("#dateTime").attr("name","dateTime"+newTrIdx);
+		orderNum();
+	}
+
+	function addActivityExecute(el){
+		var $tbody = $("#table tbody");
+		var newTrHtml = $tbody.find("tr:first").html();
+		newTrIdx = newTrIdx + 1;
+		$("#num").val(newTrIdx);
+		var newTrId = 'tr' + newTrIdx;
+		$tbody.append("<tr id='" + newTrId + "'>" + newTrHtml + "</tr>");
+		var $newTr = $("#" + newTrId);
+		<!--添加validate -->
+		var remarkName = "remark" + newTrIdx;
+		$newTr.find("#activityExecteId").attr("name","activityExecteId"+newTrIdx);
+		$newTr.find("#activityExecteId").val(el.id);
+		$newTr.find("#orderList").attr("name","orderList" + newTrIdx);
+		$newTr.find("#orderList").val(el.order_list);
+		$newTr.find("#remark").attr("name", remarkName);
+		$newTr.find("#remark").val(el.remark);
+		orderNum();
+	}
+	
+	//删除
+	function deleteTr(obj){
+		var $tr = $(obj).parent().parent();
+		var trIndex = $tr.attr("id").replace("tr", "");
+		$form.bootstrapValidator('removeField', 'orderList' + trIndex);
+		$form.bootstrapValidator('removeField', 'remark' + trIndex);
+		$tr.remove();
+		orderNum();
+	}
+	
+	function orderNum(){
+		var $rowNum = $(".rowNum");
+		
+		$rowNum.each(function(index, el){
+			$(el).text(index);
+		});
+	}
+	
+	var FieldCount=1; //to keep track of text box added  
+	$(AddButton).click(function (e)  //on add input button click  
+	{
+	        if(x <= MaxInputs) //max input box allowed  
+	        {  
+	            FieldCount++; //text box added increment  
+	            //add input box
+				var choose = $("#invest_type").val();
+				if (choose == 101101) {
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_PR', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');
+				} else if (choose == 101102) {
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_raise', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
+				} else if (choose == 101103) {
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_AD', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');		
+				} else if (choose == 101104) {
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');		
+				} else if (choose == 101105) {
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');
+					$(".needs").select2();
+					$(".product").select2({
+						data: ${productOptionList},
+						width: "100%",
+						language: "zh-CN"
+					});			
+				} else if (choose == 101106) {
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_gift', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
+				} else if (choose == 101107) {
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><tr>');
+					$(".product").select2({
+						data: ${productOptionList},
+						width: "100%",
+						language: "zh-CN"
+					});						
+				}	            
+	            x++; //text box increment  
+	        }  
+	return false;  
+	});
+	$("body").on("click",".removeclass", function(e){ //user click on remove text 
+          $(this).parent('td').parent('tr').remove(); //remove text box  
+          x--; //decrement textbox  
+	return false;
+	})	
+	
+	function editTemplate(obj){
+		var timestamp = (new Date()).valueOf();
+		var activityExecteId = $(obj).parent().parent().parent().find("#activityExecteId").val();
+		if(activityExecteId == ""){
+			$(obj).parent().parent().parent().find("#activityExecteId").val(dateTime);
+		}
+		layer.open({
+			title:"模板配置",
+			type: 2, 
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/activity/editTemplate?activityExecteId=' + $(obj).parent().parent().parent().find("#activityExecteId").val()
+		}); 
+	}
+	function setTemplate(){
+		templateList = localStorage.getItem("template");
+		layer.closeAll();
 	}
 </#macro>
 
@@ -325,204 +528,344 @@
 				</button>
 			</div>
 		</div>
+		<ul id="myTab" class="nav nav-tabs">  
+	        <li class="active"><a href="#A" data-toggle="tab">活动基本信息</a></li>  
+	        <li><a href="#B" data-toggle="tab">活动执行步骤</a></li>
+	    </ul>
 		<form action="${CPATH}/admin/activity/save" method="post" id="form" class="form-horizontal" >
 			<input type="hidden" name="activity.id" value="${(activity.id)!}">
-			<div class="box-body">
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">活动名称:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.title" value="${(activity.title)!}" style="width:261%;">
+			<input type="hidden" name="loop" id="loop">   
+			<div id="myTabContent" class="tab-content">  
+	        	<div class="tab-pane fade in active" id="A">  
+					<div class="box-body">
+						<div class="form-group">
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动名称:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.title" value="${(activity.title)!}" style="width:261%;">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动开始时间:</label>
+								<div class="input-group col-sm-8">
+									<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
+								</div>
+							</div>
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动结束时间:</label>
+								<div class="input-group col-sm-8">
+									<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动方案号:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" readonly type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
+								</div>
+							</div>
+							<div class="col-sm-5 validata-box" >
+								<label class="control-label col-sm-4">流程编号:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" readonly type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动编号:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.code" value="${(activity.code)!}">
+								</div>
+							</div>
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动类型:</label>
+								<div class="input-group col-sm-8">
+									<select class="form-control category" name="activity.category" id="activity.category">
+										${DICT_BOX('activity_category', 'select', (activity.category)!)}
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-5 validata-box" >
+								<label class="control-label col-sm-4">客户类型:</label>
+								<div class="input-group col-sm-8">
+									<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
+									</select>
+								</div>
+							</div>
+							<div class="col-sm-5 validata-box">
+								<label for="_title" class="control-label col-sm-4">客户区域:</label>
+								<div class="input-group col-sm-8">
+									<input readonly type="text" id="cityPicker" data-toggle="cityPicker" style="width:100%;">
+									<input type="hidden" id="areaNames" name="areaNames">
+									<input type="hidden" id="areaCodes" name="areaCodes">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动标签:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.tags" value="${(activity.tags)!}">
+								</div>
+							</div>
+							<div class="col-sm-5 validata-box investType" >
+								<label class="control-label col-sm-4">投入类型:</label>
+								<div class="input-group col-sm-8">
+									<select class="form-control" name="invest_type" id="invest_type">
+										<#list (dicts)! as dict>
+											<option value="${dict.value}" <#if activity?? && activity.investType == dict.value>selected</#if>>${(dict.name)!}</option>
+										</#list>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<!-- <div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">每个客户参与次数：</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
+								</div>
+							</div> -->
+							<!-- <div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">时间限制：</label>
+								<div class="input-group col-sm-8">
+									<select class="form-control" name="activity.time_interval" id="activity.time_interval">
+										${DICT_BOX('activity_time_interval', 'select', (activity.time_interval)!)}
+									</select>
+								</div>
+							</div> -->
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">名额：</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
+								</div>
+							</div>
+							<div class="col-sm-5 validata-box investNum">
+								<label class="control-label col-sm-4">投入数量:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
+									&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-5 validata-box investAmount">
+								<label for="_title" class="control-label col-sm-4">投入金额:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
+								</div>
+							</div>
+							<!--
+							<div class="col-sm-5 validata-box visitNum">
+								<label class="control-label col-sm-4">拜访次数：</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
+								</div>
+							</div>
+							-->
+						</div>
+						<div class="form-group">
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">是否上架:</label>
+								<div class="input-group col-sm-8">
+									<label class="radio-inline">
+										<input type="radio" name="activity.is_publish" value="1" <#if !activity?? || (activity.is_publish)! == 1>checked</#if> />是
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="activity.is_publish" value="0" <#if activity?? && (activity.is_publish)! == 0>checked</#if> />否
+									</label>
+								</div>
+							</div>
+							<div class="col-sm-5 validata-box">
+									<label class="control-label col-sm-4">是否可超出申请金额:</label>
+									<div class="input-group col-sm-8">
+										<label class="radio-inline">
+											<input type="radio" name="activity.is_limit" value="1" <#if !activity?? || (activity.is_limit)! == 1>checked</#if>/>否
+										</label>
+										<label class="radio-inline">
+											<input type="radio" name="activity.is_limit" value="0"<#if activity?? && (activity.is_limit)! == 0>checked</#if>/>是
+										</label>
+									</div>
+								</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动内容:</label>
+								<div class="input-group col-sm-8">
+									<textarea class="form-control" rows="3" name="activity.content" value="${(activity.content)!}" style="width:261%;">${(activity.content)!}</textarea>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">活动海报:</label>
+								<div class="input-group col-sm-8">
+									<span class="btn btn-default" id="chooseImg" onClick="imgChoose()">选择图片</span>
+								</div>
+							</div>
+							<div class="col-sm-5 validata-box" style="margin-left:-20%;">
+								<label class="control-label col-sm-4"></label>
+								<div class="input-group col-md-10 col-sm-10">
+									<ul class="list-inline list-unstyled" id="imageDiv">
+										<#list (imageList)! as img>
+											<li>
+												<div class="imgDiv">
+													<img src="${img}" class='jp-grids-photos img-responsive' >
+													<input type='hidden' name='imageUrl[]' value="${img}">
+													<div class="delete"></div>
+												</div>
+											</li>
+										</#list>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div id="expendDetail" style="display:none">
+							<div class="form-group">
+								<div class="col-sm-5 validata-box">
+									<label class="control-label col-sm-4">费用明细:</label>
+									<div class="input-group col-md-2 col-sm-8">
+										<span id='AddMoreFileBox' class="btn btn-default">添加明细</span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group col-sm-12 validata-box">
+								<label class="control-label col-sm-2"></label>
+								<div class="input-group col-md-7 col-sm-12">
+									<table class="table table-bordered text-center" id="valueTable">
+										<thead id="expendHead">
+											<tr>
+												<th width="2%"></th>
+												<th id="name1">费用类型</th>
+												<th id="name2">申请金额</th>
+											</tr>
+										</thead>
+										<tbody id="InputsWrapper">
+											<#if expenseList?size gt 0>
+												<#list expenseList as list>
+													<tr>
+														<td>
+															<a href="#" class="btn btn-danger btn-xs removeclass">
+																<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+															</a>
+														</td>
+														<td>
+															<input type="hidden" name="expenseIds[]" value="${list.id}">
+															<select class="form-control input-sm needs" name="item1[]" <#if list.flowDictType == 'feeType_name_display'>onChange="showType(this)"</#if>>
+																${DICT_BOX('${list.flowDictType}', 'select', '${list.item1}')}
+															</select>
+														</td>
+														<#if list.flowDictType=='feeType_name_AD' || list.flowDictType=='feeType_name_raise' || list.flowDictType=='feeType_name_PR'
+															|| list.flowDictType=='feeType_name_gift'>
+														<td>
+															<input class="form-control input-sm" type="text" name="item2[]" value="${list.item2}">
+														</td>
+														<#elseif list.flowDictType=='channel_define'>
+														<td>
+															<select class="form-control input-sm product" name="item2[]" id="product_${list_index}">
+															</select>
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}">
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item4[]" value="${list.item4}">
+														</td>
+														<#elseif list.flowDictType=='feeType_name_SA'>
+														<td>
+															<select class="form-control input-sm product" name="item2[]" id="product_${list_index}">
+															</select>
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}">
+														</td>
+														<#else>
+														<td>
+															<select class="form-control input-sm" name="item2[]">
+																${DICT_BOX('${list.displayDictType}', 'select', '${list.item2}')}
+															</select>
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item3[]" value="${list.item3}">
+														</td>
+														<td>
+															<input class="form-control input-sm" type="text" name="item4[]" value="${list.item4}">
+														</td>
+														</#if>
+													</tr>
+												</#list>
+											</#if>
+										</tbody>
+									</table>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">活动开始时间:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
-						</div>
-					</div>
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">活动结束时间:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
-						</div>
-					</div>
+				<div class="tab-pane fade" id="B">
+					<table id="table" class="table table-bordered table-hover text-center" width="100%" name="row">
+					<thead>
+						<tr>
+							<th width="2%"></th>
+							<th width="5%">行号</th>
+							<th width="10%">步骤</th>
+							<th width="50%">执行说明</th>
+							<th width="30%">模板配置</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="hide">
+							<td>
+								<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
+							</td>
+							<td>
+								<span class="rowNum">0</span>
+								<input type="hidden" name = "activityExecteId" id="activityExecteId"/>
+								<input type="hidden" name = "dateTime" id="dateTime" value =""/>
+							</td>
+							<td>
+								<div class = "validata-box" style="padding-left:35%;">
+									<input class="form-control input-sm" type="text" id="orderList" style="width:40%;text-align:center;" name="orderList" >
+								</div>
+							</td>
+							</td>
+							<td>
+								<div class = "validata-box">
+									<input type="text" id="remark" name="remark"  style="width: 50%;"value=""/>
+								</div>
+							</td>
+							<td>
+								<div class = "validata-box">
+									<a class="btn btn-danger btn-xs" onclick = "editTemplate(this)">编辑</a>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td>
+								<button class="btn btn-xs btn-info" onclick="addActivityEx()" ><span class="glyphicon glyphicon-plus"></span></button>
+								<input type="hidden" name = "num" id="num" value="0"/>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
 				</div>
-				
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">活动编号:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.code" value="${(activity.code)!}">
-						</div>
-					</div>
-					
-					<div class="col-sm-5 validata-box" >
-						<label class="control-label col-sm-4">流程编号:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.proc_code" value="${(activity.proc_code)!}">
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">活动方案号:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
-						</div>
-					</div>
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">活动类型:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<select class="form-control category" name="activity.category" id="activity.category">
-								${DICT_BOX('activity_category', 'select', (activity.category)!)}
-							</select>
-		               	</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">客户类型:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<select id="customerType" class="form-control" name = "customerTy" multiple="multiple">
-							</select>
-						</div>
-					</div>
-					<div class="col-sm-5 validata-box">
-	                    <label for="_title" class="control-label col-sm-4">客户区域:</label>
-	                    <div class="input-group col-sm-8 input-group-sm">
-	                        <input readonly type="text" id="cityPicker" name = "activity.area_type" data-toggle="cityPicker" style="width:100%;">
-	                        <input type="hidden" id="areaNames" name="areaNames">
-	                        <input type="hidden" id="areaCodes" name="areaCodes">
-	                    </div>
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">活动标签:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.tags" value="${(activity.tags)!}">
-						</div>
-					</div>
-					<div class="col-sm-5 validata-box investType" >
-						<label class="control-label col-sm-4">投入类型:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<select class="form-control" name="invest_type" id="invest_type" multiple="multiple" >
-								<#if activity??>
-									<#list (dicts)! as dict>
-										<option value="${dict.key}" <#if dict??&&investTypeList?contains(dict.key)>selected="selected"</#if>>${(dict.name)!}</option>
-									</#list>
-								<#else>
-									<#list (dicts)! as dict>
-										<option value="${dict.key}">${(dict.name)!}</option>
-									</#list>
-								</#if>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<!-- <div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">每个客户参与次数：</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
-						</div>
-					</div> -->
-					<!-- <div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">时间限制：</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<select class="form-control" name="activity.time_interval" id="activity.time_interval">
-								${DICT_BOX('activity_time_interval', 'select', (activity.time_interval)!)}
-							</select>
-						</div>
-					</div> -->
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">名额:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
-						</div>
-					</div>
-					<div class="col-sm-5 validata-box investNum">
-						<label class="control-label col-sm-4">投入数量:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
-							&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-5 validata-box investAmount">
-	                    <label for="_title" class="control-label col-sm-4">投入金额:</label>
-	                    <div class="input-group col-sm-8 input-group-sm">
-	                        <input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
-	                    </div>
-	                </div>
-					<div class="col-sm-5 validata-box visitNum">
-						<label class="control-label col-sm-4">拜访次数:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<input class="form-control" type="text" name="activity.visit_num" value="${(activity.visit_num)!}">
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">是否上架:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-							<label class="radio-inline">
-								<input type="radio" name="activity.is_publish" value="1" <#if !activity?? || (activity.is_publish)! == 1>checked</#if> />是
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="activity.is_publish" value="0" <#if activity?? && (activity.is_publish)! == 0>checked</#if> />否
-							</label>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">活动内容:</label>
-						<div class="input-group col-sm-8 input-group-sm">
-		                 	<textarea class="form-control" rows="3" name="activity.content" value="${(activity.content)!}" style="width:261%;">${(activity.content)!}</textarea>
-		               	</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-5 validata-box">
-							<label class="control-label col-sm-4">活动海报:</label>
-							<div class="input-group col-sm-8 input-group-sm">
-			                 	<span class="btn btn-default" id="chooseImg" onClick="imgChoose()">选择图片</span>
-			               	</div>
-					</div>
-					
-				</div>
-				<div class="col-sm-12 validata-box">
-						<label class="control-label col-sm-4"></label>
-						<div class="input-group col-md-12 col-sm-12">
-							<ul id="imageDiv">
-									<#if imageList??>
-									<#list (imageList)! as img>
-										<li style="display:inline;margin-right:15px;">
-											<div class="imgDiv" style="width: 30%; height: 200px;margin-right:15px;">
-												<img src="${img}" class='jp-grids-photos img-responsive' >
-												<input type='hidden' name='imageUrl[]' value="${img}">
-												<div class="delete"></div>
-											</div>											
-										</li>
-									</#list>
-									</#if>
-							</ul>									
-		               	</div>
-					</div>
 			</div>
-		</div>
-		<div class="box-footer"> 
-			<button type="button" id="do_submit" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">提交</button>
-			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
-		</div>
+			<div class="box-footer">
+				<button type="button" id="do_submit" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">提交</button>
+				<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
+			</div>
 		</form>
 	</div>
 </section>
-
 </@layout>

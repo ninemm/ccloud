@@ -35,7 +35,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 	public static CustomerTypeQuery me() {
 		return QUERY;
 	}
-
+	
 	public Record findById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select ");
 		fromBuilder.append(" c.id, c.name, c.code, c.price_system_id, c.proc_def_key, p.name as price_system_name");
@@ -192,5 +192,17 @@ public class CustomerTypeQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(sqlBuilder, "c.data_area", dataArea, params, needWhere);
 
 		return DAO.findFirst(sqlBuilder.toString(), params.toArray());
+	}
+	
+	public List<CustomerType> _findByDataArea(String dataArea) {
+		
+		StringBuilder sql = new StringBuilder("select *");
+		sql.append(" from `cc_customer_type`");
+		sql.append(" where is_show = 1");
+		sql.append(" and data_area like '"+dataArea+"' ");
+		sql.append(" order by create_date");
+		
+		return DAO.find(sql.toString());
+		
 	}
 }

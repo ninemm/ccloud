@@ -47,7 +47,10 @@
 <#macro script>
 
     var $gallery1 = $("#gallery1"), $galleryImg1 = $("#galleryImg1");
-    var $uploaderFiles1 = $('#uploaderFiles1');
+    var $uploaderFiles1 = $('.uploaderFiles1');
+
+    var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+    var $uploaderFiles = $('#uploaderFiles');
 
     $(function(){
         var index;
@@ -60,13 +63,22 @@
         $gallery1.on("click", function() {
             $gallery1.fadeOut(100);
         });
+
+        var index;
+        $uploaderFiles.on("click", "li", function() {
+            index = $(this).index();
+            $galleryImg.attr("style", this.getAttribute("style"));
+            $gallery.fadeIn(100);
+        });
+
+        $gallery.on("click", function() {
+            $gallery.fadeOut(100);
+        });
     });
 
     var imageArr = [];
     var count = 3;
     var $picNum = $('#weui-uploader__info');
-    var $uploaderFiles = $('#uploaderFiles');
-    var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 
     var Orientation = null;
     var MAX_HEIGHT = 1000;
@@ -97,7 +109,7 @@
                     $.alert("最多上传3张图片");
                     return false;
                 }
-                imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name});
+                imageArr.push({"pic":rst.base64, "picname":rst.origin.name });
                 $("#pic").val(JSON.stringify(imageArr));
                 var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
                 $uploaderFiles.append(str);
@@ -108,19 +120,8 @@
             })
         });
 
-        var index; //第几张图片
-        $uploaderFiles.on("click", "li", function() {
-            index = $(this).index();
-            $galleryImg.attr("style", this.getAttribute("style"));
-            $gallery.fadeIn(100);
-        });
-
-        $gallery.on("click", function() {
-            $gallery.fadeOut(100);
-        });
-
         //删除图片  删除图片的代码也贴出来。
-        $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+         $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
             $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
             imageArr.splice(index, 1);
@@ -280,6 +281,14 @@
                     <input type="text" class="weui-input" value="${(customerVisit.create_date?string('yyyy-MM-dd HH:mm'))!}" readonly>
                 </div>
             </div>
+            <#if expenseDetail??>
+	            <div class="weui-cell">
+	                <div class="weui-cell__bd">
+	                    <div class="order-customer-info-title">费用明细: </div>
+	                    <input type="text" class="weui-input" value="${(expenseDetail.expenseDetailName)!}" readonly>
+	                </div>
+	            </div>
+            </#if>
             <div class="weui-cell">
                 <div class="weui-cell__bd">
                     <div class="order-customer-info-title">描述: </div>
@@ -296,17 +305,34 @@
                     <div class="weui-uploader">
                         <div class="weui-uploader__hd">
                             <p class="weui-uploader__title">拜访实景图</p>
-                            <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div>
-                        </div>
-                        <div class="weui-uploader__bd">
-                            <ul class="weui-uploader__files" id ="uploaderFiles1">
-                                <#if (customerVisit.imageList) ??>
-                                    <#list customerVisit.imageList as bean>
-                                        <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
-                                    </#list>
-                                </#if>
-                            </ul>
-                        </div>
+                            <!-- <div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div> -->
+		                </div>
+                           	<#if activityExecutes?size gt 0>
+                           		<#list activityExecutes as list>
+                           			<span class="weui-uploader__info">${list.remark}</span>
+                           			<hr style="border:1px dashed #0000fff"/>
+                  						 <div class="weui-uploader__bd">
+                       					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
+				                            <#if (customerVisit.imageList) ??>
+			                                <#list customerVisit.imageList as bean>
+		                            			<#if (list.orderList == bean.orderList)>
+			                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+		                            			</#if>
+			                                </#list>
+				                            </#if>
+                      					</ul>
+                  						 </div>
+                  						 <hr style="border:1px dashed #0000fff"/>
+                           		</#list>
+                          		<#else> 
+                         				<div class="weui-uploader__bd">
+                      					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
+	                            		<#list customerVisit.imageList as bean>
+		                                   	<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+		                                </#list>
+	                                </ul>
+                 						 </div>
+                           	</#if>
                     </div>
                 </div>
             </div>
@@ -364,7 +390,6 @@
                         <div class="weui-uploader">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
-                                <div class="weui-uploader__info" id="weui-uploader__info">0/3</div>
                             </div>
                             <div class="weui-uploader__bd">
                                 <ul class="weui-uploader__files" id="uploaderFiles"></ul>
