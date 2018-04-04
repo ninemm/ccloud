@@ -82,7 +82,7 @@ public class PlansDetailQuery extends JBaseQuery {
 	
 	public Page<Record> paginateForAppMyPlan(int pageNumber, int pageSize, String keyword,
             String startDate, String endDate, String sellerId, String dataArea,String userId,String sellerProductId,String datetimePicker) {
-			SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM" ); 
+			SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" ); 
 			String str = sdf.format(new Date());
 			String select = "select o.*,cp.start_date,cp.end_date, u.realname, d.name as typeName, sp.custom_name,SUM(o.plan_num*sp.price) AS planNumAmount,SUM(o.complete_num*sp.price) AS completeNumAmount ";
 			StringBuilder fromBuilder = new StringBuilder("from `cc_plans_detail` o ");
@@ -108,7 +108,7 @@ public class PlansDetailQuery extends JBaseQuery {
 			if(StrKit.notBlank(datetimePicker)){
 				fromBuilder.append(" and cp.plans_month = '"+datetimePicker+"-01 00:00:00' ");
 			}else {
-				fromBuilder.append("and cp.plans_month = '"+str+"-01 00:00:00' ");
+				fromBuilder.append("and cp.start_date <= '"+str+"' and end_date >= '"+str+"' ");
 			}
 			/*if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cp.start_date >= ?");

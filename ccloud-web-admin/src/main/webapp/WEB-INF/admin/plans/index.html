@@ -97,18 +97,11 @@
 		var fields =
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
-				{field: "", title: "计划类型", align: "center", width: '5%',
+				{field: "名称", title: "计划类型", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {
-						if(row.type==101201) return "周计划";
-						else if(row.type==101202) return "月计划";
-						else  return "年计划";
+						return row.plans_month.substring(0,7)+" 月计划";
 					},
 				 edit:false},
-				{field: "", title: "计划月份", align: "center", width: '8%',
-					formatter: function(value, row, rowIndex) {
-						return row.plans_month.substring(0,7);
-					},
-				 edit: false},
 				{field: "start_date", title: "开始时间", align: "center", width: '8%', edit:false},
 				{field: "end_date", title: "结束时间", align: "center", width: '8%', edit:false},
 				{field: "seller_name", title: "销售商名称", align: "center", width: '15%', edit: false},
