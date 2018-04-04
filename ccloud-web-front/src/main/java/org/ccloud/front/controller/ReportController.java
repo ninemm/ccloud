@@ -137,7 +137,17 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
-	//业务员客户统计
+	//业务员客户目录
+	public void customerCountMenu() {
+		String typeTag = getPara("typeTag");
+		if (typeTag.equals("outStock")) {
+			customerCountByOutStock();
+		} else {
+			customerCount();
+		}
+	}
+	
+	//业务员客户统计(订单与打印)
 	public void customerCount() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");	
@@ -149,6 +159,20 @@ public class ReportController extends BaseFrontController {
 		String orderTag = getPara("orderTag");
 		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomer(startDate, endDate, dayTag, customerType, null, userId, dataArea, orderTag);
 		renderJson(record);
+	}
+	
+	//业务员客户统计(出库)
+	public void customerCountByOutStock() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");	
+		String dayTag = getPara("dayTag");
+//		String sellerId = getSessionAttr("sellerId");
+		String customerType = getPara("customerType");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String userId = getPara("userId");
+		String orderTag = getPara("orderTag");
+		List<Record> record = SalesOrderQuery.me().getMyOrderByCustomerOut(startDate, endDate, dayTag, customerType, null, userId, dataArea, orderTag);
+		renderJson(record);		
 	}
 	
 	//业务员产品种类统计

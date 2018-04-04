@@ -316,7 +316,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
 				"orderTag": 'productCount'
 			}
 			urlSelect(params,type); 
@@ -330,7 +330,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": 'totalAmount'
 			}
           	urlSelect(params,type);
@@ -344,7 +344,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": 'orderCount'
 			}
 			urlSelect(params,type);   
@@ -364,7 +364,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
 				"orderTag": $("#orderTag").val(),
 				"typeTag": 'order'
 			}
@@ -378,7 +378,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',			
 				"orderTag": $("#orderTag").val(),
 				"print" : 'true',
 				"typeTag": 'print'
@@ -393,7 +393,7 @@
 			var params = {
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
-				"endDate" : $("#endDay").val(),			
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": $("#orderTag").val(),
 				"typeTag": 'outStock'
 			}
@@ -435,10 +435,10 @@
 <!-- 							<p class="orderTagText">件数</p> -->
 <!-- 							<i class="icon-angle-down"></i> -->
 <!-- 						</span> -->
-						<span class="briefly" onclick="typeSelect(this,'day')">
-							<p class="typeText">订单</p>
-							<i class="icon-angle-down"></i>
-						</span>
+<!-- 						<span class="briefly" onclick="typeSelect(this,'day')"> -->
+<!-- 							<p class="typeText">订单</p> -->
+<!-- 							<i class="icon-angle-down"></i> -->
+<!-- 						</span> -->
 						<input type="hidden" id="dayTag">
 						<input type="hidden" id="orderTag">
 						<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">

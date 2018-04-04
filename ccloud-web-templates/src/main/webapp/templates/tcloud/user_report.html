@@ -221,7 +221,8 @@
 			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
 			"userId": '${(userId)!}',
 			"isGift": 'true'
-		}		
+		}
+		$("#dayTag").val("");
 		urlSelect(params,params2,type); 
     }
     
@@ -236,7 +237,8 @@
 			"endDate": $(obj).val() + ' 23:59:59',
 			"userId": '${(userId)!}',
 			"isGift": 'true'
-		}		
+		}
+		$("#dayTag").val("");	
 		urlSelect(params,params2,type); 
     }    
     
