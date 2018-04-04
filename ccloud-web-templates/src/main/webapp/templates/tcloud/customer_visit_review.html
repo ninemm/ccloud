@@ -90,13 +90,6 @@
             $("#length").text($("#comment").val().length + '/' + 50);
         });
 
-<<<<<<< HEAD
-        $(document).on('change', '#uploaderInput', function () {
-            lrz(this.files[0], {width: 1024})
-            .then(function (rst) {
-                if ($("#uploaderFiles")[0].children.length + 1 > count) {
-                    $.alert("最多上传3张图片");
-=======
         $(document).on("change", ".uploaderInput", function () {
 
             var files = this.files;;
@@ -114,7 +107,6 @@
                 var file = files[i];
                 if (!/image\/\w+/.test(file.type)) {
                     $.alert("请确保文件为图像类型");
->>>>>>> refs/heads/activity
                     return false;
                 }
                 imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name});
