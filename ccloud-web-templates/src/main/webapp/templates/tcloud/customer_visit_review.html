@@ -90,26 +90,14 @@
             $("#length").text($("#comment").val().length + '/' + 50);
         });
 
-        $(document).on("change", ".uploaderInput", function () {
-
-            var files = this.files;;
-            var arrNum = imageArr.length;
-            var num = arrNum + files.length;
-
-            if (num > count) {
-                $.alert("最多上传三张图片");
-                return false;
-            }
-
-            $picNum.text(num + '/' + count);
-
-            for (var i = 0; i < files.length; i ++) {
-                var file = files[i];
-                if (!/image\/\w+/.test(file.type)) {
-                    $.alert("请确保文件为图像类型");
+        $(document).on('change', '#uploaderInput', function () {
+            lrz(this.files[0], {width: 1024})
+            .then(function (rst) {
+                if ($("#uploaderFiles")[0].children.length + 1 > count) {
+                    $.alert("最多上传3张图片");
                     return false;
                 }
-                imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name});
+                imageArr.push({"pic":rst.base64, "pic_name":rst.origin.name });
                 $("#pic").val(JSON.stringify(imageArr));
                 var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
                 $uploaderFiles.append(str);
@@ -119,6 +107,7 @@
                 alert('失败');
             })
         });
+        
 
         var index; //第几张图片
         $(document).on("click", ".uploaderFiles li", function() {

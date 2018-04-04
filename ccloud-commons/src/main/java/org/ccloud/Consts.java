@@ -214,12 +214,13 @@ public class Consts {
 	public static final Integer IS_READ = 1;
 	public static final Integer NO_READ = 0;
 	
-	//活动申请状态 0:待审 1 已审 2 撤回 3 拒绝 4 结束
+	//活动申请状态 0:待审 1 已审 2 撤回 3 拒绝 4 待核销 5 结束
 	public static final Integer ACTIVITY_APPLY_STATUS_WAIT = 0;
 	public static final Integer ACTIVITY_APPLY_STATUS_PASS = 1;
 	public static final Integer ACTIVITY_APPLY_STATUS_CANCEL = 2;
 	public static final Integer ACTIVITY_APPLY_STATUS_REJECT = 3;
-	public static final Integer ACTIVITY_APPLY_STATUS_END = 4;
+	public static final Integer ACTIVITY_APPLY_STATUS_VERIFICATION = 4;
+	public static final Integer ACTIVITY_APPLY_STATUS_END = 5;
 	
 	public static final String WAREHOUSE_TYPE_MY = "0";// 直属仓库
 	public static final String WAREHOUSE_TYPE_SELLER = "1";// 销售商仓库

@@ -542,7 +542,15 @@ public class CustomerVisitController extends BaseFrontController {
 
 		if(StrKit.notBlank(location)) 
 			customerVisit.setReviewAddress(location);
-		
+			if(StrKit.notBlank(customerVisit.getActiveApplyId())) {
+				List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(customerVisit.getActiveApplyId());
+				ActivityApply activityApply = ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId());
+				List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
+				if(customerVisits.size() == activityExecutes.size()) {
+					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_VERIFICATION);
+					activityApply.update();
+				}
+			}
 		if (StrKit.notBlank(lat))
 			customerVisit.setReviewLat(new BigDecimal(lat));
 		if (StrKit.notBlank(lng))
@@ -564,6 +572,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		if (status == 1) {
 			customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
+			
 		} else {
 			customerVisit.setStatus(Customer.CUSTOMER_REJECT);
 			Kv kv = Kv.create();
@@ -1000,7 +1009,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String orderList = getPara("orderList");
 		String message = "";
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
-		if(activityApply.getStatus()== Consts.ACTIVITY_APPLY_STATUS_PASS) {
+		if(activityApply.getStatus()== Consts.ACTIVITY_APPLY_STATUS_PASS || activityApply.getStatus()== Consts.ACTIVITY_APPLY_STATUS_VERIFICATION || activityApply.getStatus()== Consts.ACTIVITY_APPLY_STATUS_END) {
 			
 			if(!orderList.equals("1")) {
 				orderList = String.valueOf(Integer.parseInt(orderList)-1);
