@@ -837,16 +837,51 @@ public class CustomerController extends BaseFrontController {
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-		
+
 		if (isCustomerAudit != null && isCustomerAudit.booleanValue()) {
-			
-			if (manager == null) {
-				return "没有设置审核主管";
+
+			List<User> managers = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+			if (managers == null || managers.size() == 0) {
+				return "您没有配置审核人，请联系管理员";
 			}
+
+			String managerUserName = "";
+			for (User u : managers) {
+				if (StrKit.notBlank(managerUserName)) {
+					managerUserName = managerUserName + ",";
+				}
+
+				managerUserName += u.getStr("username");
+
+				Message message = new Message();
+				message.setFromUserId(user.getId());
+				message.setToUserId(u.getId());
+				message.setDeptId(user.getDepartmentId());
+				message.setDataArea(user.getDataArea());
+				message.setSellerId(sellerId);
+				message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
+				message.setTitle(sellerCustomer.getCustomer().getCustomerName());
+				message.setObjectId(customerId);
+				message.setIsRead(Consts.NO_READ);
+				message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
+
+				Object customerVO = param.get("customerVO");
+				if (customerVO == null && isEnable == 0) {
+					message.setContent("新增待审核");
+				} else if(customerVO == null && isEnable == 1) {
+					message.setContent("停用待审核");
+				} else if( isEnable == 2) {
+					message.setContent("导入待审核");
+				} else {
+					List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
+					if (list != null)
+						message.setContent(JsonKit.toJson(list));
+				}
+				MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
+			}
+			param.put("manager", managerUserName);
 			
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
-			param.put("manager", manager.getUsername());
 			param.put("isEnable", isEnable);
 
 			
@@ -862,33 +897,7 @@ public class CustomerController extends BaseFrontController {
 		
 		if (!isUpdated)
 			return "操作失败";
-		
-		Message message = new Message();
-		message.setFromUserId(user.getId());
-		message.setToUserId(manager.getId());
-		message.setDeptId(user.getDepartmentId());
-		message.setDataArea(user.getDataArea());
-		message.setSellerId(sellerId);
-		message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
-		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
-		message.setObjectId(customerId);
-		message.setIsRead(Consts.NO_READ);
-		message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
-		
-		Object customerVO = param.get("customerVO");
-		if (customerVO == null && isEnable == 0) {
-			message.setContent("新增待审核");
-		} else if(customerVO == null && isEnable == 1) {
-			message.setContent("停用待审核");
-		} else if( isEnable == 2) {
-			message.setContent("导入待审核");
-		} else {
-			List<String> list = BeanCompareUtils.contrastObj(sellerCustomer, customerVO);
-			if (list != null)
-				message.setContent(JsonKit.toJson(list));
-		}
-		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
-		
+
 		return "";
 	}
 

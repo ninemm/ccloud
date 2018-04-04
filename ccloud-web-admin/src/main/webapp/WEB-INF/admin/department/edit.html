@@ -157,7 +157,7 @@ function doSubmit(){
 						<label class="control-label col-sm-2">订单审核人:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input type="hidden" name="department.order_reviewer_id" id="order_reviewer_id" value="${(dept.order_reviewer_id)!}">
-							<input class="form-control input-sm" type="text" id="order_reviewer" name="order_reviewer" value="${(dept.order_reviewer)!}" readonly>
+							<input class="form-control input-sm" type="text" id="order_reviewer" name="order_reviewer" value="${(order_reviewer_id_name)!}" readonly>
 							<div class="input-group-addon" onclick="user_tree(0)" style="cursor:pointer;">
 								<i class="fa fa-search"></i> 选择
 							</div>
@@ -167,7 +167,7 @@ function doSubmit(){
 						<label class="control-label col-sm-2">其他审核人（客户、拜访、活动）:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input type="hidden" name="department.principal_user_id" id="userIds" value="${(dept.principal_user_id)!}">
-							<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${(dept.user_realname)!}" readonly>
+							<input class="form-control input-sm" type="text" id="userNames" name="userNames" value="${(principal_user_id_name)!}" readonly>
 							<div class="input-group-addon" onclick="user_tree(1)" style="cursor:pointer;">
 								<i class="fa fa-search"></i> 选择
 							</div>
