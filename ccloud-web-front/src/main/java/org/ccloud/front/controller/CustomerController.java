@@ -880,6 +880,7 @@ public class CustomerController extends BaseFrontController {
 				MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 			}
 			param.put("manager", managerUserName);
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 			
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
 			param.put("isEnable", isEnable);

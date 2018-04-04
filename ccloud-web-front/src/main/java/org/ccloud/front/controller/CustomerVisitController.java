@@ -551,6 +551,7 @@ public class CustomerVisitController extends BaseFrontController {
 						, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName(),customerVisit.getId());
 			}
 			param.put("manager", managerUserName);
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 
 			String defKey = Consts.PROC_CUSTOMER_VISIT_REVIEW;
 
