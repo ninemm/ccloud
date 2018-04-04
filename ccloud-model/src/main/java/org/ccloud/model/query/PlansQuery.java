@@ -50,8 +50,6 @@ public class PlansQuery extends JBaseQuery {
 	
 	
 	public Page<Plans> paginate(int pageNumber, int pageSize, String keyword, String orderby, String dataArea,String type,String startDate,String endDate,String dateType,String sellerId) {
-		SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" ); 
-		String str = sdf.format(new Date());
 		String select = "SELECT cp.id,cp.plans_month,cp.user_id,cp.type,cp.seller_product_id,cp.start_date,cp.end_date,cs.seller_name,t1.plansNum as planNumAmount, t1.completeNum as completeNumAmount ,t1.completeNum/t1.plansNum as completeRatio \r\n" + 
 				"  ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_plans cp  ");
@@ -76,12 +74,10 @@ public class PlansQuery extends JBaseQuery {
 		}*/
 		if(StrKit.notBlank(dateType)) {
 			fromBuilder.append("and cp.plans_month = '"+dateType+"-01 00:00:00' ");
-		}else {
-			fromBuilder.append("and cp.start_date <= '"+str+"' and end_date >= '"+str+"' ");
 		}
-		fromBuilder.append("and pd.data_area like '"+dataArea+"' ");
+		fromBuilder.append("and cp.data_area like '"+dataArea+"' ");
 //		fromBuilder.append("and cp.seller_id = '"+sellerId+"' ");
-		fromBuilder.append("GROUP BY cp.id ORDER by cp.type,cp.plans_month desc ");
+		fromBuilder.append("GROUP BY cp.id ORDER by cp.plans_month desc ");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -127,12 +123,12 @@ public class PlansQuery extends JBaseQuery {
 		if(StrKit.notBlank(datetimePicker)){
 			fromBuilder.append(" and cp.plans_month = '"+datetimePicker+"-01 00:00:00' ");
 		}else {
-			fromBuilder.append("and cp.plans_month = '"+str+"-01 00:00:00' ");
+			fromBuilder.append("and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' ");
 		}
 		if(showType != null && showType.equals(Consts.PLAN_SHOW_SELLER_PRODUCT)) {
 			fromBuilder.append(" GROUP BY pd.seller_product_id,cp.id  order by cp.create_date desc ");
 		}else {
-			fromBuilder.append("and cp.start_date <= '"+str+"' and end_date >= '"+str+"' ");
+			fromBuilder.append(" GROUP BY pd.user_id,cp.id order by cp.create_date desc ");
 		}
 
 		if (params.isEmpty())
@@ -225,6 +221,10 @@ public class PlansQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 			
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+	
+	public Plans findSellerIdAndDataAreaAndMonth(String sellerId , String dateArea , String month) {
+		return DAO.doFindFirst(" seller_id = ? and data_area = ? and plans_month = ?",sellerId, dateArea, month+"-01 00:00:00");
 	}
 	
 }

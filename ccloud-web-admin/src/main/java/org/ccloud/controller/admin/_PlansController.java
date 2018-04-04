@@ -265,46 +265,53 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		String month = getPara("start");
 		String startDate  = getPara("startDate");
 		String endDate  = getPara("endDate");
-		Plans plans = new Plans();
-		String plansId = StrKit.getRandomUUID();
-		plans.setId(plansId);
-		plans.setSellerId(sellerId);
-		plans.setUserId(user.getId());
-		plans.setType("101202");
-		int index = month.indexOf("-");
-		String day = month +"-"+ti;
-		Calendar cal = Calendar.getInstance();  
-		//设置年份  
-		try {
-			if(StrKit.notBlank(ti)) {
-				cal.setTime(sdf.parse(day));
-				cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
-				plans.setStartDate(sdf.parse(day));
-				//设置月份  
-				cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
-				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
-				endDate= sdf.format(cal.getTime());//获得前一天
-				startDate =  month+"-"+ti;
-				plans.setEndDate(sdf.parse(endDate));
-				plans.setPlansMonth(sd.parse(month));
-			}else {
-				startDate = month + "-01";
-				cal.setTime(sdf.parse(month + "-01"));
-				cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
-				plans.setStartDate(sdf.parse(startDate));
-				//设置月份  
-				cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
-				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
-				endDate= sdf.format(cal.getTime());//获得前一天
-				plans.setEndDate(sdf.parse(endDate));
+		Plans plans = PlansQuery.me().findSellerIdAndDataAreaAndMonth(sellerId,user.getDataArea(),month);
+		String plansId = "";
+		if(plans == null) {
+			plans = new Plans();
+			plansId = StrKit.getRandomUUID();
+			plans.setId(plansId);
+			plans.setSellerId(sellerId);
+			plans.setType(Consts.MONTH_PLAN);
+			int index = month.indexOf("-");
+			String day = month +"-"+ti;
+			Calendar cal = Calendar.getInstance();  
+			//设置年份  
+			try {
+				if(StrKit.notBlank(ti)) {
+					cal.setTime(sdf.parse(day));
+					cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
+					plans.setStartDate(sdf.parse(day));
+					//设置月份  
+					cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
+					cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+					endDate= sdf.format(cal.getTime());//获得前一天
+					startDate =  month+"-"+ti;
+					plans.setEndDate(sdf.parse(endDate));
+					plans.setPlansMonth(sd.parse(month));
+				}else {
+					startDate = month + "-01";
+					cal.setTime(sdf.parse(month + "-01"));
+					cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
+					plans.setStartDate(sdf.parse(startDate));
+					//设置月份  
+					cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
+					cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+					endDate= sdf.format(cal.getTime());//获得前一天
+					plans.setEndDate(sdf.parse(endDate));
+				}
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			plans.setDeptId(user.getDepartmentId());
+			plans.setDataArea(user.getDataArea());
+			plans.setCreateDate(new Date());
+			plans.setUserId(user.getId());
+			plans.save();
+		}else {
+			plansId = plans.getId();
 		}
-		plans.setDeptId(user.getDepartmentId());
-		plans.setDataArea(user.getDataArea());
-		plans.setCreateDate(new Date());
 		//结束时间
 		try {
 			FileInputStream fis = new FileInputStream(file);  
@@ -352,7 +359,6 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		plans.save();
 		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据,重复"+inNum+"条数据");
 	}
 	
@@ -612,46 +618,53 @@ public void downloading() throws UnsupportedEncodingException{
 		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
-		Plans plans = new Plans();
-		String plansId = StrKit.getRandomUUID();
-		plans.setId(plansId);
-		plans.setSellerId(sellerId);
-		plans.setType(planType);
-		int index = month.indexOf("-");
-		String day = month +"-"+ti;
-		Calendar cal = Calendar.getInstance();  
-		//设置年份  
-		try {
-			if(StrKit.notBlank(ti)) {
-				cal.setTime(sdf.parse(day));
-				cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
-				plans.setStartDate(sdf.parse(day));
-				//设置月份  
-				cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
-				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
-				endDate= sdf.format(cal.getTime());//获得前一天
-				startDate =  month+"-"+ti;
-				plans.setEndDate(sdf.parse(endDate));
-				plans.setPlansMonth(sd.parse(month));
-			}else {
-				startDate = month + "-01";
-				cal.setTime(sdf.parse(month + "-01"));
-				cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
-				plans.setStartDate(sdf.parse(startDate));
-				//设置月份  
-				cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
-				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
-				endDate= sdf.format(cal.getTime());//获得前一天
-				plans.setEndDate(sdf.parse(endDate));
+		Plans plans = PlansQuery.me().findSellerIdAndDataAreaAndMonth(sellerId,user.getDataArea(),month);
+		String plansId = "";
+		if(plans == null) {
+			plans = new Plans();
+			plansId = StrKit.getRandomUUID();
+			plans.setId(plansId);
+			plans.setSellerId(sellerId);
+			plans.setType(planType);
+			int index = month.indexOf("-");
+			String day = month +"-"+ti;
+			Calendar cal = Calendar.getInstance();  
+			//设置年份  
+			try {
+				if(StrKit.notBlank(ti)) {
+					cal.setTime(sdf.parse(day));
+					cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
+					plans.setStartDate(sdf.parse(day));
+					//设置月份  
+					cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
+					cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+					endDate= sdf.format(cal.getTime());//获得前一天
+					startDate =  month+"-"+ti;
+					plans.setEndDate(sdf.parse(endDate));
+					plans.setPlansMonth(sd.parse(month));
+				}else {
+					startDate = month + "-01";
+					cal.setTime(sdf.parse(month + "-01"));
+					cal.set(Calendar.YEAR,Integer.parseInt(month.substring(0,index)));  
+					plans.setStartDate(sdf.parse(startDate));
+					//设置月份  
+					cal.set(Calendar.MONTH, Integer.parseInt(month.substring(index+1,month.length()))); 
+					cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+					endDate= sdf.format(cal.getTime());//获得前一天
+					plans.setEndDate(sdf.parse(endDate));
+				}
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			plans.setDeptId(user.getDepartmentId());
+			plans.setDataArea(user.getDataArea());
+			plans.setCreateDate(new Date());
+			plans.setUserId(user.getId());
+			plans.save();
+		}else {
+			plansId = plans.getId();
 		}
-		plans.setDeptId(user.getDepartmentId());
-		plans.setDataArea(user.getDataArea());
-		plans.setCreateDate(new Date());
-		plans.setUserId(user.getId());
 		int num = Integer.parseInt(getPara("productNum"));
 		int inCnt = 0;
 		for(String  userId: userIds) {
@@ -684,7 +697,7 @@ public void downloading() throws UnsupportedEncodingException{
 				inCnt++;
 			}
 		}
-		plans.save();
+		
 		renderAjaxResultForSuccess("成功导入计划" + inCnt + "条数据");
 	}
 	
