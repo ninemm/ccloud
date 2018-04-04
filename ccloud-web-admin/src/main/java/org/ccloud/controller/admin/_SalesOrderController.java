@@ -92,7 +92,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		Seller seller = SellerQuery.me().findById(sellerId);
-		String dataArea = seller.get("data_area");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<Seller> sellers = SellerQuery.me().findByDataArea(dataArea);
 
 		List<Activity> actList = new ArrayList<Activity>();
