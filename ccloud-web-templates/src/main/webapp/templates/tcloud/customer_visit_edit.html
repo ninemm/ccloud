@@ -19,14 +19,13 @@
     var orgCustomerList = {};
     var customerSelect = [];
     var problemSelect = [];
-
+	var count = 3;
     var imageArr = [];
-    var count = 3;
     var $form = $("#form");
     var $picNum = $('.weui-uploader__info');
-    var $uploaderFiles = $("#uploaderFiles");
+    var $uploaderFiles = $(".uploaderFiles");
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
-
+	var numImage = 0;
     var Orientation = null;
     var MAX_HEIGHT = 1000;
 
@@ -53,6 +52,7 @@
     }
 
     $(function() {
+<<<<<<< HEAD
 
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
@@ -65,6 +65,8 @@
             }
         )
 
+=======
+>>>>>>> refs/heads/activity
         $("#length").text($("#question_desc").val().length + '/' + 70);
         $(document).on("input", "#question_desc", function() {
             $("#length").text($("#question_desc").val().length + '/' + 70);
@@ -114,22 +116,210 @@
 		        		if(data.activityRecords!='[]'){
 						$("#activity_title").select({
 							title: "选择活动",
-							multi: true,
+							multi: false,
 							items: JSON.parse(data.activityRecords),
 							onClose: function(obj) {
 							    var activityIds = obj.data.values;
-							    $('#activity_id').val(activityIds);
+							    $('#activity_apply_id').val(activityIds);
+							  	var activityApplyId = $('#activity_apply_id').val();
+								if(activityApplyId){
+									$.ajax({
+								        url: "${CPATH}/customerVisit/getActivityExecute",
+								        data: {
+								            "activityApplyId": activityApplyId
+								        },
+								        dataType: "json",
+								        success: function(data) {
+								        		var activityExecute = data.activityExecute;
+								        		
+								        		if(activityExecute.length>0){
+									        		
+								        			$(".imageActivityExecute").hide();
+								        			$(".imgeInfo").hide();
+								        			var imageLists = data.imgeLists;
+								        			var domain = data.domain;
+								        			$(".imgeActivity").html("");
+								        			if(imageLists!=null){
+									        			numImage = imageLists.length;
+								        			}
+								        			for(var i = 0 ; i < activityExecute.length ; i++){
+								        				var html = "";
+								        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
+						                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
+							                           for(var j = 0 ; j < numImage ; j++){
+							                           		console.log(imageLists[j].orderList +"--"+ activityExecute[i].orderList)
+							                            	if(imageLists[j].orderList == activityExecute[i].orderList){
+								                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imageLists[j].savePath+')"></li>';
+							                           			imageArr.push({"pic":imageLists[j].originalPath, "picname":imageLists[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imageLists[j].savePath});
+							                            	}
+							                            }
+								                        if(numImage==0 || (imageLists[imageLists.length-1].orderList != activityExecute[i].orderList && i == (activityExecute.length-1))){
+						                                	html +='</ul>'
+							                                	+'<div class="weui-uploader__input-box">'
+							                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">'
+							                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
+							                                	+'</div></div></div>';
+							                                	$("#activity_execute_id").val(activityExecute[i].id);
+								                          }else{
+								                          	html +='</ul></div></div>';
+								                          }
+														 $(".imgeActivity").append(html);
+								        				
+								        			}
+								        			var maxOrderList = data.maxOrderList;
+								        			if(numImage != null && imageLists!=null){
+									        			if(imageLists.length>0 && activityExecute.length == maxOrderList){
+									        				$("._submit_btn").hide();
+									        			}
+								        			}
+								        		}
+								        }
+							        });
+								}
 							}
 						});
 		        		}
 		        }
 	        });
 		}
+<<<<<<< HEAD
 
+=======
+		
+        $(document).on("change", ".uploaderInput", function () {
+        	
+			var $this = $(this);
+            var files = this.files;
+            var arrNum = imageArr.length;
+            var num = 1 + $this.parent().prev().find("li").length;
+            if (num > count) {
+                $.alert("最多上传三张图片");
+                return false;
+            }
+
+            $this.parent().parent().parent().find(".weui-uploader__info").text(num + '/' + count);
+
+            for (var i = 0; i < files.length; i ++) {
+                var file = files[i];
+                if (!/image\/\w+/.test(file.type)) {
+                    $.alert("请确保文件为图像类型");
+                    return false;
+                }
+
+                EXIF.getData(file, function() {
+                    EXIF.getAllTags(this);
+                    Orientation = EXIF.getTag(this, 'Orientation');
+                });
+
+                var reader = new FileReader();
+                (function(x) {
+                    reader.onload = function(e) {
+                        var image = new Image();
+                        image.src = e.target.result;
+                        image.onload = function() {
+                            var expectWidth = this.naturalWidth;
+                            var expectHeight = this.naturalHeight;
+
+                            if (this.naturalWidth > this.naturalHeight && this.naturalWidth > 480) {
+                                expectWidth = 480;
+                                expectHeight = expectWidth * this.naturalHeight / this.naturalWidth;
+                            } else if (this.naturalHeight > this.naturalWidth && this.naturalHeight > 640) {
+                                expectHeight = 640;
+                                expectWidth = expectHeight * this.naturalWidth / this.naturalHeight;
+                            }
+
+                            var canvas = document.createElement("canvas");
+                            var ctx = canvas.getContext("2d");
+                            canvas.width = expectWidth;
+                            canvas.height = expectHeight;
+                            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+
+                            if(Orientation != "" && Orientation != 1){
+                                switch(Orientation){
+                                case 6://需要顺时针（向左）90度旋转
+                                    rotateImg(this,'left',canvas, canvas.width, canvas.height);
+                                    break;
+                                case 8://需要逆时针（向右）90度旋转
+                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);
+                                    break;
+                                case 3://需要180度旋转
+                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);//转两次
+                                    rotateImg(this,'right',canvas, canvas.width, canvas.height);
+                                    break;
+                                }
+                            }
+                            blob = canvas.toDataURL("image/jpeg", 0.5);
+                           if($("#activity_title").val()!=null){
+                           		imageArr.push({"pic":blob, "picname":x,"orderList":$this.parent().parent().parent().find("#orderList").val()});
+                           }else{
+                            	imageArr.push({"pic":blob, "picname":x,"orderList":"0"});
+                           }
+                           $(".pic").val(JSON.stringify(imageArr));
+                            var str = '<li class="weui-uploader__file " style="background-image:url('+blob+')"></li>';
+                            $this.parent().prev().append(str);
+                        };
+                    };
+                })(file.name)
+                reader.readAsDataURL(file);
+            }
+        });
+
+    function rotateImg(img, direction,canvas, width, height) {
+        //最小与最大旋转方向，图片旋转4次后回到原方向
+        var min_step = 0;
+        var max_step = 3;
+        var $uploaderFiles = "";
+        if (img == null) return;
+
+        var step = 2;
+        if (step == null) {
+            step = min_step;
+        }
+        if (direction == 'right') {
+            step++;
+            //旋转到原位置，即超过最大值
+            step > max_step && (step = min_step);
+        } else {
+            step--;
+            step < min_step && (step = max_step);
+        }
+        //旋转角度以弧度值为参数
+        var degree = step * 90 * Math.PI / 180;
+        var ctx = canvas.getContext('2d');
+        switch (step) {
+            case 0:
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                break;
+            case 1:
+                canvas.width = height;
+                canvas.height = width;
+                ctx.rotate(degree);
+                ctx.drawImage(img, 0, -height, canvas.width, canvas.height);
+                break;
+            case 2:
+                canvas.width = width;
+                canvas.height = height;
+                ctx.rotate(degree);
+                ctx.drawImage(img, -width, -height, canvas.width, canvas.height);
+                break;
+            case 3:
+                canvas.width = height;
+                canvas.height = width;
+                ctx.rotate(degree);
+                ctx.drawImage(img, -width, 0, canvas.width, canvas.height);
+                break;
+            }
+        }
+>>>>>>> refs/heads/activity
 
         var index; //第几张图片
-        $uploaderFiles.on("click", "li", function() {
+        var $uploaderFiles ;
+        $(document).on("click", ".uploaderFiles li", function() {
+            _index = $(this).index()+numImage;
             index = $(this).index();
+            $uploaderFiles = $(this).parent();
             $galleryImg.attr("style", this.getAttribute("style"));
             $gallery.fadeIn(100);
         });
@@ -139,11 +329,17 @@
         });
 
         //删除图片  删除图片的代码也贴出来。
-        $(".weui-gallery__del").click(function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+        $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
             $uploaderFiles.find("li").eq(index).remove();
+<<<<<<< HEAD
             $picNum.text($("#uploaderFiles")[0].children.length + '/' + count);
             imageArr.splice(index, 1);
             $("#pic").val(JSON.stringify(imageArr));
+=======
+            $uploaderFiles.parent().parent().find('.weui-uploader__info').text($uploaderFiles.children.length + '/' + count);
+            imageArr.splice(_index, 1);
+            $(".pic").val(JSON.stringify(imageArr));
+>>>>>>> refs/heads/activity
         });
 
     });
@@ -158,20 +354,73 @@
         //    $.toptip('备注描述不能为空', 3000, 'error');
         //    return false;
         //}
+<<<<<<< HEAD
+=======
+
+       if($("#location").val().length==0) {
+            $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
+            return false;
+        }
+        /*if(imageArr.length == 0){
+        	 $.toptip('照片不能为空', 3000, 'error'); 
+            return false;
+        }*/
+
+        $.confirm("您确定要新增拜访吗？","新增拜访", function() {
+            doSubmit();
+        });
+    }
+    
+    function noSubmit(){
+    	if($("#problem_id").val().length==0) {
+            $.toptip('问题类型不能为空', 3000, 'error');
+            return false;
+        }
+
+        if($("#question_desc").val().length==0) {
+            $.toptip('备注描述不能为空', 3000, 'error'); 
+            return false;
+        }
+>>>>>>> refs/heads/activity
 
         if($.trim($("#location").val()).length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
         }
 
-        $.confirm("您确定要新增拜访吗？","新增拜访", function() {
-            doSubmit();
+        $.confirm("您确定要新增补录吗？","新增补录", function() {
+            doNoSubmit();
         });
     }
 
     function doSubmit() {
         $.ajax({
             url: '${CPATH}/customerVisit/save',
+            method: 'post',
+            dataType: 'json',
+            data: $form.serialize(),
+            beforeSend: function() {
+                
+                $('._submit_btn').attr('disabled', true);
+                Utils.openLoadingWin('保存中...');
+            },
+            success: function(res) {
+                Utils.closeLoadingWin();
+                if (res.errorCode == 0) {
+                    location.href = '${CPATH}/customerVisit';
+                } else {
+                    $.alert(res.message);
+                }
+            },
+            error: function(res) {
+                Utils.closeLoadingWin();
+            }
+        });
+    }
+    
+    function doNoSubmit() {
+        $.ajax({
+            url: '${CPATH}/customerVisit/saveB',
             method: 'post',
             dataType: 'json',
             data: $form.serialize(),
@@ -205,7 +454,11 @@
                 $('#location-span').text(address);
                 $('#location').val(address);
             }
+<<<<<<< HEAD
         )
+=======
+        });
+>>>>>>> refs/heads/activity
     }
 </#macro>
 <@layout>
@@ -261,7 +514,8 @@
 						<div class="order-customer-info-title">
 							活动&nbsp;&nbsp;&nbsp;
 						</div>
-						<input id="activity_id"  name="activity_id" type="hidden" />
+						<input id="activity_apply_id"  name="activity_apply_id" type="hidden" />
+						<input id="activity_execute_id"  name="activity_execute_id" type="hidden" />
 						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" readonly>
                     </div>
                     <span class="weui-cell__ft"></span>
@@ -295,16 +549,20 @@
             <section class="weui-cells weui-cells_form">
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
-                        <div class="weui-uploader">
+                        <div class="weui-uploader imgeActivity">
                             <div class="weui-uploader__hd">
                                 <p class="weui-uploader__title">附件图片</p>
-                                <div class="weui-uploader__info">0/3</div>
                             </div>
-                            <div class="weui-uploader__bd">
-                                <ul class="weui-uploader__files" id="uploaderFiles"></ul>
+                            <div class="weui-uploader__bd imageActivityExecute">
+                                <ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>
                                 <div class="weui-uploader__input-box">
+<<<<<<< HEAD
                                     <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="" capture="camera">
                                     <input type="hidden" name="pic" id="pic">
+=======
+                                    <input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="">
+                                    <input type="hidden" name="pic" id="pic" class="pic">
+>>>>>>> refs/heads/activity
                                 </div>
                             </div>
                         </div>
@@ -326,6 +584,7 @@
     <#include "_inc/_goback.html" />
     <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
         <button class="red-button width-100 _submit_btn" onclick="submit()" href="">提交</button>
+        <button class="white-button width-100 _submit_btn" onclick="noSubmit()" href="" style = "color:#666;">稍后补录</button>
     </footer>
 </div>
 </@layout>

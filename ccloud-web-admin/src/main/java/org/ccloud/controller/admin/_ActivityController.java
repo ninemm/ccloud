@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,18 +29,58 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
+import org.ccloud.mid.MidDataUtil;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.HttpUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Activity;
+import org.ccloud.model.ActivityApply;
+import org.ccloud.model.ActivityExecute;
+import org.ccloud.model.ActivityExecuteTemplate;
+import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.Dict;
+import org.ccloud.model.ExpenseDetail;
+import org.ccloud.model.MidIdno;
+import org.ccloud.model.QyBasicfeetype;
+import org.ccloud.model.QyBasicflowtype;
+import org.ccloud.model.QyBasicshowtype;
+import org.ccloud.model.QyExpensedetail;
+import org.ccloud.model.YxBasicchannelinfo;
+import org.ccloud.model.YxBasicchanneltypeinfo;
+import org.ccloud.model.query.ActivityApplyQuery;
+import org.ccloud.model.query.ActivityExecuteQuery;
+import org.ccloud.model.query.ActivityExecuteTemplateQuery;
 import org.ccloud.model.query.ActivityQuery;
+import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.ExpenseDetailQuery;
+import org.ccloud.model.query.MidIdnoQuery;
+import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.QyBasicfeetypeQuery;
+import org.ccloud.model.query.QyBasicflowtypeQuery;
+import org.ccloud.model.query.QyBasicshowtypeQuery;
+import org.ccloud.model.query.QyExpensedetailQuery;
+import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.YxBasicchannelinfoQuery;
+import org.ccloud.model.query.YxBasicchanneltypeinfoQuery;
+import org.ccloud.model.vo.ExTemplate;
+import org.ccloud.model.vo.Expense;
+import org.ccloud.model.vo.ExpensesDetail;
+import org.ccloud.model.vo.ImageJson;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -67,7 +108,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String endDate = getPara("endDate");
 		Page<Record> page = ActivityQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId);
 		for(int i = 0; i <page.getList().size();i++){
-			if(!StringUtils.isBlank(page.getList().get(i).getStr("customer_type"))) {
+			if(page.getList().get(i).getStr("customer_type")!="") {
 				page.getList().get(i).set("customer_type", ActivityQuery.me().getCustomerTypes(page.getList().get(i).getStr("customer_type")));
 			}
 		}
@@ -100,7 +141,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	public void edit() {
 		String id = getPara("id");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		List<ExpenseDetail> expenseList = ExpenseDetailQuery.me().findByActivityId(id);
+		setAttr("expenseList", expenseList);
 		setAttr("dicts",dicts);
 		if(!StrKit.isBlank(id)) {
 			Activity activity = ActivityQuery.me().findById(id);
@@ -109,8 +153,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				String[] imags = activity.getImageListStore().split(",");
 				List<String> imageList = new ArrayList<String>();
 				for(int i=0;i<imags.length;i++) {
-					if(imags[i]!="")
-					imageList.add(imags[i]);
+					if(!imags[i].equals("")) {
+						imageList.add(imags[i]);
+					}
 				}
 				setAttr("imageList", imageList);
 			}
@@ -120,23 +165,53 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				areaList.add(area[i]);
 			}
 			setAttr("areaList",areaList);
-			String[] investType = activity.getInvestType().split(",");
-			List<String> investTypeList = new ArrayList<String>();
-			for(int i=0;i<investType.length;i++) {
-				investTypeList.add(investType[i]);
+			if (!StrKit.isBlank(activity.getInvestType())) {
+				String[] investType = activity.getInvestType().split(",");
+				List<String> investTypeList = new ArrayList<String>();
+				for(int i=0;i<investType.length;i++) {
+					investTypeList.add(investType[i]);
+				}
+				setAttr("investTypeList",investTypeList);
 			}
-			setAttr("investTypeList",investTypeList);
 			setAttr("startDate",  DateFormatUtils.format(activity.getStartTime(), "yyyy-MM-dd"));
 			setAttr("endDate", DateFormatUtils.format(activity.getEndTime(), "yyyy-MM-dd"));
 		}
+		
+		List<Record> productlist = SalesOrderQuery.me().findProductListBySeller(sellerId);
+		List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
+		for (Record record : productlist) {
+			Map<String, String> productOptionMap = new HashMap<String, String>();
+
+			String sellProductId = record.getStr("id");
+			String customName = record.getStr("custom_name");
+			String speName = record.getStr("valueName");
+
+			productOptionMap.put("id", sellProductId);
+			productOptionMap.put("text", customName + "/" + speName);
+
+			productOptionList.add(productOptionMap);
+		}
+		setAttr("productOptionList", JSON.toJSON(productOptionList));
 	}
 	
 	@Before(Tx.class)
 	public void save() {
 		final Activity activity = getModel(Activity.class);
-		String sellerId = getSessionAttr("sellerId");
+		List<ExpenseDetail> expenseOldList = ExpenseDetailQuery.me().findByActivityId(activity.getId());
+		String templateInfo=getPara("templateList");
+		List<ExTemplate> list = new ArrayList<>();
+		if(StrKit.notBlank(templateInfo)) {
+			JSONArray jsonArray = JSONArray.parseArray(templateInfo);
+			list =  jsonArray.toJavaList(ExTemplate.class);
+		}
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String [] imagePath = getParaValues("imageUrl[]");
-		String investTypes = getPara("investType");
+		String [] item1 = getParaValues("item1[]");
+		String [] item2 = getParaValues("item2[]");
+		String [] item3 = getParaValues("item3[]");
+		String [] item4 = getParaValues("item4[]");
+		String [] expenseIds = getParaValues("expenseIds[]");
+		String investTypes = getPara("invest_type");
 		String customerTypes = getPara("customerType");
 		if(customerTypes !=null && customerTypes.length()>180) {
 			renderAjaxResultForError("客户类型不能超过5个");
@@ -160,8 +235,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String areaNames = getPara("areaNames").replace("/", "-");
 		String startDate = getPara("startDate")+" 00:00:00";
 		String endDate = getPara("endDate")+" 23:59:59";
-		 Date sdate=null; 
-		 Date edate = null;
+		Date sdate = null; 
+		Date edate = null;
 	    SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 	    try {
 			sdate=formatter.parse(startDate);
@@ -170,7 +245,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			e.printStackTrace();
 		}  
 	    if(activity.getCategory().equals(Consts.CATEGORY_NORMAL)){
-	    	activity.setInvestAmount(new BigDecimal(0));
 	    	activity.setVisitNum(0);
 	    	activity.setInvestType("");
 	    }else{
@@ -184,8 +258,244 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		activity.setEndTime(edate);
 		activity.setCustomerType(customerTypes);
 		activity.saveOrUpdate();
+		int num = Integer.valueOf(getPara("num"));
+		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(activity.getId());
+		if(activityExecutes.size() > 0) {
+		}
+		List<String> list2 = new ArrayList<>();
+		List<String> list3 = new ArrayList<>();
+		if(num > 0) {
+			for(int i = 0; i < num ; i++) {
+				if(StrKit.isBlank(getPara("orderList" + (i + 1)))){
+					continue;
+				}
+				String aEId = (getPara("activityExecteId"+(i+1))!=null?getPara("activityExecteId"+(i+1)):"");
+				for(ActivityExecute ae : activityExecutes) {
+					if(aEId.equals(ae.getId())) {
+						list2.add(ae.getId());
+					}
+					list3.add(ae.getId());
+				}
+			}
+			for(int k = 0 ; k < list3.size() ; k++) {
+				if(!list2.contains(list3.get(k))){
+					ActivityExecuteQuery.me().batchDelete(list3.get(k));
+					ActivityExecuteTemplateQuery.me().deleteByActivityExecuteId(list3.get(k));
+				}
+			}
+			for(int i = 0; i < num ; i++) {
+				if(StrKit.isBlank(getPara("orderList" + (i + 1)))){
+					continue;
+				}
+				
+				String aEId = (getPara("activityExecteId"+(i+1))!=null?getPara("activityExecteId"+(i+1)):"");
+				String activityExecuteId = "";
+				boolean flang =false;
+				ActivityExecute activityExecute = new ActivityExecute();
+				for(String s : list2) {
+					if(aEId.equals(s)) {
+						activityExecuteId = s;
+						activityExecute = ActivityExecuteQuery.me().findById(activityExecuteId);
+						activityExecute.setOrderList(getPara("orderList"+(i+1)));
+						activityExecute.setRemark(getPara("remark"+(i+1)));
+						activityExecute.setModifyDate(new Date());
+						activityExecute.update();
+						flang = true;
+						break;
+					}
+				}
+				if(flang == false) {
+					if(StrKit.isBlank(getPara("orderList" + (i + 1)))){
+						continue;
+					}
+					activityExecuteId = StrKit.getRandomUUID();
+					activityExecute.setId(activityExecuteId);
+					activityExecute.setActivityId(activity.getId());
+					activityExecute.setOrderList(getPara("orderList"+(i+1)));
+					activityExecute.setRemark(getPara("remark"+(i+1)));
+					activityExecute.setCreateDate(new Date());
+					activityExecute.save();
+				}
+				List<ActivityExecuteTemplate> activityExecuteTemplates =  ActivityExecuteTemplateQuery.me().findActivityExecuteId(activityExecuteId);
+				List<String> list4 = new ArrayList<>();
+				if(list.size()>0) {
+					for(int j = 0 ; j < list.size() ; j++) {
+						list4.add(list.get(j).getActivityExecteTemplateId());
+					}
+					for(ActivityExecuteTemplate activityExecuteTemplate : activityExecuteTemplates) {
+						if(!list4.contains(activityExecuteTemplate.getId())) {
+							ActivityExecuteTemplateQuery.me().batchDelete(activityExecuteTemplate.getId());
+						}
+					}
+					
+					for(int j = 0 ; j < list.size() ; j++) {
+						if(list.get(j).getActivityExecteId().equals(aEId)) {
+							ActivityExecuteTemplate activityExecuteTemplate = new ActivityExecuteTemplate();
+							if(StrKit.isBlank(list.get(j).getActivityExecteTemplateId())) {
+								activityExecuteTemplate.setId(StrKit.getRandomUUID());
+								activityExecuteTemplate.setActivityExecuteId(activityExecuteId);
+								activityExecuteTemplate.setSellerId(sellerId);
+								if(StrKit.notBlank(list.get(j).getTemplateValue())){
+									activityExecuteTemplate.setTemplateValue(list.get(j).getTemplateValue());
+								}
+								activityExecuteTemplate.setTemplateValueType(list.get(j).getTemplateValueType());
+								activityExecuteTemplate.setTemplateValueOpt(list.get(j).getTemplateValueTypeValue());
+								activityExecuteTemplate.setCreateDate(new Date());
+								activityExecuteTemplate.save();
+							}else {
+								activityExecuteTemplate = ActivityExecuteTemplateQuery.me().findById(list.get(j).getActivityExecteTemplateId());
+								if(StrKit.notBlank(list.get(j).getTemplateValue())){
+									activityExecuteTemplate.setTemplateValue(list.get(j).getTemplateValue());
+								}
+								activityExecuteTemplate.setTemplateValueType(list.get(j).getTemplateValueType());
+								activityExecuteTemplate.setTemplateValueOpt(list.get(j).getTemplateValueTypeValue());
+								activityExecuteTemplate.setModifyDate(new Date());
+								activityExecuteTemplate.update();
+							}
+						}
+					}
+				}
+			}
+		}
+		BigDecimal totalMoney = new BigDecimal(0);
+		Integer totalNum = 0;
+		if (item1 != null) {
+			for(int i = 0; i < item1.length; i++) {
+				ExpenseDetail detail = new ExpenseDetail();
+				detail.setActivityId(activity.getId());
+				detail.setFlowNo(activity.getProcCode());
+				String typeID = findFlowDictType(activity.getInvestType());
+				detail.setFlowDictType(typeID);
+				if (typeID.equals("feeType_name_display")) {
+					detail.setDisplayDictType(findDisplayType(item1[i]));
+				}
+				detail.setItem1(item1[i]);
+				detail.setItem2(item2[i]);
+				if (item3 != null) {
+					detail.setItem3(item3[i]);
+				}
+				if (item4 != null) {
+					detail.setItem4(item4[i]);
+				}
+				BigDecimal[] result = calculationTotalInfo(totalMoney, totalNum, detail);
+				totalMoney = result[0];
+				totalNum = result[1].intValue();
+				detail.setState(true);			
+				if (StrKit.notBlank(expenseIds[i])) {
+					detail.setId(expenseIds[i]);
+					detail.setModifyDate(new Date());
+					detail.update();
+				} else {
+					detail.setId(StrKit.getRandomUUID());
+					detail.setCreateDate(new Date());
+					detail.save();
+				}
+			}
+			if (activity.getInvestAmount() == null) {
+				activity.setInvestAmount(totalMoney);
+			}
+			if (activity.getInvestNum() == null) {
+				activity.setInvestNum(totalNum);
+			}
+			activity.update();
+			List<String> ids = getDiffrent(expenseOldList, expenseIds);
+			ExpenseDetailQuery.me().batchDelete(ids);
+		}
 		renderAjaxResultForSuccess();
 	}
+	
+	private BigDecimal[] calculationTotalInfo(BigDecimal totalMoney, Integer totalNum, ExpenseDetail detail) {
+		BigDecimal[] result = new BigDecimal[2];
+		if (detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY) 
+				|| detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL)) {
+			result[0] = totalMoney.add(new BigDecimal(detail.getItem4()));
+			result[1] = new BigDecimal(totalNum).add(new BigDecimal(detail.getItem3()));
+		} else if(detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_SA)) {
+			result[0] = totalMoney.add(new BigDecimal(detail.getItem3()));
+			result[1] = new BigDecimal(0);
+		} else {
+			result[0] = totalMoney.add(new BigDecimal(detail.getItem2()));
+			result[1] = new BigDecimal(0);
+		}
+		return result;
+	}
+
+	/** 
+	 * 获取两个List的不同元素(耗时最低)
+	 * @param list1 
+	 * @param list2 
+	 * @return 
+	 */  
+	private static List<String> getDiffrent(List<ExpenseDetail> eList, String[] newIds) {
+		List<String> list1 = new ArrayList<String>();
+		List<String> list2 = Arrays.asList(newIds);
+		for (ExpenseDetail expenseDetail : eList) {
+			list1.add(expenseDetail.getId());
+		}
+		List<String> diff = new ArrayList<String>();  
+	    List<String> maxList = list1;  
+	    List<String> minList = list2;  
+	    if(list2.size()>list1.size()) {  
+	         maxList = list2;  
+	         minList = list1;  
+	    }  
+	    Map<String,Integer> map = new HashMap<String,Integer>(maxList.size());  
+	    for (String string : maxList) {  
+	        map.put(string, 1);  
+	    }  
+	    for (String string : minList) {  
+	        if(map.get(string)!=null) {  
+	            map.put(string, 2);  
+	            continue;  
+	        }  
+	        diff.add(string);  
+	    }  
+	    for(Map.Entry<String, Integer> entry:map.entrySet()) {  
+	        if(entry.getValue()==1) {  
+	            diff.add(entry.getKey());  
+	        }  
+	    }  
+	    return diff;  
+	}
+	
+	private String findFlowDictType(String code) {
+		String type = null;
+		if (code.equals("101101")) {
+			return "feeType_name_PR";
+		} else if (code.equals("101102")) {
+			return "feeType_name_raise";
+		} else if (code.equals("101103")) {
+			return "feeType_name_AD";
+		} else if (code.equals("101104")) {
+			return "feeType_name_display";
+		} else if (code.equals("101105")) {
+			return "channel_define";
+		} else if (code.equals("101106")) {
+			return "feeType_name_gift";
+		} else if (code.equals("101107")) {
+			return "feeType_name_SA";
+		}
+		return type;
+	}
+	
+	private String findDisplayType(String code) {
+		if (code.equals("102032")) {
+			return "display_publish";
+		} else if(code.equals("102033")) {
+			return "display_shop";
+		} else if(code.equals("102034")) {
+			return "display_retail";
+		} else if(code.equals("102035")) {
+			return "display_sell";
+		} else if(code.equals("102036")) {
+			return "display_catering";
+		} else if(code.equals("102037")) {
+			return "display_dm";
+		} else {
+			return "display_CER";
+		}
+	}
+	
 	public void getCustomerTypeOptions() {
 		String id = getPara("id");
 		String DataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
@@ -198,7 +508,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			map.put("name",record.get("name").toString());
 			if (!StringUtils.isBlank(id)) {
 				Activity activity = ActivityQuery.me().findById(id);
-				String[] customerTypes = activity.getCustomerType().split(",");
+				if(StrKit.notBlank(activity.getCustomerType())) {
+					String[] customerTypes = activity.getCustomerType().split(",");
 					for(int i = 0;i<customerTypes.length;i++){
 						if((record.get("id").toString()).equals(customerTypes[i])){
 							map.put("isvalid", 1);
@@ -207,6 +518,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 							map.put("isvalid", 0);
 						}
 					}
+				}else {
+					map.put("isvalid", 0);
+				}
 			}else {
 					map.put("isvalid", 0);
 			}
@@ -229,5 +543,745 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(flang);
 	}
 	
+	//中间库同步数据
+	@Before(Tx.class)
+	public void getMidData() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+//		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();//测试数据
+		String[] date = DateUtils.getStartDateAndEndDateByType("month");
+		List<Expense> expenseList = MidDataUtil.getExpensesInfo(date[0], date[1], "1", Consts.GET_MID_DATA_TOTALROW);
+		List<Activity> acList = new ArrayList<>();
+		List<ExpenseDetail> dlist = new ArrayList<>();
+		for (Expense qyExpense : expenseList) {
+			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
+				Activity activity = new Activity();
+				activity.setId(StrKit.getRandomUUID());
+				activity.setSellerId(sellerId);
+				activity.setCode(qyExpense.getActivityNo());
+				activity.setTitle(qyExpense.getExpenseName());
+				activity.setStartTime(DateUtils.strToDate(qyExpense.getExpenseBeginDate(), DateUtils.DEFAULT_MID_FORMATTER));
+				activity.setEndTime(DateUtils.strToDate(qyExpense.getExpenseEndDate(), DateUtils.DEFAULT_MID_FORMATTER));
+				activity.setCategory(Consts.ACTIVITY_CATEGORY_CODE);
+				String[] value = getAreaType(qyExpense.getExpenseName());
+				activity.setInvestType(DictQuery.me().findbyName(value[0]).getValue());
+				activity.setAreaType(value[1]);
+				activity.setInvestAmount(new BigDecimal(qyExpense.getApplyAmount()));
+				activity.setProcCode(qyExpense.getFlowNo());
+				activity.setPlanCode(qyExpense.getActivityNo());
+				activity.setContent(qyExpense.getMemo());
+				activity.setTimeInterval(qyExpense.getInputDay().toString());
+				activity.setIsPublish(0);
+				activity.setCreateDate(new Date());
+				acList.add(activity);
+//				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
+				getExpenseDetailsList(dlist, qyExpense.getExpenseID(), activity.getId(), activity.getInvestType(), activity.getProcCode());
+			}
+		}
+		Db.batchSave(acList, acList.size());
+		for (ExpenseDetail expenseDetail : dlist) {
+			expenseDetail.save();
+		}
+//		Db.batchSave(dlist, dlist.size());
+		renderAjaxResultForSuccess("同步成功");
+	}
+	
+	@Before(Tx.class)
+	public void getMidDataBasic() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String page = getPara("page");
+		String pageCount = getPara("pageCount");	
+		List<QyBasicflowtype> flowList = MidDataUtil.getFlowTypeInfo(startDate, endDate, page, pageCount);
+		List<QyBasicfeetype> feeList = MidDataUtil.getFeeTypeInfo(startDate, endDate, page, pageCount);
+		List<QyBasicshowtype> showList = MidDataUtil.getShowTypeInfo(startDate, endDate, page, pageCount);
+		List<YxBasicchannelinfo> channelList = MidDataUtil.getBasicChannel();
+		List<YxBasicchanneltypeinfo> channelTypeList = MidDataUtil.getBasicChannelType();
+		QyBasicflowtypeQuery.me().deleteAll();
+		QyBasicfeetypeQuery.me().deleteAll();
+		QyBasicshowtypeQuery.me().deleteAll();
+		YxBasicchannelinfoQuery.me().deleteAll();
+		YxBasicchanneltypeinfoQuery.me().deleteAll();
+		Db.batchSave(flowList, flowList.size());
+		Db.batchSave(feeList, feeList.size());
+		Db.batchSave(showList, showList.size());
+		Db.batchSave(channelList, channelList.size());
+		Db.batchSave(channelTypeList, channelTypeList.size());
+		renderAjaxResultForSuccess("同步成功");
+	}
+	
+	private void getExpenseDetailsList(List<ExpenseDetail> dlist, String expenseId, String actId, String typeId, String flowNo) {
+		List<ExpensesDetail> expenseList = MidDataUtil.getExpenseDetail(expenseId, typeId);
+		for (ExpensesDetail expensesDetail : expenseList) {
+			ExpenseDetail expenseDetail = new ExpenseDetail();
+			expenseDetail.setId(StrKit.getRandomUUID());
+			expenseDetail.setActivityId(actId);
+			expenseDetail.setFlowNo(flowNo);
+			expenseDetail.setFlowTypeId(expensesDetail.getFlowTypeID());
+			String dict = findFlowDictType(typeId);
+			expenseDetail.setFlowDictType(dict);
+			String name = QyBasicfeetypeQuery.me().findNameById(expensesDetail.getCostType());
+			Dict code = DictQuery.me().findbyName(name);
+			getItem(expenseDetail, expensesDetail, 5);
+			if (dict.equals("feeType_name_display")) {
+				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
+				String item2Value = QyBasicshowtypeQuery.me().findNameById(expenseDetail.getItem2());
+				Dict displayCode = DictQuery.me().findbyName(item2Value);
+				expenseDetail.setItem2(displayCode.getValue());
+			}
+			if (StrKit.notBlank(expensesDetail.getChannelID())) {
+				expenseDetail.setItem1(expensesDetail.getChannelID());
+			} else {
+				expenseDetail.setItem1(code.getValue());
+			}			
+			expenseDetail.setCreateDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
+			expenseDetail.setModifyDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
+			if (expensesDetail.getFlag().equals("0")) {
+				expenseDetail.setState(false);
+			} else {
+				expenseDetail.setState(true);
+			}
+			dlist.add(expenseDetail);
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private List<ExpenseDetail> getExpenseDetailList(String expenseId, String actId, String typeId) {
+		List<ExpenseDetail> expenseDetails = new ArrayList<>();
+		List<QyExpensedetail> midDatas = QyExpensedetailQuery.me().findByActivityId(expenseId);
+		for (QyExpensedetail qyExpensedetail : midDatas) {
+			ExpenseDetail expenseDetail = new ExpenseDetail();
+			expenseDetail.setId(StrKit.getRandomUUID());
+			expenseDetail.setActivityId(actId);
+			expenseDetail.setFlowNo(qyExpensedetail.getFlowNo());
+			expenseDetail.setFlowTypeId(qyExpensedetail.getFlowTypeID());
+			String dict = findFlowDictType(typeId);
+			expenseDetail.setFlowDictType(dict);
+			if (dict.equals("feeType_name_display")) {
+				String name = QyBasicfeetypeQuery.me().findNameById(qyExpensedetail.getItem1());
+				Dict code = DictQuery.me().findbyName(name);
+				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
+			}
+			expenseDetail.setItem1(qyExpensedetail.getItem1());
+//			getItem(expenseDetail, qyExpensedetail, 5);
+			expenseDetail.setCreateDate(qyExpensedetail.getCreateTime());
+			expenseDetail.setModifyDate(qyExpensedetail.getModifyTime());
+			if (qyExpensedetail.getFlag() == 0) {
+				expenseDetail.setState(false);
+			} else {
+				expenseDetail.setState(true);
+			}
+			expenseDetails.add(expenseDetail);
+		}
+		return expenseDetails;
+	}
+	
+	private void getItem(ExpenseDetail expenseDetail, ExpensesDetail qyExpensedetail, int num) {
+		qyExpensedetail.setItemInfo();
+		int j = 2;
+		for (int i = 2; i < num; i++) {
+			String otherItem = getItemString(qyExpensedetail,i);
+			if (StrKit.notBlank(otherItem)) {
+				expenseDetail.set("item" + String.valueOf(j), otherItem);
+				j++;
+			}
+		}
+	}
+	
+	private String getItemString(ExpensesDetail qyExpensedetail, int num) {
+		if (num == 2) {
+			return qyExpensedetail.getItem2();
+		} else if (num == 3) {
+			return qyExpensedetail.getItem3();
+		} else {
+			return qyExpensedetail.getItem4();
+		}
+	}
 
+	private String[] getAreaType(String data) {
+		String[] value = new String[2];
+		String[] areaFirst = data.split(":");
+		String[] flowType = areaFirst[0].split("申请");
+		value[0] = flowType[0];
+		String[] areaSecond = areaFirst[1].split("_");
+		int a = 0;
+		for (int i = 0; i < areaSecond.length; i++) {
+			if (areaSecond[i].contains("省")) {
+				a = i;
+				break;
+			}
+		}
+		String areaType = areaSecond[a] + "-" + areaSecond[a+1];
+		value[1] = areaType;
+		return value;
+	}
+
+	public void getActivityExecute() {
+		String activityId = getPara("activityId");
+		List<ActivityExecute> activityExecuteList = ActivityExecuteQuery.me().findbyActivityId(activityId);
+		renderJson(activityExecuteList);
+	}
+	
+	//投入列表
+	public void put() {
+		List<Dict> invest = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
+		setAttr("ilist", invest);
+		render("activityPut.html");
+	}
+	
+	public void putList() {
+		String keyword = getPara("k");
+		String invest_type = getPara("invest_type");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String sellerId = getSessionAttr("sellerId");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		Page<Record> page = ActivityQuery.me().activityPutPaginate(getPageNumber(), getPageSize(), keyword, startDate, endDate,sellerId,invest_type);
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+
+	//活动投放明细
+	public void putDetails() {
+		String id = getPara("id");
+		setAttr("id", id);
+		render("putDetails.html");
+	}
+	
+	//活动投放明细
+	public void putDetailsList() {
+		String id = getPara("id");
+		String status = getPara("status");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		Page<Record> page = ActivityQuery.me().putDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,id,status);
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+	
+	//活动拜访详情
+	public void visitDetails() {
+		String activityApplyId = getPara("activityApplyId");
+		setAttr("activityApplyId", activityApplyId);
+		render("visitDetails.html");
+	}
+	
+	//活动拜访详情
+	public void visitDetailsList() {
+		String activityApplyId = getPara("activityApplyId");
+		String startDate = getPara("startDate");
+		
+		String endDate = getPara("endDate");
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		Page<Record> page = ActivityQuery.me().visitDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,activityApplyId);
+		for(int i = 0; i <page.getList().size();i++){
+			if(StrKit.notBlank(page.getList().get(i).getStr("photo"))) {
+				List<ImageJson> list = Lists.newArrayList();
+				JSONArray picList = JSON.parseArray(page.getList().get(i).getStr("photo"));
+				for (int  a= 0; a <picList.size(); a++) {
+					JSONObject obj = picList.getJSONObject(a);
+					String domain = OptionQuery.me().findValue("cdn_domain");
+					String savePath = obj.getString("savePath");
+					String originalPath = obj.getString("originalPath");
+					ImageJson image = new ImageJson();
+					image.setOriginalPath(domain + "/" +originalPath);
+					image.setSavePath(domain + "/" +savePath);
+					list.add(image);
+				}
+				page.getList().get(i).set("photo", list);
+			}
+		}
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+	
+	//活动的所有拜访详情
+	public void visitAllDetails() {
+		String id = getPara("id");
+		setAttr("id", id);
+		render("visitAllDetails.html");
+	}
+	
+	//活动的所有拜访详情
+	public void visitAllDetailsList() {
+		String activityId = getPara("id");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		Page<Record> page = ActivityQuery.me().visitAllDetailsPaginate(getPageNumber(), getPageSize(), keyword,startDate, endDate,activityId);
+		for(int i = 0; i <page.getList().size();i++){
+			if(StrKit.notBlank(page.getList().get(i).getStr("photo"))) {
+				List<ImageJson> list = Lists.newArrayList();
+				JSONArray picList = JSON.parseArray(page.getList().get(i).getStr("photo"));
+				for (int  a= 0; a <picList.size(); a++) {
+					JSONObject obj = picList.getJSONObject(a);
+					String domain = OptionQuery.me().findValue("cdn_domain");
+					String savePath = obj.getString("savePath");
+					String originalPath = obj.getString("originalPath");
+					ImageJson image = new ImageJson();
+					image.setOriginalPath(domain + "/" +originalPath);
+					image.setSavePath(domain + "/" +savePath);
+					list.add(image);
+				}
+				page.getList().get(i).set("photo", list);
+			}
+		}
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+	
+	//相册js
+	public void img() {
+		String customerVisitId = getPara(0);
+		CustomerVisit CustomerVisit = CustomerVisitQuery.me().findById(customerVisitId);
+		List<ImageJson> list = Lists.newArrayList();
+		JSONArray picList = JSON.parseArray(CustomerVisit.getPhoto());
+		for (int  a= 0; a <picList.size(); a++) {
+			JSONObject obj = picList.getJSONObject(a);
+			String domain = OptionQuery.me().findValue("cdn_domain");
+			String savePath = obj.getString("savePath");
+			String originalPath = obj.getString("originalPath");
+			ImageJson image = new ImageJson();
+			image.setOriginalPath(domain + "/" +originalPath);
+			image.setSavePath(domain + "/" +savePath);
+			list.add(image);
+		}
+		setAttr("list", list);
+		render("img.html");
+	}
+	
+	//加入核销
+	public void auditReimbursement() throws Exception {
+		String ids = getPara("ids");
+		String[] activityApplyIds = ids.split(",");
+		for (String activityApplyId : activityApplyIds) {
+			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
+			List<Record> list= ActivityQuery.me().findPhoto(activityApplyId);
+			String ScenePhoto="";
+			if (list!=null) {
+				ScenePhoto=addPhoto(list);
+				if (ScenePhoto==null) {
+					renderAjaxResultForError("同步图片失败!");
+					return;
+				}
+				ScenePhoto=ScenePhoto.substring(1, ScenePhoto.length()-1);
+			}
+			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
+			Long shopId = addCustomer(YxActivity.getStr("customerId"));
+			if (shopId==null) {
+				renderAjaxResultForError("同步客户失败!");
+				return;
+			}
+			Map<String, Object> map = jointMap(YxActivity);
+			if (YxActivity.getStr("invest_type").equals(Consts.INVES_PUBLICK)) {
+				//公关赞助
+				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_PR);
+				map.put("IDNO",midIdno.getIdno());
+				map.put("ScenePhoto",ScenePhoto);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityBrandInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+					midIdno.setIdno(midIdno.getIdno()+1);
+					midIdno.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
+			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CONSUMPTION_CULTIVATION)) {
+				//消费培育
+				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_RAISE);
+				map.put("IDNO",midIdno.getIdno());
+				map.put("ScenePhoto",ScenePhoto);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityProductJudge", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+					midIdno.setIdno(midIdno.getIdno()+1);
+					midIdno.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
+			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)) {
+				//终端广告
+				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_AD);
+				map.put("IDNO",midIdno.getIdno());
+				map.put("CustomerCode",shopId+"");
+				map.put("ShopID",shopId);
+				map.put("ExecutePhotoIds",ScenePhoto);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopAdInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+					midIdno.setIdno(midIdno.getIdno()+1);
+					midIdno.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
+			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_DISPLAY)) {
+				//终端陈列 
+				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_DISPLAY);
+				map.put("IDNO",midIdno.getIdno());
+				map.put("CustomerCode",shopId+"");
+				map.put("ShopID",shopId);
+				map.put("GiftPhotoId",ScenePhoto);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopShowInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+					midIdno.setIdno(midIdno.getIdno()+1);
+					midIdno.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
+			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CUSTOMER_VISITE)) {
+				//终端客情
+				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_CHANNEL);
+				map.put("IDNO",midIdno.getIdno());
+				map.put("CustomerCode",shopId+"");
+				map.put("ShopID",shopId);
+				map.put("ActivityPhotos",ScenePhoto);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityDisplayInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+					midIdno.setIdno(midIdno.getIdno()+1);
+					midIdno.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
+			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_SUPERMARKET_GIFT)) {
+				//商超赠品
+				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_GIFT);
+				map.put("IDNO",midIdno.getIdno());
+				map.put("CustomerCode",shopId+"");
+				map.put("ShopID",shopId);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityMarketGiftInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+					midIdno.setIdno(midIdno.getIdno()+1);
+					midIdno.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
+			}else {
+				//进场费
+				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_SA);
+				map.put("IDNO",midIdno.getIdno());
+				map.put("CustomerCode",shopId+"");
+				map.put("ShopID",shopId);
+				map.put("ExecutePhotoIds",ScenePhoto);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityEntryCostInfo", map);
+					activityApply.setStatus(5);
+					activityApply.update();
+					midIdno.setIdno(midIdno.getIdno()+1);
+					midIdno.update();
+				} catch (Exception e) {
+					e.printStackTrace();
+					renderAjaxResultForError("加入核销失败!");
+					return;
+				}
+			}
+		}
+		renderAjaxResultForSuccess("加入核销成功");
+	}
+	
+	public void editTemplate() {
+		String activityExecteId = getPara("activityExecteId");
+		List<ActivityExecuteTemplate> activityExecuteTemplates = ActivityExecuteTemplateQuery.me().findActivityExecuteId(activityExecteId);
+		List<Dict> dicts = DictQuery.me().findDictByType(Consts.ACTIVITY_EXECUTE_TEMPLATE);
+		setAttr("activityExecuteTemplates", JSON.toJSON(activityExecuteTemplates));
+		setAttr("dicts", JSON.toJSON(dicts));
+		setAttr("activityExecteId",activityExecteId);
+		render("template.html");
+	}
+	
+	public void getActivityExecuteTemplate() {
+		String activityExecteId = getPara("activityExecteId");
+		List<ActivityExecuteTemplate> activityExecuteTemplates = ActivityExecuteTemplateQuery.me().findActivityExecuteId(activityExecteId);
+		renderJson(activityExecuteTemplates);
+	}
+	
+	//新增客户
+	public Long addCustomer(String customerId) {
+		Record Customer = CustomerQuery.me().findByCustomerId(customerId);
+		Customer Customer1 = CustomerQuery.me().findById(customerId);
+		Long ShopID = Customer.getLong("ShopID");
+		if (ShopID!=null) {
+			return ShopID;
+		}else {
+			MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.CUSTOMER_IDNO);
+			Map<String, Object>map=new HashMap<>();
+			map.put("ShopID", midIdno.getIdno());
+			map.put("CustomerName", Customer.getStr("CustomerName"));
+			map.put("CustomerCode", midIdno.getIdno()+"");
+			map.put("LinkMan", Customer.getStr("LinkMan"));
+			map.put("LinkMobile", Customer.getStr("LinkMobile"));
+			map.put("ResponsableMan", Customer.getStr("ResponsableMan"));
+			map.put("CustomerAddress", Customer.getStr("CustomerAddress"));
+//			map.put("ChannelName", Customer.getStr("ChannelName"));
+			map.put("ProvinceName", Customer.getStr("ProvinceName"));
+			map.put("CityName", Customer.getStr("CityName"));
+			map.put("CountyName", Customer.getStr("CountyName"));
+			map.put("PersonName", Customer.getStr("PersonName"));
+//			map.put("ChannelID", Customer.getInt("PersonName"));
+//			map.put("ProvinceID",);
+//			map.put("CityID",);
+//			map.put("CountyID",);
+//			map.put("PersonID", Customer.getInt("PersonID"));
+			map.put("CreateTime", Customer.getStr("CreateTime"));
+			map.put("ModifyTime", Customer.getStr("ModifyTime"));
+			map.put("Flag", 1);
+			try {
+				HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ShopInfo", map);
+				midIdno.setIdno(midIdno.getIdno()+1);
+				midIdno.update();
+				Customer1.setMidIdno(midIdno.getIdno());
+				Customer1.update();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+			return midIdno.getIdno();
+		}
+	}
+	
+	//保存照片
+	public String addPhoto(List<Record> listRecord) {
+		List<String> list = Lists.newArrayList();
+		for (Record record : listRecord) {
+			JSONArray picList = JSON.parseArray(record.getStr("photo"));
+			for (int  a= 0; a <picList.size(); a++) {
+				JSONObject obj = picList.getJSONObject(a);
+				String domain = OptionQuery.me().findValue("cdn_domain");
+				String savePath = obj.getString("savePath");
+				list.add(savePath);
+				Map<String, Object>map=new HashMap<>();
+				map.put("PhotoID", savePath);
+				map.put("PhotoSource", "七牛云");
+//				map.put("PhotoSize", "");
+				map.put("PhotoUrl", domain + "/" +savePath);
+//				map.put("Remark", "");
+				map.put("PhotoTime", record.getStr("create_date"));
+				map.put("ApplyTime", new Date());
+				map.put("ModifyTime", new Date());
+				map.put("PhotoType", 1);
+				try {
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/PhotoInfo", map);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+		}
+		return list.toString();
+	}
+	
+	//拼接核销map
+	public Map<String, Object> jointMap(Record YxActivity) {
+		Map<String, Object>map=new HashMap<>();
+		String[] FlowIDNO = YxActivity.getStr("FlowIDNO").split("\\.");
+		map.put("FlowIDNO",Integer.parseInt(FlowIDNO[FlowIDNO.length-1]) );
+//		map.put("ResourceID", "");
+		if (YxActivity.getStr("invest_type").equals(Consts.INVES_PUBLICK)) {
+			//公关赞助
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
+			map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
+			map.put("CustomerName",YxActivity.getStr("CustomerName"));
+			map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
+			map.put("Telephone",YxActivity.getStr("Telephone"));
+			map.put("Position",YxActivity.getStr("Position"));
+			map.put("ResourceFlag",1);
+			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+//			map.put("SignPhoto","");		
+			map.put("Telephone",YxActivity.getStr("Telephone"));
+			map.put("CreateManName",YxActivity.getStr("CreateManName"));
+			map.put("CreateTime",YxActivity.getStr("CreateTime"));
+			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
+			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));
+			map.put("Flag",1);
+//			map.put("ShopOrderID",);
+//			map.put("GiftPhoto","");
+		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CONSUMPTION_CULTIVATION)) {
+			//消费培育
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
+			map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
+			map.put("CustomerName",YxActivity.getStr("CustomerName"));
+			map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
+//			map.put("TableNum",);
+//			map.put("DinnerType",);
+			map.put("Telephone",YxActivity.getStr("Telephone"));
+			map.put("Position",YxActivity.getStr("Position"));
+			map.put("ResourceFlag",1);
+			map.put("InvestState",2);
+			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+//			map.put("ShopOrderID",);
+//			map.put("IntroducerOrderID",);
+//			map.put("IntroducerName","");
+//			map.put("IntroducerTel","");
+//			map.put("SignPhotos","");
+			map.put("CreateManName",YxActivity.getStr("CreateManName"));
+			map.put("CreateTime",YxActivity.getStr("CreateTime"));
+			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
+			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
+			map.put("Flag",1);
+//			map.put("GiftPhoto","");
+		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)) {
+			//终端广告
+			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+			map.put("CityName",YxActivity.getStr("CityName"));
+			map.put("CountyName",YxActivity.getStr("CountyName"));
+			map.put("CustomerName",YxActivity.getStr("CustomerName"));
+			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+//			map.put("ChannelID",);
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
+			map.put("Num",Integer.parseInt(YxActivity.getStr("Num")));
+			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+			map.put("InvestState",2);
+			map.put("ResourceFlag",1);
+			map.put("ExecuteManName",YxActivity.getStr("ExecuteManName"));
+			map.put("ExecuteTime",YxActivity.getStr("ExecuteTime"));		
+			map.put("ExecuteState",1);
+//			map.put("ExecuteNum",);
+//			map.put("ExecuteSize","");
+//			map.put("ExecuteRemark","");
+			map.put("WriteOffNum",Integer.parseInt(YxActivity.getStr("Num")));
+//			map.put("WriteOffSize","");
+			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+			map.put("CreateManName",YxActivity.getStr("CreateManName"));
+			map.put("CreateTime",YxActivity.getStr("CreateTime"));
+		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_DISPLAY)) {
+			//终端陈列 
+			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+			map.put("CityName",YxActivity.getStr("CityName"));
+			map.put("CountyName",YxActivity.getStr("CountyName"));
+			map.put("CustomerName",YxActivity.getStr("CustomerName"));
+//			map.put("ChannelID",);
+			map.put("ShopVisitCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
+			map.put("ShopXCJHCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
+			map.put("ResourceFlag",1);
+//			map.put("SignPhotoId","");
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
+			map.put("ShowType",Integer.parseInt(YxActivity.getStr("ShowType")));
+			map.put("BeginTime",YxActivity.getStr("BeginTime"));
+			map.put("EndTime",YxActivity.getStr("EndTime"));
+			map.put("InvestDay",Integer.parseInt(YxActivity.getStr("InvestDay")));
+			map.put("InvestType",1);
+//			map.put("Remark","");
+			map.put("GrantAmount",YxActivity.getBigDecimal("GrantAmount"));
+			map.put("CreateTime",YxActivity.getStr("CreateTime"));
+			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
+			map.put("Flag",1);
+			map.put("InvestState",2);
+			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+			map.put("GrantTime",YxActivity.getStr("CreateTime"));
+			map.put("AuditResult",1);
+			map.put("CreateManName",YxActivity.getStr("CreateManName"));
+		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CUSTOMER_VISITE)) {
+			//终端客情
+			map.put("CustomerName",YxActivity.getStr("CustomerName"));
+			map.put("ChannelID",Integer.parseInt(YxActivity.getStr("ChannelID")));
+			map.put("InvestState",2);
+//			map.put("CancleReason","");
+			map.put("ResourceFlag",1);
+//			map.put("CreateManID",);
+			map.put("CreateTime",YxActivity.getStr("CreateTime"));
+//			map.put("ShopOrderID",111);
+//			map.put("SignPhotos","");
+//			map.put("ModifyManID",);
+			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));
+			map.put("Flag",1);
+			map.put("ChannelTypeID",1);
+			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+			map.put("ShopVisitCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
+			map.put("ShopXCJHCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
+//			map.put("OrderMan",);
+			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+			map.put("CityName",YxActivity.getStr("CityName"));
+			map.put("CountyName",YxActivity.getStr("CountyName"));
+		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_SUPERMARKET_GIFT)) {
+			//商超赠品
+			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+			map.put("CityName",YxActivity.getStr("CityName"));
+			map.put("CountyName",YxActivity.getStr("CountyName"));
+			map.put("CustomerName",YxActivity.getStr("CustomerName"));
+			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+//			map.put("ChannelID",);
+			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+			map.put("InvestState",2);
+			map.put("ResourceFlag",1);
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
+			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+			map.put("CreateManName",YxActivity.getStr("CreateManName"));
+			map.put("CreateTime",YxActivity.getStr("CreateTime"));
+			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
+			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
+			map.put("Flag",1);
+		}else {
+			//进场费
+			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
+			map.put("CityName",YxActivity.getStr("CityName"));
+			map.put("CountyName",YxActivity.getStr("CountyName"));
+			map.put("CustomerName",YxActivity.getStr("CustomerName"));
+			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
+			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
+			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
+//			map.put("ChannelID",);
+//			map.put("InvestType",);
+			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+			map.put("InvestState",2);
+			map.put("ResourceFlag",1);
+//			map.put("CommodityID",);
+			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
+//			map.put("ExecuteRemark","");
+			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
+			map.put("CreateManName",YxActivity.getStr("CreateManName"));
+			map.put("CreateTime",YxActivity.getStr("CreateTime"));
+			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
+			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
+			map.put("Flag",1);
+			map.put("ExecuteManName",YxActivity.getStr("ExecuteManName"));
+			map.put("ExecuteTime",YxActivity.getStr("ExecuteTime"));		
+			map.put("ExecuteState",1);
+		}
+		return map;
+		
+	}
 }

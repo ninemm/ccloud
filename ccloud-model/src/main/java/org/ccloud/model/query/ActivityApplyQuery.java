@@ -87,8 +87,8 @@ public class ActivityApplyQuery extends JBaseQuery {
 	}
 
 	public Page<Record> findList(int pageNumber, int pageSize, String dataArea, String category, String status, String startDate, String endDate, String keyword ){
-		String select = "SELECT caa.id, cc.customer_name, caa.`status`, DATE_FORMAT(ca.start_time,'%m-%d') as start_time, " +
-				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type, d.`name`, ca.invest_amount,ca.code ";
+		String select = "SELECT caa.id,caa.activity_id, cc.customer_name, caa.`status`,caa.seller_customer_id,caa.apply_num,caa.apply_amount, DATE_FORMAT(ca.start_time,'%m-%d') as start_time, " +
+				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type,ca.title, d.`name`, ca.invest_amount,ca.code,t1.name as expenseDetailName ";
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sql = new StringBuilder("FROM cc_activity_apply caa ");
@@ -96,6 +96,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN cc_activity ca ON ca.id = caa.activity_id ");
 		sql.append("LEFT JOIN dict d ON ca.category = d.`key` ");
+		sql.append("LEFT JOIN (SELECT ed.id,d.`name` from cc_expense_detail ed LEFT JOIN dict d on d.type = ed.flow_dict_type and d.`value` = ed.item1) t1 on t1.id = caa.expense_detail_id ");
 
 		boolean needwhere = true;
 		needwhere = appendIfNotEmptyWithLike(sql, "caa.data_area", dataArea, params, needwhere);
@@ -118,12 +119,14 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	public List<Record> getToDo(String username, String dealerDataArea) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT o.*,CASE o.status WHEN "+Consts.ACTIVITY_APPLY_STATUS_WAIT+" THEN '待审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_PASS+" THEN '已审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_CANCEL+" THEN '撤回' WHEN "+Consts.ACTIVITY_APPLY_STATUS_REJECT+" THEN '拒绝' ELSE '结束' END AS activityApplyStatus, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
+		sb.append(" SELECT o.*,d.name as expenseDetailName,CASE o.status WHEN "+Consts.ACTIVITY_APPLY_STATUS_WAIT+" THEN '待审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_PASS+" THEN '已审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_CANCEL+" THEN '撤回' WHEN "+Consts.ACTIVITY_APPLY_STATUS_REJECT+" THEN '拒绝' ELSE '结束' END AS activityApplyStatus, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
 		sb.append(" FROM cc_activity_apply o ");
 		sb.append(" left join cc_activity ca on o.activity_id = ca.id");
 		sb.append(" left join cc_seller_customer cc ON o.seller_customer_id = cc.id ");
 		sb.append(" left join cc_customer c on cc.customer_id = c.id ");
-
+		sb.append(" left join cc_expense_detail ce on ce.id = o.expense_detail_id ");
+		sb.append(" left join dict d on d.`value` = ce.item1 ");
+		
 		sb.append(" LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
 		sb.append(" FROM cc_seller_customer c1 ");
 		sb.append(" LEFT JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id ");
@@ -141,13 +144,15 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username, String dealerDataArea) {
 
-		String select = "SELECT o.*,CASE o.status WHEN "+Consts.ACTIVITY_APPLY_STATUS_WAIT+" THEN '待审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_PASS+" THEN '已审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_CANCEL+" THEN '撤回' WHEN "+Consts.ACTIVITY_APPLY_STATUS_REJECT+" THEN '拒绝' ELSE '结束' END AS activityApplyStatus, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
+		String select = "SELECT o.*,d.name as expenseDetailName,CASE o.status WHEN "+Consts.ACTIVITY_APPLY_STATUS_WAIT+" THEN '待审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_PASS+" THEN '已审' WHEN "+Consts.ACTIVITY_APPLY_STATUS_CANCEL+" THEN '撤回' WHEN "+Consts.ACTIVITY_APPLY_STATUS_REJECT+" THEN '拒绝' ELSE '结束' END AS activityApplyStatus, ca.title, ca.invest_amount, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, t1.customerTypeNames, i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime  ";
 
 		LinkedList<Object> params = new LinkedList<>();
 		StringBuilder sql = new StringBuilder(" FROM cc_activity_apply o ");
 		sql.append(" left join cc_activity ca on o.activity_id = ca.id");
 		sql.append(" left join cc_seller_customer cc ON o.seller_customer_id = cc.id ");
 		sql.append(" left join cc_customer c on cc.customer_id = c.id ");
+		sql.append(" left join cc_expense_detail ce on ce.id = o.expense_detail_id ");
+		sql.append(" left join dict d on d.`value` = ce.item1 ");
 
 		sql.append(" LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
 		sql.append(" FROM cc_seller_customer c1 ");
@@ -185,8 +190,9 @@ public class ActivityApplyQuery extends JBaseQuery {
 		return DAO.find(sql, activityId,userId);
 	}
 	
-	public List<ActivityApply> findSellerCustomerIdAndActivityId(String sellerCustomerId,String activityId) {
-		return DAO.doFind(" seller_customer_id = ? and activity_id = ?  and status not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+")", sellerCustomerId,activityId);
+	public List<ActivityApply> findSellerCustomerIdAndActivityIdAndUserId(String sellerCustomerId,String activityId) {
+		String sql = "select * from cc_activity_apply where seller_customer_id = '"+sellerCustomerId+"' and activity_id = '"+activityId+"' and status not in ("+Consts.ACTIVITY_APPLY_STATUS_REJECT+","+Consts.ACTIVITY_APPLY_STATUS_CANCEL+") GROUP BY create_date";
+		return DAO.find(sql);
 	}
 
 	public List<Record> findBySellerCustomerId(String sellerCustomerId) {

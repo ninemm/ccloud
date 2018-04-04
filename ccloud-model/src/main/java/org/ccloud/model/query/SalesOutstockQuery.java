@@ -206,7 +206,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		if (StrKit.notBlank(status)) {
 			params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
 			params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
-		}		
+		}
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
@@ -229,12 +229,12 @@ public class SalesOutstockQuery extends JBaseQuery {
 			fromBuilder.append(" and o.create_date <= ?");
 			params.add(endDate);
 		}
-		
+
 		if (StrKit.notBlank(printStatus)) {
 			fromBuilder.append(" and o.is_print = ?");
 			params.add(printStatus);
 		}
-		
+
 		if (StrKit.notBlank(stockOutStatus)) {
 			fromBuilder.append(" and o.status = ?");
 			params.add(stockOutStatus);
@@ -243,7 +243,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 			fromBuilder.append(" and t0.biz_user_id = ?");
 			params.add(salesmanId);
 		}
-		
+		if (StrKit.notBlank(carWarehouseId)) {
+			fromBuilder.append(" and o.warehouse_id= ?");
+			params.add(carWarehouseId);
+		}
 		if (StrKit.notBlank(status)) {
 			fromBuilder.append(" and o.status != ? and outCount > refundCount");
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
@@ -256,7 +259,16 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append("order by "+sort+" "+order);
 		}
-		
+
+		fromBuilder.append(" and cso.status != " + Consts.SALES_ORDER_STATUS_CANCEL + " and ( o.outstock_sn like '%"
+				+ keyword + "%' or c.customer_name like '%" + keyword + "%' ) ");
+
+		if (sort == "" || null == sort) {
+			fromBuilder.append("order by " + "o.create_date desc");
+		} else {
+			fromBuilder.append("order by " + sort + " " + order);
+		}
+
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

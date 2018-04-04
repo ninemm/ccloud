@@ -148,10 +148,19 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString() + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
-
+		String imageListStore = customerVisit.getPhoto();
+		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
+		ExpenseDetail expenseDetail = new ExpenseDetail();
+		if(CustomerVisitQuery.me().findById(id).getActiveApplyId()!="") {
+			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
+			setAttr("expenseDetail",expenseDetail);
+		}
+		
 		setAttr("customerVisit", customerVisit);
 		setAttr("cTypeName", Joiner.on(",").join(typeList.iterator()));
-
+		setAttr("list",list);
+		setAttr("activityExecutes",activityExecutes);
 		User user1 = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//审核后将message中是否阅读改为是
 		Message message=MessageQuery.me().findByObjectIdAndToUserId(id, user1.getId());

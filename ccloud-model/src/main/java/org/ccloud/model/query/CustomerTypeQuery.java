@@ -35,7 +35,7 @@ public class CustomerTypeQuery extends JBaseQuery {
 	public static CustomerTypeQuery me() {
 		return QUERY;
 	}
-
+	
 	public Record findById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(" select ");
 		fromBuilder.append(" c.id, c.name, c.code, c.price_system_id, c.proc_def_key, p.name as price_system_name");
@@ -154,5 +154,55 @@ public class CustomerTypeQuery extends JBaseQuery {
 		String sql = "select * from cc_customer_type where data_area = '"+dataArea+"' and code = ?";
 		return DAO.findFirst(sql, code);
 	}
+
+	public List<Record> findByMember(String customerId, String sellerId) {
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sql = new StringBuilder( "SELECT cct.id AS id , cct. name AS name ");
+		sql.append("FROM cc_seller_customer csc ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
+		sql.append("WHERE csc.seller_id = ? AND csc.customer_id = ? ");
+
+		params.add(sellerId);
+		params.add(customerId);
+
+		return Db.find(sql.toString(), params.toArray());
+	}
+
+	public CustomerType findBySellerCustomer(String sellerId, String customerId) {
+
+		StringBuilder sql = new StringBuilder( "SELECT cct.* ");
+		sql.append("FROM cc_seller_customer csc ");
+		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
+		sql.append("WHERE csc.seller_id = ? ");
+		sql.append("AND csc.customer_id = ? ");
+
+		return DAO.findFirst(sql.toString(), sellerId, customerId);
+	}
+
+	public CustomerType findByName(String name, String dataArea) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		StringBuilder sqlBuilder = new StringBuilder(" select c.* ");
+		sqlBuilder.append(" from `cc_customer_type` c ");
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.name", name, params, needWhere);
+		needWhere = appendIfNotEmpty(sqlBuilder, "c.data_area", dataArea, params, needWhere);
+
+		return DAO.findFirst(sqlBuilder.toString(), params.toArray());
+	}
 	
+	public List<CustomerType> _findByDataArea(String dataArea) {
+		
+		StringBuilder sql = new StringBuilder("select *");
+		sql.append(" from `cc_customer_type`");
+		sql.append(" where is_show = 1");
+		sql.append(" and data_area like '"+dataArea+"' ");
+		sql.append(" order by create_date");
+		
+		return DAO.find(sql.toString());
+		
+	}
 }

@@ -77,6 +77,16 @@
                 <p>备注
                     <span>${(apply.content)!}</span>
                 </p>
+                  <#if expenseDetail??>
+        			<p>费用类型
+	                    <span>${(expenseDetail.expenseDetailName)!}</span>
+	                </p>
+	                <#if expenseDetail.expenseDetailName1??>
+		                <p>品项
+		                    <span>${(expenseDetail.expenseDetailName1)!}</span>
+		                </p>
+	                </#if>
+      			</#if>
                 <!--<p>-->
                     <!--附件图片-->
                     <!--<span>-->
@@ -88,16 +98,23 @@
                 <!--</p>-->
             </div>
         </div>
-        <#if invesType??>
-        	<#if apply.invest_amount??>
+        <#if apply.apply_amount??>
 	        <div class="weui-cell weui-cell_access">
 	            <div class="weui-cell__bd">
 	                申请总金额
 	                <span class="fr">
-	            <span class="ft20 orange">${(apply.invest_amount?string(',###.##'))!}</span>&nbsp;元</span>
+	            <span class="ft20 orange">${apply.apply_amount?string("0.00")}</span>&nbsp;元</span>
 	            </div>
 	        </div>
-	       </#if>
+        </#if>
+        <#if apply.apply_num??>
+	        <div class="weui-cell weui-cell_access">
+	            <div class="weui-cell__bd">
+	                申请数量
+	                <span class="fr">
+	            	<span class="ft20 orange">${apply.apply_num}</span></span>
+	            </div>
+	        </div>
         </#if>
         <!--<div class="weui-cell weui-cell_access">
             <div class="weui-cell__bd">
