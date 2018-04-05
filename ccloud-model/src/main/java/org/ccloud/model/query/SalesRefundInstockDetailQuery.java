@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -265,6 +266,124 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		}
 
 		return true;
+	}
+
+	public Map<String, Object> insertForAppByUser(Map<String, String[]> paraMap, String orderId, Date date, String departmentId, String dataArea, int index) {
+		String sellerProductId = paraMap.get("sellProductId")[index];
+		String convert = paraMap.get("convert")[index];
+		String bigNum = paraMap.get("bigNum")[index];
+		String smallNum = paraMap.get("smallNum")[index];
+		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
+		BigDecimal productPrice = new BigDecimal(paraMap.get("bigPrice")[index]);
+		SalesRefundInstockDetail detail = new SalesRefundInstockDetail();
+		detail.setId(StrKit.getRandomUUID());
+		detail.setRefundInstockId(orderId);
+		detail.setSellProductId(sellerProductId);
+		BigDecimal smallPrice = productPrice.divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal bigAmount = new BigDecimal(bigNum).multiply(productPrice);
+		BigDecimal smallAmount = new BigDecimal(smallNum).multiply(smallPrice);
+		BigDecimal productAmount = bigAmount.add(smallAmount);
+		String isGiftStr = paraMap.get("isGift")[index];
+		Integer isGift = isGiftStr != null ? Integer.valueOf(isGiftStr) : 0;
+		
+		detail.setProductCount(productCount);
+		detail.setProductPrice(productPrice);
+		detail.setProductAmount(productAmount);
+		detail.setOutstockDetailId(null);
+		detail.setRejectProductCount(productCount);
+		detail.setRejectProductPrice(productPrice);
+		detail.setRejectAmount(productAmount);
+		
+		detail.setIsGift(isGift);
+		detail.setCreateDate(date);
+		detail.setDeptId(departmentId);
+		detail.setDataArea(dataArea);
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("status", detail.save());
+		if (isGift == 0) {
+			map.put("productAmount", productAmount);
+		} else {
+			map.put("productAmount", new BigDecimal(0));
+		}
+		return map;
+	}
+
+	public Map<String, Object> insertForAppGiftByUser(Map<String, String[]> paraMap, String orderId, Date date, String departmentId, String dataArea, int index) {
+		String giftSellerProductId = paraMap.get("giftSellProductId")[index];
+		String convert = paraMap.get("giftConvert")[index];
+		String giftNum = paraMap.get("giftNum")[index];
+		String giftUnit = paraMap.get("giftUnit")[index];
+		
+		Integer productCount = 0;
+		if ("bigUnit".equals(giftUnit)) {
+			productCount = Integer.valueOf(giftNum) * Integer.valueOf(convert);
+		} else {
+			productCount = Integer.valueOf(giftNum);
+		}
+		SalesRefundInstockDetail detail = new SalesRefundInstockDetail();
+		detail.setId(StrKit.getRandomUUID());
+		detail.setRefundInstockId(orderId);
+		detail.setSellProductId(giftSellerProductId);
+		
+		BigDecimal productAmount = new BigDecimal(0);
+		String productPrice = paraMap.get("giftBigPrice")[index];
+		if ("bigUnit".equals(giftUnit)) {
+			BigDecimal bigAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 0 , RoundingMode.DOWN)
+					                       .multiply(new BigDecimal(productPrice));
+			productAmount = bigAmount;
+		} else {
+			BigDecimal smallPrice = new BigDecimal(productPrice).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal smallAmount = new BigDecimal(detail.getProductCount()).divideAndRemainder(new BigDecimal(convert))[1].multiply(smallPrice);
+			productAmount = smallAmount;
+		}
+		detail.setProductCount(productCount);
+		detail.setProductPrice(new BigDecimal(productPrice));
+		detail.setProductAmount(productAmount);
+		detail.setOutstockDetailId(null);
+		detail.setRejectProductCount(productCount);
+		detail.setRejectProductPrice(new BigDecimal(productPrice));
+		detail.setRejectAmount(productAmount);
+		
+		detail.setIsGift(1);
+		detail.setCreateDate(date);
+		detail.setDeptId(departmentId);
+		detail.setDataArea(dataArea);
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("status", detail.save());
+		map.put("productAmount", new BigDecimal(0));
+		return map;
+	}
+
+	public Map<String, Object> insertForAppCompositionByUser(SellerProduct product, String orderId, Date date, String departmentId, String dataArea, int number) {
+		String sellerProductId = product.getId();
+		Integer convert = product.getInt("convert_relate");
+		double compositionCount = Double.valueOf(product.getStr("productCount"));
+		Integer productCount = (int) Math.round(compositionCount * number);
+		SalesRefundInstockDetail detail = new SalesRefundInstockDetail();
+		detail.setId(StrKit.getRandomUUID());
+		detail.setRefundInstockId(orderId);
+		detail.setSellProductId(sellerProductId);
+		BigDecimal productAmount = new BigDecimal(detail.getProductCount()).divide(new BigDecimal(convert), 2, BigDecimal.ROUND_HALF_UP)
+                .multiply(product.getPrice());
+		
+		detail.setProductCount(productCount);
+		detail.setProductPrice(product.getPrice());
+		detail.setProductAmount(productAmount);
+		detail.setOutstockDetailId(null);
+		detail.setRejectProductCount(productCount);
+		detail.setRejectProductPrice(product.getPrice());
+		detail.setRejectAmount(productAmount);
+		
+		detail.setIsGift(product.getInt("isGift"));
+		detail.setCreateDate(date);
+		detail.setDeptId(departmentId);
+		detail.setDataArea(dataArea);
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("status", detail.save());
+		return map;
 	}
 
 
