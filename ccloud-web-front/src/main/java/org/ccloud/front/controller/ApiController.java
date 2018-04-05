@@ -16,25 +16,48 @@
 package org.ccloud.front.controller;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.model.Content;
+import org.ccloud.model.Product;
+import org.ccloud.model.PurchaseOrder;
+import org.ccloud.model.PurchaseOrderDetail;
+import org.ccloud.model.Seller;
+import org.ccloud.model.Supplier;
 import org.ccloud.model.Taxonomy;
 import org.ccloud.model.User;
 import org.ccloud.model.query.ContentQuery;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.PurchaseOrderQuery;
+import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.SupplierQuery;
 import org.ccloud.model.query.TaxonomyQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.vo.StockInRequestBody;
+import org.ccloud.model.vo.StockInRequestProduct;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.template.TemplateManager;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 
 @RouterMapping(url = "/api")
@@ -305,6 +328,98 @@ public class ApiController extends JBaseController {
 		ret.set("scoreData", strBuilder.toString());
 		
 		renderAjaxResultForSuccess("success", ret);*/
+	}
+	
+	/**
+	 * 入库接口
+	 */
+	public void stockIn() {
+		String jsonData = getHeader("data");
+		if(StrKit.isBlank(jsonData)) {
+			renderAjaxResultForError("no data");
+			return;
+		}
+		Gson gson = new GsonBuilder().setDateFormat(DateUtils.DEFAULT_FORMATTER).create();
+		FastDateFormat fdf = FastDateFormat.getInstance(DateUtils.DEFAULT_FILE_NAME_FORMATTER);
+		StockInRequestBody stockInRequest = gson.fromJson(jsonData, StockInRequestBody.class);
+		List<StockInRequestProduct> products = stockInRequest.getProducts();
+		if(CollectionUtils.isEmpty(products)) {
+			renderAjaxResultForError("no products");
+			return;
+		}
+		Set<String> set = new HashSet<String>();
+		for(int i = 0; i < products.size(); i++) {
+			set.add(products.get(i).getCode());
+		}
+		if(set.size() < products.size()){
+			renderAjaxResultForError("订单中有两件及以上相同的产品，请重新选择！");
+			return;
+		}
+		Calendar calendar = Calendar.getInstance();
+		Date nowDateTime = calendar.getTime();
+		String nowDateTimeStr = fdf.format(calendar);
+		Seller seller = SellerQuery.me().findbyCode(stockInRequest.getSellerCode());
+		if(seller == null) {
+			renderAjaxResultForError("seller code error");
+		}
+		final PurchaseOrder purchaseOrder = getModel(PurchaseOrder.class);
+		final PurchaseOrderDetail purchaseOrderDetail = getModel(PurchaseOrderDetail.class);
+		String porderSn = "PO"+ seller.getSellerCode() + nowDateTimeStr.substring(0,8)+PurchaseOrderQuery.me().getNewSn(seller.getId());
+		
+		List<Supplier> suppliers = SupplierQuery.me().findByCode(stockInRequest.getSupplierCode());
+		if(CollectionUtils.isEmpty(suppliers)) {
+			renderAjaxResultForError("supplier code error");
+			return;
+		}
+		Supplier supplier = suppliers.get(0);
+		
+		String id = StrKit.getRandomUUID();
+		purchaseOrder.set("id", id);
+		purchaseOrder.set("porder_sn", porderSn);
+		purchaseOrder.set("supplier_id", supplier.getId());
+//		purchaseOrder.set("contact", StringUtils.getArrayFirst(paraMap.get("contact")));
+//		purchaseOrder.set("mobile", StringUtils.getArrayFirst(paraMap.get("mobile")));
+//		purchaseOrder.set("biz_user_id", user.getId());
+		purchaseOrder.set("biz_date", nowDateTime);
+		purchaseOrder.set("status", 0);
+		
+		BigDecimal totalAmount = new BigDecimal(0);
+		for (Iterator<StockInRequestProduct> iterator = products.iterator(); iterator.hasNext();) {
+			StockInRequestProduct stockInRequestProduct = iterator.next();
+			totalAmount.add(stockInRequestProduct.getTotalPrice());
+		}
+		
+		purchaseOrder.set("total_amount", totalAmount);
+		purchaseOrder.set("payment_type", stockInRequest.getPayType());
+		purchaseOrder.set("remark", stockInRequest.getRemark());
+//		purchaseOrder.set("dept_id", user.getDepartmentId());
+//		purchaseOrder.set("data_area", user.getDataArea());
+		purchaseOrder.set("deal_date", stockInRequest.getDealDate());
+		purchaseOrder.set("create_date", nowDateTime);
+		
+		purchaseOrder.save();
+		
+		int index = 0;
+		for (Iterator<StockInRequestProduct> iterator = products.iterator(); iterator.hasNext();) {
+			index++;
+			StockInRequestProduct stockInRequestProduct = iterator.next();
+			String productCode = stockInRequestProduct.getCode();
+			Product product = ProductQuery.me().findbyProductSn(productCode);
+			if(product != null) {
+				purchaseOrderDetail.set("id", StrKit.getRandomUUID());
+				purchaseOrderDetail.set("purchase_order_id", id);
+				purchaseOrderDetail.set("product_id", product.getId());
+				purchaseOrderDetail.set("product_count", stockInRequestProduct.getNum());
+				purchaseOrderDetail.set("product_amount", totalAmount);
+				purchaseOrderDetail.set("product_price", stockInRequestProduct.getTotalPrice());
+				purchaseOrderDetail.set("order_list",index);
+				purchaseOrderDetail.set("create_date", nowDateTime);
+//				purchaseOrderDetail.set("dept_id", user.getDepartmentId());
+//				purchaseOrderDetail.set("data_area", user.getDataArea());
+				purchaseOrderDetail.save();
+			}
+		}
+		renderAjaxResultForSuccess();
 	}
 	
 }
