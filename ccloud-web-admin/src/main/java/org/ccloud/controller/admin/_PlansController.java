@@ -164,8 +164,9 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 				+ "plansTemplate.xls";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
-		List<User> users = UserQuery.me().findByData(dataArea);
+		List<User> users = UserQuery.me().findByDataAndDeptId(dataArea,user.getDepartmentId());
 	    // 声明一个工作薄
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("table");
@@ -257,7 +258,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
-		List<User> users = UserQuery.me().findByData(dataArea);
+		List<User> users = UserQuery.me().findByDataAndDeptId(dataArea,user.getDepartmentId());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
@@ -580,8 +581,9 @@ public void downloading() throws UnsupportedEncodingException{
 	public void edit() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
-		List<User> users = UserQuery.me().findByData(dataArea);
+		List<User> users = UserQuery.me().findByDataAndDeptId(dataArea,user.getDepartmentId());
 		List<Dict> dicts = DictQuery.me().findDictByType(Consts.PLAN);
 		//获取当前月份，在后面再加10个月
 		Calendar calendar=Calendar.getInstance();
