@@ -18,6 +18,7 @@ import org.ccloud.model.PlansDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DataAreaUtil;
 
 import com.alibaba.fastjson.JSON;
 import com.jfinal.aop.Before;
@@ -57,6 +58,7 @@ public class PlansController extends BaseFrontController {
 	public void makePlan() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		String type = getPara("typeId");
 		String datetimePicker = getPara("datetime-picker");
 		String startDate = getPara("start-date");
@@ -83,46 +85,53 @@ public class PlansController extends BaseFrontController {
 			renderAjaxResultForError("计划的产品不能为空");
 			return;
 		}
-		Plans plans = new Plans();
-		String plansId = StrKit.getRandomUUID();
-		plans.setId(plansId);
-		plans.setSellerId(sellerId);
-		plans.setUserId(user.getId());
-		plans.setType(type);
-		int index = datetimePicker.indexOf("-");
-		String day = datetimePicker +"-"+ti;
-		Calendar cal = Calendar.getInstance();  
-		//设置年份  
-		try {
-			if(StrKit.notBlank(ti)) {
-				cal.setTime(sdf.parse(day));
-				cal.set(Calendar.YEAR,Integer.parseInt(datetimePicker.substring(0,index)));  
-				plans.setStartDate(sdf.parse(day));
-				//设置月份  
-				cal.set(Calendar.MONTH, Integer.parseInt(datetimePicker.substring(index+1,datetimePicker.length()))); 
-				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
-				endDate= sdf.format(cal.getTime());//获得前一天
-				startDate =  datetimePicker+"-"+ti;
-				plans.setEndDate(sdf.parse(endDate));
-				plans.setPlansMonth(sd.parse(datetimePicker));
-			}else {
-				startDate = datetimePicker + "-01";
-				cal.setTime(sdf.parse(datetimePicker + "-01"));
-				cal.set(Calendar.YEAR,Integer.parseInt(datetimePicker.substring(0,index)));  
-				plans.setStartDate(sdf.parse(startDate));
-				//设置月份  
-				cal.set(Calendar.MONTH, Integer.parseInt(datetimePicker.substring(index+1,datetimePicker.length()))); 
-				cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
-				endDate= sdf.format(cal.getTime());//获得前一天
-				plans.setEndDate(sdf.parse(endDate));
+		Plans plans = PlansQuery.me().findSellerIdAndDataAreaAndMonth(sellerId,deptDataArea,datetimePicker);
+		String plansId = "";
+		if(plans == null) {
+			plans = new Plans();
+			plansId = StrKit.getRandomUUID();
+			plans.setId(plansId);
+			plans.setSellerId(sellerId);
+			plans.setUserId(user.getId());
+			plans.setType(type);
+			int index = datetimePicker.indexOf("-");
+			String day = datetimePicker +"-"+ti;
+			Calendar cal = Calendar.getInstance();  
+			//设置年份  
+			try {
+				if(StrKit.notBlank(ti)) {
+					cal.setTime(sdf.parse(day));
+					cal.set(Calendar.YEAR,Integer.parseInt(datetimePicker.substring(0,index)));  
+					plans.setStartDate(sdf.parse(day));
+					//设置月份  
+					cal.set(Calendar.MONTH, Integer.parseInt(datetimePicker.substring(index+1,datetimePicker.length()))); 
+					cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+					endDate= sdf.format(cal.getTime());//获得前一天
+					startDate =  datetimePicker+"-"+ti;
+					plans.setEndDate(sdf.parse(endDate));
+					plans.setPlansMonth(sd.parse(datetimePicker));
+				}else {
+					startDate = datetimePicker + "-01";
+					cal.setTime(sdf.parse(datetimePicker + "-01"));
+					cal.set(Calendar.YEAR,Integer.parseInt(datetimePicker.substring(0,index)));  
+					plans.setStartDate(sdf.parse(startDate));
+					//设置月份  
+					cal.set(Calendar.MONTH, Integer.parseInt(datetimePicker.substring(index+1,datetimePicker.length()))); 
+					cal.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+					endDate= sdf.format(cal.getTime());//获得前一天
+					plans.setEndDate(sdf.parse(endDate));
+				}
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			plans.setDeptId(user.getDepartmentId());
+			plans.setDataArea(deptDataArea);
+			plans.setCreateDate(new Date());
+			plans.save();
+		}else {
+			plansId = plans.getId();
 		}
-		plans.setDeptId(user.getDepartmentId());
-		plans.setDataArea(user.getDataArea());
-		plans.setCreateDate(new Date());
 		for(int i=0;i<productIds.length;i++) {
 			PlansDetail detail = PlansDetailQuery.me().findbySSEU(productIds[i],startDate,endDate,user.getId());
 			if(detail!=null) {
@@ -142,7 +151,6 @@ public class PlansController extends BaseFrontController {
 			plansDetail.setDataArea(user.getDataArea());
 			plansDetail.save();
 		}
-		plans.save();
 		renderAjaxResultForSuccess("新增成功");
 	}
 

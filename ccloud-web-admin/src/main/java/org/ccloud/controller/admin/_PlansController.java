@@ -53,6 +53,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.model.Dict;
 import org.ccloud.model.Plans;
@@ -254,6 +255,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
 		List<User> users = UserQuery.me().findByData(dataArea);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -265,7 +267,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		String month = getPara("start");
 		String startDate  = getPara("startDate");
 		String endDate  = getPara("endDate");
-		Plans plans = PlansQuery.me().findSellerIdAndDataAreaAndMonth(sellerId,user.getDataArea(),month);
+		Plans plans = PlansQuery.me().findSellerIdAndDataAreaAndMonth(sellerId,deptDataArea,month);
 		String plansId = "";
 		if(plans == null) {
 			plans = new Plans();
@@ -305,7 +307,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 				e1.printStackTrace();
 			}
 			plans.setDeptId(user.getDepartmentId());
-			plans.setDataArea(user.getDataArea());
+			plans.setDataArea(deptDataArea);
 			plans.setCreateDate(new Date());
 			plans.setUserId(user.getId());
 			plans.save();
@@ -613,12 +615,13 @@ public void downloading() throws UnsupportedEncodingException{
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		String month = getPara("month");
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
-		Plans plans = PlansQuery.me().findSellerIdAndDataAreaAndMonth(sellerId,user.getDataArea(),month);
+		Plans plans = PlansQuery.me().findSellerIdAndDataAreaAndMonth(sellerId,deptDataArea,month);
 		String plansId = "";
 		if(plans == null) {
 			plans = new Plans();
@@ -658,7 +661,7 @@ public void downloading() throws UnsupportedEncodingException{
 				e1.printStackTrace();
 			}
 			plans.setDeptId(user.getDepartmentId());
-			plans.setDataArea(user.getDataArea());
+			plans.setDataArea(deptDataArea);
 			plans.setCreateDate(new Date());
 			plans.setUserId(user.getId());
 			plans.save();
