@@ -57,6 +57,11 @@
 
 <#macro script>
 $(function() {
+	var refundStatus = getItemBykey("refund");
+	if (refundStatus == '1') {
+		$("#placeOrder").html("确认退货");
+	}
+
 	initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
 	wxReadyGetLocation(
