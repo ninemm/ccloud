@@ -485,6 +485,10 @@ $(function() {
 
 	var flg = true;
 	function doSubmit(){
+		var refund = getItemBykey("refund");
+		if (refund == '1') {
+			$('#form').attr("action", "${CPATH}/refund/saveRefundByUser")
+		}
 
 		layer.open({
 			type: 2,
@@ -504,6 +508,7 @@ $(function() {
 					removeItemBykey("productList");
 					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
+					removeItemBykey("refund");
 					
 					$.modal({
 						title: data.message,
