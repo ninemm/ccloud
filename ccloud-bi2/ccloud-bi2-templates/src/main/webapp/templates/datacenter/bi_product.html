@@ -1,0 +1,298 @@
+<#include "_inc/_bi_layout.html"/>
+<#macro script_import>
+</#macro>
+<#macro css_import>
+</#macro>
+<#macro css>
+    .weui-cells {
+        margin-top: 0;
+        background: inherit;
+        font-size: 0.6rem;
+    }
+    table {
+        background: #fff;
+        margin-bottom: 0!important;
+    }
+    table a {
+        text-decoration: underline;
+    }
+    th {
+        vertical-align: middle!important;
+        text-align: center!important;
+    }
+    td {
+        vertical-align: middle!important;
+    }
+    tr {
+        line-height: 1.5rem;
+        height: 1.5rem;
+    }
+    .wy-header {
+        background: #f2f2f2;
+        margin-top: 2.4rem;
+    }
+    #area_rank{
+        width: 100%;
+        height:4rem;
+    }
+    #customer_rank{
+        width: 100%;
+        height:8rem;
+    }
+</#macro>
+<#macro script>
+    $(function() {
+        product(provName, cityName, '', dateType);
+
+        initTopHoverTree("gotop", 100, 10, 50);
+
+        $('#goback').on('click', function() {
+            historyUtils.back();
+        });
+    });
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
+    var dateType = 0;
+    var cInvCode = '';
+    var cInvName = '';
+
+    //做时间的切换选择
+    $(".date").click(function(e) {
+        var $a = $(e.currentTarget);
+        $a.parent().find(".date").removeClass("active-date");
+        $a.addClass("active-date");
+    });
+    function setDateType(type){
+        dateType = type;
+        product(provName, cityName, '', dateType);
+    }
+    
+    //产品选择
+    function setProduct(Code, Name){
+        Utils.loading();
+        cInvCode = Code;
+        cInvName = Name;
+        area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
+        customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
+    }
+    
+    //产品
+    function product(provName, cityName, countryName, dateType){
+        Utils.loading();
+        $.ajax({
+            url:"${CPATH}/biSales/product",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var prTitle = '产品销售排行';
+            if((provName + cityName + countryName).trim() != '' ){
+                prTitle = provName + cityName + countryName + prTitle;
+            } else {
+                prTitle = '全国' + prTitle;
+            }
+            var $p = $("#p_product_rank");
+            $p.empty();
+            $p.text(prTitle);
+
+            var $tbody = $("#product_rank tbody");
+            $tbody.empty();
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
+            for(var i = 0; i < data.length; i++){
+                var fun = "setProduct('" + data[i].id + "'" + "," + "'" + data[i].custom_name + "')";
+                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].custom_name + "</a></td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+            }
+
+            var dataCInvCode = (data[0] != undefined ? data[0].id : '');
+            var dataCInvName = (data[0] != undefined ? data[0].custom_name : '');
+
+            //调用其他纬度
+            area_rank(provName, cityName, '', dateType, dataCInvCode, dataCInvName);
+            customer_rank(provName, cityName, '', dateType, dataCInvCode, dataCInvName);
+       });
+    }
+    
+    //区域
+    function area_rank(provName, cityName, countryName, dateType, cInvCode, cInvName){
+      $.ajax({
+            url:"${CPATH}/biSales/areaByProduct",
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var areaYData = [];
+            var areaSeriesData = [];
+            var area_rank = document.getElementById('area_rank');
+            var $area_rank = $(area_rank);
+            
+            $area_rank.height(80);
+            for(var i = 0; i < data.length; i++){
+                var height = $area_rank.height();
+                $area_rank.height(height += 16);
+            
+                if (cityName.trim() != '') {
+                    areaYData.push(data[i].countryName);
+                }else if(provName.trim() != ''){
+                    areaYData.push(data[i].cityName);
+                }else{
+                    areaYData.push(data[i].provName);
+                }
+                areaSeriesData.push(data[i].totalNum);
+            }
+
+            var areaTitle = cInvName + '销售情况';
+            //if((provName + cityName + countryName).trim() != '' ){
+            //    areaTitle = provName + cityName + countryName + areaTitle;
+            //} else {
+            //    areaTitle = '' + areaTitle;
+            //}
+            var $p = $("#p_area_rank");
+            $p.empty();
+            $p.text(areaTitle);
+
+
+            var areaRankChart = echarts.init(area_rank);
+            var option = {
+                color: ['#4ac7f5'],
+                grid: {
+                    left: '2%',
+                    right: '15%',
+                    bottom: 15,
+                    top: 15,
+                    containLabel: true
+                },
+                calculable : true,
+                xAxis : {
+                    show : false,
+                    name : '数量/件',
+                    type : 'value',
+                    boundaryGap: [0, 0.01]
+                },
+                yAxis : {
+                    type : 'category',
+                    data : areaYData.reverse(),
+                    axisLabel : {
+                        interval : 0,
+                        fontSize : 8
+                    }
+                },
+                series : {
+                    type:'bar',
+                    barWidth:15,
+                    data:areaSeriesData.reverse(),
+                    label:{
+                        normal:{
+                            show:true,
+                            position:'right',
+                            formatter: '{c}件'
+                        }
+                    }
+                }
+           };
+           areaRankChart.resize();
+           areaRankChart.setOption(option,true);
+           //areaRankChart.on('click', areaClick);
+       });
+    }
+    
+    //客户
+    function customer_rank(provName, cityName, countryName, dateType, cInvCode, cInvName){
+        $.ajax({
+            url:"${CPATH}/biSales/customerTypeByProduct",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var crSeriesData = [];
+
+            for(var i = 0; i < data.length; i++){
+                crSeriesData.push({
+                    name: data[i].customerTypeName + '(' + data[i].totalAmount + '万元)',
+                    value: data[i].totalAmount
+                });
+            }
+            var crTitle = cInvName +'客户分布';
+            //if((provName + cityName + countryName).trim() != '' ){
+            //    crTitle = provName + cityName + countryName + crTitle;
+            //} else {
+            //    crTitle = '' + crTitle;
+            //}
+            var $p = $("#p_customer_rank");
+            $p.empty();
+            $p.text(crTitle);
+
+            var customer_rank = document.getElementById('customer_rank');
+            var $customer_rank = $(customer_rank);
+
+            var customerRankChart = echarts.init(customer_rank);
+            var crOption = {
+                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2', '#a6c84c', '#ffa022', '#46bee9'],
+                series: [
+                    {
+                        name:crTitle,
+                        type:'pie',
+                        radius: ['30%', '50%'],
+                        center: ['50%', '50%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                textStyle: {
+                                    fontSize: 9
+                                }
+                            }
+                        },
+                        data:crSeriesData
+                    }
+                ]
+            };
+            customerRankChart.resize();
+            customerRankChart.setOption(crOption,true);
+            //customerRankChart.on('click', customerClick);
+        });
+    }
+</#macro>
+<@layout>
+<section>
+    <div class="bi-body">
+        <#include "_inc/_bi_search_box.html"/>
+        <header class="wy-header">
+            <div id="goback" class="wy-header-icon-back"><span></span></div>
+            <div id="p_product_rank" class="wy-header-title"></div>
+        </header>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" style="padding: 0">
+                <table class="table table-striped table-bordered" id="product_rank">
+                    <tbody>
+                        <tr>
+                            <th>
+                                产品
+                            </th>
+                            <th>
+                                省份
+                            </th>
+                            <th>
+                                数量(件)
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="title" id="p_area_rank"></p>
+        <div id="area_rank">
+        </div>
+        <p class="title" id="p_customer_rank"></p>
+        <div id="customer_rank" id="p_customer_rank">
+        </div>
+    </div>
+</section>
+<#include "_inc/_nav_box.html"/>
+<span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>
+</@layout>

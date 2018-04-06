@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<infos>
+		<title>datacenter</title>
+		<id>datacenter</id>
+		<description>Report Template add  by Eric</description>
+		<author>Eric</author>
+		<authorWebsite>http://www.9mm.tech</authorWebsite>
+		<version>v1.0</version>
+		<versionCode>1</versionCode>
+		<updateUrl>http://www.9mm.tech</updateUrl>
+	</infos>
+
+	<module title="内容管理" name="article" list="文章列表" add="撰写文章">
+		<taxonomy title="文章分类" name="category" formType="select" />
+		<taxonomy title="页面专题" name="feature" formType="select" />
+		
+		<!-- <metadata dataType="input" name="recommend" text="推荐"  placeholder="推荐文章"/>
+		<metadata dataType="input" name="_meta2" text="元数据2"  placeholder="元数据测试2"/> -->
+	</module>
+	
+	<thumbnail name="page_thumb" size="770 x 300" />
+	<thumbnail name="page_small_thumb" size="300 x 300" />
+	<thumbnail name="article_thumb" size="600 x 200" />
+	<thumbnail name="article_small_thumb" size="240 x 140" />
+
+</config>
