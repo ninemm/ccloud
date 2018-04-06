@@ -48,6 +48,7 @@ import org.ccloud.model.QyBasicfeetype;
 import org.ccloud.model.QyBasicflowtype;
 import org.ccloud.model.QyBasicshowtype;
 import org.ccloud.model.QyExpensedetail;
+import org.ccloud.model.Seller;
 import org.ccloud.model.YxBasicchannelinfo;
 import org.ccloud.model.YxBasicchanneltypeinfo;
 import org.ccloud.model.query.ActivityApplyQuery;
@@ -66,6 +67,7 @@ import org.ccloud.model.query.QyBasicflowtypeQuery;
 import org.ccloud.model.query.QyBasicshowtypeQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.YxBasicchannelinfoQuery;
 import org.ccloud.model.query.YxBasicchanneltypeinfoQuery;
 import org.ccloud.model.vo.ExTemplate;
@@ -546,7 +548,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	//中间库同步数据
 	@Before(Tx.class)
 	public void getMidData() {
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 //		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();//测试数据
 		String[] date = DateUtils.getStartDateAndEndDateByType("month");
 		List<Expense> expenseList = MidDataUtil.getExpensesInfo(date[0], date[1], "1", Consts.GET_MID_DATA_TOTALROW);
@@ -555,8 +556,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		for (Expense qyExpense : expenseList) {
 			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
 				Activity activity = new Activity();
+				Seller seller = SellerQuery.me().findbyCode(qyExpense.getFranchiserCode());
+				if (seller == null) {
+					continue;
+				}
 				activity.setId(StrKit.getRandomUUID());
-				activity.setSellerId(sellerId);
+				activity.setSellerId(seller.getId());
 				activity.setCode(qyExpense.getActivityNo());
 				activity.setTitle(qyExpense.getExpenseName());
 				activity.setStartTime(DateUtils.strToDate(qyExpense.getExpenseBeginDate(), DateUtils.DEFAULT_MID_FORMATTER));
