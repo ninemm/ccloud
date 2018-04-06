@@ -651,13 +651,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		excel.setSaveDate(saveDate);
 		excel.setCreateDate(createDate);
 		excel.setPrintDate(printDate);
-		if (record.get("realname") == null) {
+		if (record.get("bizName") == null) {
 			excel.setBizUser("");
 		} else {
-			excel.setBizUser(record.getStr("realname"));
+			excel.setBizUser(record.getStr("bizName"));
 		}
 		if (record.get("receive_type").toString().equals("0")) {
-			excel.setReceiveType("应收账款");
+			excel.setReceiveType("账期");
 		} else {
 			excel.setReceiveType("现金");
 		}
