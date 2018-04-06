@@ -537,7 +537,7 @@ public void downloading() throws UnsupportedEncodingException{
 	    	 for(int k = 0; k < sellerProductDetails.size();k++) {
     			 if(sellerProductDetails.get(k).getStr("seller_product_id").equals(details.get(j).getStr("seller_product_id")) 
     					 && sellerProductDetails.get(k).getStr("user_id").equals(_sellerProductDetails.get(i).get("user_id"))
-    					 && sellerProductDetails.get(k).get("plans_id").equals(sellerProductDetails.get(i).get("plans_id"))
+    					 && sellerProductDetails.get(k).get("plans_id").equals(_sellerProductDetails.get(i).get("plans_id"))
     					 && sellerProductDetails.get(k).get("plansMonth").equals(_sellerProductDetails.get(i).get("plansMonth"))) {
     				 p0Cell.setCellValue(sellerProductDetails.get(k).getStr("plan_num"));
     				 p1Cell.setCellValue(sellerProductDetails.get(k).getStr("complete_num"));

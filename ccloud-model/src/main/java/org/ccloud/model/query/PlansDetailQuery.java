@@ -195,8 +195,8 @@ public class PlansDetailQuery extends JBaseQuery {
 	}
 	
 	public List<Record> findBySellerId(String sellerId , String plansMonth){
-		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
-		String str = sdf.format(new Date());
+		/*SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
+		String str = sdf.format(new Date());*/
 		StringBuilder fromBuilder = new StringBuilder("select pd.seller_product_id,sp.custom_name ");
 		fromBuilder.append("from cc_plans_detail pd ");
 		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
@@ -204,16 +204,16 @@ public class PlansDetailQuery extends JBaseQuery {
 		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
 		if(StrKit.notBlank(plansMonth)){
 			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");
-		}else {
+		}/*else {
 			fromBuilder.append("and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' ");
-		}
+		}*/
 		fromBuilder.append("GROUP BY pd.seller_product_id ");
 		return Db.find(fromBuilder.toString());
 	}
 	
 	public List<Record> findAllBySellerId(String sellerId , String plansMonth){
-		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
-		String str = sdf.format(new Date());
+		/*SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
+		String str = sdf.format(new Date());*/
 		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.start_date as startDate,cp.end_date as endDate,cp.plans_month as plansMonth,cp.type,u.realname ");
 		fromBuilder.append("from cc_plans_detail pd ");
 		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
@@ -221,16 +221,16 @@ public class PlansDetailQuery extends JBaseQuery {
 		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
 		if(StrKit.notBlank(plansMonth)){
 			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");
-		}else {
+		}/*else {
 			fromBuilder.append("and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' ");
-		}
+		}*/
 		fromBuilder.append("GROUP BY cp.id,pd.user_id, pd.seller_product_id ORDER BY cp.id,pd.user_id,pd.seller_product_id ");
 		return Db.find(fromBuilder.toString());
 	}
 	
 	public List<Record> _findAllBySellerId(String sellerId , String plansMonth){
-		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
-		String str = sdf.format(new Date());
+		/*SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
+		String str = sdf.format(new Date());*/
 		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.start_date as startDate,cp.end_date as endDate,cp.plans_month as plansMonth,cp.type,u.realname ");
 		fromBuilder.append("from cc_plans_detail pd ");
 		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
@@ -238,9 +238,9 @@ public class PlansDetailQuery extends JBaseQuery {
 		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
 		if(StrKit.notBlank(plansMonth)){
 			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");
-		}else {
+		}/*else {
 			fromBuilder.append("and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' ");
-		}
+		}*/
 		fromBuilder.append("GROUP BY cp.id,pd.user_id ORDER BY cp.id,pd.user_id ");
 		return Db.find(fromBuilder.toString());
 	}
