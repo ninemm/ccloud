@@ -508,17 +508,26 @@ $(function() {
 					removeItemBykey("productList");
 					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
-					removeItemBykey("refund");
 					
 					$.modal({
 						title: data.message,
 						buttons: [
-							{ text: "查看订单", className: "default", onClick: function(){ 
-								location.href = "${CPATH}/order/myOrder";
+							{ text: "查看订单", className: "default", onClick: function(){
+									if (refund == '1') {
+										removeItemBykey("refund");
+										location.href = "${CPATH}/refund/myRefund";
+									} else {
+										location.href = "${CPATH}/order/myOrder";
+									}
 								} 
 							},
 							{ text: "继续下单", className: "primary", onClick: function(){
-								location.href = '${CPATH}/product';
+									if (refund == '1') {
+										removeItemBykey("refund");
+										location.href = '${CPATH}/product?refund=1';
+									} else {
+										location.href = '${CPATH}/product';
+									}
 								} 
 							},
 						]
