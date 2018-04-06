@@ -417,13 +417,22 @@ public class OrderController extends BaseFrontController {
 
 		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 
-			User orderReviewer = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
-			if (orderReviewer == null) {
+			List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
+			if (orderReviewers == null || orderReviewers.size() == 0) {
 				return "您没有配置审核人,请联系管理员";
 			}
-			param.put("manager", orderReviewer.getUsername());
-			toUserId = orderReviewer.getId();
-			OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),orderId);
+
+			String orderReviewUserName = "";
+			for (User u : orderReviewers) {
+				if (StrKit.notBlank(orderReviewUserName)) {
+					orderReviewUserName = orderReviewUserName + ",";
+				}
+
+				orderReviewUserName += u.getStr("username");
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核",  user.getId(), u.getStr("id"),
+						user.getDepartmentId(), user.getDataArea(), orderId);
+			}
+			param.put("manager", orderReviewUserName);
 		}
 
 		String procInstId = workflow.startProcess(orderId, proc_def_key, param);

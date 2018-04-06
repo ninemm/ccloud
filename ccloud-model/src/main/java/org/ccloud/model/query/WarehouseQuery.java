@@ -166,4 +166,11 @@ public class WarehouseQuery extends JBaseQuery {
 		String sql = "SELECT cw.* from cc_warehouse cw LEFT JOIN cc_user_join_warehouse cujw on cujw.warehouse_id = cw.id where cujw.user_id = ?";
 		return DAO.find(sql, userId);
 	}
+
+	public Warehouse findRefundWareHouse(String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT cw.id, cw.code, cw.`name`, cw.type FROM cc_inventory c ");
+		fromBuilder.append("LEFT JOIN cc_warehouse cw ON cw.id = c.warehouse_id ");
+		fromBuilder.append("where c.seller_id = ? AND type != 2 GROUP BY c.warehouse_id");
+		return DAO.findFirst(fromBuilder.toString(), sellerId);
+	}
  }

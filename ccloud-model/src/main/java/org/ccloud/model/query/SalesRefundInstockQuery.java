@@ -302,6 +302,35 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		}
 		return SN;
 	}
+	
+	public SalesRefundInstock insertAppByUser(String instockId, Map<String, String[]> map, User user,
+			String sellerId, String sellerCode, Date date, Warehouse wareHouse) {
+		String newSn = SalesRefundInstockQuery.me().getNewSn(sellerId);
+		// SR + (机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
+		String instockSn = "SR" + sellerCode +  StringUtils.getArrayFirst(map.get("customerTypeCode"))
+		+ wareHouse.getCode() + DateUtils.format("yyMMdd", new Date()) + newSn;
+		
+		SalesRefundInstock salesRefundInstock = new SalesRefundInstock();
+		
+		salesRefundInstock.setId(instockId);
+		salesRefundInstock.setInstockSn(instockSn);
+		salesRefundInstock.setWarehouseId(wareHouse.getId());
+		salesRefundInstock.setSellerId(sellerId);
+		salesRefundInstock.setCustomerId(StringUtils.getArrayFirst(map.get("customerId")));
+		salesRefundInstock.setCustomerTypeId(StringUtils.getArrayFirst(map.get("customerType")));
+		salesRefundInstock.setBizUserId(user.getId());
+		salesRefundInstock.setInputUserId(user.getId());
+		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		salesRefundInstock.setOutstockId(null);
+		String paymentType = StringUtils.getArrayFirst(map.get("receiveType"));
+		salesRefundInstock.setPaymentType(StringUtils.isNumeric(paymentType)? Integer.parseInt(paymentType) : 1);
+		salesRefundInstock.setCreateDate(date);
+		salesRefundInstock.setDeptId(user.getDepartmentId());
+		salesRefundInstock.setDataArea(user.getDataArea());
+		salesRefundInstock.setRemark(StringUtils.getArrayFirst(map.get("remark")));
+		
+		return salesRefundInstock;		
+	}
 
 	public SalesRefundInstock insertByApp(String instockId, Record record, String userId,
 			String sellerId, String sellerCode, String paymentType, Date date, String remark) {
