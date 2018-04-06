@@ -31,6 +31,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
+import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 
 /**
@@ -241,20 +242,23 @@ public class ActivityController extends BaseFrontController {
 		param.put("orderId", activityApplyId);
 
 
-		String toUserId = "";
-
-		User manager = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
-		if (manager == null) {
-			
+		List<User> managers = UserQuery.me().findManagerByDeptId(user.getDepartmentId());
+		if (managers == null || managers.size() == 0) {
 			return "error";
 		}
-		param.put("manager", manager.getUsername());
-		toUserId = manager.getId();
+
+		String managerUserName = "";
+		for (User u : managers) {
+			if (StrKit.notBlank(managerUserName)) {
+				managerUserName = managerUserName + ",";
+			}
+
+			managerUserName += u.getStr("username");
+			sendMessage(sellerId, customerName, "活动审核", user.getId(), u.getId(), user.getDepartmentId(), user.getDataArea(),activityApplyId);
+		}
+		param.put("manager", managerUserName);
 
 		String procInstId = workflow.startProcess(activityApplyId, proc_def_key, param);
-
-
-		sendMessage(sellerId, customerName, "活动审核", user.getId(), toUserId, user.getDepartmentId(), user.getDataArea(),activityApplyId);
 
 		return procInstId;
 	}

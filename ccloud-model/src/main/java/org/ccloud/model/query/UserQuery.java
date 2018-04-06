@@ -224,14 +224,14 @@ public class UserQuery extends JBaseQuery {
 		return Db.find(sql.toString(), params.toArray() );
 	}
 	
-	public User findManagerByDeptId(String deptId) {
-		String sql = "select u.* from user u left join department d on u.id = d.principal_user_id where d.id = ?";
-		return DAO.findFirst(sql, deptId);
+	public List<User> findManagerByDeptId(String deptId) {
+		String sql = "SELECT * FROM user u where FIND_IN_SET(u.id,(select d.principal_user_id from department d  where d.id = ? ))";
+		return DAO.find(sql, deptId);
 	}
 
-	public User findOrderReviewerByDeptId(String deptId) {
-		String sql = "select u.* from user u left join department d on u.id = d.order_reviewer_id where d.id = ?";
-		return DAO.findFirst(sql, deptId);
+	public List<User> findOrderReviewerByDeptId(String deptId) {
+		String sql = "SELECT * FROM user u where FIND_IN_SET(u.id,(select d.order_reviewer_id from department d  where d.id = ? ))";
+		return DAO.find(sql, deptId);
 	}
 
 	public List<Record> findByUserCheck(String id, String dataArea) {
