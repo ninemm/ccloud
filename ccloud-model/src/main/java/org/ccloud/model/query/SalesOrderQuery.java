@@ -2453,11 +2453,11 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.dept_id", deptId, params, needWhere);
 		
 		if (needWhere) {
-			fromBuilder.append(" where c.status not in (1001,1002) ");
+			fromBuilder.append(" where c.status != ? ");
 		} else {
-			fromBuilder.append(" and c.status not in (1001,1002) ");
+			fromBuilder.append(" and c.status != ? ");
 		}
-		
+		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(isGift)) {
 			fromBuilder.append(" and cc.is_gift = 1 ");
 		} else {

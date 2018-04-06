@@ -233,8 +233,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 		//更新计划
 		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
-		if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
-			return false;
+		if (StrKit.notBlank(order_user)) {
+			if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
+				return false;
+			}
 		}
 		
 		return true;
