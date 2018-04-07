@@ -152,9 +152,11 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
 		ExpenseDetail expenseDetail = new ExpenseDetail();
-		if(CustomerVisitQuery.me().findById(id).getActiveApplyId()!="") {
-			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
-			setAttr("expenseDetail",expenseDetail);
+		if(CustomerVisitQuery.me().findById(id).getActiveApplyId()!="" && StrKit.notBlank(CustomerVisitQuery.me().findById(id).getActiveApplyId())) {
+			if(StrKit.notBlank((ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId()))){
+				expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
+				setAttr("expenseDetail",expenseDetail);
+			}
 		}
 		
 		setAttr("customerVisit", customerVisit);
