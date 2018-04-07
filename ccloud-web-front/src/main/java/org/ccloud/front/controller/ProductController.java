@@ -38,6 +38,7 @@ import com.jfinal.plugin.activerecord.Record;
 public class ProductController extends BaseFrontController {
 
 	public void index() {
+		String refund = getPara("refund");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
@@ -76,6 +77,7 @@ public class ProductController extends BaseFrontController {
 			}
 		}
 		
+		setAttr("refund", refund);
 		setAttr("productList", JSON.toJSON(productList));
 		setAttr("compositionList", JSON.toJSON(compositionList));
 		setAttr("tags", JSON.toJSON(tagSet));
