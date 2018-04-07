@@ -241,7 +241,7 @@ public class PlansDetailQuery extends JBaseQuery {
 		/*SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
 		String str = sdf.format(new Date());*/
 		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.start_date as startDate,cp.end_date as endDate,cp.plans_month as plansMonth,cp.type,u.realname,"
-				+ "t1.plansAmount,t1.completeAmount,SUM(t1.plansAmount) as totalPlansAmount,SUM(t1.completeAmount) as totalCompleteAmount,convert((t1.completeAmount)/(t1.plansAmount)*100,decimal(10,2)) as completeRetio ");
+				+ "t1.plansAmount,t1.completeAmount,convert((t1.completeAmount)/(t1.plansAmount)*100,decimal(10,2)) as completeRetio ");
 		fromBuilder.append("from cc_plans_detail pd ");
 		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = pd.user_id ");
