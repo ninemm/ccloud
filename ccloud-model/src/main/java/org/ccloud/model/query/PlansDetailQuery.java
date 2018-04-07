@@ -203,7 +203,7 @@ public class PlansDetailQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN (SELECT pd.seller_product_id,convert(SUM(sp.price * pd.plan_num),decimal(10,2)) as plansAmount,convert(SUM(sp.price * pd.complete_num),decimal(10,2)) as completeAmount,"
 				+ "SUM(pd.plan_num) as plansNum,SUM(pd.complete_num) as completeNum "
 				+ "from cc_plans_detail pd LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id "
-				+ "where pd.data_area like '"+dataArea+"' GROUP BY pd.plans_id,pd.seller_product_id) t1 "
+				+ "where pd.data_area like '"+dataArea+"' GROUP BY pd.seller_product_id) t1 "
 				+ "on t1.seller_product_id = pd.seller_product_id ");
 		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
 		if(StrKit.notBlank(plansMonth)){
@@ -223,10 +223,10 @@ public class PlansDetailQuery extends JBaseQuery {
 		fromBuilder.append("from cc_plans_detail pd ");
 		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = pd.user_id ");
-		fromBuilder.append("LEFT JOIN (SELECT pd.seller_product_id,convert(SUM(sp.price * pd.plan_num),decimal(10,2)) as plansAmount,convert(SUM(sp.price * pd.complete_num),decimal(10,2)) as completeAmount "
+		fromBuilder.append("LEFT JOIN (SELECT pd.seller_product_id,pd.user_id,pd.plans_id,convert(SUM(sp.price * pd.plan_num),decimal(10,2)) as plansAmount,convert(SUM(sp.price * pd.complete_num),decimal(10,2)) as completeAmount "
 				+ "from cc_plans_detail pd LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id "
 				+ "where pd.data_area like '"+dataArea+"' GROUP BY pd.plans_id,pd.user_id,pd.seller_product_id) t1 "
-				+ "on t1.seller_product_id = pd.seller_product_id ");
+				+ "on t1.seller_product_id = pd.seller_product_id and t1.user_id = pd.user_id and t1.plans_id = pd.plans_id ");
 		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
 		if(StrKit.notBlank(plansMonth)){
 			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");
