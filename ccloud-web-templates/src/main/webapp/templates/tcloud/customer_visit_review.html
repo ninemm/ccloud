@@ -313,8 +313,8 @@
                            			<hr style="border:1px dashed #0000fff"/>
                   						 <div class="weui-uploader__bd">
                        					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
-				                            <#if (customerVisit.imageList) ??>
-			                                <#list customerVisit.imageList as bean>
+				                            <#if (customerVisit.photoList) ??>
+			                                <#list customerVisit.photoList as bean>
 		                            			<#if (list.orderList == bean.orderList)>
 			                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
 		                            			</#if>
@@ -324,7 +324,7 @@
                   						 </div>
                   						 <hr style="border:1px dashed #0000fff"/>
                            		</#list>
-                          		<#else> 
+                          		<#else>
                          				<div class="weui-uploader__bd">
                       					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
 	                            		<#list customerVisit.imageList as bean>
