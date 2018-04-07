@@ -346,6 +346,15 @@
 		loadOrderData();
 	});
 	
+	function findIndex(source, target) {
+		for (var i = target.length - 1; i >= 0; i--) {
+			if (target[i].sellProductId == source) {
+				return i;
+			}
+		}
+		return -1;	
+	}
+	
 	function OrderAgain(id) {
 	     $.ajax({
             type: "post",
@@ -364,11 +373,21 @@
 				}
 				var lastItem = '';
 				var parentId = '';
+				var lastProductIds = [];
 				var totalCount = 0;
 	            $.each(data.orderDetail, function(idx, item) {
 	            	if (item.is_composite == '0') {
-		            	var product = getProduct(item);
-		            	productList.push(product);	            		
+	            		var index = $.inArray(item.sell_product_id, lastProductIds); 
+	            		lastProductIds.push(item.sell_product_id);
+	            		if (index < 0) {
+			            	var product = getProduct(item);
+			            	productList.push(product);								            		
+	            		} else {
+	            			var desc = findIndex(item.sell_product_id, productList);
+	            			var product = productList[desc];
+			            	var sub_product = product.subProduct[0];
+			            	setSubItem(sub_product, item);         		
+	            		}
 	            	} else {
 	            		if (parentId != item.composite_id) {
 	            			var $newProductDetail = $(".composition:last");
@@ -431,6 +450,27 @@
 		        window.location.href = '${CPATH}/product';			       	
             }
         });		
+	}
+	
+	function setSubItem(product, item) {
+		product.productName = item.custom_name;
+		product.valueName =  item.valueName;
+		product.bigPriceSpan = '￥' + item.price;
+		product.smallPriceSpan = '￥' + (item.price/item.convert_relate).toFixed(2);
+		product.bigUnitSpan = '￥' + (item.price/item.convert_relate).toFixed(2);
+		product.smallUnitSpan = '/' + item.small_unit;
+				
+		product.bigPrice = item.price;
+		product.smallPrice = (item.price/item.convert_relate).toFixed(2);
+		product.bigUnit = item.big_unit;
+		product.smallUnit = item.small_unit;
+		product.sellProductId =  item.sell_product_id;
+		product.productId = item.productId;
+		product.convert = item.convert_relate;
+		
+		product.bigNum = Math.floor(item.product_count/item.convert_relate);
+		product.smallNum = (item.product_count%item.convert_relate);
+		product.isGift = 1;			
 	}
 	
 	function getComposition($el, $html, totalCount){
