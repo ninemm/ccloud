@@ -575,7 +575,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		//String deptIds = getPara("deptId");
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
-				+ "userInfo.xls";
+				+ "userInfo.xlsx";
 		String userId = "";
 		Page<User> page = UserQuery.me().paginateUser(1, Integer.MAX_VALUE,  keyword, dataArea, "u.create_date",userId);
 		List<User> userList = page.getList();
