@@ -25,6 +25,10 @@
 	$("#datetime-picker").change(function(){
 		var date3 = new Date($("#datetime-picker").val().replace(/-/g,"/"));	
 		$("#datetime-picker").val(date3.Format("yyyy-MM"));
+	});
+	$(document).on("click", ".close-picker", function() {
+		var date3 = new Date($("#datetime-picker").val().replace(/-/g,"/"));	
+		$("#datetime-picker").val(date3.Format("yyyy-MM"));
 		 combo();
 	});
 	var cpLock = true;

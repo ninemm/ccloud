@@ -157,6 +157,7 @@ public class PlansController extends BaseFrontController {
 	public void myPlans() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		User us = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -167,7 +168,7 @@ public class PlansController extends BaseFrontController {
 		List<Map<String, Object>> sellerProducts = new ArrayList<>();
 		sellerProducts.add(all);
 		
-		List<User> userList = UserQuery.me().findByData(selectDataArea);
+		List<User> userList = UserQuery.me().findByDataAndDeptId(selectDataArea,us.getDepartmentId());
 		for (User user : userList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", user.getRealname());

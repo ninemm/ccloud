@@ -177,13 +177,10 @@ public class PlansDetailQuery extends JBaseQuery {
 	}
 	
 	public List<PlansDetail> findbyDateAreaAndUserId(String dataArea,String userId,String sellerId){
-		SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
-		String str = sdf.format(new Date());
 		String sql = "SELECT pd.*,csp.custom_name from cc_plans_detail pd "
 				+ "LEFT JOIN cc_plans cp on cp.id = pd.plans_id "
 				+ "LEFT JOIN cc_seller_product csp on csp.id = pd.seller_product_id "
 				+ "where cp.seller_id = '"+sellerId+"' and pd.user_id = '"+userId+"' "
-				+ "and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' "
 				+ " GROUP BY pd.seller_product_id";
 		return DAO.find(sql);
 	}
@@ -194,30 +191,42 @@ public class PlansDetailQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}
 	
-	public List<Record> findBySellerId(String sellerId , String plansMonth){
+	public List<Record> findBySellerId(String sellerId , String plansMonth,String dataArea){
 		/*SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
 		String str = sdf.format(new Date());*/
-		StringBuilder fromBuilder = new StringBuilder("select pd.seller_product_id,sp.custom_name ");
+		StringBuilder fromBuilder = new StringBuilder("select pd.seller_product_id,sp.custom_name,"
+				+ "t1.plansAmount as totalPlansAmount,t1.completeAmount as totalCompleteAmount,t1.plansNum as pNum,t1.completeNum as cNum, "
+				+ "convert((t1.completeAmount)/(t1.plansAmount)*100,decimal(10,2)) as completeRetio ");
 		fromBuilder.append("from cc_plans_detail pd ");
 		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
 		fromBuilder.append("LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id ");
+		fromBuilder.append("LEFT JOIN (SELECT pd.seller_product_id,convert(SUM(sp.price * pd.plan_num),decimal(10,2)) as plansAmount,convert(SUM(sp.price * pd.complete_num),decimal(10,2)) as completeAmount,"
+				+ "SUM(pd.plan_num) as plansNum,SUM(pd.complete_num) as completeNum "
+				+ "from cc_plans_detail pd LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id "
+				+ "where pd.data_area like '"+dataArea+"' GROUP BY pd.plans_id,pd.seller_product_id) t1 "
+				+ "on t1.seller_product_id = pd.seller_product_id ");
 		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
 		if(StrKit.notBlank(plansMonth)){
 			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");
 		}/*else {
 			fromBuilder.append("and cp.start_date <= '"+str+"' and cp.end_date >= '"+str+"' ");
 		}*/
-		fromBuilder.append("GROUP BY pd.seller_product_id ");
+		fromBuilder.append("GROUP BY pd.seller_product_id ORDER BY pd.seller_product_id");
 		return Db.find(fromBuilder.toString());
 	}
 	
-	public List<Record> findAllBySellerId(String sellerId , String plansMonth){
+	public List<Record> findAllBySellerId(String sellerId , String plansMonth,String dataArea){
 		/*SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
 		String str = sdf.format(new Date());*/
-		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.start_date as startDate,cp.end_date as endDate,cp.plans_month as plansMonth,cp.type,u.realname ");
+		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.start_date as startDate,cp.end_date as endDate,cp.plans_month as plansMonth,cp.type,u.realname,"
+				+ "t1.plansAmount,t1.completeAmount,SUM(t1.plansAmount) as totalPlansAmount,SUM(t1.completeAmount) as totalCompleteAmount ");
 		fromBuilder.append("from cc_plans_detail pd ");
 		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = pd.user_id ");
+		fromBuilder.append("LEFT JOIN (SELECT pd.seller_product_id,convert(SUM(sp.price * pd.plan_num),decimal(10,2)) as plansAmount,convert(SUM(sp.price * pd.complete_num),decimal(10,2)) as completeAmount "
+				+ "from cc_plans_detail pd LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id "
+				+ "where pd.data_area like '"+dataArea+"' GROUP BY pd.plans_id,pd.user_id,pd.seller_product_id) t1 "
+				+ "on t1.seller_product_id = pd.seller_product_id ");
 		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
 		if(StrKit.notBlank(plansMonth)){
 			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");
@@ -228,13 +237,18 @@ public class PlansDetailQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 	
-	public List<Record> _findAllBySellerId(String sellerId , String plansMonth){
+	public List<Record> _findAllBySellerId(String sellerId , String plansMonth,String dataArea){
 		/*SimpleDateFormat sdf =   new SimpleDateFormat( " yyyy-MM-dd" ); 
 		String str = sdf.format(new Date());*/
-		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.start_date as startDate,cp.end_date as endDate,cp.plans_month as plansMonth,cp.type,u.realname ");
+		StringBuilder fromBuilder = new StringBuilder("select pd.*,cp.start_date as startDate,cp.end_date as endDate,cp.plans_month as plansMonth,cp.type,u.realname,"
+				+ "t1.plansAmount,t1.completeAmount,SUM(t1.plansAmount) as totalPlansAmount,SUM(t1.completeAmount) as totalCompleteAmount,convert((t1.completeAmount)/(t1.plansAmount)*100,decimal(10,2)) as completeRetio ");
 		fromBuilder.append("from cc_plans_detail pd ");
 		fromBuilder.append("LEFT JOIN cc_plans cp on cp.id = pd.plans_id ");
 		fromBuilder.append("LEFT JOIN `user` u on u.id = pd.user_id ");
+		fromBuilder.append("LEFT JOIN (SELECT pd.seller_product_id,convert(SUM(sp.price * pd.plan_num),decimal(10,2)) as plansAmount,convert(SUM(sp.price * pd.complete_num),decimal(10,2)) as completeAmount "
+				+ "from cc_plans_detail pd LEFT JOIN cc_seller_product sp on sp.id = pd.seller_product_id "
+				+ "where pd.data_area like '"+dataArea+"' GROUP BY pd.plans_id,pd.user_id) t1 "
+				+ "on t1.seller_product_id = pd.seller_product_id ");
 		fromBuilder.append("where cp.seller_id = '"+sellerId+"' ");
 		if(StrKit.notBlank(plansMonth)){
 			fromBuilder.append("and cp.plans_month = '"+plansMonth+"-01 00:00:00' ");

@@ -40,8 +40,10 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -153,6 +155,12 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	/*@RequiresPermissions(value = { "/admin/plans/uploading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)*/
 	public void upload() {
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
+		if(ti.equals("")) {
+			ti = "01";
+		}
+		setAttr("ti",ti);
 		render("upload.html");
 	}
 	
@@ -261,8 +269,8 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		List<User> users = UserQuery.me().findByDataAndDeptId(dataArea,user.getDepartmentId());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
-		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
-		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
+//		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+//		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
 		//开始时间
 		File file = getFile().getFile();
 		String month = getPara("start");
@@ -276,7 +284,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 			plans.setId(plansId);
 			plans.setSellerId(sellerId);
 			plans.setType(Consts.MONTH_PLAN);
-			int index = month.indexOf("-");
+			/*int index = month.indexOf("-");
 			String day = month +"-"+ti;
 			Calendar cal = Calendar.getInstance();  
 			//设置年份  
@@ -304,8 +312,15 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 					plans.setEndDate(sdf.parse(endDate));
 				}
 			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
+			}*/
+			try {
+				plans.setStartDate(sdf.parse(startDate));
+				plans.setEndDate(sdf.parse(endDate));
+				plans.setPlansMonth(sd.parse(month));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			plans.setDeptId(user.getDepartmentId());
 			plans.setDataArea(deptDataArea);
@@ -372,14 +387,17 @@ public void downloading() throws UnsupportedEncodingException{
 	int num = 0;
 	//合并行的结束位置
 	int end = 1;
+	int amountPlans = 0;
+	int amountComplete = 0;
 	String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+	String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 //	String type = getPara("type");
 	String dateType = getPara("dateType");
 	//统计销售计划中需要导出的计划范围的所有的产品
-	List<Record> details = PlansDetailQuery.me().findBySellerId(sellerId,dateType);
+	List<Record> details = PlansDetailQuery.me().findBySellerId(sellerId,dateType,dataArea);
 	//查询出所有计划中的产品、业务员明细
-	List<Record> sellerProductDetails = PlansDetailQuery.me().findAllBySellerId(sellerId,dateType);
-	List<Record> _sellerProductDetails = PlansDetailQuery.me()._findAllBySellerId(sellerId,dateType);
+	List<Record> sellerProductDetails = PlansDetailQuery.me().findAllBySellerId(sellerId,dateType,dataArea);
+	List<Record> _sellerProductDetails = PlansDetailQuery.me()._findAllBySellerId(sellerId,dateType,dataArea);
 	// 声明一个工作薄
 	HSSFWorkbook wb = new HSSFWorkbook();
 	HSSFSheet sheet = wb.createSheet("table");
@@ -395,6 +413,13 @@ public void downloading() throws UnsupportedEncodingException{
     setBorder2.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 水平居中
     setBorder2.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER); // 上下居中
     setBorder2.setWrapText(true);//设置自动换行
+    //设置表格样式3
+    HSSFCellStyle setBorder3 = wb.createCellStyle();
+    setBorder3.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 水平居中
+    setBorder3.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER); // 上下居中
+    setBorder3.setWrapText(true);//设置自动换行
+    setBorder3.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+    setBorder3.setFillPattern(CellStyle.SOLID_FOREGROUND);
     //设置字体
     HSSFFont font = wb.createFont();
     font.setFontName("黑体");
@@ -405,6 +430,7 @@ public void downloading() throws UnsupportedEncodingException{
     font2.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);//粗体显示
     font2.setFontHeightInPoints((short) 12);
     setBorder.setFont(font2);
+    setBorder3.setFont(font2);
     HSSFRow  newRow = sheet.createRow(0);
     HSSFRow  nRow = sheet.createRow(1);
     //合并单元格
@@ -423,144 +449,217 @@ public void downloading() throws UnsupportedEncodingException{
     sheet.addMergedRegion(regions);
     sheet.addMergedRegion(regione);
     sheet.addMergedRegion(regiony);
-    for(int i = 0;i < details.size(); i++) {
-    	CellRangeAddress region = new CellRangeAddress(0,  0, (2*(i+2)+i), (2*(i+2)+i+2));
-    	Cell pCell = newRow.createCell(2*(i+2)+i);
-    	Cell cell01 = nRow.createCell(2*(i+2)+i);
-    	Cell cell02 = nRow.createCell(2*(i+2)+i+1);
-    	Cell cell03 = nRow.createCell(2*(i+2)+i+2);
-    	pCell.setCellValue(details.get(i).getStr("custom_name"));
-    	cell01.setCellValue("计划");
-    	cell02.setCellValue("完成");
-    	cell03.setCellValue("完成情况");
-    	sheet.addMergedRegion(region);
-    	pCell.setCellStyle(setBorder);
-    	cell01.setCellStyle(setBorder);
-    	cell02.setCellStyle(setBorder);
-    	cell03.setCellStyle(setBorder);
+    for(int i = 0;i < details.size()+1; i++) {
+    	if(i == (details.size())) {
+    		Cell zCell = nRow.createCell(5*details.size()+4);
+    		zCell.setCellValue("合计计划金额");
+    		Cell cCell = nRow.createCell(5*details.size()+5);
+    		cCell.setCellValue("合计完成金额");
+    		Cell rCell = nRow.createCell(5*details.size()+6);
+    		rCell.setCellValue("完成率");
+    		zCell.setCellStyle(setBorder3);
+    		cCell.setCellStyle(setBorder3);
+    		rCell.setCellStyle(setBorder3);
+    	}else {
+    		
+    		CellRangeAddress region = new CellRangeAddress(0,  0, (5*i+4), (5*i+8));
+    		Cell pCell = newRow.createCell(5*i+4);
+    		Cell cell01 = nRow.createCell(5*i+4);
+    		Cell cell02 = nRow.createCell(5*i+4+1);
+    		Cell cell03 = nRow.createCell(5*i+4+2);
+    		Cell cell04 = nRow.createCell(5*i+4+3);
+    		Cell cell05 = nRow.createCell(5*i+4+4);
+    		pCell.setCellValue(details.get(i).getStr("custom_name"));
+    		cell01.setCellValue("计划");
+    		cell02.setCellValue("完成");
+    		cell03.setCellValue("计划金额");
+    		cell04.setCellValue("完成金额");
+    		cell05.setCellValue("完成情况");
+    		sheet.addMergedRegion(region);
+    		pCell.setCellStyle(setBorder);
+    		cell01.setCellStyle(setBorder);
+    		cell02.setCellStyle(setBorder);
+    		cell03.setCellStyle(setBorder3);
+    		cell04.setCellStyle(setBorder3);
+    		cell05.setCellStyle(setBorder);
+    	}
     }
     for(int i = 0;i < _sellerProductDetails.size(); i++) {
     	HSSFRow  row = sheet.createRow(i+2);
-    	if( i>0 && _sellerProductDetails.get(i).get("type") .equals(_sellerProductDetails.get(i-1).get("type")) ) {
-    		end = i+1;
-	    	if(!_sellerProductDetails.get(i).get("plansMonth").equals(_sellerProductDetails.get(i-1).get("plansMonth"))  
-	    			) {
-	    		Cell typeCell = row.createCell(0);
-	    		Cell startCell = row.createCell(1);
-	    		Cell endCell = row.createCell(2);
-	    		if(_sellerProductDetails.get(i).get("type").equals(Consts.WEEK_PLAN)) {
-	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.WEEK_PLAN).getName());
-	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-	    		}else if(sellerProductDetails.get(i).get("type").equals(Consts.MONTH_PLAN)) {
-	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.MONTH_PLAN).getName());
-	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-	    		}else {
-	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.YEAR_PLAN).getName());
-	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-	    		}
-	    		if(end>(end-num)) {
-    				CellRangeAddress regionT = new CellRangeAddress((end-num),  end, 0, 0);
-    				CellRangeAddress regionS = new CellRangeAddress((end-num),  end, 1, 1);
-    				CellRangeAddress regionE = new CellRangeAddress((end-num),  end, 2, 2);
-    				sheet.addMergedRegion(regionT);
-    				sheet.addMergedRegion(regionS);
-    				sheet.addMergedRegion(regionE);
-	    		}
-	    		
-	    		if(i+1 == _sellerProductDetails.size() && num > 1) {
-    				
-    			}
-	    		typeCell.setCellStyle(setBorder);
-	    		startCell.setCellStyle(setBorder);
-	    		endCell.setCellStyle(setBorder);
-	    		num=0;
-	    	}else {
-	    		Cell typeCell = row.createCell(0);
-	    		Cell startCell = row.createCell(1);
-	    		Cell endCell = row.createCell(2);
-	    		if(sellerProductDetails.get(i).get("type").equals(Consts.WEEK_PLAN)) {
-	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.WEEK_PLAN).getName());
-	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-	    		}else if(sellerProductDetails.get(i).get("type").equals(Consts.MONTH_PLAN)) {
-	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.MONTH_PLAN).getName());
-	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-	    		}else {
-	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.YEAR_PLAN).getName());
-	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-	    		}
-	    		typeCell.setCellStyle(setBorder);
-	    		startCell.setCellStyle(setBorder);
-	    		endCell.setCellStyle(setBorder);
-	    		num++;
-	    		if(i+1 == _sellerProductDetails.size()) {
-	    			CellRangeAddress regionT = new CellRangeAddress((end-num+1),  end+1, 0, 0);
-	    			CellRangeAddress regionS = new CellRangeAddress((end-num+1),  end+1, 1, 1);
-	    			CellRangeAddress regionE = new CellRangeAddress((end-num+1),  end+1, 2, 2);
-	    			sheet.addMergedRegion(regionT);
-	    			sheet.addMergedRegion(regionS);
-	    			sheet.addMergedRegion(regionE);
-	    		}
-	    		
-	    	}
-    	}else {
-    		Cell typeCell = row.createCell(0);
-    		Cell startCell = row.createCell(1);
-    		Cell endCell = row.createCell(2);
-    		if(sellerProductDetails.get(i).get("type").equals(Consts.WEEK_PLAN)) {
-    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.WEEK_PLAN).getName());
-    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-    		}else if(sellerProductDetails.get(i).get("type").equals(Consts.MONTH_PLAN)) {
-    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.MONTH_PLAN).getName());
-    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-    		}else {
-    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.YEAR_PLAN).getName());
-    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
-    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
-    		}
-    		typeCell.setCellStyle(setBorder);
-    		startCell.setCellStyle(setBorder);
-    		endCell.setCellStyle(setBorder);
-    		
-    	}
-		Cell uCell = row.createCell(3);
-		uCell.setCellValue(UserQuery.me().findById(_sellerProductDetails.get(i).get("user_id").toString()).getRealname());
-		uCell.setCellStyle(setBorder);
-		 for(int  j= 0;j < details.size();j++) {
-    		Cell p0Cell = row.createCell(2*(j+2)+j);
-    		Cell p1Cell = row.createCell(2*(j+2)+j+1);
-    		Cell p2Cell = row.createCell(2*(j+2)+j+2);
-	    	 for(int k = 0; k < sellerProductDetails.size();k++) {
-    			 if(sellerProductDetails.get(k).getStr("seller_product_id").equals(details.get(j).getStr("seller_product_id")) 
-    					 && sellerProductDetails.get(k).getStr("user_id").equals(_sellerProductDetails.get(i).get("user_id"))
-    					 && sellerProductDetails.get(k).get("plans_id").equals(_sellerProductDetails.get(i).get("plans_id"))
-    					 && sellerProductDetails.get(k).get("plansMonth").equals(_sellerProductDetails.get(i).get("plansMonth"))) {
-    				 p0Cell.setCellValue(sellerProductDetails.get(k).getStr("plan_num"));
-    				 p1Cell.setCellValue(sellerProductDetails.get(k).getStr("complete_num"));
-    				 p2Cell.setCellValue(sellerProductDetails.get(k).getStr("complete_ratio")+"%");
-    				 p0Cell.setCellStyle(setBorder2);
-    				 p1Cell.setCellStyle(setBorder2);
-    				 p2Cell.setCellStyle(setBorder2);
-    				 break;
-    			 }else {
-    				 p0Cell.setCellValue("0");
-    				 p1Cell.setCellValue("0");
-    				 p2Cell.setCellValue("0.00%");
-    				 p0Cell.setCellStyle(setBorder2);
-    				 p1Cell.setCellStyle(setBorder2);
-    				 p2Cell.setCellStyle(setBorder2);
-    			 }
-	    	 }
-    	 }
+        	if( i>0 && _sellerProductDetails.get(i).get("type") .equals(_sellerProductDetails.get(i-1).get("type")) ) {
+        		end = i+1;
+    	    	if(!_sellerProductDetails.get(i).get("plansMonth").equals(_sellerProductDetails.get(i-1).get("plansMonth"))  
+    	    			) {
+    	    		Cell typeCell = row.createCell(0);
+    	    		Cell startCell = row.createCell(1);
+    	    		Cell endCell = row.createCell(2);
+    	    		if(_sellerProductDetails.get(i).get("type").equals(Consts.WEEK_PLAN)) {
+    	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.WEEK_PLAN).getName());
+    	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+    	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+    	    		}else if(sellerProductDetails.get(i).get("type").equals(Consts.MONTH_PLAN)) {
+    	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.MONTH_PLAN).getName());
+    	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+    	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+    	    		}else {
+    	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.YEAR_PLAN).getName());
+    	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+    	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+    	    		}
+    	    		if(end>(end-num)) {
+        				CellRangeAddress regionT = new CellRangeAddress((end-num),  end, 0, 0);
+        				CellRangeAddress regionS = new CellRangeAddress((end-num),  end, 1, 1);
+        				CellRangeAddress regionE = new CellRangeAddress((end-num),  end, 2, 2);
+        				sheet.addMergedRegion(regionT);
+        				sheet.addMergedRegion(regionS);
+        				sheet.addMergedRegion(regionE);
+    	    		}
+    	    		
+    	    		if(i+1 == _sellerProductDetails.size() && num > 1) {
+        				
+        			}
+    	    		typeCell.setCellStyle(setBorder);
+    	    		startCell.setCellStyle(setBorder);
+    	    		endCell.setCellStyle(setBorder);
+    	    		num=0;
+    	    	}else {
+    	    		Cell typeCell = row.createCell(0);
+    	    		Cell startCell = row.createCell(1);
+    	    		Cell endCell = row.createCell(2);
+    	    		if(sellerProductDetails.get(i).get("type").equals(Consts.WEEK_PLAN)) {
+    	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.WEEK_PLAN).getName());
+    	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+    	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+    	    		}else if(sellerProductDetails.get(i).get("type").equals(Consts.MONTH_PLAN)) {
+    	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.MONTH_PLAN).getName());
+    	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+    	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+    	    		}else {
+    	    			typeCell.setCellValue(DictQuery.me().findByValue(Consts.YEAR_PLAN).getName());
+    	    			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+    	    			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+    	    		}
+    	    		typeCell.setCellStyle(setBorder);
+    	    		startCell.setCellStyle(setBorder);
+    	    		endCell.setCellStyle(setBorder);
+    	    		num++;
+    	    		if(i+1 == _sellerProductDetails.size()) {
+    	    			CellRangeAddress regionT = new CellRangeAddress((end-num+1),  end+1, 0, 0);
+    	    			CellRangeAddress regionS = new CellRangeAddress((end-num+1),  end+1, 1, 1);
+    	    			CellRangeAddress regionE = new CellRangeAddress((end-num+1),  end+1, 2, 2);
+    	    			sheet.addMergedRegion(regionT);
+    	    			sheet.addMergedRegion(regionS);
+    	    			sheet.addMergedRegion(regionE);
+    	    		}
+    	    		
+    	    	}
+        	}else {
+        		Cell typeCell = row.createCell(0);
+        		Cell startCell = row.createCell(1);
+        		Cell endCell = row.createCell(2);
+        		if(sellerProductDetails.get(i).get("type").equals(Consts.WEEK_PLAN)) {
+        			typeCell.setCellValue(DictQuery.me().findByValue(Consts.WEEK_PLAN).getName());
+        			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+        			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+        		}else if(sellerProductDetails.get(i).get("type").equals(Consts.MONTH_PLAN)) {
+        			typeCell.setCellValue(DictQuery.me().findByValue(Consts.MONTH_PLAN).getName());
+        			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+        			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+        		}else {
+        			typeCell.setCellValue(DictQuery.me().findByValue(Consts.YEAR_PLAN).getName());
+        			startCell.setCellValue(_sellerProductDetails.get(i).get("startDate").toString());
+        			endCell.setCellValue(_sellerProductDetails.get(i).get("endDate").toString());
+        		}
+        		typeCell.setCellStyle(setBorder);
+        		startCell.setCellStyle(setBorder);
+        		endCell.setCellStyle(setBorder);
+        		
+        	}
+    		Cell uCell = row.createCell(3);
+    		uCell.setCellValue(UserQuery.me().findById(_sellerProductDetails.get(i).get("user_id").toString()).getRealname());
+    		uCell.setCellStyle(setBorder);
+    		for(int  j= 0;j < details.size();j++) {
+        		Cell p0Cell = row.createCell(5*j+4);
+        		Cell p1Cell = row.createCell(5*j+4+1);
+        		Cell p2Cell = row.createCell(5*j+4+2);
+        		Cell p3Cell = row.createCell(5*j+4+3);
+        		Cell p4Cell = row.createCell(5*j+4+4);
+    	    	 for(int k = 0; k < sellerProductDetails.size();k++) {
+        			 if(sellerProductDetails.get(k).getStr("seller_product_id").equals(details.get(j).getStr("seller_product_id")) 
+        					 && sellerProductDetails.get(k).getStr("user_id").equals(_sellerProductDetails.get(i).get("user_id"))
+        					 && sellerProductDetails.get(k).get("plans_id").equals(_sellerProductDetails.get(i).get("plans_id"))
+        					 && sellerProductDetails.get(k).get("plansMonth").equals(_sellerProductDetails.get(i).get("plansMonth"))) {
+        				 p0Cell.setCellValue(sellerProductDetails.get(k).getStr("plan_num"));
+        				 p1Cell.setCellValue(sellerProductDetails.get(k).getStr("complete_num"));
+        				 p2Cell.setCellValue(sellerProductDetails.get(k).getStr("plansAmount"));
+        				 p3Cell.setCellValue(sellerProductDetails.get(k).getStr("completeAmount"));
+        				 p4Cell.setCellValue(sellerProductDetails.get(k).getStr("complete_ratio")+"%");
+        				 p0Cell.setCellStyle(setBorder2);
+        				 p1Cell.setCellStyle(setBorder2);
+        				 p2Cell.setCellStyle(setBorder3);
+        				 p3Cell.setCellStyle(setBorder3);
+        				 p4Cell.setCellStyle(setBorder2);
+        				 break;
+        			 }else {
+        				 p0Cell.setCellValue("0");
+        				 p1Cell.setCellValue("0");
+        				 p2Cell.setCellValue("0.00");
+        				 p3Cell.setCellValue("0.00");
+        				 p4Cell.setCellValue("0.00%");
+        				 p0Cell.setCellStyle(setBorder2);
+        				 p1Cell.setCellStyle(setBorder2);
+        				 p2Cell.setCellStyle(setBorder3);
+        				 p3Cell.setCellStyle(setBorder3);
+        				 p4Cell.setCellStyle(setBorder2);
+        			 }
+    	    	 }
+        	 }
+    		 Cell zACell = row.createCell(5*details.size()+4);
+     		Cell cACell = row.createCell(5*details.size()+5);
+     		Cell rACell = row.createCell(5*details.size()+6);
+     		zACell.setCellValue(_sellerProductDetails.get(i).get("totalPlansAmount").toString());
+     		cACell.setCellValue(_sellerProductDetails.get(i).get("totalCompleteAmount").toString());
+     		rACell.setCellValue(_sellerProductDetails.get(i).get("completeRetio").toString()+"%");
+     		rACell.setCellStyle(setBorder3);
+     		zACell.setCellStyle(setBorder3);
+     		cACell.setCellStyle(setBorder3);
 		 //合并行
 		 
+    }
+    
+    HSSFRow  rowT = sheet.createRow(_sellerProductDetails.size()+2);
+    Cell zTCell = rowT.createCell(0);
+    zTCell.setCellValue("合计");
+    zTCell.setCellStyle(setBorder3);
+    CellRangeAddress regionT = new CellRangeAddress(details.size()-2,  details.size()-2, 0, 3);
+    sheet.addMergedRegion(regionT);
+    for(int i = 0 ; i < details.size()+1 ; i++) {
+    	if(i == details.size()) {
+    		Cell pTZCell = rowT.createCell(5*i+4);
+    		Cell pTCCell = rowT.createCell(5*i+4+1);
+    		Cell pTRCell = rowT.createCell(5*i+4+2);
+    		/*pTZCell.setCellValue(amountPlans);
+    		pTCCell.setCellValue(amountComplete);*/
+    		pTZCell.setCellStyle(setBorder3);
+    		pTCCell.setCellStyle(setBorder3);
+    		pTRCell.setCellStyle(setBorder3);
+    	}else {
+    		Cell p0Cell = rowT.createCell(5*i+4);
+    		Cell p1Cell = rowT.createCell(5*i+4+1);
+    		Cell p2Cell = rowT.createCell(5*i+4+2);
+    		Cell p3Cell = rowT.createCell(5*i+4+3);
+    		Cell p4Cell = rowT.createCell(5*i+4+4);
+    		p0Cell.setCellValue(details.get(i).get("pNum").toString());
+    		p1Cell.setCellValue(details.get(i).get("cNum").toString());
+    		p2Cell.setCellValue(details.get(i).get("totalPlansAmount").toString());
+    		p3Cell.setCellValue(details.get(i).get("totalCompleteAmount").toString());
+    		p4Cell.setCellValue(details.get(i).get("completeRetio").toString()+"%");
+    		p0Cell.setCellStyle(setBorder3);
+    		p1Cell.setCellStyle(setBorder3);
+    		p2Cell.setCellStyle(setBorder3);
+    		p3Cell.setCellStyle(setBorder3);
+    		p4Cell.setCellStyle(setBorder3);
+    	}
     }
     File  file = new File(filePath);
     //文件输出流
@@ -585,6 +684,11 @@ public void downloading() throws UnsupportedEncodingException{
 		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", ""); 
 		List<User> users = UserQuery.me().findByDataAndDeptId(dataArea,user.getDepartmentId());
 		List<Dict> dicts = DictQuery.me().findDictByType(Consts.PLAN);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
+		if(ti.equals("")) {
+			ti = "01";
+		}
 		//获取当前月份，在后面再加10个月
 		Calendar calendar=Calendar.getInstance();
 		//获得当前时间的月份，月份从0开始所以结果要加1
@@ -601,6 +705,7 @@ public void downloading() throws UnsupportedEncodingException{
 			}
 			years.add(year+i+"");
 		}
+		setAttr("ti",ti);
 		setAttr("dicts",dicts);
 		setAttr("sellerProducts",productRecords);
 		setAttr("users",users);
@@ -619,8 +724,8 @@ public void downloading() throws UnsupportedEncodingException{
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		String month = getPara("month");
-		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
-		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
+//		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+//		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM");
 		Plans plans = PlansQuery.me().findSellerIdAndDataAreaAndMonth(sellerId,deptDataArea,month);
@@ -631,7 +736,7 @@ public void downloading() throws UnsupportedEncodingException{
 			plans.setId(plansId);
 			plans.setSellerId(sellerId);
 			plans.setType(planType);
-			int index = month.indexOf("-");
+			/*int index = month.indexOf("-");
 			String day = month +"-"+ti;
 			Calendar cal = Calendar.getInstance();  
 			//设置年份  
@@ -659,8 +764,15 @@ public void downloading() throws UnsupportedEncodingException{
 					plans.setEndDate(sdf.parse(endDate));
 				}
 			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
+			}*/
+			try {
+				plans.setStartDate(sdf.parse(startDate));
+				plans.setEndDate(sdf.parse(endDate));
+				plans.setPlansMonth(sd.parse(month));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			plans.setDeptId(user.getDepartmentId());
 			plans.setDataArea(deptDataArea);
