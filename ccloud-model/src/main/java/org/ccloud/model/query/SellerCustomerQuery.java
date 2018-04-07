@@ -252,17 +252,18 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("JOIN cc_customer c ON csc.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_member m on m.customer_id = c.id ");
 		sql.append("LEFT JOIN cc_member_join_seller mjs on m.id = mjs.member_id AND mjs.user_id = '" + userId + "' AND mjs.seller_id = '" +  dealerId + "'");
-
-		sql.append("LEFT JOIN cc_sales_outstock cso ON cujc.seller_customer_id = cso.customer_id ");
-		DateTime dateTime = new DateTime(new Date());
-		if ("2".equals(isOrdered)) {
-			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusWeeks(-1).toDate()) + "' ");
-		} else if ("3".equals(isOrdered)) {
-			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-1).toDate()) + "' ");
-		} else if ("4".equals(isOrdered)) {
-			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-3).toDate()) + "' ");
-		} else if ("5".equals(isOrdered)) {
-			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-6).toDate()) + "' ");
+		if(StrKit.notBlank(isOrdered)) {
+			sql.append("LEFT JOIN cc_sales_outstock cso ON cujc.seller_customer_id = cso.customer_id ");
+			DateTime dateTime = new DateTime(new Date());
+			if ("2".equals(isOrdered)) {
+				sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusWeeks(-1).toDate()) + "' ");
+			} else if ("3".equals(isOrdered)) {
+				sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-1).toDate()) + "' ");
+			} else if ("4".equals(isOrdered)) {
+				sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-3).toDate()) + "' ");
+			} else if ("5".equals(isOrdered)) {
+				sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-6).toDate()) + "' ");
+			}
 		}
 
 		sql.append("LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
@@ -305,6 +306,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 				sql.append("HAVING count(DISTINCT(cso.id)) = 0 ");
 			}
 		}
+		sql.append("ORDER BY csc.create_date DESC ");
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 
 	}
