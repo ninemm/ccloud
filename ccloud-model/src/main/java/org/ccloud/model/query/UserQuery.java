@@ -370,6 +370,6 @@ public class UserQuery extends JBaseQuery {
 				+"where u.data_area like ? and g.group_code in ('role05','role06','role10') "
 //				+ "and u.department_id = ? "  
 				+"GROUP BY u.id";
-		return DAO.find(sql, dataArea,deptId);
+		return DAO.find(sql, dataArea);
 	}
 }
