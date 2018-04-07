@@ -156,8 +156,8 @@
                             </#list>
                         <#else>
                             <div class="weui-uploader__bd">
-                                <ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
-                                    <#list visit.imageList as bean>
+                                <ul class="weui-uploader__files uploaderFiles" id="uploaderFilesReview">
+                                    <#list visit.photoList as bean>
                                         <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
                                     </#list>
                                 </ul>
