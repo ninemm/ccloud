@@ -11,30 +11,6 @@
 	#valueName {
 		max-width: 7.5rem;
 	}
-	.main-good {
-		width:1.5rem;
-		height:1.5rem;
-		line-height:1.5rem;
-		font-size: .7rem;
-		text-align:center;
-		border-radius:50%;
-		background-color: #ea6f5a;
-		position: absolute;
-		color: #fff;
-		top:50%;
-		margin-top:-.75rem;
-		left: .5rem;
-	}
-	#compositionValueName {
-    padding: 0 0.25rem;
-    margin-left: 2.2rem;
-    margin-right: 0.8rem;
-	}
-	#compositionValueName div {
-		white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/shopping-cart.js"></script>
@@ -310,7 +286,7 @@ function initProductComposition(){
 		
 		$newProductDetail.find("#compositionNum").val(el.compositionNum);
 
-		$newProductDetail.find("#compositionValueName").html(el.compositionValueName);
+		$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
 		
 		$newProductDetail.find("#gift").html(el.compositionSub);
 	});
@@ -483,149 +459,149 @@ function order(){
 </#macro>
 
 <@layout>
-	<div class="weui-content">
-		<div id="shopping-cart">
-			<main>
-				<div class="weui-panel weui-panel_access common" style="display: none">
-					<input type="hidden" id="sellProductId" value="">
-					<input type="hidden" id="productId" value="">
-					<input type="hidden" id="convert" value="">
-					<input type="hidden" id="bigCost" value="">
-					<input type="hidden" id="smallCost" value="">
-					<input type="hidden" id="bigAccountPrice" value="">
-					<input type="hidden" id="smallAccountPrice" value="">
-					<nobr>
-						<p class="product_name" id="productName">
-							<!-- <span class="gift-tag">赠品</span> -->
-						</p>
-					</nobr>
-					<div class="product_unit">
-						<p>规格：</p>
-						<span id="valueName"></span>
-						<div class="fr">
-							<label class="no-bg" for="isGift">是否赠品</label>
-							<input type="checkbox" name="isGift" id="isGift" value="1" class="weui-agree__checkbox">
+<div class="weui-content">
+	<div id="shopping-cart">
+		<main>
+			<div class="weui-panel weui-panel_access common" style="display: none">
+				<input type="hidden" id="sellProductId" value="">
+				<input type="hidden" id="productId" value="">
+				<input type="hidden" id="convert" value="">
+				<input type="hidden" id="bigCost" value="">
+				<input type="hidden" id="smallCost" value="">
+				<input type="hidden" id="bigAccountPrice" value="">
+				<input type="hidden" id="smallAccountPrice" value="">
+				<nobr>
+					<p class="product_name" id="productName">
+						<!-- <span class="gift-tag">赠品</span> -->
+					</p>
+				</nobr>
+				<div class="product_unit">
+					<p>规格：</p>
+					<span id="valueName"></span>
+					<div class="fr">
+						<label class="no-bg" for="isGift">是否赠品</label>
+						<input type="checkbox" name="isGift" id="isGift" value="1" class="weui-agree__checkbox">
+					</div>
+				</div>
+				<div class="product_bUnit">
+					<span class="price" id="bigPriceSpan"></span>
+					<span class="unit" id="bigUnitSpan"></span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
+						</div>
+						<input type="number" min="0" value="0" class="fl" id="bigNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
 						</div>
 					</div>
-					<div class="product_bUnit">
-						<span class="price" id="bigPriceSpan"></span>
-						<span class="unit" id="bigUnitSpan"></span>
-						<div class="spinner">
-							<div class="operate fl">
-								<i class="icon-minus2"></i>
-							</div>
-							<input type="number" min="0" value="0" class="fl" id="bigNum">
-							<div class="operate fl">
-								<i class="icon-plus2"></i>
-							</div>
+					<#if isEdit>
+						<input type="number" class="street-value bigPrice" id="bigPrice" value="0" >
+					<#else>
+						<input type="number" class="street-value bigPrice" id="bigPrice" value="0" readonly>
+					</#if>
+				</div>
+				<div class="product_mUnit">
+					<span class="price" id="smallPriceSpan" ></span>
+					<span class="unit" id="smallUnitSpan" ></span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
 						</div>
-						<#if isEdit>
-							<input type="number" class="street-value bigPrice" id="bigPrice" value="0">
-							<#else>
-								<input type="number" class="street-value bigPrice" id="bigPrice" value="0" readonly>
-						</#if>
+						<input type="number" min="0" value="0" class="fl" id="smallNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
+						</div>
 					</div>
-					<div class="product_mUnit">
-						<span class="price" id="smallPriceSpan"></span>
-						<span class="unit" id="smallUnitSpan"></span>
-						<div class="spinner">
-							<div class="operate fl">
-								<i class="icon-minus2"></i>
-							</div>
-							<input type="number" min="0" value="0" class="fl" id="smallNum">
-							<div class="operate fl">
-								<i class="icon-plus2"></i>
-							</div>
-						</div>
-						<#if isEdit>
-							<input type="number" class="street-value smallPrice" id="smallPrice" value="0">
-							<#else>
-								<input type="number" class="street-value smallPrice" id="smallPrice" value="0" readonly>
-						</#if>
-						<i class="icon-trash-o fr ft30 gray"></i>
+					<#if isEdit>
+						<input type="number" class="street-value smallPrice" id="smallPrice" value="0" >
+					<#else>
+						<input type="number" class="street-value smallPrice" id="smallPrice" value="0" readonly>
+					</#if>
+					<i class="icon-trash-o fr ft30 gray"></i>
+				</div>
+				<hr />
+				<div class="gift" id="gift">
+					<input type="hidden" id="giftSellProductId" value="">
+					<input type="hidden" id="giftProductId" value="">
+					<input type="hidden" id="giftConvert" value="">
+					<input type="hidden" id="giftBigPrice" value="" >
+					<div>
+						<input type="checkbox" name="add-gift" id="addGift" class="weui-agree__checkbox">
+						<label for="addGift">添加赠品</label>
 					</div>
-					<hr />
-					<div class="gift" id="gift">
-						<input type="hidden" id="giftSellProductId" value="">
-						<input type="hidden" id="giftProductId" value="">
-						<input type="hidden" id="giftConvert" value="">
-						<input type="hidden" id="giftBigPrice" value="">
-						<div>
-							<input type="checkbox" name="add-gift" id="addGift" class="weui-agree__checkbox">
-							<label for="addGift">添加赠品</label>
+					<div style="display:none" class="select-area">
+						<div class="goods">
+							<span>商品</span>
+							<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
+							<i class="icon-sort-desc"></i>
 						</div>
-						<div style="display:none" class="select-area">
-							<div class="goods">
-								<span>商品</span>
-								<input type="text" class="choose-good weui-input" placeholder="选择商品" id="giftProduct" readonly>
-								<i class="icon-sort-desc"></i>
-							</div>
-							<div class="number">
-								<span>数量</span>
-								<div class="spinner">
-									<div class="operate fl">
-										<i class="icon-minus2"></i>
-									</div>
-									<input type="number" min="0" value="1" class="fl" id="giftNum" readyOnly>
-									<div class="operate fl">
-										<i class="icon-plus2"></i>
-									</div>
+						<div class="number">
+							<span>数量</span>
+							<div class="spinner">
+								<div class="operate fl">
+									<i class="icon-minus2"></i>
 								</div>
-								<input type="hidden" name="giftUnit" id="giftUnit">
-								<input type="text" class="choose-unit weui-input" placeholder="单位" id="giftUnitName" readonly>
-								<i class="icon-sort-desc"></i>
+								<input type="number" min="0" value="1" class="fl" id="giftNum" readyOnly>
+								<div class="operate fl">
+									<i class="icon-plus2"></i>
+								</div>
 							</div>
+							<input type="hidden" name="giftUnit" id="giftUnit">
+							<input type="text" class="choose-unit weui-input" placeholder="单位" id="giftUnitName" readonly>
+							<i class="icon-sort-desc"></i>
 						</div>
 					</div>
 				</div>
-				<div class="weui-panel weui-panel_access composition" style="display: none">
-					<input type="hidden" id="compositionId" value="">
-					<nobr>
-						<p class="product_name" id="compositionName"></p>
-					</nobr>
-					<div class="product_unit">
-						<div class="main-good">主</div>
-						<div id="compositionValueName"></div>
-					</div>
-					<div class="product_bUnit">
-						<span class="price" id="compositionPriceSpan"></span>
-						<div class="spinner">
-							<div class="operate fl">
-								<i class="icon-minus2"></i>
-							</div>
-							<input type="number" min="0" value="0" class="fl" id="compositionNum">
-							<div class="operate fl">
-								<i class="icon-plus2"></i>
-							</div>
+			</div>
+			<div class="weui-panel weui-panel_access composition" style="display: none">
+				<input type="hidden" id="compositionId" value="">
+				<nobr>
+					<p class="product_name" id="compositionName"></p>
+				</nobr>
+				<div class="product_unit">
+					<p>规格：</p>
+					<span id="compositionValueName"></span>
+				</div>
+				<div class="product_bUnit">
+					<span class="price" id="compositionPriceSpan"></span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
 						</div>
-						<#if isEdit>
-							<input type="number" class="street-value" id="compositionPrice" value="0">
-							<#else>
-								<input type="number" class="street-value" id="compositionPrice" value="0" readonly>
-						</#if>
-						<i class="icon-trash-o fr ft30 gray"></i>
-					</div>
-					<div class="hr"></div>
-					<div id="gift" class="weui-flex">
-						<span>
-							<i class="icon-tags"></i>
-						</span>
-						<div class="weui-flex__item">
-							<p id="sub">
-								<span id="subProduct"> </span>
-							</p>
-							<p id="subsubProduct" class="none">
-							</p>
+						<input type="number" min="0" value="0" class="fl" id="compositionNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
 						</div>
+					</div>
+					<#if isEdit>
+						<input type="number" class="street-value" id="compositionPrice" value="0" >
+					<#else>
+						<input type="number" class="street-value" id="compositionPrice" value="0" readonly>
+					</#if>
+					<i class="icon-trash-o fr ft30 gray"></i>
+				</div>
+				<div class="hr"></div>
+				<div id="gift" class="weui-flex">
+					<span>
+						<i class="icon-tags"></i>
+					</span>
+					<div class="weui-flex__item">
+						<p id="sub">
+							<span id="subProduct"> </span>
+						</p>
+						<p id="subsubProduct" class="none">
+						</p>
 					</div>
 				</div>
-			</main>
-			<#include "_inc/_goback.html" />
-			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
-				<p class="total bg-white weui-flex__item" id="totalNum"></p>
-				<button id="addGoods" class="place-order yellow-button white">添加商品</button>
-				<button id="placeOrder" class="place-order red-button white">下单</button>
-			</footer>
-		</div>
+			</div>
+		</main>
+		<#include "_inc/_goback.html" />
+		<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+			<p class="total bg-white weui-flex__item" id="totalNum"></p>
+			<button id="addGoods" class="place-order yellow-button white">添加商品</button>
+			<button id="placeOrder" class="place-order red-button white">下单</button>
+		</footer>
 	</div>
+</div>
 </@layout>
