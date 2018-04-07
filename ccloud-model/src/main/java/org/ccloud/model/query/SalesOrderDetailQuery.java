@@ -64,6 +64,28 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 		return Db.find(sqlBuilder.toString(), orderId);
 	}
+	
+	public List<Record> orderAgainDetail(String orderId) {
+
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT sod.*, sp.custom_name,sp.tax_price, sp.price,sp.bar_code, sp.cost, ");
+		sqlBuilder.append(" p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, ");
+		sqlBuilder.append(" w.code as warehouseCode, t1.valueName,w.name as warehouseName, IFNULL(cpc1.seller_product_id,cpc.seller_product_id) as sub_id, IFNULL(cpc.name,cpc1.name) as comName, ");
+		sqlBuilder.append(" IFNULL(cpc.main_product_count,cpc1.sub_product_count) as comCount, IFNULL(cpc.price,cpc1.price) as comPrice ");
+		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" LEFT JOIN cc_goods g ON g.id = p.goods_id ");
+		sqlBuilder.append(" LEFT JOIN cc_warehouse w ON sod.warehouse_id = w.id ");
+		sqlBuilder.append(" LEFT JOIN (SELECT * FROM cc_product_composition GROUP BY parent_id) cpc ON cpc.parent_id = sod.composite_id AND cpc.seller_product_id = sod.sell_product_id ");
+		sqlBuilder.append(" LEFT JOIN cc_product_composition cpc1 ON cpc1.parent_id = sod.composite_id AND cpc1.sub_seller_product_id = sod.sell_product_id ");
+		sqlBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		sqlBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		sqlBuilder.append(" WHERE order_id = ? ");
+		sqlBuilder.append(" ORDER BY sod.composite_id ");
+
+		return Db.find(sqlBuilder.toString(), orderId);
+	}	
 
 	@SuppressWarnings("unchecked")
 	public boolean insert(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,

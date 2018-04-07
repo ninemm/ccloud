@@ -230,7 +230,7 @@
 						$newOrder.find("#cancel").remove();
 					}
 					$newOrder.find("#orderAgain").on('click', function(){ 
- 						 window.location.href = "${CPATH}/order/getOldOrder?orderId="+el.id;
+ 						OrderAgain(el.id);
 					});
 
 					$newOrder.find("#status").on('click', function(){ 
@@ -343,6 +343,112 @@
 		loading = true;
 		loadOrderData();
 	});
+	
+	function OrderAgain(id) {
+	     $.ajax({
+            type: "post",
+            url: "${CPATH}/order/getOrderInfo?orderId="+id,
+            dataType: "json",
+            success:function(data) {
+            	var order = data.order;
+            	var productList = [];
+            	var compositionList = [];
+				var customer = {
+					"customerName": order.customer_name,
+					"sellerCustomerId": order.customer_id,
+					"contact": order.ccontact,
+					"mobile":  order.cmobile,
+					"address": order.caddress
+				}
+	            $.each(data.orderDetail, function(idx, item) {
+	            	if (item.is_composite == '0') {
+		            	var product = getProduct(item);
+		            	productList.push(product);	            		
+	            	} else {
+	            		if (item.sell_product_id == item.sub_id) {
+	            			var composition = getComposition(item);
+	            			compositionList.push(composition);
+	            		}
+	            	}
+	            });
+	            console.log(compositionList);
+	            setItemBykey("productList", productList);
+	            setItemBykey("compositionList", compositionList);
+		        setItemBykey("customerInfo", customer);
+		        window.location.href = '${CPATH}/product';			       	
+            }
+        });		
+	}
+	
+	function getComposition($el){
+		return composition = {
+			compositionName : $el.comName,
+			
+			compositionPriceSpan : '￥' + $el.comPrice,
+<!-- 			stock : $el.find("#stock").text(), -->
+			
+			compositionPrice : $el.comPrice,
+			compositionId : $el.composite_id,
+	
+			compositionNum : ($el.product_count/$el.comCount).toFixed(0)
+			
+			compositionValueName : $el.find("#compositionValueName").text(),
+			compositionSub : $el.find("#gift").html()
+		}
+	}
+	
+	function getProduct($el){
+		return product = {
+			productName : $el.custom_name,
+			valueName : $el.valueName,
+			
+			bigPriceSpan : '￥' + $el.price,
+			smallPriceSpan : '￥' + ($el.price/$el.convert_relate).toFixed(2),
+			bigUnitSpan : '/' + $el.big_unit,
+			smallUnitSpan :'/' + $el.small_unit,
+<!-- 			stock : $el.stock, -->
+	
+			bigCost : $el.cost,
+			smallCost : ($el.cost/$el.convert_relate).toFixed(2),
+			bigAccountPrice : $el.tax_price,
+			smallAccountPrice : ($el.tax_price/$el.convert_relate).toFixed(2),
+	
+			bigPrice : $el.price,
+			smallPrice :($el.price/$el.convert_relate).toFixed(2),
+			bigUnit : $el.big_unit,
+			smallUnit : $el.small_unit,
+			sellProductId : $el.sell_product_id,
+			productId : $el.productId,
+			convert : $el.convert_relate,
+	
+			bigNum : Math.floor($el.product_count/$el.convert_relate),
+			smallNum : ($el.product_count%$el.convert_relate),
+			isGift : $el.is_gift,
+			
+			subProduct : [{
+				productName : "",
+				valueName : "",
+						
+				bigPriceSpan : "",
+				smallPriceSpan : "",
+				bigUnitSpan : "",
+				smallUnitSpan : "",
+				stock : "",
+				
+				bigPrice : "",
+				smallPrice : "",
+				bigUnit : "",
+				smallUnit : "",
+				sellProductId : "",
+				productId : "",
+				convert : "",
+		
+				bigNum : "",
+				smallNum : "",
+				isGift : 1
+			}]
+		}
+	}	
 	
 	function combo() {
 		$main.empty();
