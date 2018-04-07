@@ -32,6 +32,9 @@
         transform: translateY(-50%);
         margin-top:0!important;
     }
+    button {
+        background: #fff;
+    }
 
 </#macro>
 
@@ -60,6 +63,7 @@
 		}).on("click", ".nearby-customer", function(){
             sign = 1;
             var $this = $(this);
+            $this.attr('disabled', true);
             $this.addClass('red-class').siblings().removeClass('red-class');
             combo();
         }).on("click", "#searchCancel", function(){
@@ -71,6 +75,7 @@
         }).on("click", ".choose-customer", function(){
             sign = 0;
             var $this = $(this);
+            $this.attr('disabled', true);
             $this.addClass('red-class').siblings().removeClass('red-class');
             combo();
         }).on("click", "#customerInfo", function() {
@@ -85,6 +90,7 @@
     var $loading = $("#loading");
     var $noMore = $("#noMore");
     var loading = false;
+    var $button = $('.order-top-btns button');
 
     var keyword = '';
     var page = 1;
@@ -153,6 +159,7 @@
             page++;
             if (sign == 0) loading = false;
             else loading = true;
+            $button.attr('disabled',false);
         });
     }
 
@@ -196,15 +203,15 @@
         
         <article class="customer" style="width: 100%">
             <div class="weui-flex order-top-btns t-c ft14">
-                <div class="weui-flex__item choose-customer red-class">
+                <button class="weui-flex__item choose-customer red-class">
                     <span><i class="icon-user"></i></span>
                     公司客户
-                </div>
+                </button>
                 <@shiro.hasPermission name="/admin/sellerCustomer/import">
-                <div class="weui-flex__item nearby-customer">
+                <button class="weui-flex__item nearby-customer">
                     <span><i class="icon-map-marker"></i></span>
                     附近客户
-                </div>
+                </button>
                 </@shiro.hasPermission>
                 <input type="hidden" name="lng" id="lng">
                 <input type="hidden" name="lat" id="lat">
