@@ -766,6 +766,6 @@ function order(){
 	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 		<p class="total bg-white weui-flex__item" id="totalNum"></p>
 		<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
-		<button id="placeOrder" class="place-order red-button white">下单</button>
+		<button id="placeOrder" class="place-order red-button white"><#if refund?? && refund == '1'>下一步<#else>下单</#if></button>
 	</footer>
 </@layout>

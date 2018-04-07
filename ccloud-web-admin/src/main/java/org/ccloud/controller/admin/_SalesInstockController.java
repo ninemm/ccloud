@@ -213,6 +213,9 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 
 			for (String s : outId) {
 				Record printInfo = SalesRefundInstockQuery.me().findStockInForPrint(s);
+				if (StrKit.isBlank(printInfo.getStr("salesOutStockId"))) {
+					printInfo = SalesRefundInstockQuery.me().findStockInForPrintByNoOrder(s);
+				}
 				List<Record> ProductInfos = SalesRefundInstockQuery.me().findPrintProductInfo(s);
 				Map<String, Object> map = new HashMap<>();
 				map.put("printInfo", printInfo);

@@ -547,4 +547,21 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+
+	public Record findStockInForPrintByNoOrder(String inStockId) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(" SELECT sr.id as salesRefundInstockId, sr.instock_sn, sr.payment_type, sr.remark AS stockInRemark, c.address AS delivery_address, sr.total_reject_amount, ");
+		stringBuilder.append(" cs.customer_kind, c.id AS customerId, c.customer_name, c.contact AS ccontact, c.mobile AS cmobile, c.address AS ");
+		stringBuilder.append(" caddress, ct. NAME AS customerTypeName, ct. CODE AS customerTypeCode, u.realname, u.mobile, w. CODE AS ");
+		stringBuilder.append(" warehouseCode, cp.factor, w.`name` AS warehouseName, w.phone AS warehousePhone, sr.create_date AS returnOrderTime, ");
+		stringBuilder.append(" sr.remark, sn.seller_name as sellerName, sr.total_reject_amount AS total_amount, sr.id AS orderId, sr.input_user_id AS biz_user_id, sr.create_date as order_date, sn.id AS sellerId, pt.context AS printFootContext ");
+		stringBuilder.append(" FROM cc_sales_refund_instock  sr LEFT JOIN cc_seller_customer cs ON sr.customer_id = cs.id ");
+		stringBuilder.append(" LEFT JOIN cc_customer c ON cs.customer_id = c.id ");
+		stringBuilder.append(" LEFT JOIN cc_seller sn ON sn.id = sr.seller_id LEFT JOIN cc_customer_type ct ON sr.customer_type_id = ");
+		stringBuilder.append(" ct.id LEFT JOIN cc_price_system cp ON cp.id = ct.price_system_id LEFT JOIN USER u ON sr.input_user_id = u.id LEFT ");
+		stringBuilder.append(" JOIN cc_warehouse w ON sr.warehouse_id = w.id LEFT JOIN cc_seller_join_template cjt ON cjt.seller_id = sn.id LEFT ");
+		stringBuilder.append(" JOIN cc_print_template pt ON pt.id = cjt.print_template_id WHERE sr.id = ? ");
+		
+		return Db.findFirst(stringBuilder.toString(), inStockId);
+	}
 }
