@@ -27,6 +27,8 @@
 		$("#datetime-picker").val(date3.Format("yyyy-MM"));
 	});
 	$(document).on("click", ".close-picker", function() {
+		planAmount = 0;
+		completeAmount = 0;
 		var date3 = new Date($("#datetime-picker").val().replace(/-/g,"/"));	
 		$("#datetime-picker").val(date3.Format("yyyy-MM"));
 		 combo();
