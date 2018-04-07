@@ -625,8 +625,8 @@ public void downloading() throws UnsupportedEncodingException{
     		 Cell zACell = row.createCell(5*details.size()+4);
      		Cell cACell = row.createCell(5*details.size()+5);
      		Cell rACell = row.createCell(5*details.size()+6);
-     		zACell.setCellValue(_sellerProductDetails.get(i).get("totalPlansAmount").toString());
-     		cACell.setCellValue(_sellerProductDetails.get(i).get("totalCompleteAmount").toString());
+     		zACell.setCellValue(_sellerProductDetails.get(i).get("plansAmount").toString());
+     		cACell.setCellValue(_sellerProductDetails.get(i).get("completeAmount").toString());
      		rACell.setCellValue(_sellerProductDetails.get(i).get("completeRetio").toString()+"%");
      		rACell.setCellStyle(setBorder4);
      		zACell.setCellStyle(setBorder4);
