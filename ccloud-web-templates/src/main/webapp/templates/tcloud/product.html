@@ -58,6 +58,8 @@
 $(function() {
 	var cpLock = true;
 	var time;
+	var refund = '${refund!}';
+	setItemBykey("refund", refund);
 
 	$(document).on("compositionstart", "#searchInput", function() {
 		cpLock = false;

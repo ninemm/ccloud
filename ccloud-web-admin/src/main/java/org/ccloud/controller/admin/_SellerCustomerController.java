@@ -398,7 +398,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String dataArea = getPara("data_area");
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
-				+ "customerInfo.xls";
+				+ "customerInfo.xlsx";
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
@@ -970,6 +970,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
 			}
 			param.put("manager", managerUserName);
+			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
 			param.put("isEnable", isEnable);
