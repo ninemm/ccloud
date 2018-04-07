@@ -15,6 +15,27 @@
     .red-class {
         color: #ea6f5a!important;
     }
+
+    .responsible {
+        float: right;
+        color: red;
+        max-width: 8rem;
+    }
+    .contactP {
+        margin-top: .5rem; 
+        overflow: hidden;
+    }
+    .contact {
+        position: absolute;
+        left: 0;
+        top:50%;
+        transform: translateY(-50%);
+        margin-top:0!important;
+    }
+    button {
+        background: #fff;
+    }
+
 </#macro>
 
 <#macro script_import>
@@ -26,8 +47,6 @@
 <#macro script>
 
     var sign = 0;//0表示公司客户，1表示附近客户
-    var time;
-    var cpLock = true;
 
     $(function() {
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
@@ -38,22 +57,13 @@
                 $("#lat").val(lat.toFixed(6));
             }
         )
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-        }).on("compositionend", "#searchInput", function() {
-            cpLock = true;
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){combo();},500);
-            }
-        }).on("input", "#searchInput", function() {
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){combo();},500);
-            }
-        }).on("click", ".nearby-customer", function(){
+        $(document).on("submit", ".weui-search-bar__form", function() {
+			combo();
+			return false;
+		}).on("click", ".nearby-customer", function(){
             sign = 1;
             var $this = $(this);
+            $this.attr('disabled', true);
             $this.addClass('red-class').siblings().removeClass('red-class');
             combo();
         }).on("click", "#searchCancel", function(){
@@ -65,6 +75,7 @@
         }).on("click", ".choose-customer", function(){
             sign = 0;
             var $this = $(this);
+            $this.attr('disabled', true);
             $this.addClass('red-class').siblings().removeClass('red-class');
             combo();
         }).on("click", "#customerInfo", function() {
@@ -79,6 +90,7 @@
     var $loading = $("#loading");
     var $noMore = $("#noMore");
     var loading = false;
+    var $button = $('.order-top-btns button');
 
     var keyword = '';
     var page = 1;
@@ -131,7 +143,7 @@
                 var contactP  = "";
                 if (el.contact != undefined) {
                     contactP = el.contact + "/" + el.mobile;
-                    if(el.getted != null) contactP = contactP + "<span style='float: right;color:  red;'>" + el.getted + "</span>";
+                    if(el.getted != null) contactP = "<p class='contact gray'>" + contactP + "</p>" + "<div class='responsible'>" + el.getted + "</div>";
                 }else if (el.mobile == null || el.mobile == '') contactP = "无";
                 else contactP = el.mobile;
                 $newCustomer.find("#contactP").html(contactP);
@@ -147,6 +159,7 @@
             page++;
             if (sign == 0) loading = false;
             else loading = true;
+            $button.attr('disabled',false);
         });
     }
 
@@ -187,29 +200,29 @@
                 <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
             </div>
         </header>
-        <div class="weui-flex order-top-btns t-c ft14">
-            <div class="weui-flex__item border-right-1px choose-customer red-class">
-                <span><i class="icon-user"></i></span>
-                公司客户
+        
+        <article class="customer" style="width: 100%">
+            <div class="weui-flex order-top-btns t-c ft14">
+                <button class="weui-flex__item choose-customer red-class">
+                    <span><i class="icon-user"></i></span>
+                    公司客户
+                </button>
+                <@shiro.hasPermission name="/admin/sellerCustomer/import">
+                <button class="weui-flex__item nearby-customer">
+                    <span><i class="icon-map-marker"></i></span>
+                    附近客户
+                </button>
+                </@shiro.hasPermission>
+                <input type="hidden" name="lng" id="lng">
+                <input type="hidden" name="lat" id="lat">
             </div>
-            <@shiro.hasPermission name="/admin/sellerCustomer/import">
-            <div class="weui-flex__item nearby-customer">
-                <span><i class="icon-map-marker"></i></span>
-                附近客户
-            </div>
-            </@shiro.hasPermission>
-            <input type="hidden" name="lng" id="lng">
-            <input type="hidden" name="lat" id="lat">
-        </div>
-        <article class="customer" style="width:100%; top: 4rem">
-
-            <div id="infinite" style="top:0">
+            <div id="infinite">
                 <div id="customerList">
                     <div class="weui-panel weui-panel_access" style="display: none">
                         <div class="weui-flex">
                             <div class="weui-flex__item customer-info" id="customerInfo">
                                 <p class="ft14" id="customerName">小张烤鱼</p>
-                                <p class="gray" id="contactP">小张/18611111111</p>
+                                <div class="relative contactP" id="contactP">小张/18611111111</div>
                                 <input type="hidden" id="sellerCustomerId" value="">
                                 <input type="hidden" id="contact" value="">
                                 <input type="hidden" id="mobile" value="">

@@ -210,13 +210,14 @@
 								<div class="weui-cell weui-cell_access">
 									<a href="${CPATH}/order/orderReview?orderId=${order.id!}&taskId=${order.taskId!}&assignee=${order.assignee!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
-											<p class="customer_name">
+											<p class="customer_name black3">
 												<#if order.member_id ??>
 													<span class="tag">终端下单</span>
 												</#if>
 												${(order.customer_name)!}
+												<span class="fr" style="color:red">${(order.realname)!}</span>
 											</p>
-											<div class="ft14 gray">
+											<div class="ft14 black3">
 												<p>
 													<#if order.receive_type == 0>
 														<span class="tag">账期</span>
@@ -264,13 +265,13 @@
 								<div class="weui-cell weui-cell_access">
 									<a href="${CPATH}/order/orderReview?orderId=${orderInfo.id!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
-											<p class="customer_name">
+											<p class="customer_name black3">
 												<#if orderInfo.member_id?? >
 													<span class="tag">终端下单</span>
 												</#if>
 												${(orderInfo.customer_name)!}
 											</p>
-											<div class="ft14 gray">
+											<div class="ft14 black3">
 												<p>
 													<#if orderInfo.receive_type == 0>
 														<span class="tag">账期</span>

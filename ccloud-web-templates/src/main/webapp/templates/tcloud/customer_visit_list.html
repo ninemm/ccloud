@@ -48,28 +48,10 @@
   		</#if>
         refresh();
 
-        var cpLock = true;
-		var time;
-
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-		}).on("compositionend", "#searchInput", function() {
-			cpLock = true;
-			if(cpLock) {
-				clearTimeout(time);
-				time = setTimeout(function(){ 
-					setItemBykey("keyword", $("#searchInput").val());
-                    refresh();
-				},500);
-			}
-		}).on("input", "#searchInput", function() {
-			if(cpLock) {
-				clearTimeout(time);
-				time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    refresh();
-                },500);
-			}
+        $(document).on("submit", ".weui-search-bar__form", function() {
+            setItemBykey("keyword", $("#searchInput").val());
+            refresh();			
+            return false;
 		}).on("change", "#customer-type", function() {
 			setItemBykey("typeId", $("#customer-type").data('values'));
 			setItemBykey("type", $("#customer-type").val());
@@ -215,7 +197,7 @@
             <div class="weui-search-bar__box">
                 <i class="weui-icon-search"></i>
                 <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-                <a href="javascript:" class="weui-icon-clear" id="searchClear" onclick="searchCancel()"></a>
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
             </div>
             <label class="weui-search-bar__label" id="searchText">
                 <i class="weui-icon-search"></i>

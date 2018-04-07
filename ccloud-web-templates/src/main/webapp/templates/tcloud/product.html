@@ -56,30 +56,16 @@
 
 <#macro script>
 $(function() {
-	var cpLock = true;
-	var time;
 	var refund = '${refund!}';
 	setItemBykey("refund", refund);
 
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				keyword = $(this).val();
-				changeInit();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				keyword = $("#searchInput").val();
-				changeInit();
-			},500);
-		}
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		keyword = $("#searchInput").val();
+		changeInit();
+		return false;
+	}).on("click", "#searchCancel", function() {
+		keyword = $("#searchInput").val();
+		changeInit();
 	}).on("click", ".gift-open", function () {
         if ($(this).text() === "展开") {
 	        $(this).text("收起");
@@ -737,7 +723,7 @@ function order(){
 									<div id="stock"></div>
 									<div id="activityName" class="activityName"></div>
 								</div>
-								<hr>
+								<div class="hr"></div>
 								<div id="gift" class="weui-flex">
 									<span>
 										<i class="icon-tags"></i>

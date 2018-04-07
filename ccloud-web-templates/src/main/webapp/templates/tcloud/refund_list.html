@@ -24,30 +24,15 @@
 			setItemBykey("startDate", $.today());
 			setItemBykey("endDate", $.today() + ' 23:59:59');  			
 		</#if>
-		  
-		var cpLock = true;
-        var time;
 
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-        }).on("compositionend", "#searchInput", function() {
-            cpLock = true;
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    combo();
-                },500);
-            }
-        }).on("input", "#searchInput", function() {
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    combo();
-                },500);
-            }
-        }).on("change", "#status", function() {
+		$(document).on("submit", ".weui-search-bar__form", function() {
+			setItemBykey("keyword", $("#searchInput").val());
+			combo();
+			return false;
+		}).on("click", "#searchCancel", function() {
+			setItemBykey("keyword", $("#searchInput").val());
+			combo();
+		}).on("change", "#status", function() {
 			setItemBykey("status", $("#status").data('values'));
 			setItemBykey("statusName", $("#status").val());
 			combo();
@@ -405,7 +390,7 @@
 						</p>
 					</div>
 				</a>
-				<hr>
+				<div class="hr"></div>
 				<div id="cancel" class="button white-button fl">撤销</div>
 				<div id="refund" class="button red-button fr">详情</div>
 				<@shiro.hasPermission name="/admin/salesRefund/check">

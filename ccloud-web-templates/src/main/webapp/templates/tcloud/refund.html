@@ -24,28 +24,13 @@
 		setItemBykey("endDate", $.today() + ' 23:59:59');
 	</#if>
 
-	var cpLock = true;
-	var time;
-
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				setItemBykey("keyword", $("#searchInput").val());
-				combo();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				setItemBykey("keyword", $("#searchInput").val());
-				combo();
-			},500);
-		}
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		setItemBykey("keyword", $("#searchInput").val());
+		combo();
+		return false;
+	}).on("click", "#searchCancel", function() {
+		setItemBykey("keyword", $("#searchInput").val());
+		combo();
 	}).on("change", "#status", function() {
 		setItemBykey("status", $("#status").data('values'));
 		setItemBykey("statusName", $("#status").val());	
@@ -304,7 +289,7 @@
 							</p>
 						</div>
 					</a>
-					<hr>
+					<div class="hr"></div>
 					<div id="refund" class="button white-button fr">退货</div>
 				</div>
 			</div>

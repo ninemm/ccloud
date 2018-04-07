@@ -204,10 +204,10 @@
 								<div class="weui-cell weui-cell_access">
 									<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApply.id!}&taskId=${activityApply.taskId!}&assignee=${activityApply.assignee!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
-											<p class="customer_name">
+											<p class="customer_name black3">
 												${(activityApply.customer_name)!}
 											</p>
-											<div class="ft14 gray">
+											<div class="ft14 black3">
 												<p>活动名称：${(activityApply.title)!}</p>
 												<#if activityApply.expenseDetailName??>
 													<p>费用类型：${(activityApply.expenseDetailName)!}</p>
@@ -216,15 +216,12 @@
 													联系人：<span>${(activityApply.ccontact)!} / ${(activityApply.cmobile)!}</span>
 													<span class="fr">${(activityApply.customerTypeNames)!}</span>
 												</p>
-												<p>
-													<#if activityApply.apply_amount??>
-													投入金额：￥<span>${(activityApply.apply_amount)!}</span></#if>
-													<span class="fr" id="date">时间：${(activityApply.create_date)!}</span>
-												</p>
-												<p>
-													<#if activityApply.apply_num??>
-													投入数量：<span>${(activityApply.apply_num)!}</span></#if>
-												</p>
+													<p>
+												<#if activityApply.invest_amount??>
+														投入金额：￥<span>${(activityApply.invest_amount)!}</span>
+												</#if>
+													</p>
+													<p id="date">时间：${(activityApply.create_date)!}</p>
 											</div>
 										</div>
 									</a>
@@ -258,11 +255,11 @@
 								<div class="weui-cell weui-cell_access">
 									<a href="${CPATH}/activity/activityApplyReview?activityApplyId=${activityApplyInfo.id!}" style="display:block;width:100%;">
 										<div class="weui-cell__bd ft16">
-											<p class="customer_name">
+											<p class="customer_name black3">
 												${(activityApplyInfo.customer_name)!}
 												<span class="fr">${(activityApplyInfo.activityApplyStatus)!}</span>
 											</p>
-											<div class="ft14 gray">
+											<div class="ft14 black3">
 												<p>活动名称：${(activityApplyInfo.title)!}</p>
 												<#if activityApplyInfo.expenseDetailName??>
 													<p>费用类型：${(activityApplyInfo.expenseDetailName)!}</p>
@@ -272,14 +269,9 @@
 													<span class="fr">${(activityApplyInfo.customerTypeNames)!}</span>
 												</p>
 												<p>
-													<#if activityApplyInfo.apply_amount??>
-													投入金额：￥<span>${(activityApplyInfo.apply_amount)!}</span></#if>
-													<span class="fr" id="date">时间：${(activityApplyInfo.endTime)!}</span>
-												</p>
-												<p>
-													<#if activityApplyInfo.apply_num??>
-													投入数量：<span>${(activityApplyInfo.apply_num)!}</span></#if>
-												</p>
+													投入金额：￥<span>${(activityApplyInfo.invest_amount)!}</span>
+												</p>													
+												<p id="date">时间：${(activityApplyInfo.endTime)!}</p>
 											</div>
 										</div>
 									</a>

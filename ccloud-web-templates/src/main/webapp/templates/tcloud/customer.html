@@ -4,6 +4,12 @@
     #customer {
         background: #f3f5f7;
     }
+    .with-report-top {
+        position:absolute;
+        top:5rem;
+        bottom:0;
+        width:100%;
+    }
 </#macro>
 <#macro script_import>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
@@ -47,29 +53,11 @@
   		</#if>
         refresh();
         
-        var cpLock = true;
-        var time;
-
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-        }).on("compositionend", "#searchInput", function() {
-            cpLock = true;
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    refresh();
-                },500);
-            }
-        }).on("input", "#searchInput", function() {
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    refresh();
-                },500);
-            }
-        }).on("change", "#region", function() {
+        $(document).on("submit", ".weui-search-bar__form", function() {
+            setItemBykey("keyword", $("#searchInput").val());
+            refresh();			
+            return false;
+		}).on("change", "#region", function() {
 			setItemBykey("regionId", $("#region").data('values'));
 			setItemBykey("region", $("#region").val());
 			refresh();
@@ -303,89 +291,91 @@
 </#macro>
 
 <@layout>
-<div id="customer">
-    <header>
-	    <div class="report-top weui-flex">
-	        <div class="weui-flex__item">
-	            <img src="${CTPATH}/images/order.png" alt="">
-	            <div class="border-right-1px">
-	                <p class="ft16">客户总数</p>
-	                <p class="ft14" id="customerCount1"></p>
-	            </div>
-	        </div>
-	        <div class="weui-flex__item">
-	            <img src="${CTPATH}/images/customer.png" alt="">
-	            <div>
-	                <p class="ft16">下单客户数</p>
-	                <p class="ft14" id="orderCount1"></p>
-	            </div>
-	        </div>
-	    </div>
-        <div class="weui-search-bar" id="SearchBar">
-            <form class="weui-search-bar__form">
-                <div class="weui-search-bar__box">
-                    <i class="weui-icon-search"></i>
-                    <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-                    <a href="javascript:" class="weui-icon-clear" id="searchClear" onclick="searchCancel()"></a>
+    <div id="customer">
+        <div class="report-top weui-flex">
+            <div class="weui-flex__item">
+                <img src="${CTPATH}/images/order.png" alt="">
+                <div class="border-right-1px">
+                    <p class="ft16">客户总数</p>
+                    <p class="ft14" id="customerCount1"></p>
                 </div>
-                <label class="weui-search-bar__label" id="searchText">
-                    <i class="weui-icon-search"></i>
-                    <span>请输入客户名或联系人</span>
-                </label>
-            </form>
-            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" onclick="searchCancel()">取消</a>
+            </div>
+            <div class="weui-flex__item">
+                <img src="${CTPATH}/images/customer.png" alt="">
+                <div>
+                    <p class="ft16">下单客户数</p>
+                    <p class="ft14" id="orderCount1"></p>
+                </div>
+            </div>
         </div>
-    </header>
-    <article class="customer" style="top:153px;">
-        <header class="has-th-list weui-flex">
-            <div class="head-search select-area weui-flex__item">
-                <div class="weui-flex">
-                <div class="weui-flex__item">
-                    <input type="text" id="region" placeholder="业务员" class="weui-input" readonly>
-                    <i class="icon-sort-desc"></i>
+        <div class="with-report-top">
+            <header>
+                <div class="weui-search-bar" id="SearchBar">
+                    <form class="weui-search-bar__form">
+                        <div class="weui-search-bar__box">
+                            <i class="weui-icon-search"></i>
+                            <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                            <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+                        </div>
+                        <label class="weui-search-bar__label" id="searchText">
+                            <i class="weui-icon-search"></i>
+                            <span>请输入客户名或联系人</span>
+                        </label>
+                    </form>
+                    <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" onclick="searchCancel()">取消</a>
                 </div>
-                <div class="weui-flex__item">
-                    <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
-                    <i class="icon-sort-desc"></i>
-                </div>
-                <div class="weui-flex__item">
-                    <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
-                    <i class="icon-sort-desc"></i>
-                </div>
-                    <input type="hidden" name="lng" id="lng">
-                    <input type="hidden" name="lat" id="lat">
-                </div>
-            </div>
-            <div id="combin-filter-btn">
-                <i class="icon-th-list"></i>
-            </div>
-        </header>
-	    <article  class="infinite">
-	        <div id="customerList">
-	        </div>
-            <div class="weui-loadmore">
-                <i class="weui-loading"></i>
-                <span class="weui-loadmore__tips">正在加载</span>
-            </div>
-	    </article>
-    </article>
-</div>
-<@shiro.hasPermission name="/admin/sellerCustomer/edit">
-<a class="hidden-menu" href="${CPATH}/customer/edit">
-    <img src="${CTPATH}/images/customer_add.png" alt="">
-</a>
-</@shiro.hasPermission>
-<div class="layer"></div>
-<#include "_inc/_footer_nav.html" />
-<article id="combin-filter">
-    <div class="filter-item">
-        <h4 class="ft14">选择搜索范围</h4>
-        <div class="relative ft12" id="getDate">
+            </header>
+            <article class="customer" style="top:44px;">
+                <header class="has-th-list weui-flex">
+                    <div class="head-search select-area weui-flex__item">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item">
+                                <input type="text" id="region" placeholder="业务员" class="weui-input" readonly>
+                                <i class="icon-sort-desc"></i>
+                            </div>
+                            <div class="weui-flex__item">
+                                <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
+                                <i class="icon-sort-desc"></i>
+                            </div>
+                            <div class="weui-flex__item">
+                                <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
+                                <i class="icon-sort-desc"></i>
+                            </div>
+                            <input type="hidden" name="lng" id="lng">
+                            <input type="hidden" name="lat" id="lat">
+                        </div>
+                    </div>
+                    <div id="combin-filter-btn">
+                        <i class="icon-th-list"></i>
+                    </div>
+                </header>
+                <article class="infinite">
+                    <div id="customerList">
+                    </div>
+                    <div class="weui-loadmore">
+                        <i class="weui-loading"></i>
+                        <span class="weui-loadmore__tips">正在加载</span>
+                    </div>
+                </article>
+            </article>
         </div>
     </div>
-    <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-        <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
-        <button class="red-button confirm-search-btn weui-flex__item" onclick="getAreaCustomer()">确定</button>
-    </footer>
-</article>
+    <@shiro.hasPermission name="/admin/sellerCustomer/edit">
+        <a class="hidden-menu" href="${CPATH}/customer/edit">
+            <img src="${CTPATH}/images/customer_add.png" alt="">
+        </a>
+    </@shiro.hasPermission>
+    <div class="layer"></div>
+    <#include "_inc/_footer_nav.html" />
+    <article id="combin-filter">
+        <div class="filter-item">
+            <h4 class="ft14">选择搜索范围</h4>
+            <div class="relative ft12" id="getDate">
+            </div>
+        </div>
+        <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+            <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+            <button class="red-button confirm-search-btn weui-flex__item" onclick="getAreaCustomer()">确定</button>
+        </footer>
+    </article>
 </@layout>
