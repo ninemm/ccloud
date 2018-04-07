@@ -387,8 +387,8 @@ public void downloading() throws UnsupportedEncodingException{
 	int num = 0;
 	//合并行的结束位置
 	int end = 1;
-	int amountPlans = 0;
-	int amountComplete = 0;
+//	int amountPlans = 0;
+//	int amountComplete = 0;
 	String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 	String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 //	String type = getPara("type");
@@ -418,8 +418,15 @@ public void downloading() throws UnsupportedEncodingException{
     setBorder3.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 水平居中
     setBorder3.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER); // 上下居中
     setBorder3.setWrapText(true);//设置自动换行
-    setBorder3.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+    setBorder3.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
     setBorder3.setFillPattern(CellStyle.SOLID_FOREGROUND);
+  //设置表格样式4
+    HSSFCellStyle setBorder4 = wb.createCellStyle();
+    setBorder4.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 水平居中
+    setBorder4.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER); // 上下居中
+    setBorder4.setWrapText(true);//设置自动换行
+    setBorder4.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+    setBorder4.setFillPattern(CellStyle.SOLID_FOREGROUND);
     //设置字体
     HSSFFont font = wb.createFont();
     font.setFontName("黑体");
@@ -431,6 +438,7 @@ public void downloading() throws UnsupportedEncodingException{
     font2.setFontHeightInPoints((short) 12);
     setBorder.setFont(font2);
     setBorder3.setFont(font2);
+    setBorder4.setFont(font2);
     HSSFRow  newRow = sheet.createRow(0);
     HSSFRow  nRow = sheet.createRow(1);
     //合并单元格
@@ -457,9 +465,9 @@ public void downloading() throws UnsupportedEncodingException{
     		cCell.setCellValue("合计完成金额");
     		Cell rCell = nRow.createCell(5*details.size()+6);
     		rCell.setCellValue("完成率");
-    		zCell.setCellStyle(setBorder3);
-    		cCell.setCellStyle(setBorder3);
-    		rCell.setCellStyle(setBorder3);
+    		zCell.setCellStyle(setBorder4);
+    		cCell.setCellStyle(setBorder4);
+    		rCell.setCellStyle(setBorder4);
     	}else {
     		
     		CellRangeAddress region = new CellRangeAddress(0,  0, (5*i+4), (5*i+8));
@@ -620,9 +628,9 @@ public void downloading() throws UnsupportedEncodingException{
      		zACell.setCellValue(_sellerProductDetails.get(i).get("totalPlansAmount").toString());
      		cACell.setCellValue(_sellerProductDetails.get(i).get("totalCompleteAmount").toString());
      		rACell.setCellValue(_sellerProductDetails.get(i).get("completeRetio").toString()+"%");
-     		rACell.setCellStyle(setBorder3);
-     		zACell.setCellStyle(setBorder3);
-     		cACell.setCellStyle(setBorder3);
+     		rACell.setCellStyle(setBorder4);
+     		zACell.setCellStyle(setBorder4);
+     		cACell.setCellStyle(setBorder4);
 		 //合并行
 		 
     }
@@ -630,7 +638,7 @@ public void downloading() throws UnsupportedEncodingException{
     HSSFRow  rowT = sheet.createRow(_sellerProductDetails.size()+2);
     Cell zTCell = rowT.createCell(0);
     zTCell.setCellValue("合计");
-    zTCell.setCellStyle(setBorder3);
+    zTCell.setCellStyle(setBorder4);
     CellRangeAddress regionT = new CellRangeAddress(_sellerProductDetails.size()+2, _sellerProductDetails.size()+2, 0, 3);
     sheet.addMergedRegion(regionT);
     for(int i = 0 ; i < details.size()+1 ; i++) {
@@ -640,9 +648,9 @@ public void downloading() throws UnsupportedEncodingException{
     		Cell pTRCell = rowT.createCell(5*i+4+2);
     		/*pTZCell.setCellValue(amountPlans);
     		pTCCell.setCellValue(amountComplete);*/
-    		pTZCell.setCellStyle(setBorder3);
-    		pTCCell.setCellStyle(setBorder3);
-    		pTRCell.setCellStyle(setBorder3);
+    		pTZCell.setCellStyle(setBorder4);
+    		pTCCell.setCellStyle(setBorder4);
+    		pTRCell.setCellStyle(setBorder4);
     	}else {
     		Cell p0Cell = rowT.createCell(5*i+4);
     		Cell p1Cell = rowT.createCell(5*i+4+1);
@@ -654,11 +662,11 @@ public void downloading() throws UnsupportedEncodingException{
     		p2Cell.setCellValue(details.get(i).get("totalPlansAmount").toString());
     		p3Cell.setCellValue(details.get(i).get("totalCompleteAmount").toString());
     		p4Cell.setCellValue(details.get(i).get("completeRetio").toString()+"%");
-    		p0Cell.setCellStyle(setBorder3);
-    		p1Cell.setCellStyle(setBorder3);
-    		p2Cell.setCellStyle(setBorder3);
-    		p3Cell.setCellStyle(setBorder3);
-    		p4Cell.setCellStyle(setBorder3);
+    		p0Cell.setCellStyle(setBorder4);
+    		p1Cell.setCellStyle(setBorder4);
+    		p2Cell.setCellStyle(setBorder4);
+    		p3Cell.setCellStyle(setBorder4);
+    		p4Cell.setCellStyle(setBorder4);
     	}
     }
     File  file = new File(filePath);
