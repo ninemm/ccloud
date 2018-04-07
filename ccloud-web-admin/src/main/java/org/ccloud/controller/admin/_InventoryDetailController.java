@@ -132,7 +132,7 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 		String endDate = getPara("endDate");
 		String sellerProductId = getPara("sellerProductId");
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\plans\\"
-				+ "出库明细.xls";
+				+ "出库明细.xlsx";
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
