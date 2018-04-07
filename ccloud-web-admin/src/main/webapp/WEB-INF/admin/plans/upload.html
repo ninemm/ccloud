@@ -21,12 +21,12 @@
 
 	var $form = $("#form");
 
+	var ti = ${(ti)!};
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#month', 'month', 'yyyy-MM', 3, 10, 3);
 		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
-
 	});
 
 	var validatorFields = {
@@ -41,7 +41,24 @@
 			}
 		}
 	};
-
+	$(document).on("change", "#month", function() {
+			var date = new Date($("#month").val()+"-"+ti);
+			var year = date.getFullYear();
+		    var mon = date.getMonth()+2; 
+		    if(ti == "01"){
+			mon = date.getMonth()+1;
+			}
+			if(mon == "13"){
+				year = date.getFullYear()+1;
+				mon = "01";
+			}    
+		    var  day=date.getTime()-1000*60*60*24; 
+		    date.setTime(day);
+		    var strDay=date.getDate();  
+			$("#startDate").val($("#month").val()+"-"+ti);
+			$("#endDate").val(year+"-"+mon+"-"+strDay);
+			
+		});
 	$('#_user_tree').click(function() {
 		layer.open({
 			title:'负责人',
@@ -122,7 +139,7 @@
 						 <input id="month" class="form-control" type="text" value="${month!}" name="month" placeholder="活动开始日期" style="height:30px;">
 					</div>
 				</div>
-				<!-- <div class="form-group col-sm-12 validata-box">
+				<div class="form-group col-sm-12 validata-box">
 					<label class="control-label col-sm-2">开始时间:</label>
 					<div class="input-group col-md-4 col-sm-4-offset-2">
 						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
@@ -133,7 +150,7 @@
 					<div class="input-group col-md-4 col-sm-4-offset-2">
 						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 					</div>
-				</div> -->
+				</div>
 				<div class="form-group col-sm-12 validata-box">
 					<label class="control-label col-sm-2" style = "padding-top:0px;">*上传文件:</label>
 					<div class="input-group col-md-4 col-sm-10">
