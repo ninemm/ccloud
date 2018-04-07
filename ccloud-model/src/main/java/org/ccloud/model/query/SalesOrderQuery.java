@@ -1363,7 +1363,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	public List<Record> getUserRank(String startDate, String endDate, String dayTag, String deptId, String sellerId,
-			String orderTag, String dataArea, String print) {
+			String orderTag, String dataArea, String print, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1385,7 +1385,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(" and cc.status not in (1001,1002)");
 		}
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, needWhere);
+		}
 		if (StrKit.notBlank(print)) {
 			if (StrKit.notBlank(startDate)) {
 				fromBuilder.append(" and cc.print_time >= ? ");
@@ -1535,7 +1537,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getGiftCountByUser(String startDate, String endDate, String dayTag, String deptId,
-			String sellerId, String dataArea, String orderTag, String print) {
+			String sellerId, String dataArea, String orderTag, String print, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1560,7 +1562,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		}
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cs.receive_type", receiveType, params, needWhere);
+		}
 		if (StrKit.notBlank(print)) {
 			if (StrKit.notBlank(startDate)) {
 				fromBuilder.append(" and cs.print_time >= ? ");
@@ -1597,7 +1601,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	public List<Record> getGiftCountByUserByOutStock(String startDate, String endDate, String dayTag, String deptId,
-			String sellerId, String dataArea, String orderTag) {
+			String sellerId, String dataArea, String orderTag, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1611,6 +1615,10 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cso.order_id ");
 		fromBuilder.append("LEFT JOIN `user` u ON u.id = cs.biz_user_id ");
 		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = csp.product_id ");
+		if (StrKit.notBlank(receiveType)) {
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock csojo ON csojo.outstock_id=o.id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id=csojo.order_id ");
+		}
 		boolean needWhere = true;
 		if (StringUtils.isNotBlank(deptId)) {
 			needWhere = appendIfNotEmpty(fromBuilder, " u.department_id", deptId, params, needWhere);
@@ -1647,7 +1655,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}	
 
 	public List<Record> getSellerCount(String startDate, String endDate, String dayTag, String sellerId,
-			String dataArea, String orderTag, String print) {
+			String dataArea, String orderTag, String print, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1664,7 +1672,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(" and cc.status not in (1001,1002) ");
 		}
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, needWhere);
+		}
 		if (StrKit.notBlank(print)) {
 			if (StrKit.notBlank(startDate)) {
 				fromBuilder.append(" and cc.print_time >= ? ");
@@ -1701,7 +1711,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	public List<Record> getSellerCountByOutStock(String startDate, String endDate, String dayTag, String sellerId,
-			String dataArea, String orderTag) {
+			String dataArea, String orderTag, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1714,12 +1724,19 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_product cp ON cp.id = sp.product_id ");
 		fromBuilder.append("GROUP BY cd.outstock_id) t1 on t1.outstock_id = cc.id ");
 		fromBuilder.append("LEFT JOIN cc_seller cs on cs.id = cc.seller_id ");
+		if (StrKit.notBlank(receiveType)) {
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock csojo ON csojo.outstock_id=cc.id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id=csojo.order_id ");
+		}
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where cc.status != ? ");
 		} else {
 			fromBuilder.append(" and cc.status != ? ");
+		}
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cso.receive_type", receiveType, params, needWhere);
 		}
 		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(startDate)) {
@@ -1745,7 +1762,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}	
 
-	public List<Record> getGiftCountBySeller(String startDate, String endDate, String dayTag, String dataArea, String orderTag, String print) {
+	public List<Record> getGiftCountBySeller(String startDate, String endDate, String dayTag, String dataArea, String orderTag, String print, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1765,7 +1782,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		} else {
 			fromBuilder.append(" and cs.status not in (1001,1002) and cc.is_gift = 1 ");
 		}
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cs.receive_type", receiveType, params, needWhere);
+		}
 		if (StrKit.notBlank(print)) {
 			if (StrKit.notBlank(startDate)) {
 				fromBuilder.append(" and cs.print_time >= ? ");
@@ -1802,7 +1821,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 	
 	public List<Record> getGiftCountBySellerByOutStock(String startDate, String endDate, String dayTag, String dataArea,
-			String orderTag) {
+			String orderTag, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1815,6 +1834,11 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_seller se on se.id = cs.seller_id ");
 		fromBuilder.append("LEFT JOIN cc_seller_product csp on cc.sell_product_id = csp.id ");
 		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = csp.product_id ");	
+		if (StrKit.notBlank(receiveType)) {
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock csojo ON csojo.outstock_id=cs.id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id=csojo.order_id ");
+		}
+		
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cs.data_area", dataArea, params, needWhere);
 		if (needWhere) {
@@ -1823,7 +1847,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cs.status != ? and cc.is_gift = 1");
 		}
 		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
-
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cso.receive_type", receiveType, params, needWhere);
+		}
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cs.biz_date >= ? ");
 			params.add(startDate);
@@ -2269,7 +2295,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getUserRankZero(String startDate, String endDate, String dayTag, String sellerId,
-			String orderTag, String dataArea) {
+			String orderTag, String dataArea, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -2290,10 +2316,14 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cc.create_date <= ? ");
 			params.add(endDate);
 		}
+		
 		fromBuilder.append("GROUP BY cc.biz_user_id ) t1 ON t1.biz_user_id = u.id ");
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " u.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, needWhere);
+		}
 		fromBuilder.append("GROUP BY u.id ");
 		
 		if (StrKit.notBlank(orderTag)) {
