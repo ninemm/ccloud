@@ -11,6 +11,30 @@
 	#valueName {
 		max-width: 7.5rem;
 	}
+	.main-good {
+		width:1.5rem;
+		height:1.5rem;
+		line-height:1.5rem;
+		font-size: .7rem;
+		text-align:center;
+		border-radius:50%;
+		background-color: #ea6f5a;
+		position: absolute;
+		color: #fff;
+		top:50%;
+		margin-top:-.75rem;
+		left: .5rem;
+	}
+	#compositionValueName {
+    padding: 0 0.25rem;
+    margin-left: 2.2rem;
+    margin-right: 0.8rem;
+	}
+	#compositionValueName div {
+		white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/shopping-cart.js"></script>
@@ -285,9 +309,9 @@ function initProductComposition(){
 		$newProductDetail.find("#compositionId").val(el.compositionId);
 		
 		$newProductDetail.find("#compositionNum").val(el.compositionNum);
-
-		$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
-		
+		console.log(el.compositionValueName);
+		$newProductDetail.find("#compositionValueName").html(el.compositionValueName);
+		console.log(el.compositionSub);
 		$newProductDetail.find("#gift").html(el.compositionSub);
 	});
 }
@@ -560,8 +584,8 @@ function order(){
 					<p class="product_name" id="compositionName"></p>
 				</nobr>
 				<div class="product_unit">
-					<p>规格：</p>
-					<span id="compositionValueName"></span>
+					<div class="main-good">主</div>
+					<div id="compositionValueName"></div>
 				</div>
 				<div class="product_bUnit">
 					<span class="price" id="compositionPriceSpan"></span>
@@ -569,15 +593,15 @@ function order(){
 						<div class="operate fl">
 							<i class="icon-minus2"></i>
 						</div>
-						<input type="number" min="0" value="0" class="fl" id="compositionNum" >
+						<input type="number" min="0" value="0" class="fl" id="compositionNum">
 						<div class="operate fl">
 							<i class="icon-plus2"></i>
 						</div>
 					</div>
 					<#if isEdit>
-						<input type="number" class="street-value" id="compositionPrice" value="0" >
-					<#else>
-						<input type="number" class="street-value" id="compositionPrice" value="0" readonly>
+						<input type="number" class="street-value" id="compositionPrice" value="0">
+						<#else>
+							<input type="number" class="street-value" id="compositionPrice" value="0" readonly>
 					</#if>
 					<i class="icon-trash-o fr ft30 gray"></i>
 				</div>
