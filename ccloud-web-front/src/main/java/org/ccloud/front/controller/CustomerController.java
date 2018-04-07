@@ -154,7 +154,8 @@ public class CustomerController extends BaseFrontController {
 			html.append("			</div>\n");
 			html.append("		</div>\n");
 			html.append("	</div>\n");
-			html.append("	<hr />\n");
+			html.append("	<div class=\"hr\"></div>");
+
 			if (visitAdd || salesOrderAdd) {
 				html.append("	<div class=\"operate-btn\">\n");
 				if (visitAdd) {
@@ -233,7 +234,7 @@ public class CustomerController extends BaseFrontController {
 				html.append("			</div>\n");
 				html.append("		</div>\n");
 				html.append("	</div>\n");
-				html.append("	<hr />\n");
+				html.append("	<div class=\"hr\"></div>");
 				html.append("	<div class=\"operate-btn\">\n");
 				html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.get("customer_name").toString() + "',\n" +
 						"                                                                     sellerCustomerId:'" + customer.get("id").toString() + "',\n" +
@@ -294,7 +295,7 @@ public class CustomerController extends BaseFrontController {
 					"							 </p>\n" +
 					"                        </div>\n" +
 					"                        </a>\n" +
-					"                        <hr>\n" +
+					"                        <div class=\"hr\"></div>" +
 					"                        <div>\n");
 			if(order.get("status").toString().equals("0")) html.append("<div class=\"button white-button fl\">撤销</div>\n");
 			html.append(
