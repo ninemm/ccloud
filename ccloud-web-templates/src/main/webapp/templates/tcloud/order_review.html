@@ -215,7 +215,7 @@
 	          <p>下单时间&nbsp;${(order.create_date)!}</p>
 	          <p>业务员&nbsp;${(order.realname)!}</p>
 	        </div>
-	        <hr>
+	        <div class="hr"></div>
 	        <div class="ft14">
 	          <#if order.receive_type = 0>
 	            <input type="checkbox" name="if-account" checked disabled="disabled" class="weui-agree__checkbox">
@@ -371,7 +371,7 @@
 		          </#if>
 	          </div>
 	        </#list>
-	        <hr>
+	        <div class="hr"></div>
 	        <div class="t-r ft14">
 	          总计：       <span class="red" id="totalSpan">${(order.total_amount)?string(',###.##')}元</span>
 	        	<input type="hidden" name="totalNum" id="totalNum" value="${(order.total_count)!}">
@@ -389,7 +389,7 @@
 	          </p>
 	          <p>地址详情：${(order.delivery_address)!}</p>
 	        </div>
-	        <hr>
+	        <div class="hr"></div>
 	        <div class="ft14">
 	          备注信息：
 	          <span class="ft12">

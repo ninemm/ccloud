@@ -4,9 +4,6 @@
 </#macro>
 <#macro title>我的订单</#macro>
 <#macro css>
-	#orderSn {
-		color: #999;
-	}
 	#my-order {
 		top: 44px;
 		position: absolute;
@@ -499,7 +496,7 @@
 					<div id="main">
 						<div class="weui-panel weui-panel_access" style="display: none">
 							<div class="list-layer"></div>
-							<div class="ft14 gray">
+							<div class="ft14 black3">
 								<span class="tag" id="receiveType">账期</span>
 								<span id="orderSn"></span>
 								<span class="fr orange">
@@ -508,7 +505,7 @@
 								</span>
 								<span class="fr orange" id="status"></span>
 							</div>
-							<div class="customer_name gray">
+							<div class="customer_name black3">
 								<span id="customerName" class=""></span>
 								<span class="fr show-more-btn" id="showOrderProductDetail">
 									显示详情
@@ -517,20 +514,20 @@
 								<input type="hidden" id="oId"></input>
 							</div>
 							<div class="none">
-								<a href="" id="salesOrderId">
-									<hr>
+								<a href="" id="salesOrderId" class="black3">
+									<div class="hr"></div>
 									<div class="appendOrdeProductDetail">
 
 									</div>
-									<hr>
-									<div class="gray">
+									<div class="hr"></div>
+									<div class="black3">
 										<p>
 											联系人：
 											<span id="contact"></span>
 											<span class="fr" id="customerType"></span>
 										</p>
 									</div>
-									<div class="gray">
+									<div class="black3">
 										<p>
 											金额：￥
 											<span id="amount"></span>
@@ -538,7 +535,7 @@
 										</p>
 									</div>
 								</a>
-								<hr>
+								<div class="hr"></div>
 								<div id="cancel" class="button white-button fl">撤销</div>
 								<div id="orderAgain" class="button red-button fr">再次购买</div>
 								<div id="pass" class="button yellow-button fr m-r-5">审核通过</div>
