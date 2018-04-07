@@ -38,7 +38,6 @@ public class CustomerVisit extends BaseCustomerVisit<CustomerVisit> {
 	private static final long serialVersionUID = 1L;
 
 	public List<ImageJson> getPhotoList() {
-
 		String imageListStore = getStr("photo");
 
 		if (StrKit.notBlank(imageListStore)) {
