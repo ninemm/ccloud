@@ -449,8 +449,9 @@ public class SalesOrderQuery extends JBaseQuery {
 	
 	public List<SalesOrder> getToDo(String username) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(" SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime ");
+		sb.append(" SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, a.ID_ taskId, a.NAME_ taskName, a.ASSIGNEE_ assignee, a.CREATE_TIME_ createTime, u.realname ");
 		sb.append(" FROM cc_sales_order o ");
+		sb.append(" left join user u ON o.biz_user_id = u.id ");
 		sb.append(" left join cc_seller_customer cc ON o.customer_id = cc.id ");
 		sb.append(" left join cc_customer c on cc.customer_id = c.id ");
 		sb.append(" left join cc_customer_type ct on o.customer_type_id = ct.id ");
