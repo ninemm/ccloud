@@ -570,6 +570,7 @@ public class OrderController extends BaseFrontController {
 			}
 		}
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_CANCEL);
+		salesOrder.setModifyDate(new Date());
 		if (!salesOrder.saveOrUpdate()) {
 			renderAjaxResultForError("取消订单失败");
 			return;

@@ -343,7 +343,7 @@ public class CustomerController extends BaseFrontController {
 		}
 		String history = getPara("history");
 		setAttr("history", history);	
-		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		setAttr("customerType", JSON.toJSONString(getCustomerType1()));
 		if(StrKit.notBlank(id)) setAttr("type", "edit");
 		else setAttr("type", "add");
 		
@@ -367,6 +367,24 @@ public class CustomerController extends BaseFrontController {
 		return list;
 	}
 
+	//去除直营商
+	public List<Map<String, Object>> getCustomerType1(){
+
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea1(dataArea);
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for(CustomerType customerType : customerTypeList)
+		{
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			list.add(item);
+		}
+
+		return list;
+	}
+	
 	@Before(Tx.class)
 	public void save() {
 		
@@ -789,6 +807,8 @@ public class CustomerController extends BaseFrontController {
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
 			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+			sellerCustomer.setIsEnabled(0);
+			updated = sellerCustomer.saveOrUpdate();
 		}
 		
 		Map<String, Object> var = Maps.newHashMap();

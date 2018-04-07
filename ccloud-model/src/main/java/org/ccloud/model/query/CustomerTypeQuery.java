@@ -115,6 +115,23 @@ public class CustomerTypeQuery extends JBaseQuery {
 		
 	}
 
+	//去除直营商选项
+	public List<CustomerType> findByDataArea1(String dataArea) {
+		
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		StringBuilder sql = new StringBuilder("select *");
+		sql.append(" from `cc_customer_type` c");
+		sql.append(" where c.is_show = 1");
+		sql.append(" and c.`code`!='G' ");
+		appendIfNotEmpty(sql, "c.data_area", dataArea, params, false);
+		
+		sql.append(" order by c.create_date");
+		
+		return DAO.find(sql.toString(), params.toArray());
+		
+	}
+	
 	public String findIdByName(String name, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
