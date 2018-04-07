@@ -353,11 +353,13 @@ public class ReportController extends BaseFrontController {
 		String dayTag = getPara("dayTag");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		String receiveType = getPara("receiveType");
 		setAttr("userName", UserQuery.me().findById(userId).getRealname());
 		setAttr("userId", userId);
 		setAttr("dayTag", dayTag);
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);
+		setAttr("receiveType", receiveType);
 		render("user_report.html");
 	}
 	
@@ -366,11 +368,13 @@ public class ReportController extends BaseFrontController {
 		String dayTag = getPara("dayTag");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");		
+		String receiveType = getPara("receiveType");
 		setAttr("sellerName", SellerQuery.me().findById(sellerId).getSellerName());
 		setAttr("sellerId", sellerId);
 		setAttr("dayTag", dayTag);
 		setAttr("startDate", startDate);
 		setAttr("endDate", endDate);		
+		setAttr("receiveType", receiveType);		
 		render("seller_report.html");
 	}
 	
@@ -414,7 +418,8 @@ public class ReportController extends BaseFrontController {
 		if (typeTag != null && typeTag.equals("print")) {
 			print = "true";
 		}		
-		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea, print);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getUserRank(startDate, endDate, dayTag, deptId, sellerId, orderTag, dataArea, print,receiveType);
 		renderJson(record);
 	}
 	
@@ -430,7 +435,8 @@ public class ReportController extends BaseFrontController {
 		String orderTag = getPara("orderTag");
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
-		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea,receiveType);
 		renderJson(record);
 	}
 	
@@ -461,7 +467,8 @@ public class ReportController extends BaseFrontController {
 //		}
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea,receiveType);
 		renderJson(record);
 	}	
 	
@@ -491,7 +498,8 @@ public class ReportController extends BaseFrontController {
 		if (typeTag != null && typeTag.equals("print")) {
 			print = "true";
 		}		
-		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag, print);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getGiftCountByUser(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag, print,receiveType);
 		renderJson(record);
 	}
 	
@@ -507,7 +515,8 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String deptId = getPara("deptId");
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getGiftCountByUserByOutStock(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getGiftCountByUserByOutStock(startDate, endDate, dayTag, deptId, sellerId, dataArea, orderTag,receiveType);
 		renderJson(record);
 	}
 	
@@ -532,7 +541,8 @@ public class ReportController extends BaseFrontController {
 		if (typeTag != null && typeTag.equals("print")) {
 			print = "true";
 		}		
-		List<Record> record = SalesOrderQuery.me().getGiftCountBySeller(startDate, endDate, dayTag, dataArea, orderTag, print);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getGiftCountBySeller(startDate, endDate, dayTag, dataArea, orderTag, print,receiveType);
 		renderJson(record);
 	}
 	
@@ -543,7 +553,8 @@ public class ReportController extends BaseFrontController {
 		String dayTag = getPara("dayTag");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getGiftCountBySellerByOutStock(startDate, endDate, dayTag, dataArea, orderTag);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getGiftCountBySellerByOutStock(startDate, endDate, dayTag, dataArea, orderTag,receiveType);
 		renderJson(record);
 	}	
 	
@@ -569,7 +580,8 @@ public class ReportController extends BaseFrontController {
 		if (typeTag != null && typeTag.equals("print")) {
 			print = "true";
 		}		
-		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, null, dataArea, orderTag, print);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getSellerCount(startDate, endDate, dayTag, null, dataArea, orderTag, print,receiveType);
 		renderJson(record);
 	}
 	
@@ -581,7 +593,8 @@ public class ReportController extends BaseFrontController {
 //		String sellerId = getSessionAttr("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String orderTag = getPara("orderTag");
-		List<Record> record = SalesOrderQuery.me().getSellerCountByOutStock(startDate, endDate, dayTag, null, dataArea, orderTag);
+		String receiveType = getPara("receiveType");
+		List<Record> record = SalesOrderQuery.me().getSellerCountByOutStock(startDate, endDate, dayTag, null, dataArea, orderTag,receiveType);
 		renderJson(record);
 	}	
 	
