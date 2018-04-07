@@ -425,4 +425,17 @@ $(function() {
 	}).on('click', '.return_index', function() {
 		location.href = "/";
 	});
+
+	if ($(".hidden-menu")[0]) {
+		var rightMenu = new Headroom($(".hidden-menu")[0], {
+			tolerance: 5,
+			classes: {
+				initial: "animated",
+				pinned: "slideInRight",
+				unpinned: "slideOutRight"
+			},
+			scroller: $('.menu-right, main, .infinite')[0]
+		});
+		rightMenu.init();
+	}
 })
