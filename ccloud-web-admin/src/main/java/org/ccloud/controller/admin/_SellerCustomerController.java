@@ -190,7 +190,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		boolean isChecked = (isCustomerReview != null && isCustomerReview) ? true : false;
 		//当是经销商管理员修改时
 		if(isSuperAdmin || isDealerAdmin || !isChecked) {
-			Customer persiste = CustomerQuery.me().findByCustomerMobile(customer.getMobile());
+			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
 
 			if (persiste != null) {
 				customer.setId(persiste.getId());
@@ -296,7 +296,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		} else {
 			// 检查客户是否存在
-			Customer persiste = CustomerQuery.me().findByCustomerMobile(customer.getMobile());
+			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
 
 			if (persiste != null) {
 				customer.setId(persiste.getId());
@@ -491,7 +491,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 					break;
 				}
 				// 检查客户是否存在
-				Customer customer = CustomerQuery.me().findByCustomerMobile(excel.getMobile());
+				Customer customer = CustomerQuery.me().findByCustomerNameAndMobile(excel.getCustomerName(), excel.getMobile());
 
 				if (customer == null) {
 					customer = new Customer();
@@ -768,7 +768,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			if (customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerMobile(customerVO.getMobile());
+				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 

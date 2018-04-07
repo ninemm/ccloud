@@ -103,11 +103,12 @@ public class CustomerQuery extends JBaseQuery {
 		return list;
 	}
 
-	@Deprecated
+
 	public Customer findByCustomerNameAndMobile(String customerName, String mobile) {
 		return DAO.doFindFirst("customer_name = ? and mobile = ?", customerName, mobile);
 	}
 
+	@Deprecated
 	public Customer findByCustomerMobile(String mobile) {
 		return DAO.doFindFirst("mobile = ?", mobile);
 	}
