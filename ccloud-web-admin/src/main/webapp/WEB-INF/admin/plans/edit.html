@@ -82,7 +82,14 @@
 		var date = new Date($("#month").val()+"-"+ti);
 		var year = date.getFullYear();
 	    var mon = date.getMonth()+2;     
-	    var   day=date.getTime()-1000*60*60*24; 
+		if(ti == "01"){
+			mon = date.getMonth()+1;
+		}
+		if(mon == "13"){
+			year = date.getFullYear()+1;
+			mon = "01";
+		}
+	    var day=date.getTime()-1000*60*60*24; 
 	    date.setTime(day);
 	    var strDay=date.getDate();  
 		$("#startDate").val($("#month").val()+"-"+ti);

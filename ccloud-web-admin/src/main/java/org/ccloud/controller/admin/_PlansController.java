@@ -157,7 +157,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	public void upload() {
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
-		if(ti.equals("")) {
+		if(StrKit.isBlank(ti)) {
 			ti = "01";
 		}
 		setAttr("ti",ti);
@@ -686,7 +686,7 @@ public void downloading() throws UnsupportedEncodingException{
 		List<Dict> dicts = DictQuery.me().findDictByType(Consts.PLAN);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		String ti = OptionQuery.me().findValue(Consts.OPTION_WEB_PROC_PLANS_LIMIT + sellerCode);
-		if(ti.equals("")) {
+		if(StrKit.isBlank(ti)) {
 			ti = "01";
 		}
 		//获取当前月份，在后面再加10个月
