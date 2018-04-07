@@ -116,6 +116,16 @@
         </#if>
       </div>
       </#if>
+      <#if salesOrder.status == 1001>
+	      <div class="weui-cell weui-cell_access">
+	        <div></div>
+	        <p>
+	          订单取消
+	          <span class="fr">${(salesOrder.modify_date)!}</span>
+	        </p>
+	         <p>操作人：${(salesOrder.salesName)!}</p>
+	      </div>
+      </#if>
 <!--       <div class="weui-cell weui-cell_access">
         <p>
           订单出库
