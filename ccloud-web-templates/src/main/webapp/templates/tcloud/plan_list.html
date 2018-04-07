@@ -121,12 +121,20 @@
 
 	$("#userId").select({
 		title: "选择业务员",
-		items: ${userIds!}
+		items: ${userIds!},
+		onChange: function(obj){
+				planAmount = 0;
+				completeAmount = 0;
+		} 
 	});
 	
 	$("#sellerProductId").select({
 		title: "选择产品",
-		items: ${sellerProducts!}
+		items: ${sellerProducts!},
+		onChange: function(obj){
+				planAmount = 0;
+				completeAmount = 0;
+		}
 	});
 	$("#start-date").calendar({
 		maxDate: function() {
