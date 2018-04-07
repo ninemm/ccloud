@@ -166,28 +166,11 @@ $(function() {
 	total();
 	
 	//客户选择部分
-	var cpLock = true;
-	var time;
-
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		combo();
+		return false;
 	}).on("click", "#searchCancel", function() {
-			combo();
+		combo();
 	}).on("change", "#userId", function() {
 			combo();
 	}).on("change", "#customerTypeId", function() {

@@ -32,6 +32,7 @@
         transform: translateY(-50%);
         margin-top:0!important;
     }
+
 </#macro>
 
 <#macro script_import>
@@ -43,8 +44,6 @@
 <#macro script>
 
     var sign = 0;//0表示公司客户，1表示附近客户
-    var time;
-    var cpLock = true;
 
     $(function() {
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
@@ -55,20 +54,10 @@
                 $("#lat").val(lat.toFixed(6));
             }
         )
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-        }).on("compositionend", "#searchInput", function() {
-            cpLock = true;
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){combo();},500);
-            }
-        }).on("input", "#searchInput", function() {
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){combo();},500);
-            }
-        }).on("click", ".nearby-customer", function(){
+        $(document).on("submit", ".weui-search-bar__form", function() {
+			combo();
+			return false;
+		}).on("click", ".nearby-customer", function(){
             sign = 1;
             var $this = $(this);
             $this.addClass('red-class').siblings().removeClass('red-class');
@@ -204,23 +193,23 @@
                 <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
             </div>
         </header>
-        <div class="weui-flex order-top-btns t-c ft14">
-            <div class="weui-flex__item border-right-1px choose-customer red-class">
-                <span><i class="icon-user"></i></span>
-                公司客户
+        
+        <article class="customer" style="width: 100%">
+            <div class="weui-flex order-top-btns t-c ft14">
+                <div class="weui-flex__item choose-customer red-class">
+                    <span><i class="icon-user"></i></span>
+                    公司客户
+                </div>
+                <@shiro.hasPermission name="/admin/sellerCustomer/import">
+                <div class="weui-flex__item nearby-customer">
+                    <span><i class="icon-map-marker"></i></span>
+                    附近客户
+                </div>
+                </@shiro.hasPermission>
+                <input type="hidden" name="lng" id="lng">
+                <input type="hidden" name="lat" id="lat">
             </div>
-            <@shiro.hasPermission name="/admin/sellerCustomer/import">
-            <div class="weui-flex__item nearby-customer">
-                <span><i class="icon-map-marker"></i></span>
-                附近客户
-            </div>
-            </@shiro.hasPermission>
-            <input type="hidden" name="lng" id="lng">
-            <input type="hidden" name="lat" id="lat">
-        </div>
-        <article class="customer" style="width:100%; top: 4rem">
-
-            <div id="infinite" style="top:0">
+            <div id="infinite">
                 <div id="customerList">
                     <div class="weui-panel weui-panel_access" style="display: none">
                         <div class="weui-flex">

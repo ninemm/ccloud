@@ -17,35 +17,18 @@
 
     $(function() {
 		//搜索框监听
-		var cpLock = true;
-		var time;
-
-        $(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-		}).on("compositionend", "#searchInput", function() {
-			cpLock = true;
-			if(cpLock) {
-				clearTimeout(time);
-				time = setTimeout(function(){ 
+			$(document).on("submit", ".weui-search-bar__form", function() {
+				combo();
+				return false;
+			}).on("click", "#searchCancel", function() {
 					combo();
-				},500);
-			}
-		}).on("input", "#searchInput", function() {
-			if(cpLock) {
-				clearTimeout(time);
-				time = setTimeout(function(){ 
+			}).on("change", "#userId", function() {
 					combo();
-				},500);
-			}
-		}).on("click", "#searchCancel", function() {
-            combo();
-        }).on("change", "#userId", function() {
-            combo();
-        }).on("change", "#customerTypeId", function() {
-            combo();
-        }).on("change", "#isOrdered", function() {
-            combo();
-        }).on("click", "#customerInfo", function() {
+			}).on("change", "#customerTypeId", function() {
+					combo();
+			}).on("change", "#isOrdered", function() {
+					combo();
+			}).on("click", "#customerInfo", function() {
 			var el = $(this);
 	        var customerInfo = {
 	        	customerName : el.find("#customerName").text(),
