@@ -463,7 +463,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user/uploading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void userTemplate() {
-		String realPath = getSession().getServletContext().getRealPath("\\") +"\\WEB-INF\\admin\\user\\userTemplate.xls";
+		String realPath = getSession().getServletContext().getRealPath("\\") +"\\WEB-INF\\admin\\user\\userTemplate.xlsx";
 		renderFile(new File(realPath.replace("\\", "/")));
 	}
 	
@@ -579,7 +579,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		//String deptIds = getPara("deptId");
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
-				+ "userInfo.xls";
+				+ "userInfo.xlsx";
 		String userId = "";
 		Page<User> page = UserQuery.me().paginateUser(1, Integer.MAX_VALUE,  keyword, dataArea, "u.create_date",userId);
 		List<User> userList = page.getList();
