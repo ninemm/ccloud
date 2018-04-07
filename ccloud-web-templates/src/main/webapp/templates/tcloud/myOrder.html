@@ -360,18 +360,69 @@
 					"mobile":  order.cmobile,
 					"address": order.caddress
 				}
+				var lastItem = '';
+				var parentId = '';
+				var totalCount = 0;
 	            $.each(data.orderDetail, function(idx, item) {
 	            	if (item.is_composite == '0') {
 		            	var product = getProduct(item);
 		            	productList.push(product);	            		
 	            	} else {
-	            		if (item.sell_product_id == item.sub_id) {
-	            			var composition = getComposition(item);
-	            			compositionList.push(composition);
+	            		if (parentId != item.composite_id) {
+	            			var $newProductDetail = $(".composition:last");
+	            			if (parentId != '') {
+		            			var composition = getComposition(lastItem, $newProductDetail, totalCount);
+		            			compositionList.push(composition);	            				
+	            			}
+	            			lastItem = item;
+	            			parentId = item.composite_id;
+	            			totalCount = 0;
+							var bigCount = (item.comCount/item.convert_relate).toFixed(0);
+							var smallCount = (item.comCount%item.convert_relate).toFixed(0);
+							totalCount = totalCount + (item.comCount/item.convert_relate).toFixed(2) * 1;
+							var bigCountHtml = "";
+							var smallCountHtml = "";			
+							if (bigCount != 0) {
+								 bigCountHtml = "" + bigCount + item.big_unit + "";
+							}
+							if (smallCount != 0) {
+								smallCountHtml = "" + smallCount + item.small_unit + "";
+							}
+							$newProductDetail.find("#compositionValueName").html('<div>'+item.custom_name + ' ' + bigCountHtml + smallCountHtml+'</div>');
+	            		} else {
+	            			lastItem = item;
+							var sub_bigCount = (item.comCount/item.convert_relate).toFixed(0);
+							var sub_smallCount = (item.comCount%item.convert_relate).toFixed(0);
+							totalCount = totalCount + (item.comCount/item.convert_relate).toFixed(2) * 1;
+							var sub_bigCountHtml = "";
+							var sub_smallCountHtml = "";
+							var $newProductDetail = $(".composition:last");
+							if (sub_bigCount != 0) {
+								sub_bigCountHtml = "" + sub_bigCount + item.big_unit + "";
+							}
+							
+							if (sub_smallCount != 0) {
+								sub_smallCountHtml = "" + sub_smallCount + item.small_unit + "";
+							}
+							var html = $newProductDetail.find("#subProduct").html().trim();
+							if (item.is_gift == 0) { 
+								$newProductDetail.find("#compositionValueName").append('<div>'+item.custom_name + ' ' + sub_bigCountHtml + sub_smallCountHtml+'</div>');
+							} else {
+								if (html) {
+									$newProductDetail.find("#subsubProduct").append("<p>"+item.custom_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"</p>");
+								} else {
+									$newProductDetail.find("#subProduct").append(""+item.custom_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"");
+								}
+							}
+	            		}
+	            		
+	            		if (idx == data.orderDetail.length-1) {
+	            			var $newProductDetail = $(".composition:last");
+	            			var composition = getComposition(item, $newProductDetail, totalCount);
+	            			compositionList.push(composition);	 	            		
 	            		}
 	            	}
 	            });
-	            console.log(compositionList);
 	            setItemBykey("productList", productList);
 	            setItemBykey("compositionList", compositionList);
 		        setItemBykey("customerInfo", customer);
@@ -380,7 +431,7 @@
         });		
 	}
 	
-	function getComposition($el){
+	function getComposition($el, $html, totalCount){
 		return composition = {
 			compositionName : $el.comName,
 			
@@ -390,10 +441,11 @@
 			compositionPrice : $el.comPrice,
 			compositionId : $el.composite_id,
 	
-			compositionNum : ($el.product_count/$el.comCount).toFixed(0)
+			compositionNum : ($el.product_count/$el.comCount).toFixed(0),
+			compositionCount : totalCount,
+			compositionValueName : $html.find("#compositionValueName").html(),
 			
-			compositionValueName : $el.find("#compositionValueName").text(),
-			compositionSub : $el.find("#gift").html()
+			compositionSub : $html.find("#gift").html()
 		}
 	}
 	
@@ -686,6 +738,50 @@
 <a class="hidden-menu" href="${CPATH}/product">
     <img src="${CTPATH}/images/order_add.png" alt="">
 </a>
+<div class="" style="display: none">
+	<section class="product_detail weui-panel weui-panel_access composition">
+		<div>
+			<div class="product-top">
+				<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
+				<div class="weui-cell_access product-top-right">
+					<p class="product_name" id="compositionName"></p>
+					<div class="product_unit">
+						<div class="main-good">主</div>
+						<div id="compositionValueName"></div>
+					</div>
+					<span class="weui-cell__ft"></span>
+				</div>
+			</div>
+			<div class="product_bUnit">
+				<span class="price" id="compositionPriceSpan"></span>
+				<div class="spinner">
+					<div class="operate fl">
+						<i class="icon-minus2"></i>
+					</div>
+					<input type="number" min="0" value="0" class="fl" id="compositionNum">
+					<div class="operate fl">
+						<i class="icon-plus2"></i>
+					</div>
+				</div>
+			</div>
+			<div id="stock"></div>
+			<div id="activityName" class="activityName"></div>
+		</div>
+		<hr>
+		<div id="gift" class="weui-flex">
+			<span>
+				<i class="icon-tags"></i>
+			</span>
+			<div class="weui-flex__item">
+				<p id="sub">
+					<span id="subProduct"> </span>
+				</p>
+				<p id="subsubProduct" class="none">
+				</p>
+			</div>
+		</div>
+	</section>
+</div>
 </@shiro.hasPermission>
 <#include "_inc/_footer_nav.html" />
 </@layout>
