@@ -631,7 +631,7 @@ public void downloading() throws UnsupportedEncodingException{
     Cell zTCell = rowT.createCell(0);
     zTCell.setCellValue("合计");
     zTCell.setCellStyle(setBorder3);
-    CellRangeAddress regionT = new CellRangeAddress(details.size()-2,  details.size()-2, 0, 3);
+    CellRangeAddress regionT = new CellRangeAddress(_sellerProductDetails.size()+2, _sellerProductDetails.size()+2, 0, 3);
     sheet.addMergedRegion(regionT);
     for(int i = 0 ; i < details.size()+1 ; i++) {
     	if(i == details.size()) {
