@@ -964,7 +964,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}	
 	
 	public Record getMyOrderAmount(String startDate, String endDate, String dayTag, String customerType,
-			String deptId, String sellerId, String userId, String dataArea, String print) {
+			String deptId, String sellerId, String userId, String dataArea, String print, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -984,6 +984,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.biz_user_id", userId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, needWhere);
+		}
 		
 		if (needWhere) {
 			fromBuilder.append(" where cc.status not in (1001,1002)");
@@ -1035,7 +1038,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Record getMyOrderAmountByOutStock(String startDate, String endDate, String dayTag, String customerType,
-			String deptId, String sellerId, String userId, String dataArea) {
+			String deptId, String sellerId, String userId, String dataArea, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1062,7 +1065,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		needWhere = appendIfNotEmpty(fromBuilder, "cs.biz_user_id", userId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cs.receive_type", receiveType, params, needWhere);
+		}
 		if (needWhere) {
 			fromBuilder.append(" where cc.status != ? ");
 		} else {
@@ -1086,7 +1091,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}	
 
 	public List<Record> getMyOrderStatucCount(String startDate, String endDate, String dayTag, String sellerId,
-			String dataArea) {
+			String dataArea, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1123,7 +1128,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cc.create_date <= ?");
 			params.add(endDate);
 		}
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, needWhere);
+		}
 		fromBuilder.append("GROUP BY status");
 		
 		if (params.isEmpty())
@@ -1133,7 +1140,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getMyOrderByCustomer(String startDate, String endDate, String dayTag, String customerType, String sellerId,
-			String userId, String dataArea, String orderTag, String print) {
+			String userId, String dataArea, String orderTag, String print, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1154,7 +1161,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
 		}
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, needWhere);
+		}
 		if (needWhere) {
 			fromBuilder.append(" where cc.status not in (1001,1002)");
 		} else {
@@ -1196,7 +1205,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getMyOrderByProduct(String startDate, String endDate, String dayTag, String productType, String sellerId, 
-			String userId, String customerId, String isGift, String dataArea, String deptId, String orderTag, String isHide, String print) {
+			String userId, String customerId, String isGift, String dataArea, String deptId, String orderTag, String isHide, String print, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1221,6 +1230,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		if (StrKit.notBlank(isHide)) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cs.is_source", Consts.SELLER_PRODUCT_SOURCE_DEALER, params, needWhere);
+		}
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "c.receive_type", receiveType, params, needWhere);
 		}
 		needWhere = appendIfNotEmpty(fromBuilder, " gt.id", productType, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.biz_user_id", userId, params, needWhere);
@@ -1276,7 +1288,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Record getMyRefundOrderCount(String startDate, String endDate, String dayTag, String sellerId,
-			String dataArea) {
+			String dataArea, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -1301,6 +1313,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (StrKit.notBlank(endDate)) {
 			fromBuilder.append(" and cc.create_date <= ? ");
 			params.add(endDate);
+		}
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.payment_type", receiveType, params, needWhere);
 		}
 		if (params.isEmpty())
 			return Db.findFirst(fromBuilder.toString());
@@ -2365,7 +2380,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getMyOrderByCustomerOut(String startDate, String endDate, String dayTag, String customerType, String sellerId,
-			String userId, String dataArea, String orderTag) {
+			String userId, String dataArea, String orderTag, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -2392,7 +2407,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
 		}
 		needWhere = appendIfNotEmpty(fromBuilder, "cc.customer_type_id", customerType, params, needWhere);
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "od.receive_type", receiveType, params, needWhere);
+		}
 		if (needWhere) {
 			fromBuilder.append(" where cc.status != ? ");
 		} else {
@@ -2422,7 +2439,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getMyOrderByProductOut(String startDate, String endDate, String dayTag, String productType, String sellerId, 
-			String userId, String customerId, String isGift, String dataArea, String deptId, String orderTag, String isHide) {
+			String userId, String customerId, String isGift, String dataArea, String deptId, String orderTag, String isHide, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -2439,7 +2456,10 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" JOIN cc_goods_category gc ON g.goods_category_id = gc.id ");
 			fromBuilder.append(" JOIN cc_goods_type gt on g.goods_type_id = gt.id ");
 		}
-		
+		if (StrKit.notBlank(receiveType)) {
+			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock csojo ON csojo.outstock_id=c.id ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id=csojo.order_id ");
+		}
 		boolean needWhere = true;
 		if (StrKit.isBlank(userId)) {
 			needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
@@ -2447,6 +2467,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		if (StrKit.notBlank(isHide)) {
 			needWhere = appendIfNotEmpty(fromBuilder, "cs.is_source", Consts.SELLER_PRODUCT_SOURCE_DEALER, params, needWhere);
+		}
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cso.receive_type", receiveType, params, needWhere);
 		}
 		needWhere = appendIfNotEmpty(fromBuilder, " gt.id", productType, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.biz_user_id", userId, params, needWhere);

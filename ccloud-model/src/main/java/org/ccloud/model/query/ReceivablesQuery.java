@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.Consts;
 import org.ccloud.model.Receivables;
@@ -119,5 +120,19 @@ public class ReceivablesQuery extends JBaseQuery {
 	public Receivables findBySn(String outstock_sn) {;
 		String select = "SELECT cc.* FROM cc_receivables cc LEFT JOIN cc_receivables_detail cr on cc.object_id = cr.object_id where cr.ref_sn = ? ";
 		return DAO.findFirst(select, outstock_sn);
+	}
+
+	public List<Record> findByDataArea(String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT cc.customer_name , cr.receive_amount , cr.act_amount , cr.balance_amount ");
+		fromBuilder.append("FROM cc_receivables cr ");
+		fromBuilder.append("LEFT JOIN cc_seller_customer csc ON csc.id = cr.object_id ");
+		fromBuilder.append("LEFT JOIN cc_customer cc ON cc.id = csc.customer_id ");
+		fromBuilder.append("WHERE cr.object_type = 'customer' ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(fromBuilder, "cr.data_area", dataArea, params, false);
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 }
