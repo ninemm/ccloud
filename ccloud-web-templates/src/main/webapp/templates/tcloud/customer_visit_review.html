@@ -296,12 +296,12 @@
                     <div class="weui-uploader">
                         <div class="weui-uploader__hd">
                             <p class="weui-uploader__title">拜访实景图</p>
-                            <div class="weui-uploader__info">${(customerVisit.imageList?size)!0}/3</div>
+                            <div class="weui-uploader__info">${(customerVisit.photoList?size)!0}/3</div>
                         </div>
                         <div class="weui-uploader__bd">
                             <ul class="weui-uploader__files" id ="uploaderFiles1">
-                                <#if (customerVisit.imageList) ??>
-                                    <#list customerVisit.imageList as bean>
+                                <#if (customerVisit.photoList) ??>
+                                    <#list customerVisit.photoList as bean>
                                         <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
                                     </#list>
                                 </#if>
