@@ -44,6 +44,8 @@
 	}).on("compositionend", "#searchInput", function() {
 		cpLock = true;
 		if(cpLock) {
+			planAmount = 0;
+			completeAmount = 0;
 			clearTimeout(time);
 			time = setTimeout(function(){ 
 				combo();
@@ -51,12 +53,16 @@
 		}
 	}).on("input", "#searchInput", function() {
 		if(cpLock) {
+			planAmount = 0;
+			completeAmount = 0;
 			clearTimeout(time);
 			time = setTimeout(function(){ 
 				combo();
 			},500);
 		}
 	}).on("click", "#searchCancel", function() {
+		planAmount = 0;
+		completeAmount = 0;
 		combo();
 	}).on("change", "#sellerProductId", function() {
 		combo();
