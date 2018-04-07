@@ -246,7 +246,7 @@ var MapSet = {
 };
 
 $(function() {
-	var goback = new Headroom($(".left-back")[0], {
+/*	var goback = new Headroom($(".left-back")[0], {
 		tolerance: 5,
 		offset: 200,
 		classes: {
@@ -255,5 +255,5 @@ $(function() {
 			unpinned: "slideOutLeft"
 		}
 	});
-	goback.init();
+	goback.init();*/
 })
