@@ -9,6 +9,12 @@
 	}
 </#macro>
 <#macro script>	
+	var cpLock = true;
+	var time;
+	var page = 1;
+	var size = 10;
+	var planAmount = 0;
+	var completeAmount = 0;
 	$(function() {
 		$(".plansShow").css('display','none');
 		combo();
@@ -33,12 +39,6 @@
 		completeAmount = 0;
 		 combo();
 	});
-	var cpLock = true;
-	var time;
-	var page = 1;
-	var size = 10;
-	var planAmount = 0;
-	var completeAmount = 0;
 	$(document).on("compositionstart", "#searchInput", function() {
 		cpLock = false;
 	}).on("compositionend", "#searchInput", function() {
