@@ -872,7 +872,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, SalesOrderExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -890,7 +890,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}
 	
 	public SalesOrderExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String activity) {

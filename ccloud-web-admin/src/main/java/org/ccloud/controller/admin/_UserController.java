@@ -594,7 +594,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, UserExecel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -612,7 +612,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}	
 	
 	@Before(UCodeInterceptor.class)

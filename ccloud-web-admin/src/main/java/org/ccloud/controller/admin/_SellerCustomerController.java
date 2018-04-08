@@ -84,14 +84,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		long startTime = System.currentTimeMillis();//获取当前时间
 		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType);
-		long endTime = System.currentTimeMillis();
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
-		System.out.println("----------=================================---------------------------------------------------------------------程序运行时间："+(endTime-startTime)+"ms");
 	}
 
 	public void queryCustomerType() {
@@ -434,7 +431,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, CustomerExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -452,7 +449,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		
 		ExcelExportUtil.closeExportBigExcel();
 
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}
 
 	@RequiresPermissions(value = { "/admin/sellerCustomer/uploading", "/admin/dealer/all",
