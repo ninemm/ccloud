@@ -402,7 +402,7 @@ public void downloading() throws UnsupportedEncodingException{
 	HSSFWorkbook wb = new HSSFWorkbook();
 	HSSFSheet sheet = wb.createSheet("table");
     String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\plans\\"
-			+ "销售计划信息.xls";
+			+ "销售计划.xls";
     //设置表格样式1
     HSSFCellStyle setBorder = wb.createCellStyle();
     setBorder.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 水平居中
@@ -418,14 +418,14 @@ public void downloading() throws UnsupportedEncodingException{
     setBorder3.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 水平居中
     setBorder3.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER); // 上下居中
     setBorder3.setWrapText(true);//设置自动换行
-    setBorder3.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+    setBorder3.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
     setBorder3.setFillPattern(CellStyle.SOLID_FOREGROUND);
   //设置表格样式4
     HSSFCellStyle setBorder4 = wb.createCellStyle();
     setBorder4.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 水平居中
     setBorder4.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER); // 上下居中
     setBorder4.setWrapText(true);//设置自动换行
-    setBorder4.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+    setBorder4.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
     setBorder4.setFillPattern(CellStyle.SOLID_FOREGROUND);
     //设置字体
     HSSFFont font = wb.createFont();

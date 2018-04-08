@@ -69,11 +69,20 @@
 		"typeTag": $("#typeTag").val(),
 		"receiveType": $("#receiveType").val()
 	}  
+	var params2 = {
+		"dayTag":  'today',
+		"startDate": startDate,
+		"endDate" : endDate,
+		"typeTag": $("#typeTag").val(),
+		"receiveType": $("#receiveType").val(),
+		"isGift": 1
+	} 
  	orderAmount(params);
  	refundCount(params);
  	orderStatus(params);
  	customerCount(params);
  	productCount(params);
+ 	giftCount(params2);
   })
   
     function orderAmount(params) {
@@ -188,8 +197,25 @@
 		);    	
     }
     
+    function giftCount(params2) {
+    	$.showLoading();
+		Utils.ajax('${CPATH}/report/productCountMenu', params2, 
+			function(data){
+				$.hideLoading();
+	            var length = data.length;
+	            var $tbody = $("#productGift tbody");
+	            $tbody.empty();
+	            $tbody.append("<tr><th width='60%' style='text-align:center'>产品</th><th width='20%' style='padding: 8px 0;text-align:center'>数量(件)</th><th width='20%' style='padding: 8px 0;text-align:center'>金额(元)</th></tr>");
+	            for(var i = 0; i < length; i++){
+	                $tbody.append("<tr><td>" + data[i].custom_name + "</td><td class='t-r'>" + (data[i].productCount).toFixed(2) + "</td><td class='t-r'>" + formatNumber(data[i].totalAmount) + "</td></tr>");
+	            }				
+			}
+		);    	
+    }    
+    
     function getProduct(customerId, name) {
     	$(".productName").html(name + "商品销售统计");
+    	$(".productGiftName").html(name + "赠品销售统计");
 		var params = {
 			"dayTag":  $("#dayTag").val(),
 			"startDate": $("#startDay").val(),
@@ -199,7 +225,16 @@
 			"receiveType": $("#receiveType").val()
 			
 		}
+		var params2 = {
+			"dayTag":  $("#dayTag").val(),
+			"startDate": $("#startDay").val(),
+			"endDate" : $("#endDay").val(),
+			"customerId": customerId,
+			"typeTag": $("#typeTag").val(),
+			"isGift": 1
+		}		
     	productCount(params);
+    	giftCount(params2);
     }
     
     function urlSelect(params, type){
@@ -605,6 +640,20 @@
 					<!-- 				<a class="report-detail" onClick="proDetail()">详情></a> -->
 				</div>
 			</div>
+			<div class="weui-panel weui-panel_access">
+				<div class="weui-panel__hd pro t-c productGiftName">
+					赠品销售统计
+				</div>
+				<div class="weui-cells weui-cells_form mg-0">
+					<div class="weui-cell" style="padding: 0">
+						<table class="table table-striped table-bordered mg-0" id="productGift">
+							<tbody>
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>			
 			<div class="weui-panel weui-panel_access margin-0">
 				<div class="weui-panel__hd t-c">
 					订单完成统计
