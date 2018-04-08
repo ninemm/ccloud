@@ -1,4 +1,7 @@
 <#include "_inc/_layout.html"/>
+<#macro script_import>
+	<script type='text/javascript' src="${CTPATH}/js/order_again.js"></script>
+</#macro>
 <#macro title>历史订单</#macro>
 <#macro css>
     #history {
@@ -92,9 +95,9 @@
         });
     }
     
-    function orderAgain(id) {
-		 window.location.href = "${CPATH}/order/getOldOrder?orderId=" + id;
-    }
+    function orderTry(id) {
+        OrderAgain("${CPATH}/order/getOrderInfo?orderId=" + id, "${CPATH}/product");
+    }    
     function getback() {
     window.location.href = '${CPATH}/customer?history=' + 1;
     }
@@ -129,7 +132,7 @@
                         <hr>
                         <div>
                             <#if order.status = 0><div class="button white-button fl">撤销</div></#if>
-                            <div class="button red-button fr" onclick="orderAgain('${(order.id)!}')">再次购买</div>
+                            <div class="button red-button fr" onclick="orderTry('${(order.id)!}')">再次购买</div>
                         </div>
                     </div>
             </#list>
