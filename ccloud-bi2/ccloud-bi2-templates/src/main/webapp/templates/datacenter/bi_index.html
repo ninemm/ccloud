@@ -42,6 +42,11 @@
         width: 100%;
         height: 100%;
     }
+
+    #allmap{
+        width:100%;
+        height: 20rem;
+    }
 </#macro>
 
 <#macro script_import>
@@ -55,8 +60,9 @@
 </#macro>
 <#macro script>
     $(function() {
+        lMap();
         mapLocation(false);
-        topTotal(provName, cityName, countryName);
+        //topTotal(provName, cityName, countryName);
     });
 
     var $city = $("#city-name");
@@ -83,7 +89,7 @@
     function setDateType(type){
         dateType = type;
         total(provName, cityName, countryName, dateType);
-        loadOrderData()
+        //loadOrderData()
     }
     
     //顶部统计
@@ -265,8 +271,8 @@
 
             curProvName = strKit.convertProvName(provName);
 
-            mapDataUrl = getMapDataUrl();
-            loadOrderData();
+            //mapDataUrl = getMapDataUrl();
+            //loadOrderData();
         }
     });
     
@@ -339,7 +345,7 @@
 
                                            $city.text(cityName);
                                            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-                                           loadOrderData();
+                                           //loadOrderData();
                                        });
                                    }
                                    
@@ -367,7 +373,7 @@
                                   
                                   $city.text(cityName);
                                   mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-                                  loadOrderData();
+                                  //loadOrderData();
                                   alert("定位失败！请检查是否开启定位，暂时將为您显示武汉信息");
                                }
                            });
@@ -386,11 +392,101 @@
            curProvName = strKit.convertProvName(provName);
 
            mapDataUrl = '${CTPATH}/json/'+cityMap[curProvName]+'/'+cityMap[cityName]+'.json';
-           loadOrderData();
+           //loadOrderData();
         }
     }
 
-    function loadOrderData() {
+    var map = new BMap.Map("allmap");
+    var redIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20));
+
+    //地图
+    function lMap(){
+        Utils.loading();
+        map.centerAndZoom('咸宁', 5);
+        map.enableScrollWheelZoom(true);
+        map.clearOverlays();
+        dealerListMap();
+    }
+
+    function dealerListMap(){
+    
+        $.ajax({
+            url:"${CPATH}/biIndex/dealerList",
+            type:"post",
+            data:{dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+            
+            for(var i = 0; i < data.dealerList.length; i++) {
+                var dealerList = data.dealerList;
+                (function(i){
+                
+                    $.ajax({
+                        async: false,
+                        type: "GET",
+                        dataType: 'jsonp',
+                        jsonp: 'callback',
+                        jsonpCallback: 'callbackfunction',
+                        url: "http://api.map.baidu.com/geocoder/v2/?city="+ dealerList[i].city_name +"&address=" + dealerList[i].country_name +"&output=json&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t&callback=showLocation",
+                        contentType: "application/json;utf-8"
+                    }).done(function(data){
+                        if(data.status == 0){
+                            var new_point = new BMap.Point(data.result.location.lng,data.result.location.lat);
+                            var marker = new BMap.Marker(new_point, {icon:redIcon});  //创建标注
+                            map.addOverlay(marker);              // 将标注添加到地图中
+                            
+                            var opts = {
+                            width : 240,     // 信息窗口宽度
+                            height: 80,     // 信息窗口高度
+                            title : dealerList[i].seller_name , // 信息窗口标题
+                            enableMessage:true//设置允许信息窗发送短息
+                            };
+                            var content = '';
+                            addClickHandler(content,marker,opts,dealerList[i].data_area);
+                        }
+                    });
+                
+                })(i);
+            }
+        
+        });
+    }
+    
+    function addClickHandler(content,marker,opts,dataArea){
+        marker.addEventListener("click",function(e){
+            var p = e.target;
+            var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+            var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象
+            map.openInfoWindow(infoWindow,point); //开启信息窗口
+            selectSeller(dataArea);
+        });
+    }
+    
+    
+    function selectSeller(dataArea) {
+        Utils.loading();
+        $.ajax({
+            url:"${CPATH}/biIndex/selectSeller",
+            type:"post",
+            data:{dataArea: dataArea},
+            dataType:"json"
+        }).done(function(data){
+            provName = data[0].prov_name;
+            cityName = data[0].city_name;
+            countryName = data[0].country_name;
+
+            $.cookie(Utils.provCacheName, provName, { expires: 7 });
+            $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+            $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+            
+            topTotal(provName, cityName, countryName);
+            total(provName, cityName, countryName, dateType);
+
+        });
+    }
+
+/*    function loadOrderData() {
         var myChart = echarts.init(document.getElementById("map"));
         var series = [];
         myChart.showLoading({
@@ -586,7 +682,7 @@
         }
 
         return '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
-    }
+    }*/
     
 
 </#macro>
@@ -613,15 +709,20 @@
         </div>
         
         <div class="divide-line"></div>
-        <div id="orderAvg"></div>
-        <div class="divide-line"></div>
 
-        <div id="map-wrapper" class="map-wrapper">
+<!--        <div id="map-wrapper" class="map-wrapper">
             <div id="map" class="maps"></div>
-        </div>
-
+        </div>-->
+        
         <div class="title">
-            <h3>销售汇总</h3>
+            <h4>选择经销商</h4>
+        </div>
+        <div id="allmap"></div>
+        
+        <div class="divide-line"></div>
+        
+        <div class="title">
+            <h4>销售汇总</h4>
         </div>
         <div class="sales-gather">
             <div class="gather">
@@ -646,51 +747,10 @@
                 <div class="clearfix"></div>
             </div>
         </div>
-
-        <!-- <div class="title">
-            <h3>统计类别</h3>
-        </div>
-        <div class="weui-grids">
-            <a href="${CPATH}/area" class="weui-grid js_grid">
-                <div class="weui-grid__icon" style="text-align: center">
-                    <i class="icon-map" style="color: orangered;font-size: 10vw;text-align: center;"></i>
-                    <span class="icon-map classify-icon" style="color: orangered;font-size: 10vw;text-align: center;"></span>
-                </div>
-                <p class="weui-grid__label">
-                        地区
-                </p>
-                </a>
-                <a href="${CPATH}/customer" class="weui-grid js_grid">
-                    <div class="weui-grid__icon" style="text-align: center">
-                        <i class="icon-users" style="color: lightskyblue;font-size: 10vw;text-align: center;"></i>
-                        <span class="icon-group" style="color: lightskyblue; font-size: 10vw;"></span>
-                    </div>
-                    <p class="weui-grid__label">
-                         客户
-                    </p>
-                </a>
-                <a href="${CPATH}/product" class="weui-grid js_grid">
-                    <div class="weui-grid__icon" style="text-align: center">
-                        <i class="icon-box2" style="color: greenyellow;font-size: 10vw;text-align: center;"></i>
-                        <span class="icon-box2" style="color: greenyellow; font-size: 10vw;"></span>
-                    </div>
-                    <p class="weui-grid__label">
-                            产品
-                    </p>
-                </a>
-                <a href="${CPATH}/dealer" class="weui-grid js_grid">
-                    <div class="weui-grid__icon" style="text-align: center">
-                        <i class="icon-sitemap" style="color: DarkOrange;font-size: 10vw;text-align: center;"></i>
-                        <span class="icon-box2" style="color: greenyellow; font-size: 10vw;"></span>
-                    </div>
-                    <p class="weui-grid__label">
-                            经销商
-                    </p>
-                </a>
-            </div> 
-            <div class="weui-footer">
-                <p class="weui-footer__text">Copyright &copy; 2017 武汉珈研</p>
-            </div> -->
+        
+        <div class="divide-line"></div>
+        <div id="orderAvg"></div>
+        
     </div>
 </section>
 <#include "_inc/_nav_box.html"/>

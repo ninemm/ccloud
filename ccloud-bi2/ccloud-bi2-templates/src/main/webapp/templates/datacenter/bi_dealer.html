@@ -119,7 +119,7 @@
       $.ajax({
             url:"${CPATH}/biSales/dealerDetail",
             type:"post",
-            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, dealerCode: dealerCode},
+            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, dataArea: dataArea},
             dataType:"json"
         }).done(function(data){
             //直营商

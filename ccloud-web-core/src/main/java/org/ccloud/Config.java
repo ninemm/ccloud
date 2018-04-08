@@ -15,6 +15,7 @@
  */
 package org.ccloud;
 
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import org.ccloud.core.CCloud;
 import org.ccloud.core.CCloudConfig;
 import org.ccloud.message.Actions;
@@ -55,6 +56,8 @@ public class Config extends CCloudConfig {
 		CCloud.addFunction("OPTION_SELECTED", new OptionSelected());
 		CCloud.addFunction("METADATA_CHECKED", new MetadataChecked());
 		CCloud.addFunction("METADATA_SELECTED", new MetadataSelected());
+
+		ApiConfigKit.putApiConfig(getApiConfig());
 
 		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
 		

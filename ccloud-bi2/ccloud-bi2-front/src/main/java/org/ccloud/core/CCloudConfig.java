@@ -248,7 +248,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		SystemLogThread.start();
 		onCCloudStarted();
 		
-		ApiConfigKit.putApiConfig(WechatApi.getApiConfig());
+//		ApiConfigKit.putApiConfig(WechatApi.getApiConfig());
 		
 		log.info("CCloud is started!");
 	}

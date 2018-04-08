@@ -16,34 +16,31 @@ package org.ccloud.controller.bi;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.HashKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.ehcache.CacheKit;
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
+import com.jfinal.qyweixin.sdk.api.JsTicket;
+import com.jfinal.qyweixin.sdk.api.JsTicketApi;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.query.BiSalesQuery;
+import org.ccloud.model.query.Bi2SalesQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.joda.time.DateTime;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RouterMapping(url = "/biIndex")
 public class BiIndexController extends BaseFrontController {
 
-	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
+		initWechatConfig();
+		String dataArea = "001012";
 
-		String sellerId = "";
-
-		sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		if (StrKit.isBlank(sellerId)) {
-			sellerId = getPara(0);
-			setSessionAttr(Consts.SESSION_SELLER_ID, sellerId);
-		}
+		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dataArea);
 
 		render("bi_index.html");
 	}
@@ -51,7 +48,7 @@ public class BiIndexController extends BaseFrontController {
 	// 顶部统计
 	public void topTotal() {
 
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -59,9 +56,9 @@ public class BiIndexController extends BaseFrontController {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("totalAllCustomerCount",
-				BiSalesQuery.me().findAllCustomerCount(sellerId, provName, cityName, countryName));
+				Bi2SalesQuery.me().findAllCustomerCount(dataArea, provName, cityName, countryName));
 		result.put("totalCustomerCount",
-				BiSalesQuery.me().findCustomerCount(sellerId, provName, cityName, countryName, null, null));
+				Bi2SalesQuery.me().findCustomerCount(dataArea, provName, cityName, countryName, null, null));
 
 		renderJson(result);
 
@@ -69,7 +66,7 @@ public class BiIndexController extends BaseFrontController {
 
 	public void total() {
 
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -80,15 +77,15 @@ public class BiIndexController extends BaseFrontController {
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("orderAvg", BiSalesQuery.me().findOrderAvgAmountList(sellerId, provName, cityName, countryName,
+		result.put("orderAvg", Bi2SalesQuery.me().findOrderAvgAmountList(dataArea, provName, cityName, countryName,
 				DateUtils.plusDays(startDate, -2), endDate));
 
 		result.put("totalCustomerCount",
-				BiSalesQuery.me().findCustomerCount(sellerId, provName, cityName, countryName, startDate, endDate));
+				Bi2SalesQuery.me().findCustomerCount(dataArea, provName, cityName, countryName, startDate, endDate));
 		result.put("totalOrderCount",
-				BiSalesQuery.me().findOrderCount(sellerId, provName, cityName, countryName, startDate, endDate));
+				Bi2SalesQuery.me().findOrderCount(dataArea, provName, cityName, countryName, startDate, endDate));
 		result.put("totalOrderAmount",
-				BiSalesQuery.me().findTotalAmount(sellerId, provName, cityName, countryName, startDate, endDate));
+				Bi2SalesQuery.me().findTotalAmount(dataArea, provName, cityName, countryName, startDate, endDate));
 
 		renderJson(result);
 
@@ -96,7 +93,7 @@ public class BiIndexController extends BaseFrontController {
 
 	public void orderAmount() {
 
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -119,7 +116,7 @@ public class BiIndexController extends BaseFrontController {
 		}
 
 		List<LinkedList<Map<String, Object>>> result = Lists.newLinkedList();
-		List<Record> list = BiSalesQuery.me().findOrderAmount(sellerId, provName, cityName, null, startDate,
+		List<Record> list = Bi2SalesQuery.me().findOrderAmount(dataArea, provName, cityName, null, startDate,
 				endDate, devideFlg);
 		for (Record map : list) {
 
@@ -144,8 +141,8 @@ public class BiIndexController extends BaseFrontController {
 		render("bi_area.html");
 	}
 
-	@Before(WechatJSSDKInterceptor.class)
 	public void customer() {
+		initWechatConfig();
 		setAttr("cur_nav", "customer");
 		render("bi_customer.html");
 	}
@@ -158,6 +155,83 @@ public class BiIndexController extends BaseFrontController {
 	public void dealer() {
 		setAttr("cur_nav", "dealer");
 		render("bi_dealer.html");
+	}
+
+	public void dealerList(){
+
+//		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
+		String dateType = "0"; // 0: 昨天， 1: 最近1周， 2: 最近1月
+
+		String startDate = DateUtils.getDateByType(dateType);
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("dealerList",
+				Bi2SalesQuery.me().findDealerList(startDate,endDate));
+
+		renderJson(result);
+	}
+
+	public void selectSeller() {
+
+		String dataArea = getPara("dataArea");
+
+		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dataArea);
+		List<Record> seller = Bi2SalesQuery.me().findSellerByDataArea(dataArea);
+
+		renderJson(seller);
+	}
+
+	public void initWechatConfig() {
+
+		String jsapi_ticket = CacheKit.get("ccloud", "jsapi_ticket");
+		if (StrKit.isBlank(jsapi_ticket)) {
+			JsTicket jsApiTicket = JsTicketApi.getTicket(JsTicketApi.JsApiType.jsapi);
+			jsapi_ticket = jsApiTicket.getTicket();
+			CacheKit.put("ccloud", "jsapi_ticket", jsapi_ticket);
+		}
+
+		String nonce_str = create_nonce_str();
+		// 注意 URL 一定要动态获取，不能 hardcode.
+		String url = "http://" + getRequest().getServerName() // 服务器地址
+				             // + ":"
+				             // + getRequest().getServerPort() //端口号
+				             + getRequest().getContextPath() // 项目名称
+				             + getRequest().getServletPath();// 请求页面或其他地址
+		String qs = getRequest().getQueryString(); // 参数
+		if (qs != null) {
+			url = url + "?" + (getRequest().getQueryString());
+		}
+		// url="http://javen.tunnel.mobi/my_weixin/_front/share.jsp";
+		// System.out.println("url>>>>" + url);
+		String timestamp = create_timestamp();
+		// 这里参数的顺序要按照 key 值 ASCII 码升序排序
+		// 注意这里参数名必须全部小写，且必须有序
+		String str = "jsapi_ticket=" + jsapi_ticket + "&noncestr=" + nonce_str + "&timestamp=" + timestamp + "&url="
+				             + url;
+
+		String signature = HashKit.sha1(str);
+
+		// System.out.println("corpId " + ApiConfigKit.getApiConfig().getCorpId()
+		// + " nonceStr " + nonce_str + " timestamp " + timestamp);
+		// System.out.println("url " + url + " signature " + signature);
+		// System.out.println("nonceStr " + nonce_str + " timestamp " + timestamp);
+		// System.out.println(" jsapi_ticket " + jsapi_ticket);
+		// System.out.println("nonce_str " + nonce_str);
+		setAttr("appId", ApiConfigKit.getApiConfig().getCorpId());
+		setAttr("nonceStr", nonce_str);
+		setAttr("timestamp", timestamp);
+		setAttr("url", url);
+		setAttr("signature", signature);
+		setAttr("jsapi_ticket", jsapi_ticket);
+	}
+
+	private static String create_timestamp() {
+		return Long.toString(System.currentTimeMillis() / 1000);
+	}
+
+	private static String create_nonce_str() {
+		return UUID.randomUUID().toString();
 	}
 
 }
