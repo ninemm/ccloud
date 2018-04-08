@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
@@ -210,4 +211,20 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		renderJson(customerList);	
 	}
 	
+	public void organizationSyn() {
+		List<Record>list=DepartmentQuery.me().findSellerName();
+		setAttr("list", list);
+		render("organizationSyn.html");
+	}
+		
+	public void findByDataArea() {
+		String dataArea = getPara("dataArea");
+		List<Record>list=new ArrayList<Record>();
+		if (!StrKit.notBlank(dataArea)) {
+			renderJson(list);	
+			return;
+		}
+		list=DepartmentQuery.me().findByDataAreaSeller(dataArea);
+		renderJson(list);	
+	}
 }
