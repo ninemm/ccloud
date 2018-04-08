@@ -204,14 +204,14 @@ public class HttpExcute {
 	 * @param response
 	 */
 	private void readSessionId(HttpResponse response) {
-		Header header = response.getFirstHeader("Set-Cookie");
-		if (header != null) {
-			try {
-				FileUtils.writeStringToFile(new File("cookie2"),
-						header.getValue(), false);
-			} catch (IOException e) {
-			}
-		}
+//		Header header = response.getFirstHeader("Set-Cookie");
+//		if (header != null) {
+//			try {
+//				FileUtils.writeStringToFile(new File("cookie2"),
+//						header.getValue(), false);
+//			} catch (IOException e) {
+//			}
+//		}
 	}
 
 	/**
