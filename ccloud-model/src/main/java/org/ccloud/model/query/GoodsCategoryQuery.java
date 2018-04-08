@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.ccloud.model.GoodsCategory;
 import org.ccloud.model.ModelSorter;
 
@@ -270,5 +271,15 @@ public class GoodsCategoryQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_goods_category cgc on cgc.id = cg.goods_category_id ");
 		fromBuilder.append("where cc.seller_id = ? GROUP BY cgc.id ");
 		return DAO.find(fromBuilder.toString(), sellerId);
+	}
+	
+	public GoodsCategory findByCode(String code) {
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("SELECT g.id, g.brand_id, g.supplier_id, ");
+		sqlBuilder.append("g.name, g.code, g.grade, g.state, ");
+		sqlBuilder.append("g.is_parent, g.create_date, g.modify_date ");
+		sqlBuilder.append("FROM cc_goods_category g where g.code = ?");
+		List<GoodsCategory> list = DAO.find(sqlBuilder.toString(), code);
+		return CollectionUtils.isNotEmpty(list) ? list.get(0) : null;
 	}
 }

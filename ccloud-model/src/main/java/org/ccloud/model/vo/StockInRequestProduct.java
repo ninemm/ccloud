@@ -12,19 +12,28 @@ import java.math.BigDecimal;
  */
 public class StockInRequestProduct {
 	private String code;
-	private BigDecimal totalPrice;
+	private BigDecimal price;
 	private Integer num;
+	
+	public StockInRequestProduct() {}
+	public StockInRequestProduct(String code, BigDecimal price, Integer num) {
+		this.code = code;
+		this.price = price;
+		this.num = num;
+	}
+	
 	public String getCode() {
 		return code;
 	}
 	public void setCode(String code) {
 		this.code = code;
 	}
-	public BigDecimal getTotalPrice() {
-		return totalPrice;
+	
+	public BigDecimal getPrice() {
+		return price;
 	}
-	public void setTotalPrice(BigDecimal totalPrice) {
-		this.totalPrice = totalPrice;
+	public void setPrice(BigDecimal price) {
+		this.price = price;
 	}
 	public Integer getNum() {
 		return num;

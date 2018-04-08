@@ -27,19 +27,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.shiro.util.CollectionUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
+import org.ccloud.interceptor.SessionInterceptor;
+import org.ccloud.model.Brand;
 import org.ccloud.model.Content;
+import org.ccloud.model.Department;
+import org.ccloud.model.GoodsCategory;
 import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseOrder;
 import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.Seller;
+import org.ccloud.model.SellerSynchronize;
 import org.ccloud.model.Supplier;
 import org.ccloud.model.Taxonomy;
 import org.ccloud.model.User;
+import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.ContentQuery;
+import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
@@ -47,6 +55,8 @@ import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SupplierQuery;
 import org.ccloud.model.query.TaxonomyQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.vo.SaveGoodsCategoryRequestBody;
+import org.ccloud.model.vo.SellerSynchronizeRequestBody;
 import org.ccloud.model.vo.StockInRequestBody;
 import org.ccloud.model.vo.StockInRequestProduct;
 import org.ccloud.route.RouterMapping;
@@ -57,9 +67,11 @@ import org.ccloud.utils.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 
+@Clear(SessionInterceptor.class)
 @RouterMapping(url = "/api")
 public class ApiController extends JBaseController {
 
@@ -115,7 +127,7 @@ public class ApiController extends JBaseController {
 		}
 
 		String sign_method = getPara("sign_method");
-		if (!StringUtils.isNotBlank(sign_method)) {
+		if (StringUtils.isBlank(sign_method)) {
 			renderAjaxResultForError("sign_method must not empty!");
 			return;
 		}
@@ -146,6 +158,7 @@ public class ApiController extends JBaseController {
 			renderAjaxResultForError("hava no this method : " + method);
 			return;
 		} catch (Throwable e) {
+			e.printStackTrace();
 			renderAjaxResultForError("system error!");
 			return;
 		}
@@ -331,22 +344,24 @@ public class ApiController extends JBaseController {
 	}
 	
 	/**
-	 * 入库接口
+	 * 采购单入库同步接口
 	 */
-	public void stockIn() {
-		String jsonData = getHeader("data");
+	public void savePurchaseStockIn() {
+		String jsonData = getPara("data");
 		if(StrKit.isBlank(jsonData)) {
 			renderAjaxResultForError("no data");
 			return;
 		}
 		Gson gson = new GsonBuilder().setDateFormat(DateUtils.DEFAULT_FORMATTER).create();
-		FastDateFormat fdf = FastDateFormat.getInstance(DateUtils.DEFAULT_FILE_NAME_FORMATTER);
+		FastDateFormat fdf = FastDateFormat.getInstance(DateUtils.DEFAULT_FORMATTER);
 		StockInRequestBody stockInRequest = gson.fromJson(jsonData, StockInRequestBody.class);
 		List<StockInRequestProduct> products = stockInRequest.getProducts();
-		if(CollectionUtils.isEmpty(products)) {
+		if(products == null || products.size() == 0) {		// 校验产品列表是否为空
 			renderAjaxResultForError("no products");
 			return;
 		}
+		
+		// 校验产品列表中是否有重复产品   ------ start
 		Set<String> set = new HashSet<String>();
 		for(int i = 0; i < products.size(); i++) {
 			set.add(products.get(i).getCode());
@@ -355,70 +370,210 @@ public class ApiController extends JBaseController {
 			renderAjaxResultForError("订单中有两件及以上相同的产品，请重新选择！");
 			return;
 		}
+		// 校验产品列表中是否有重复产品   ------ end
+		
 		Calendar calendar = Calendar.getInstance();
 		Date nowDateTime = calendar.getTime();
 		String nowDateTimeStr = fdf.format(calendar);
+		
+		// 查询并校验经销商编码是否正确
 		Seller seller = SellerQuery.me().findbyCode(stockInRequest.getSellerCode());
 		if(seller == null) {
 			renderAjaxResultForError("seller code error");
 		}
+		
 		final PurchaseOrder purchaseOrder = getModel(PurchaseOrder.class);
 		final PurchaseOrderDetail purchaseOrderDetail = getModel(PurchaseOrderDetail.class);
-		String porderSn = "PO"+ seller.getSellerCode() + nowDateTimeStr.substring(0,8)+PurchaseOrderQuery.me().getNewSn(seller.getId());
+		Department department = DepartmentQuery.me().findById(seller.getDeptId());
+		String porderSn = "PO" + seller.getSellerCode() + nowDateTimeStr.substring(0,8)+PurchaseOrderQuery.me().getNewSn(seller.getId());
 		
+		// 查询并校验供应商编码是否正确
 		List<Supplier> suppliers = SupplierQuery.me().findByCode(stockInRequest.getSupplierCode());
 		if(CollectionUtils.isEmpty(suppliers)) {
-			renderAjaxResultForError("supplier code error");
+			renderAjaxResultForError("供应商编码错误");
 			return;
 		}
-		Supplier supplier = suppliers.get(0);
 		
+		Supplier supplier = suppliers.get(0);
 		String id = StrKit.getRandomUUID();
 		purchaseOrder.set("id", id);
 		purchaseOrder.set("porder_sn", porderSn);
 		purchaseOrder.set("supplier_id", supplier.getId());
-//		purchaseOrder.set("contact", StringUtils.getArrayFirst(paraMap.get("contact")));
-//		purchaseOrder.set("mobile", StringUtils.getArrayFirst(paraMap.get("mobile")));
-//		purchaseOrder.set("biz_user_id", user.getId());
+		purchaseOrder.set("contact", supplier.getContact());
+		purchaseOrder.set("mobile", supplier.getMobile());
+//		purchaseOrder.set("biz_user_id", "");
 		purchaseOrder.set("biz_date", nowDateTime);
 		purchaseOrder.set("status", 0);
-		
-		BigDecimal totalAmount = new BigDecimal(0);
-		for (Iterator<StockInRequestProduct> iterator = products.iterator(); iterator.hasNext();) {
-			StockInRequestProduct stockInRequestProduct = iterator.next();
-			totalAmount.add(stockInRequestProduct.getTotalPrice());
-		}
-		
-		purchaseOrder.set("total_amount", totalAmount);
 		purchaseOrder.set("payment_type", stockInRequest.getPayType());
 		purchaseOrder.set("remark", stockInRequest.getRemark());
-//		purchaseOrder.set("dept_id", user.getDepartmentId());
-//		purchaseOrder.set("data_area", user.getDataArea());
+		purchaseOrder.set("dept_id", seller.getDeptId());
+		purchaseOrder.set("data_area", department.getDataArea());
 		purchaseOrder.set("deal_date", stockInRequest.getDealDate());
 		purchaseOrder.set("create_date", nowDateTime);
 		
-		purchaseOrder.save();
 		
 		int index = 0;
+		BigDecimal num = null;	// 大件数数量，由小单位数量除以换算关系
+		BigDecimal totalAmount = new BigDecimal(0);		// 所有产品总金额
+		BigDecimal singleAmount = new BigDecimal(0);	// 单个产品总金额：大件价格乘以大件数量
+		
 		for (Iterator<StockInRequestProduct> iterator = products.iterator(); iterator.hasNext();) {
 			index++;
 			StockInRequestProduct stockInRequestProduct = iterator.next();
 			String productCode = stockInRequestProduct.getCode();
 			Product product = ProductQuery.me().findbyProductSn(productCode);
+			num = new BigDecimal(stockInRequestProduct.getNum()).divide(new BigDecimal(product.getConvertRelate()), 2, BigDecimal.ROUND_HALF_UP);
+			singleAmount = stockInRequestProduct.getPrice().multiply(num);
+			totalAmount.add(singleAmount);
 			if(product != null) {
 				purchaseOrderDetail.set("id", StrKit.getRandomUUID());
 				purchaseOrderDetail.set("purchase_order_id", id);
 				purchaseOrderDetail.set("product_id", product.getId());
 				purchaseOrderDetail.set("product_count", stockInRequestProduct.getNum());
-				purchaseOrderDetail.set("product_amount", totalAmount);
-				purchaseOrderDetail.set("product_price", stockInRequestProduct.getTotalPrice());
+				purchaseOrderDetail.set("product_amount", singleAmount);
+				purchaseOrderDetail.set("product_price", stockInRequestProduct.getPrice());
 				purchaseOrderDetail.set("order_list",index);
 				purchaseOrderDetail.set("create_date", nowDateTime);
-//				purchaseOrderDetail.set("dept_id", user.getDepartmentId());
-//				purchaseOrderDetail.set("data_area", user.getDataArea());
+				purchaseOrderDetail.set("dept_id", seller.getDeptId());
+				purchaseOrderDetail.set("data_area", department.getDataArea());
 				purchaseOrderDetail.save();
 			}
 		}
+		purchaseOrder.set("total_amount", totalAmount);
+		purchaseOrder.save();
+		renderAjaxResultForSuccess();
+	}
+	
+	/**
+	 * 商品类别同步接口
+	 * @author wally
+	 */
+	public void saveGoodsCategory() {
+		String jsonData = getPara("data");
+		if(StrKit.isBlank(jsonData)) {
+			renderAjaxResultForError("no data");
+			return;
+		}
+		Gson gson = new GsonBuilder().setDateFormat(DateUtils.DEFAULT_FORMATTER).create();
+		SaveGoodsCategoryRequestBody saveRequest = gson.fromJson(jsonData, SaveGoodsCategoryRequestBody.class);
+		if(StrKit.isBlank(saveRequest.getSupplierCode())) {
+			renderAjaxResultForError("供应商编码不能为空");
+			return;
+		}
+		if(StrKit.isBlank(saveRequest.getCategoryCode())) {
+			renderAjaxResultForError("商品类别编码不能为空");
+			return;
+		}
+		if(StrKit.isBlank(saveRequest.getCategoryName())) {
+			renderAjaxResultForError("商品类别名称不能为空");
+			return;
+		}
+		if(saveRequest.getCategoryName().trim().length() > 30) {
+			renderAjaxResultForError("商品类别名称不能超过30个字");
+			return;
+		}
+		if(StrKit.isBlank(saveRequest.getParentCode())) {
+			renderAjaxResultForError("上一级商品类别编码不能为空");
+			return;
+		}
+		List<Supplier> suppliers = SupplierQuery.me().findByCode(saveRequest.getSupplierCode());
+		if(CollectionUtils.isEmpty(suppliers)) {
+			renderAjaxResultForError("供应商编码错误");
+			return;
+		}
+		
+		GoodsCategory dbCategory = GoodsCategoryQuery.me().findByCode(saveRequest.getCategoryCode());
+		if(dbCategory != null) {
+			renderAjaxResultForError("商品类别编码已存在");
+			return;
+		}
+		GoodsCategory parentGoodsCategory = GoodsCategoryQuery.me().findByCode(saveRequest.getParentCode());
+		if(parentGoodsCategory == null) {
+			renderAjaxResultForError("上一级商品编码错误");
+			return;
+		}
+		
+		Calendar calendar = Calendar.getInstance();
+		Supplier supplier = suppliers.get(0);
+		List<Brand> brands = BrandQuery.me().findBySupplierId(supplier.getId());
+		Brand brand = brands.get(0);
+		GoodsCategory goodsCategory = getModel(GoodsCategory.class);
+		goodsCategory.setId(StrKit.getRandomUUID());
+		goodsCategory.setCode(saveRequest.getCategoryCode());
+		goodsCategory.setName(saveRequest.getCategoryName().trim());
+		goodsCategory.setBrandId(brand.getId());
+		goodsCategory.setSupplierId(supplier.getId());
+		goodsCategory.setParentId(parentGoodsCategory.getId());
+		goodsCategory.setGrade(parentGoodsCategory.getGrade() - 1);
+		goodsCategory.setIsParent(goodsCategory.getGrade() == 3 ? 0 : 1);
+		goodsCategory.setState(1);
+		goodsCategory.setCreateDate(calendar.getTime());
+		goodsCategory.save();
+		renderAjaxResultForSuccess();
+	}
+	
+	/**
+	 * 经销商同步接口
+	 * @author wally
+	 */
+	public void saveSellerSynchronize() {
+		String jsonData = getPara("data");
+		if(StrKit.isBlank(jsonData)) {
+			renderAjaxResultForError("no data");
+			return;
+		}
+		Calendar calendar = Calendar.getInstance();
+		Gson gson = new GsonBuilder().setDateFormat(DateUtils.DEFAULT_FORMATTER).create();
+		SellerSynchronizeRequestBody saveRequest = gson.fromJson(jsonData, SellerSynchronizeRequestBody.class);
+		if(StrKit.isBlank(saveRequest.getSellerCode())) {
+			renderAjaxResultForError("经销商编码不能为空");
+			return;
+		}
+		if(StrKit.isBlank(saveRequest.getSellerName())) {
+			renderAjaxResultForError("经销商名称不能为空");
+			return;
+		}
+		if(saveRequest.getSellerCode().length() > 22) {
+			renderAjaxResultForError("经销商编码长度不能超过22");
+			return;
+		}
+		if(saveRequest.getSellerName().length() > 100) {
+			renderAjaxResultForError("经销商名称长度不能超过100");
+			return;
+		}
+		if(StrKit.isBlank(saveRequest.getProvName())) {
+			renderAjaxResultForError("经销商省份不能为空");
+			return;
+		}
+		if(StrKit.isBlank(saveRequest.getCityName())) {
+			renderAjaxResultForError("经销商城市不能为空");
+			return;
+		}
+		
+		Seller seller = SellerQuery.me().findbyCode(saveRequest.getSellerCode());
+		if(seller != null) {
+			renderAjaxResultForError("经销商编码已经存在");
+			return;
+		}
+//		SellerSynchronize dbSynchronize = SellerSynchronizeQuery.me().findByCode(saveRequest.getSellerCode());
+//		if(dbSynchronize != null) {
+//			renderAjaxResultForError("经销商编码已经同步");
+//			return;
+//		}
+		SellerSynchronize sellerSynchronize = new SellerSynchronize();
+		sellerSynchronize.setId(StrKit.getRandomUUID());
+		sellerSynchronize.setSellerCode(saveRequest.getSellerCode());
+		sellerSynchronize.setSellerName(saveRequest.getSellerName().trim());
+		sellerSynchronize.setContact(saveRequest.getContact());
+		sellerSynchronize.setPhone(saveRequest.getPhone());
+		sellerSynchronize.setProvName(saveRequest.getProvName().trim());
+		sellerSynchronize.setCityName(saveRequest.getCityName().trim());
+		sellerSynchronize.setCountryName(saveRequest.getCountryName());
+		sellerSynchronize.setSellerType(0);
+		sellerSynchronize.setHasStore(0);
+		sellerSynchronize.setCreateDate(calendar.getTime());
+		sellerSynchronize.setModifyDate(calendar.getTime());
+		sellerSynchronize.save();
 		renderAjaxResultForSuccess();
 	}
 	

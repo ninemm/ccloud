@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2015-${year}, Wally Wang 王勇 (wally8292@163.com).
+StockInRequestBody.java
+StockInResponseBody.java * Copyright (c) 2015-${year}, Wally Wang 王勇 (wally8292@163.com).
  */
 package org.ccloud.model.vo;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @author wally
  *
  */
-public class StockInRequestBody {
+public class StockInRequestBody extends BaseRequestBody<StockInResponseBody> {
 	private String sellerCode;
 	private String supplierCode;
 	private List<StockInRequestProduct> products;
