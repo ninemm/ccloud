@@ -53,13 +53,13 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 
 			Object _comment = execution.getVariable("comment");
 			String comment = _comment.toString();
-			this.sendOrderWxMesssage(user.getWechatOpenId(), orderId, user.getRealname(), comment);
+			this.sendOrderWxMesssage(user.getWechatOpenId(), user.getWechatUseriId(), orderId, user.getRealname(), comment);
 		}
 
 		System.err.println("--------------执行完成---------------");
 	}
 
-	private void sendOrderWxMesssage(String toWechatOpenId, String orderId, String realname, String comment) {
+	private void sendOrderWxMesssage(String toWechatOpenId, String toWorkWechatUserId, String orderId, String realname, String comment) {
 
 		Kv kv = Kv.create();
 
@@ -77,6 +77,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 		}
 
 		kv.set("touser", toWechatOpenId);
+		kv.set("toWorkUserId", toWorkWechatUserId);
 		kv.set("templateId", messageTemplate.getTemplateId());
 
 		kv.set("orderId", salesOrder.get("order_sn"));
