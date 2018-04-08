@@ -113,7 +113,6 @@ public class CustomerQuery extends JBaseQuery {
 		return DAO.doFindFirst("mobile = ?", mobile);
 	}
 
-	@Deprecated
 	public Integer findByNameAndMobile(String name, String mobile) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
