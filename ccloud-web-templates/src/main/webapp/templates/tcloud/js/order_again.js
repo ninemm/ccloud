@@ -154,8 +154,8 @@
 	
 			bigCost : $el.cost,
 			smallCost : ($el.cost/$el.convert_relate).toFixed(2),
-			bigAccountPrice : $el.tax_price,
-			smallAccountPrice : ($el.tax_price/$el.convert_relate).toFixed(2),
+			bigAccountPrice : $el.account_price,
+			smallAccountPrice : ($el.account_price/$el.convert_relate).toFixed(2),
 	
 			bigPrice : $el.price,
 			smallPrice :($el.price/$el.convert_relate).toFixed(2),
