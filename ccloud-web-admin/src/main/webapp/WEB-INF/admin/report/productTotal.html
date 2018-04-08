@@ -35,7 +35,7 @@
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
-		jQuery.mm.initEditTableExport('#_inventoryDetail_table', url, initParams, initFields(), null);
+		jQuery.mm.initEditTableExport('#_inventoryDetail_table', url, initParams, initFields(), null,null,"商品详情");
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');
