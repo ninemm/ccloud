@@ -248,6 +248,6 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	} 
 }
