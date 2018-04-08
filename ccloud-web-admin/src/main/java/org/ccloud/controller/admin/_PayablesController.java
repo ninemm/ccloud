@@ -237,7 +237,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, payablesExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);

@@ -167,7 +167,7 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 		}
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, OutDetailExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);

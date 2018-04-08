@@ -448,7 +448,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 				row.createCell(13).setCellValue(record.get("review_date")!=null?(String)sdf.format(record.get("review_date")):"");
 			}
       
-		   fileOut = new FileOutputStream(filePath);
+		   fileOut = new FileOutputStream(filePath.replace("\\", "/"));
 		   wb.write(fileOut);  
 		} catch (Exception io) {
 			io.printStackTrace();

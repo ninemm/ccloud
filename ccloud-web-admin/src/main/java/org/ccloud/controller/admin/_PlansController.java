@@ -239,7 +239,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	        	cellP.setCellStyle(ztStyle2);
 	        }
 	    }
-	    File  file = new File(filePath);
+	    File  file = new File(filePath.replace("\\", "/"));
 	    //文件输出流
 	    try {
 			FileOutputStream outStream = new FileOutputStream(file);
@@ -669,7 +669,7 @@ public void downloading() throws UnsupportedEncodingException{
     		p4Cell.setCellStyle(setBorder4);
     	}
     }
-    File  file = new File(filePath);
+    File  file = new File(filePath.replace("\\", "/"));
     //文件输出流
     try {
 		FileOutputStream outStream = new FileOutputStream(file);
