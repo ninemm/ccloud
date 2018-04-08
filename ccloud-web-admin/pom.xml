@@ -189,6 +189,10 @@
 					<encoding>utf-8</encoding>
 					<packagingExcludes>WEB-INF/web.xml</packagingExcludes>
 					<overlays>
+					    <overlay>
+                            <groupId>org.ccloud</groupId>
+                            <artifactId>ccloud-web-front</artifactId>
+                        </overlay>
 						<overlay>
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-core</artifactId>
@@ -197,10 +201,6 @@
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-upms-admin</artifactId>
 						</overlay> -->
-						<overlay>
-							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-front</artifactId>
-						</overlay>
 						<overlay>
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-templates</artifactId>

@@ -41,7 +41,6 @@ import org.ccloud.shiro.core.ShiroInterceptor;
 import org.ccloud.shiro.core.ShiroPlugin;
 import org.ccloud.utils.ClassUtils;
 import org.ccloud.utils.StringUtils;
-import org.ccloud.wechat.WechatApi;
 import org.ccloud.workflow.plugin.ActivitiPlugin;
 
 import com.alibaba.druid.filter.stat.StatFilter;
@@ -65,8 +64,8 @@ import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.cron4j.Cron4jPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.ViewType;
-import com.jfinal.weixin.sdk.api.ApiConfigKit;
 import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 
 import net.sf.ehcache.CacheManager;
@@ -254,7 +253,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		SystemLogThread.start();
 		onCCloudStarted();
 		
-		ApiConfigKit.putApiConfig(WechatApi.getApiConfig());
+//		ApiConfigKit.putApiConfig(WechatApi.getApiConfig());
 		
 		log.info("CCloud is started!");
 	}

@@ -130,7 +130,6 @@ public class SellerCustomerQuery extends JBaseQuery {
 				+ ", c.prov_code, c.city_code, c.country_code, c.address" + ", t1.customerTypeNames, t2.realnames";
 
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
-		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
 //		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
 
 		if(StrKit.isBlank(customerTypeId)) {
@@ -249,16 +248,19 @@ public class SellerCustomerQuery extends JBaseQuery {
 				"FROM cc_user_join_customer cujc ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON cujc.seller_customer_id = csc.id ");
 		sql.append("JOIN cc_customer c ON csc.customer_id = c.id ");
-		sql.append("LEFT JOIN cc_sales_outstock cso ON cujc.seller_customer_id = cso.customer_id ");
-		DateTime dateTime = new DateTime(new Date());
-		if ("2".equals(isOrdered)) {
-			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusWeeks(-1).toDate()) + "' ");
-		} else if ("3".equals(isOrdered)) {
-			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-1).toDate()) + "' ");
-		} else if ("4".equals(isOrdered)) {
-			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-3).toDate()) + "' ");
-		} else if ("5".equals(isOrdered)) {
-			sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-6).toDate()) + "' ");
+		if(StrKit.notBlank(isOrdered)) {
+			sql.append("LEFT JOIN cc_sales_outstock cso ON cujc.seller_customer_id = cso.customer_id ");
+
+			DateTime dateTime = new DateTime(new Date());
+			if ("2".equals(isOrdered)) {
+				sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusWeeks(-1).toDate()) + "' ");
+			} else if ("3".equals(isOrdered)) {
+				sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-1).toDate()) + "' ");
+			} else if ("4".equals(isOrdered)) {
+				sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-3).toDate()) + "' ");
+			} else if ("5".equals(isOrdered)) {
+				sql.append("AND cso.create_date > '" + DateUtils.format(dateTime.plusMonths(-6).toDate()) + "' ");
+			}
 		}
 
 		sql.append("LEFT JOIN (SELECT c1.id,GROUP_CONCAT(ct. NAME) AS customerTypeNames ");
@@ -519,7 +521,6 @@ public class SellerCustomerQuery extends JBaseQuery {
 				+ ", c.prov_code, c.city_code, c.country_code, c.address" + ", t1.customerTypeNames, t2.realnames";
 
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
-		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
 //		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
 
 		if(StrKit.isBlank(customerTypeId)) {
