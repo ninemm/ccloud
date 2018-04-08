@@ -220,15 +220,15 @@ public class HttpExcute {
 	 * @param post
 	 */
 	private void writeSessionId(HttpPost post) {
-		try {
-			String cookies = FileUtils.readFileToString(new File("cookie2"));
-			if (cookies != null && cookies.length() > 0) {
-				post.addHeader("cookie", cookies);
-
-			}
-		} catch (IOException e) {
-
-		}
+//		try {
+//			String cookies = FileUtils.readFileToString(new File("cookie2"));
+//			if (cookies != null && cookies.length() > 0) {
+//				post.addHeader("cookie", cookies);
+//
+//			}
+//		} catch (IOException e) {
+//
+//		}
 	}
 	
 	
