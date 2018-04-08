@@ -454,6 +454,12 @@ public class CustomerController extends BaseFrontController {
 		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 
 		if(isChecked == null || !isChecked) {
+			// 查看客户库是否存在这个客户
+			Integer customerCount = CustomerQuery.me().findByNameAndMobile(customer.getCustomerName(), customer.getMobile());
+			if(customerCount >= 1) {
+				renderAjaxResultForError("客户名称和联系电话已经存在");
+				return;
+			}
 			//如果不走流程直接做操作
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_NORMAL);
 
@@ -488,7 +494,12 @@ public class CustomerController extends BaseFrontController {
 			map.put("customerVO", temp);
 
 		} else {
-
+			// 查看客户库是否存在这个客户
+			Integer customerCount = CustomerQuery.me().findByNameAndMobile(customer.getCustomerName(), customer.getMobile());
+			if(customerCount >= 1) {
+				renderAjaxResultForError("客户名称和联系电话已经存在");
+				return;
+			}
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_AUDIT);
 			if (StrKit.notBlank(updated)) {
 				renderAjaxResultForError(updated);
