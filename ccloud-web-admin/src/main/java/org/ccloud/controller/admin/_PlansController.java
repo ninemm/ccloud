@@ -169,7 +169,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 	"/admin/all" }, logical = Logical.OR)*/
 	public void plansTemplate() {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\plans\\"
-				+ "plansTemplate.xls";
+				+ "销售计划导入模板.xls";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -402,7 +402,7 @@ public void downloading() throws UnsupportedEncodingException{
 	HSSFWorkbook wb = new HSSFWorkbook();
 	HSSFSheet sheet = wb.createSheet("table");
     String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\plans\\"
-			+ "plansInfo.xls";
+			+ "销售计划信息.xls";
     //设置表格样式1
     HSSFCellStyle setBorder = wb.createCellStyle();
     setBorder.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 水平居中

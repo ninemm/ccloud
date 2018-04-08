@@ -938,18 +938,17 @@ public class SalesOrderQuery extends JBaseQuery {
 	
 	//统计业务员当日 当月 销售额排行(前5)
 		public List<Record> querysalesManAmountBy(String selDataArea,String by,String desc){
-			StringBuilder fromBuilder = new StringBuilder("select t1.biz_user_id,t1.title,t1.sumamount from (SELECT cso.biz_user_id , u.realname title , SUM(so.total_amount) sumamount ");
-			fromBuilder.append(" FROM cc_sales_outstock so ");
-			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
-			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
-			fromBuilder.append(" LEFT JOIN `user` u ON u.id = cso.biz_user_id ");
+			StringBuilder fromBuilder = new StringBuilder("select t1.biz_user_id,t1.title,t1.sumamount from (SELECT so.biz_user_id , u.realname title , SUM(so.total_amount) sumamount ");
+			fromBuilder.append(" FROM cc_sales_order so ");
+			fromBuilder.append(" LEFT JOIN `user` u ON u.id = so.biz_user_id ");
 			if(by.equals("day")) {
 				fromBuilder.append(" where DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
 			}else if(by.equals("month")) {
 				fromBuilder.append(" where so.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
 			}
-			fromBuilder.append(" and cso.data_area like '"+selDataArea+"%' ");
-			fromBuilder.append(" GROUP BY cso.biz_user_id ORDER BY sumamount ");
+			fromBuilder.append(" and so.data_area like '"+selDataArea+"%' ");
+			fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") ");
+			fromBuilder.append(" GROUP BY so.biz_user_id ORDER BY sumamount ");
 			fromBuilder.append(desc+" limit 0,5 ");
 			fromBuilder.append(") t1 ORDER BY t1.sumamount asc ");
 			return Db.find(fromBuilder.toString());
@@ -1486,15 +1485,14 @@ public class SalesOrderQuery extends JBaseQuery {
 	//商品销售排行 当日or汇总
 		public List<Record> queryGoodsSales(String selDataArea,boolean toDay,String desc){
 			StringBuilder fromBuilder = new StringBuilder("select t1.id,t1.title,t1.countgoods,t1.sumamount from (SELECT csp.id , csp.custom_name title , sum(csod.product_count) countgoods , sum(csod.product_amount) sumamount ");
-			fromBuilder.append(" FROM cc_sales_outstock so ");
-			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
-			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
-			fromBuilder.append(" LEFT JOIN cc_sales_outstock_detail csod ON csod.outstock_id=so.id ");
+			fromBuilder.append(" FROM cc_sales_order so ");
+			fromBuilder.append(" LEFT JOIN cc_sales_order_detail csod ON csod.order_id=so.id ");
 			fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csod.sell_product_id = csp.id ");
 			fromBuilder.append(" where csod.data_area like '"+selDataArea+"' ");
 			if(toDay) {
 				fromBuilder.append("and DATE_FORMAT(csod.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
 			}
+			fromBuilder.append("and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")  ");
 			fromBuilder.append("group by csp.id order by sumamount ");
 			fromBuilder.append(desc+" limit 0,5) t1 ");
 			fromBuilder.append(" ORDER BY t1.sumamount asc ");
@@ -1508,7 +1506,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id = so.id ");
 			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
 			fromBuilder.append(" LEFT JOIN cc_seller cs ON cso.seller_id = cs.id ");
-
+			
 			fromBuilder.append(" where cso.data_area like '"+selDataArea+"' ");
 			if(by.equals("day")) {
 				fromBuilder.append("and DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
@@ -1517,6 +1515,25 @@ public class SalesOrderQuery extends JBaseQuery {
 			}
 			fromBuilder.append("and cs.seller_type = 1 ");
 			fromBuilder.append("group by cso.seller_id order by sumamount ");
+			fromBuilder.append(desc+" limit 0,5) t1 ORDER BY t1.sumamount ");
+			return Db.find(fromBuilder.toString());
+		}
+		
+		//直营商销售排行 当日/当月
+		public List<Record> _querySellerSales(String selDataArea,String by,String desc){
+			StringBuilder fromBuilder = new StringBuilder("select t1.seller_id,t1.title,t1.sumamount from  (SELECT so.seller_id , cs.seller_name title , sum(so.total_amount) sumamount ");
+			fromBuilder.append(" FROM cc_sales_order so ");
+			fromBuilder.append(" LEFT JOIN cc_seller cs ON so.seller_id = cs.id ");
+			
+			fromBuilder.append(" where so.data_area like '"+selDataArea+"' ");
+			if(by.equals("day")) {
+				fromBuilder.append("and DATE_FORMAT(so.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d') ");
+			}else if(by.equals("month")) {
+				fromBuilder.append("and so.create_date like CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'%') ");
+			}
+			fromBuilder.append("and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")  ");
+			fromBuilder.append("and cs.seller_type = 1 ");
+			fromBuilder.append("group by so.seller_id order by sumamount ");
 			fromBuilder.append(desc+" limit 0,5) t1 ORDER BY t1.sumamount ");
 			return Db.find(fromBuilder.toString());
 		}
