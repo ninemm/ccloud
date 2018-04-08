@@ -31,11 +31,11 @@ import org.ccloud.ui.freemarker.function.TaxonomyBox;
 import org.ccloud.ui.freemarker.tag.ContentTag;
 import org.ccloud.ui.freemarker.tag.ContentsTag;
 import org.ccloud.ui.freemarker.tag.DictTag;
+import org.ccloud.wechat.WechatApi;
 
-import com.jfinal.kit.PropKit;
-import com.jfinal.qyweixin.sdk.api.ApiConfig;
 import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.template.Engine;
+import com.jfinal.weixin.sdk.api.ApiConfigKit;
 
 public class Config extends CCloudConfig {
 
@@ -59,6 +59,7 @@ public class Config extends CCloudConfig {
 		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
 		
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
+		ApiConfigKit.putApiConfig(WechatApi.getApiConfig());
 	}
 
 	@Override
@@ -66,23 +67,4 @@ public class Config extends CCloudConfig {
 		
 	}
 	
-	public ApiConfig getApiConfig() {
-
-		ApiConfig ac = new ApiConfig();
-		
-		// 配置微信 API 相关常量
-		ac.setToken(PropKit.get("token"));
-		ac.setCorpId(PropKit.get("corpId"));
-		ac.setCorpSecret(PropKit.get("secret"));
-		ac.setAgentId(PropKit.get("agentId"));		
-		
-		/**
-		 *  是否对消息进行加密，对应于微信平台的消息加解密方式：
-		 *  1：true进行加密且必须配置 encodingAesKey
-		 *  2：false采用明文模式，同时也支持混合模式
-		 */
-		ac.setEncryptMessage(PropKit.getBoolean("encryptMessage", false));
-		ac.setEncodingAesKey(PropKit.get("encodingAesKey", "setting it in config file"));
-		return ac;
-	}
 }

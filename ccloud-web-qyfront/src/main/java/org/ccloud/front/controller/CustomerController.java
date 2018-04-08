@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.jfinal.kit.Ret;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -17,16 +16,40 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.*;
+import org.ccloud.model.Customer;
+import org.ccloud.model.CustomerJoinCorp;
+import org.ccloud.model.CustomerJoinCustomerType;
+import org.ccloud.model.CustomerStore;
+import org.ccloud.model.CustomerType;
+import org.ccloud.model.Department;
+import org.ccloud.model.Dict;
+import org.ccloud.model.Message;
+import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.User;
+import org.ccloud.model.UserJoinCustomer;
+import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.compare.BeanCompareUtils;
-import org.ccloud.model.query.*;
+import org.ccloud.model.query.CustomerJoinCorpQuery;
+import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
+import org.ccloud.model.query.CustomerQuery;
+import org.ccloud.model.query.CustomerStoreQuery;
+import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.DictQuery;
+import org.ccloud.model.query.MessageQuery;
+import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.UserJoinCustomerQuery;
+import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
-import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
+import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
 import org.joda.time.DateTime;
 
 import com.alibaba.fastjson.JSON;
@@ -39,6 +62,7 @@ import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
+import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -51,7 +75,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerController extends BaseFrontController {
 
-	@Before(WechatJSSDKInterceptor.class)
+	@Before(WorkWechatJSSDKInterceptor.class)
 	public void index() {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -330,7 +354,7 @@ public class CustomerController extends BaseFrontController {
 		render("customer_history_order.html");
 	}
 
-	@Before(WechatJSSDKInterceptor.class)
+	@Before(WorkWechatJSSDKInterceptor.class)
 	public void edit() {
 		
 		String id = getPara("sellerCustomerId");
@@ -672,7 +696,7 @@ public class CustomerController extends BaseFrontController {
 			if(customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
+				Customer persiste = CustomerQuery.me().findByCustomerMobile(customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 
@@ -926,7 +950,7 @@ public class CustomerController extends BaseFrontController {
 		boolean updated;
 
 		// 查看客户库是否存在这个客户
-		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+		Customer persist = CustomerQuery.me().findByCustomerMobile(customer.getMobile());
 
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()
@@ -1045,7 +1069,7 @@ public class CustomerController extends BaseFrontController {
 		render("customer_detail.html");
 	}
 
-	@Before(WechatJSSDKInterceptor.class)
+	@Before(WorkWechatJSSDKInterceptor.class)
 	public void importCustomer() {
 		render("customer_import.html");
 	}
@@ -1089,7 +1113,7 @@ public class CustomerController extends BaseFrontController {
 		renderJson(map);
 	}
 
-	@Before(WechatJSSDKInterceptor.class)
+	@Before(WorkWechatJSSDKInterceptor.class)
 	public void gotoEdit() {
 		String id = getPara("id");
 
@@ -1104,7 +1128,7 @@ public class CustomerController extends BaseFrontController {
 		render("customer_edit.html");
 	}
 
-	@Before(WechatJSSDKInterceptor.class)
+	@Before(WorkWechatJSSDKInterceptor.class)
 	public void gotoAroundEdit() {
 		String id = getPara("id");
 		if (StrKit.notBlank(id)) {
