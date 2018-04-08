@@ -372,4 +372,8 @@ public class UserQuery extends JBaseQuery {
 				+"GROUP BY u.id";
 		return DAO.find(sql, dataArea);
 	}
+	
+	public User findDataArea (String dataArea) {
+		return DAO.doFindFirst("data_area = ?",dataArea);
+	}
 }

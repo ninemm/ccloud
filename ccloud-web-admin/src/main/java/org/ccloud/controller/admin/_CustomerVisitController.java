@@ -376,7 +376,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	@SuppressWarnings("deprecation")
 	public void exportExcel(List<Record> dataList, String filePath) throws IOException {
 
-		filePath = filePath +  "客户拜访信息.xls";
+		filePath = filePath +  "客户拜访记录.xls";
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
