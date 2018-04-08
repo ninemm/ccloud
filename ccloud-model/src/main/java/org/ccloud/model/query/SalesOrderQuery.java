@@ -2594,7 +2594,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
 		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
-			needWhere = appendIfNotEmpty(fromBuilder, "cso.receive_type", receiveType, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "od.receive_type", receiveType, params, needWhere);
 		}
 		if (needWhere) {
 			fromBuilder.append(" where cc.status != ? ");

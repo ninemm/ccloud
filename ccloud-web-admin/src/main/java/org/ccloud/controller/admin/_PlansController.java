@@ -251,7 +251,7 @@ public class _PlansController extends JBaseCRUDController<Plans> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	
 	}
 	@Before(Tx.class)
@@ -681,7 +681,7 @@ public void downloading() throws UnsupportedEncodingException{
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
-	renderFile(new File(filePath));
+	renderFile(new File(filePath.replace("\\", "/")));
 }
 	
 	@RequiresPermissions(value = { "/admin/plans/edit"}, logical = Logical.OR)

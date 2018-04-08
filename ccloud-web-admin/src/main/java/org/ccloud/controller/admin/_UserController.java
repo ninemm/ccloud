@@ -612,7 +612,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}	
 	
 	@Before(UCodeInterceptor.class)

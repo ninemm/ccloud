@@ -475,7 +475,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			if (wb != null)
 				wb.close();
 		}
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 
 	}
 	
