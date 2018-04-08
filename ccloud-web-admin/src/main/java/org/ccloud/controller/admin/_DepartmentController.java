@@ -211,20 +211,4 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		renderJson(customerList);	
 	}
 	
-	public void organizationSyn() {
-		List<Record>list=DepartmentQuery.me().findSellerName();
-		setAttr("list", list);
-		render("organizationSyn.html");
-	}
-	
-	public void findByDataArea() {
-		String dataArea = getPara("dataArea");
-		List<Record>list=new ArrayList<Record>();
-		if (!StrKit.notBlank(dataArea)) {
-			renderJson(list);	
-			return;
-		}
-		list=DepartmentQuery.me().findByDataAreaSeller(dataArea);
-		renderJson(list);	
-	}
 }
