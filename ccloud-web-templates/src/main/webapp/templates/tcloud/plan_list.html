@@ -9,12 +9,6 @@
 	}
 </#macro>
 <#macro script>	
-	var cpLock = true;
-	var time;
-	var page = 1;
-	var size = 10;
-	var planAmount = 0;
-	var completeAmount = 0;
 	$(function() {
 		$(".plansShow").css('display','none');
 		combo();
@@ -39,27 +33,15 @@
 		completeAmount = 0;
 		 combo();
 	});
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			planAmount = 0;
-			completeAmount = 0;
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			planAmount = 0;
-			completeAmount = 0;
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
+	var page = 1;
+	var size = 10;
+	var planAmount = 0;
+	var completeAmount = 0;
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		planAmount = 0;
+		completeAmount = 0;
+		combo();
+		return false;
 	}).on("click", "#searchCancel", function() {
 		planAmount = 0;
 		completeAmount = 0;
@@ -383,7 +365,7 @@
 
 	function combo() {
 		$planList.empty();
-		loading = false;
+		loading = true;
 		page = 1;
 		loadPlanData();
 	}
