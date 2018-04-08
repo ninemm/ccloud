@@ -210,4 +210,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		renderJson(customerList);	
 	}
 	
+	public void organizationSyn() {
+		render("organizationSyn.html");
+	}
 }
