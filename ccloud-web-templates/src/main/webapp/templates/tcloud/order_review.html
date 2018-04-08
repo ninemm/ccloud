@@ -217,9 +217,23 @@
 		var allTotalAmount = 0;
 		$.each(products, function(index, el) {
 			var $el = $(el);
+			var is_composite = $el.find("#isCom").val();
+			var sub_id = $el.find("#sub_id").val();
+			var sell_pid = $el.find("#sell_pid").val();
 			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
-			if($el.find("#isGift").val() == 0) {
-				total += rowTotal;
+			if (is_composite == 1) {
+				if (sub_id == sell_pid) {
+					var comPrice =  $el.find("#sell_price").val();
+					var totalC = $el.find("#total_ct").val();
+					var comC = $el.find("#comCount").val();
+					var count_com = (totalC/comC).toFixed(0);
+					var amount_com = count_com * comPrice;
+					total = total + amount_com;
+				}
+			} else {
+				if($el.find("#isGift").val() == 0) {
+					total += rowTotal;
+				}			
 			}
 			var bigNum = parseInt($el.find("#bigNum").val());
 			var convert = parseInt($el.find("#convert").val());
@@ -357,7 +371,56 @@
 								<input type="hidden" name="productName" id="productName" value="${(orderDetail.custom_name)!}">
 								<input type="hidden" name="bigUnit" id="bigUnit" value="${(orderDetail.big_unit)!}">
 								<input type="hidden" name="smallUnit" id="smallUnit" value="${(orderDetail.small_unit)!}">
+	             				<input type="hidden" name="sub_id" id="sub_id" value="${(orderDetail.sub_id)!}">
+	              				<input type="hidden" name="isCom" id="isCom" value="${(orderDetail.is_composite)!}">
+	              				<input type="hidden" name="total_ct" id="total_ct" value="${(orderDetail.product_count)!}">
+	              				<input type="hidden" name="comCount" id="comCount" value="${(orderDetail.comCount)!}">
+	              				<input type="hidden" name="sell_pid" id="sell_pid" value="${(orderDetail.sell_product_id)!}">
+	              				<input type="hidden" name="sell_price" id="sell_price" value="${(orderDetail.comPrice)!}">																
 								<#if orderDetail.is_gift??>
+						          <#if orderDetail.is_composite = 1>
+						              <div class="modify_price todo-product-box">
+										<#list images! as list>
+											<#if list.productSn == orderDetail.product_sn>
+												<img src="${list.savePath!}" alt="" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'">
+												<#break>
+											</#if>
+										</#list>
+						                <p><span class="ctag">组合</span>${(orderDetail.custom_name)!}</p>
+						                <div class="p-l-15">
+						                  <div class="weui-flex__item">
+						                    <div class="fl">
+						                      <input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
+						                        ${(orderDetail.product_price)!}
+						                        <input type="hidden" name="bigPrice" id="bigPrice" value="${(orderDetail.product_price)!}">
+						                      <span class="gray">（${(orderDetail.price)!}）</span>
+						                    </div>
+						                  </div>
+						                  <div class="weui-flex__item t-r relative fr">
+						                    <input type="hidden" name="bigNumSpan" id="bigNumSpan" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+						                        ${(orderDetail.product_count / orderDetail.convert_relate)?floor}
+						                        <input type="hidden" name="bigNum" id="bigNum" value="${(orderDetail.product_count / orderDetail.convert_relate)?floor}">
+						                    ${(orderDetail.big_unit)!}
+						                  </div>
+						                </div>
+						                <div class="p-l-15">
+						                  <div class="weui-flex__item">
+						                    <div class="fl">
+						                      <input type="hidden" name="smallPriceSpan" id="smallPriceSpan" value="${(orderDetail.product_price / orderDetail.convert_relate)?string(',###.##')}">
+						                        ${(orderDetail.product_price / orderDetail.convert_relate)?string('0.##')}
+						                        <input type="hidden" name="smallPrice" id="smallPrice" value="${(orderDetail.product_price / orderDetail.convert_relate)?string(',###.##')}">
+						                      <span class="gray">（${(orderDetail.price / orderDetail.convert_relate)?string(',###.##')}）</span>
+						                    </div>
+						                  </div>
+						                  <div class="weui-flex__item t-r relative fr">
+						                    <input type="hidden" name="smallNumSpan" id="smallNumSpan" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+						                      ${(orderDetail.product_count % orderDetail.convert_relate)}
+						                      <input type="hidden" name="smallNum" id="smallNum" value="${(orderDetail.product_count % orderDetail.convert_relate)}">
+						                    ${(orderDetail.small_unit)!}
+						                  </div>
+						                </div>
+						              </div>		          	
+						          <#else>								
 									<#if orderDetail.is_gift=0>
 										<div class="modify_price todo-product-box">
 
@@ -488,6 +551,7 @@
 												${(orderDetail.small_unit)!}
 											</div>
 										</div>
+									</#if>
 									</#if>
 								</#if>
 							</div>
