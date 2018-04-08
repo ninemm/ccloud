@@ -345,7 +345,7 @@ function initComposition(compositionList){
 			var $type = $menuRight.find(".type:last");
 			$type.find(".composition:last").find("#comTotalCount").val(totalCount);
 			totalCount = 0;			
-			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
+			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.parent_id + "' >" + compositionHtml + "</section>");
 			var $newProductDetail = $type.find(".composition:last");
 			$newProductDetail.find("#compositionName").text(el.name);
 			
@@ -393,7 +393,8 @@ function initComposition(compositionList){
 		}else{
 			var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
 			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);
-			totalCount = totalCount + (el.sub_product_count/el.sub_convert).toFixed(2) * 1;
+			var sub_count = (el.sub_product_count/el.sub_convert).toFixed(2);
+			totalCount = (Number(totalCount) + Number(sub_count)).toFixed(2);
 			var sub_bigCountHtml = "";
 			var sub_smallCountHtml = "";
 			var $type = $menuRight.find(".type:last");
@@ -415,6 +416,11 @@ function initComposition(compositionList){
 					$newProductDetail.find("#subProduct").append(""+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"");
 				}		
 			}
+		}
+		
+		if (index == compositionList.length-1) {
+			$type.find(".composition:last").find("#comTotalCount").val(totalCount);
+			totalCount = 0;
 		}
 
 	});
@@ -470,7 +476,7 @@ function calTotal() {
 		var total = 0;
 		var $typeEl = $(typeEl);
 		var id = $typeEl.attr('id');
-		var products = $typeEl.find('.product_detail')
+		var products = $typeEl.find('.product_detail');
 		$.each(products, function(index, el) {
 			var $el = $(el);
 			if(id == 'composition'){
