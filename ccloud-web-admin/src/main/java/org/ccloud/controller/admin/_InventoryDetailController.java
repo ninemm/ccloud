@@ -183,6 +183,6 @@ public class _InventoryDetailController extends JBaseCRUDController<InventoryDet
 			}
 		}
 		ExcelExportUtil.closeExportBigExcel();
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}
 }

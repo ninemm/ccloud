@@ -389,7 +389,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			
 			ExcelExportUtil.closeExportBigExcel();
 			
-			renderFile(new File(filePath));
+			renderFile(new File(filePath.replace("\\", "/")));
 		}
 		
 		public void operateHistory() {

@@ -255,7 +255,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	} 
 	
 }
