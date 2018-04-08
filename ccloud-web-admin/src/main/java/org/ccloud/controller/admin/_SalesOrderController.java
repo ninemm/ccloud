@@ -815,7 +815,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getPara("sellerId");
 		String activityId = getPara("activity");
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
-				+ "salesOrderInfo.xls";
+				+ "salesOrderInfo.xlsx";
 		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId);
 		List<Record> salesOderList = page.getList();
 		

@@ -690,7 +690,7 @@ public class CustomerController extends BaseFrontController {
 			if(customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerMobile(customerVO.getMobile());
+				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 
@@ -946,7 +946,7 @@ public class CustomerController extends BaseFrontController {
 		boolean updated;
 
 		// 查看客户库是否存在这个客户
-		Customer persist = CustomerQuery.me().findByCustomerMobile(customer.getMobile());
+		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
 
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()
