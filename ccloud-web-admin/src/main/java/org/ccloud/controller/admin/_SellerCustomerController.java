@@ -84,14 +84,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		long startTime = System.currentTimeMillis();//获取当前时间
 		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType);
-		long endTime = System.currentTimeMillis();
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
-		System.out.println("----------=================================---------------------------------------------------------------------程序运行时间："+(endTime-startTime)+"ms");
 	}
 
 	public void queryCustomerType() {

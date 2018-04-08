@@ -611,7 +611,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, SalesOutstockExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
