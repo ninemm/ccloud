@@ -522,7 +522,7 @@ jQuery.mm = {
 		});
 	},
 	
-	initEditTableExport : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
+	initEditTableExport : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc,fileNames) {
 		
 		tableId = tableId || "_table";
 		
@@ -549,17 +549,22 @@ jQuery.mm = {
 			smartDisplay: false,
 			undefinedText: '',
 			columns: fields,
+			cardView: false,                    //是否显示详细视图  
+            detailView: true,                   //是否显示父子表  
 			showExport: true,  //是否显示导出按钮  
 			buttonsAlign:"right",  //按钮位置  
 			exportTypes:['excel'],  //导出文件类型  
 			exportDataType: "all",
 			onEditableSave: editableSaveFunc || function () {},
-			onClickCell: clickCellFunc || function () {}
+			onClickCell: clickCellFunc || function () {},
+			exportOptions:{  
+                fileName: fileNames,
+            },  
 			
 		});
 	},
 	
-	initEditTableExport2 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
+	initEditTableExport2 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc,fileNames) {
 		
 		tableId = tableId || "_table";
 		
@@ -591,12 +596,15 @@ jQuery.mm = {
 			exportTypes:['excel'],  //导出文件类型  
 			exportDataType: "all",
 			onEditableSave: editableSaveFunc || function () {},
-			onClickCell: clickCellFunc || function () {}
+			onClickCell: clickCellFunc || function () {},
+			exportOptions:{  
+                fileName: fileNames,
+            },  
 			
 		});
 	},
 	
-	initEditTableExport3 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
+	initEditTableExport3 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc,fileNames) {
 		
 		tableId = tableId || "_table";
 		
@@ -621,12 +629,15 @@ jQuery.mm = {
 			exportTypes:['excel'],  //导出文件类型  
 			exportDataType: "all",
 			onEditableSave: editableSaveFunc || function () {},
-			onClickCell: clickCellFunc || function () {}
+			onClickCell: clickCellFunc || function () {},
+			exportOptions:{  
+                fileName: fileNames,
+            },  
 			
 		});
 	},
 	
-	initEditTableExport4 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc) {
+	initEditTableExport4 : function(tableId, url, queryParams, fields, editableSaveFunc, clickCellFunc,fileNames) {
 		
 		tableId = tableId || "_table";
 		
@@ -651,7 +662,10 @@ jQuery.mm = {
 			exportTypes:['excel'],  //导出文件类型  
 			exportDataType: "all",
 			onEditableSave: editableSaveFunc || function () {},
-			onClickCell: clickCellFunc || function () {}
+			onClickCell: clickCellFunc || function () {},
+			exportOptions:{  
+                fileName: fileNames,
+            },  
 			
 		});
 	},
