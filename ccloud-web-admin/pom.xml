@@ -103,7 +103,7 @@
 		
 		<dependency>
 			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-web-qyfront</artifactId>
+			<artifactId>ccloud-web-front</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
 			<scope>compile</scope>
@@ -191,7 +191,7 @@
 					<overlays>
 					    <overlay>
                             <groupId>org.ccloud</groupId>
-                            <artifactId>ccloud-web-qyfront</artifactId>
+                            <artifactId>ccloud-web-front</artifactId>
                         </overlay>
 						<overlay>
 							<groupId>org.ccloud</groupId>
