@@ -399,9 +399,16 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	public void downloading() throws UnsupportedEncodingException {
 
 		String dataArea = getPara("data_area");
-
-		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
-				+ "客户信息.xlsx";
+		User user = UserQuery.me().findDataArea(dataArea);
+		String filePath = "";
+		if(user == null) {
+			Department department = DepartmentQuery.me().findByDataArea(dataArea);
+			filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
+					+department.getDeptName()+ "的客户信息.xlsx";
+		}else {
+			filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
+					+user.getRealname()+ "的客户信息.xlsx";
+		}
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
