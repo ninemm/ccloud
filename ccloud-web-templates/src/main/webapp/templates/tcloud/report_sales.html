@@ -65,15 +65,17 @@
 		"dayTag":  'today',
 		"startDate": startDate,
 		"endDate" : endDate,
-		"typeTag": $("#typeTag").val()
-	}
+		"typeTag": $("#typeTag").val(),
+		"receiveType": $("#receiveType").val()
+	}  
 	var params2 = {
 		"dayTag":  'today',
 		"startDate": startDate,
 		"endDate" : endDate,
 		"typeTag": $("#typeTag").val(),
+		"receiveType": $("#receiveType").val(),
 		"isGift": 1
-	}	 
+	} 
  	orderAmount(params);
  	refundCount(params);
  	orderStatus(params);
