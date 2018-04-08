@@ -417,10 +417,10 @@ public class CustomerController extends BaseFrontController {
 		// 查看客户库是否存在这个客户
 		Integer customerCount = CustomerQuery.me().findByNameAndMobile(customer.getCustomerName(), customer.getMobile());
 		if(customerCount >= 1) {
-			renderAjaxResultForError("客户名称和联系电话已经存在");
+			renderAjaxResultForError("客户名称和联系电话已经存在，请导入");
 			return;
 		}
-
+		
 		String storeId = getPara("storeId");
 		if(StrKit.notBlank(storeId)) {
 			CustomerStore customerStore = CustomerStoreQuery.me().findById(storeId);
