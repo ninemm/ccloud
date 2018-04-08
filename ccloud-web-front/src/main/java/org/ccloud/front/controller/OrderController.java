@@ -148,7 +148,7 @@ public class OrderController extends BaseFrontController {
 		String orderId = getPara("orderId");
 		String taskId = getPara("taskId");
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
-		List<Record> orderDetailList = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		List<Record> orderDetailList = SalesOrderDetailQuery.me().orderAgainDetail(orderId);
 		List<Map<String, String>> images = getImageSrc(orderDetailList);
 
 		order.set("statusName", getStatusName(order.getInt("status")));
