@@ -1615,10 +1615,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cso.order_id ");
 		fromBuilder.append("LEFT JOIN `user` u ON u.id = cs.biz_user_id ");
 		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = csp.product_id ");
-		if (StrKit.notBlank(receiveType)) {
-			fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock csojo ON csojo.outstock_id=o.id ");
-			fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id=csojo.order_id ");
-		}
 		boolean needWhere = true;
 		if (StringUtils.isNotBlank(deptId)) {
 			needWhere = appendIfNotEmpty(fromBuilder, " u.department_id", deptId, params, needWhere);
@@ -1630,6 +1626,9 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" where o.status != ? and cc.is_gift = 1");
 		} else {
 			fromBuilder.append(" and o.status != ? and cc.is_gift = 1");
+		}
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cs.receive_type", receiveType, params, needWhere);
 		}
 		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		if (StrKit.notBlank(startDate)) {
