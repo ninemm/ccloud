@@ -2097,7 +2097,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getDepartmentCount(String startDate, String endDate, String dayTag, String sellerId,
-			String dataArea, String orderTag) {
+			String dataArea, String orderTag, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -2111,7 +2111,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
-		
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, needWhere);
+		}
 		if (needWhere) {
 			fromBuilder.append(" where cc.status not in (1001,1002)");
 		} else {

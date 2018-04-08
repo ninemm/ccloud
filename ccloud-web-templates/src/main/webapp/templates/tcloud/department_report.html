@@ -54,6 +54,7 @@
     $(".begin-date").val($.today());
     $("#dayTag").val("today");
    	$("#orderTag").val("productCount");
+   	$("#receiveType").val("all");
     var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';  
 	var params = {
@@ -93,6 +94,7 @@
 		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
+				var receiveType = $("#receiveType").val();
 		        var yData = [];
 		        var seriesData = [];
 		        for (var i = 0; i < data.length; i++) {
@@ -233,6 +235,7 @@
 		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
+				var receiveType = $("#receiveType").val();
 		        var yData = [];
 		        var seriesData = [];
 	            var length = data.length;
@@ -373,7 +376,8 @@
 		var params = {
     		"startDate": $(obj).val(),
 			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
-			"orderTag": $("#orderTag").val()
+			"orderTag": $("#orderTag").val(),
+			"receiveType": $("#receiveType").val()
 		}
 		$("#dayTag").val("");
 		urlSelect(params,type); 
@@ -383,7 +387,8 @@
 		var params = {
     		"startDate": $(obj).parent().find('#startDay').val(),
 			"endDate": $(obj).val() + ' 23:59:59',
-			"orderTag": $("#orderTag").val()
+			"orderTag": $("#orderTag").val(),
+			"receiveType": $("#receiveType").val()
 		}
 		$("#dayTag").val("");
 		urlSelect(params,type); 
@@ -396,7 +401,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'today',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"receiveType": $("#receiveType").val()
 			}
 			urlSelect(params,type);
             $(obj).find(".dayTagText").text('今日')
@@ -407,7 +413,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'yesterday',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"receiveType": $("#receiveType").val()
 			}
           	urlSelect(params,type);
             $(obj).find(".dayTagText").text('昨日')
@@ -418,7 +425,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'week',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"receiveType": $("#receiveType").val()
 			}
 			urlSelect(params,type);   
           	$(obj).find(".dayTagText").text('本周')
@@ -429,7 +437,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastweek',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"receiveType": $("#receiveType").val()
 			}
           urlSelect(params,type);
           $(obj).find(".dayTagText").text('上周')
@@ -440,7 +449,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'month',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"receiveType": $("#receiveType").val()
 			}     
 			urlSelect(params,type);    
          	$(obj).find(".dayTagText").text('本月')
@@ -451,7 +461,8 @@
           onClick: function () {
 			var params = {
 				"dayTag": 'lastmonth',
-				"orderTag": $("#orderTag").val()
+				"orderTag": $("#orderTag").val(),
+				"receiveType": $("#receiveType").val()
 			}         
 			urlSelect(params,type);
           	$(obj).find(".dayTagText").text('上月')
@@ -470,7 +481,8 @@
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',
-				"orderTag": 'productCount'
+				"orderTag": 'productCount',
+				"receiveType": $("#receiveType").val()
 			}
 			urlSelect(params,type); 
 			getUnit("productCount");
@@ -484,7 +496,8 @@
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',		
-				"orderTag": 'totalAmount'
+				"orderTag": 'totalAmount',	
+				"receiveType": $("#receiveType").val()
 			}
           	urlSelect(params,type);
           	getUnit("totalAmount");
@@ -498,12 +511,62 @@
 				"dayTag":  $("#dayTag").val(),
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',			
-				"orderTag": 'orderCount'
+				"orderTag": 'orderCount',
+				"receiveType": $("#receiveType").val()
 			}
 			urlSelect(params,type);   
 			getUnit("orderCount");
           	$(obj).find(".orderTagText").text('笔数')
           	$("#orderTag").val("orderCount");
+          }
+        }]
+      }); 	
+ 	}  	
+ 	
+ 	
+ 	function receiveSelect(obj,type) {
+      $.actions({
+        actions: [{
+           text: "全部",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
+				"orderTag": $("#orderTag").val(),
+				"receiveType": 'all'
+			}
+			urlSelect(params,type); 
+            $(obj).find(".receiveText").text('全部')
+            $("#receiveType").val("all");
+          }
+        }, {
+          text: "账期",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
+				"orderTag": $("#orderTag").val(),
+				"receiveType": '0'
+			}
+			urlSelect(params,type); 
+            $(obj).find(".receiveText").text('账期')
+            $("#receiveType").val("0");
+          }
+        }, {
+          text: "现结",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',			
+				"orderTag": $("#orderTag").val(),
+				"receiveType": '1'
+			}
+			urlSelect(params,type); 
+            $(obj).find(".receiveText").text('现结')
+            $("#receiveType").val("1");
           }
         }]
       }); 	
@@ -525,6 +588,7 @@
 					</span>
 					<input type="hidden" id="orderTag">
 					<input type="hidden" id="dayTag">
+					<input type="hidden" id="receiveType">
 					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
 					<span class="overview-hd-segmenting fr"> — </span>
 					<input class="weui-input begin-date fr t-r" type="text" id="startDay" onchange="startDaySelect(this,'day')" readonly="">
@@ -554,8 +618,12 @@
 				</div>
 			</div>
 			<div class="weui-panel weui-panel_access">
-				<div class="weui-panel__hd t-c ft16">
-					部门销售统计
+				<div class="weui-panel__hd pro t-c">
+					<span class="briefly" onclick="receiveSelect(this,'day')" style= "position: absolute; left: 0.5rem;">
+						<p class="receiveText">全部</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					<span class="ft16 t-c">部门销售统计</span>
 					<!--<span class="briefly" onclick="dayTagSelect(this,'user')">
 				<p class="dayTagText">今日</p>
 					<i class="icon-angle-down"></i>
