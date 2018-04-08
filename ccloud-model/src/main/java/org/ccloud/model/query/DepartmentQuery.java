@@ -688,15 +688,6 @@ public class DepartmentQuery extends JBaseQuery {
 		return childList;
 	}
 
-	public List<Record> findSellerName() {
-		String sql="SELECT cs.id,cs.seller_name,d.data_area  FROM cc_seller cs LEFT JOIN department d ON cs.dept_id = d.id WHERE d.dept_level = 1";
-		return Db.find(sql);
-	}
-
-	public List<Record> findByDataAreaSeller(String dataArea) {
-		String sql="SELECT cs.seller_name , d.dept_level ,cs.jpwx_open_id FROM cc_seller cs LEFT JOIN department d ON cs.dept_id = d.id WHERE ";
-		sql=sql+"d.data_area LIKE '"+dataArea+"%' AND d.dept_level IN(1 , 2) ORDER BY d.dept_level";
-		return Db.find(sql);
-	}
+	
 
 }

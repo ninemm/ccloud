@@ -54,6 +54,7 @@
     $(".begin-date").val($.today());
     $("#dayTag").val("today");
    	$("#orderTag").val("productCount");
+   	$("#typeTag").val("order");
    	$("#receiveType").val("all");
     var startDate = $.today();
 	var endDate = $.today() + ' 23:59:59';  
@@ -61,6 +62,8 @@
 		"dayTag":  'today',
 		"startDate": startDate,
 		"endDate" : endDate,
+		"typeTag": $("#typeTag").val(),
+		"receiveType": $("#receiveType").val()
 	}
  	orderAmount(params);
  	deptCount(params);
@@ -69,7 +72,7 @@
   })
   
     function orderAmount(params) {
-		Utils.ajax('${CPATH}/report/orderAmount', params, 
+		Utils.ajax('${CPATH}/report/orderAmountMenu', params, 
 			function(data){
 				$("#productAmount").html(data.productCount+"件/");
 				$("#orderCount").html(data.orderCount+"笔");
@@ -84,7 +87,7 @@
     	var salesIndent = document.getElementById('deptCount');
     	var salesIndentChart = echarts.init(salesIndent);
     	salesIndentChart.showLoading();    
-		Utils.ajax('${CPATH}/report/getDepartmentCountForSales', params, 
+		Utils.ajax('${CPATH}/report/getDepartmentCountForSalesMenu', params, 
 			function(data){
 				var high = 40 * data.length + 100;
 		        if (high < 300) {
@@ -94,6 +97,7 @@
 		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
+				var typeTag = $("#typeTag").val();
 				var receiveType = $("#receiveType").val();
 		        var yData = [];
 		        var seriesData = [];
@@ -206,7 +210,7 @@
     
     function productCount(params) {
     	$.showLoading();
-		Utils.ajax('${CPATH}/report/productCount', params, 
+		Utils.ajax('${CPATH}/report/productCountMenu', params, 
 			function(data){
 				$.hideLoading();
 	            var length = data.length;
@@ -225,7 +229,7 @@
     	var salesIndent = document.getElementById('userCount');
     	var salesIndentChart = echarts.init(salesIndent);
     	salesIndentChart.showLoading();    
-		Utils.ajax('${CPATH}/report/getUserRank', params, 
+		Utils.ajax('${CPATH}/report/getUserRankMenu', params, 
 			function(data){
 				var high = 40 * data.length + 100;
 		        if (high < 300) {
@@ -235,6 +239,7 @@
 		        }			
 				salesIndentChart.hideLoading();
 				var orderTag = $("#orderTag").val();
+				var typeTag = $("#typeTag").val();
 				var receiveType = $("#receiveType").val();
 		        var yData = [];
 		        var seriesData = [];
@@ -377,6 +382,7 @@
     		"startDate": $(obj).val(),
 			"endDate": $(obj).parent().find('#endDay').val() + ' 23:59:59',
 			"orderTag": $("#orderTag").val(),
+			"typeTag": $("#typeTag").val(),
 			"receiveType": $("#receiveType").val()
 		}
 		$("#dayTag").val("");
@@ -388,6 +394,7 @@
     		"startDate": $(obj).parent().find('#startDay').val(),
 			"endDate": $(obj).val() + ' 23:59:59',
 			"orderTag": $("#orderTag").val(),
+			"typeTag": $("#typeTag").val(),
 			"receiveType": $("#receiveType").val()
 		}
 		$("#dayTag").val("");
@@ -402,6 +409,7 @@
 			var params = {
 				"dayTag": 'today',
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}
 			urlSelect(params,type);
@@ -414,6 +422,7 @@
 			var params = {
 				"dayTag": 'yesterday',
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}
           	urlSelect(params,type);
@@ -426,6 +435,7 @@
 			var params = {
 				"dayTag": 'week',
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}
 			urlSelect(params,type);   
@@ -438,6 +448,7 @@
 			var params = {
 				"dayTag": 'lastweek',
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}
           urlSelect(params,type);
@@ -450,6 +461,7 @@
 			var params = {
 				"dayTag": 'month',
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}     
 			urlSelect(params,type);    
@@ -462,6 +474,7 @@
 			var params = {
 				"dayTag": 'lastmonth',
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}         
 			urlSelect(params,type);
@@ -482,6 +495,7 @@
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',
 				"orderTag": 'productCount',
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}
 			urlSelect(params,type); 
@@ -497,6 +511,7 @@
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": 'totalAmount',	
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}
           	urlSelect(params,type);
@@ -512,6 +527,7 @@
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',			
 				"orderTag": 'orderCount',
+				"typeTag": $("#typeTag").val(),
 				"receiveType": $("#receiveType").val()
 			}
 			urlSelect(params,type);   
@@ -523,6 +539,57 @@
       }); 	
  	}  	
  	
+ 	function typeSelect(obj,type) {
+      $.actions({
+        actions: [{
+          text: "已下单",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',
+				"orderTag": $("#orderTag").val(),
+				"typeTag": 'order',
+				"receiveType": $("#receiveType").val()
+			}
+			urlSelect(params,type); 
+            $(obj).find(".typeText").text('已下单')
+            $("#typeTag").val("order");
+          }
+        }, {
+          text: "已打印",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
+				"orderTag": $("#orderTag").val(),
+				"print" : 'true',
+				"typeTag": 'print',
+				"receiveType": $("#receiveType").val()
+			}
+          	urlSelect(params,type);
+            $(obj).find(".typeText").text('已打印')
+            $("#typeTag").val("print");
+          }
+        }, {
+          text: "已出库",
+          onClick: function () {
+			var params = {
+				"dayTag":  $("#dayTag").val(),
+				"startDate": $("#startDay").val(),
+				"endDate" : $("#endDay").val() + ' 23:59:59',		
+				"orderTag": $("#orderTag").val(),
+				"typeTag": 'outStock',
+				"receiveType": $("#receiveType").val()
+			}
+			urlSelect(params,type);   
+          	$(obj).find(".typeText").text('已出库')
+          	$("#typeTag").val("outStock");
+          }
+        }]
+      });
+ 	}      
  	
  	function receiveSelect(obj,type) {
       $.actions({
@@ -534,6 +601,7 @@
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": 'all'
 			}
 			urlSelect(params,type); 
@@ -548,6 +616,7 @@
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',		
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": '0'
 			}
 			urlSelect(params,type); 
@@ -562,6 +631,7 @@
 				"startDate": $("#startDay").val(),
 				"endDate" : $("#endDay").val() + ' 23:59:59',			
 				"orderTag": $("#orderTag").val(),
+				"typeTag": $("#typeTag").val(),
 				"receiveType": '1'
 			}
 			urlSelect(params,type); 
@@ -588,6 +658,7 @@
 					</span>
 					<input type="hidden" id="orderTag">
 					<input type="hidden" id="dayTag">
+					<input type="hidden" id="typeTag">
 					<input type="hidden" id="receiveType">
 					<input class="weui-input end-date fr" type="text" id="endDay" onchange="endDaySelect(this,'day')" readonly="">
 					<span class="overview-hd-segmenting fr"> — </span>
@@ -618,12 +689,17 @@
 				</div>
 			</div>
 			<div class="weui-panel weui-panel_access">
-				<div class="weui-panel__hd pro t-c">
-					<span class="briefly" onclick="receiveSelect(this,'day')" style= "position: absolute; left: 0.5rem;">
+					<div class="weui-panel__hd t-c" style=" font-size: .8rem;">
+					<span class="briefly" onclick="typeSelect(this,'day')" style="width: 3.5rem;float: left;">
+						<p class="typeText">已下单</p>
+						<i class="icon-angle-down"></i>
+					</span>
+					部门销售统计
+					<span class="briefly" onclick="receiveSelect(this,'day')" style="float: right;">
 						<p class="receiveText">全部</p>
 						<i class="icon-angle-down"></i>
 					</span>
-					<span class="ft16 t-c">部门销售统计</span>
+					
 					<!--<span class="briefly" onclick="dayTagSelect(this,'user')">
 				<p class="dayTagText">今日</p>
 					<i class="icon-angle-down"></i>

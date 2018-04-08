@@ -2113,7 +2113,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public List<Record> getDepartmentCount(String startDate, String endDate, String dayTag, String sellerId,
-			String dataArea, String orderTag, String receiveType) {
+			String dataArea, String orderTag, String receiveType, String print) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
@@ -2136,15 +2136,28 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" and cc.status not in (1001,1002)");
 		}
 
-		if (StrKit.notBlank(startDate)) {
-			fromBuilder.append(" and cc.create_date >= ? ");
-			params.add(startDate);
-		}
+		if (StrKit.notBlank(print)) {
+			if (StrKit.notBlank(startDate)) {
+				fromBuilder.append(" and cc.print_time >= ? ");
+				params.add(startDate);
+			}
 
-		if (StrKit.notBlank(endDate)) {
-			fromBuilder.append(" and cc.create_date <= ? ");
-			params.add(endDate);
+			if (StrKit.notBlank(endDate)) {
+				fromBuilder.append(" and cc.print_time <= ? ");
+				params.add(endDate);
+			}
+		} else {
+			if (StrKit.notBlank(startDate)) {
+				fromBuilder.append(" and cc.create_date >= ? ");
+				params.add(startDate);
+			}
+
+			if (StrKit.notBlank(endDate)) {
+				fromBuilder.append(" and cc.create_date <= ? ");
+				params.add(endDate);
+			}
 		}
+		
 		fromBuilder.append("GROUP BY d.id ");
 		
 		if (StrKit.notBlank(orderTag)) {
@@ -2553,6 +2566,60 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append("ORDER BY totalAmount desc ");
 		}
 		
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> getDepartmentCountForSalesOutStock(String startDate, String endDate, String dayTag,
+			 String sellerId, String dataArea, String orderTag, String receiveType) {
+		if (StrKit.notBlank(dayTag)) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(t1.productCount), 0) AS productCount, IFNULL(SUM(cc.total_amount),0) as totalAmount, count(*) as orderCount, ");
+		fromBuilder.append(" d.dept_name, d.id FROM cc_sales_outstock cc ");
+		fromBuilder.append("LEFT JOIN department d ON cc.dept_id = d.id ");
+		fromBuilder.append("LEFT JOIN (SELECT SUM(cd.product_count/cp.convert_relate) as productCount, cd.outstock_id FROM cc_sales_outstock_detail cd ");
+		fromBuilder.append("LEFT JOIN cc_seller_product sp ON sp.id = cd.sell_product_id ");
+		fromBuilder.append("LEFT JOIN cc_product cp on cp.id = sp.product_id ");
+		fromBuilder.append("GROUP BY cd.outstock_id) t1 on t1.outstock_id = cc.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso ON cso.outstock_id = cc.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order od ON od.id = cso.order_id ");		
+		boolean needWhere = true;
+		
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, " cc.seller_id", sellerId, params, needWhere);
+		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "cso.receive_type", receiveType, params, needWhere);
+		}
+		if (needWhere) {
+			fromBuilder.append(" where cc.status != ? ");
+		} else {
+			fromBuilder.append(" and cc.status != ? ");
+		}
+		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and cc.create_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and cc.create_date <= ? ");
+			params.add(endDate);
+		}
+		
+		fromBuilder.append("GROUP BY d.id ");
+		
+		if (StrKit.notBlank(orderTag)) {
+			fromBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			fromBuilder.append("ORDER BY totalAmount desc ");
+		}		
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());
 
