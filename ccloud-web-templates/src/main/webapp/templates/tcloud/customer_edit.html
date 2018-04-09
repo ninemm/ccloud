@@ -205,7 +205,7 @@
                 if (res.errorCode == 0) {
                     location.href = '${CPATH}/customer'
                 } else {
-                    $.alert(res.message);
+                    $.toptip(res.message, 1000, 'error');
                     $('._submit_btn').attr('disabled', false);
                 }
                 layer.closeAll();
