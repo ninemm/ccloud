@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -86,6 +88,7 @@ public class HttpExcute {
 			params.put("sign_method", "1");
 			String md5 = EncryptUtils.signForRequest(params, secretKey);
 			params.put("sign", md5);
+			System.out.println(ToStringBuilder.reflectionToString(params, ToStringStyle.MULTI_LINE_STYLE));
 //			String url = BASE_URL+";jsessionid="+getSession2File();
 			String result = post(REQUEST_URL, params, headers, file);
 			try {

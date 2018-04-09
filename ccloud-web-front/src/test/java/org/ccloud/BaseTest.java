@@ -27,8 +27,7 @@ public class BaseTest extends TestCase {
 	 * @param headers：请求头信息
 	 */
 	protected void execute(BaseRequestBody<? extends BaseResponseBody> request, Map<String, String> params, Map<String, String> headers) {
-		BaseResponseBody responseBody = new HttpExcute(secretKey).execute(request, params, headers);
-		printlnResult(responseBody);
+		execute(request, params, headers, null);
 	}
 	
 	protected void execute(BaseRequestBody<? extends BaseResponseBody> request, Map<String, String> params, Map<String, String> headers, File file) {
