@@ -197,11 +197,13 @@
                     location.href = '${CPATH}/customer'
                 } else {
                     $.toptip(res.message, 1000, 'error');
+                    $('._submit_btn').attr('disabled', false);
                 }
                 layer.closeAll();
             },
             error: function(res) {
                 layer.closeAll();
+                $('._submit_btn').attr('disabled', false);
             }
         });
     }
