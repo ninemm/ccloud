@@ -825,8 +825,12 @@ public class CustomerController extends BaseFrontController {
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
 			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
-			sellerCustomer.setIsEnabled(0);
-			updated = sellerCustomer.saveOrUpdate();
+			WorkFlowService workflowService = new WorkFlowService();
+			Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
+			if (null==customerVO) {
+				sellerCustomer.setIsEnabled(0);
+				updated = sellerCustomer.saveOrUpdate();
+			}
 		}
 		
 		Map<String, Object> var = Maps.newHashMap();
