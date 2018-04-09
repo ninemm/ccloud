@@ -98,10 +98,11 @@ public class PlansQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword, params, needWhere);
 		if(showType != null && showType.equals(Consts.PLAN_SHOW_SELLER_PRODUCT)) {
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "csp.custom_name", keyword, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "pd.seller_product_id", sellerProductId, params, needWhere);
 		}else {
+			needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword, params, needWhere);
 			needWhere = appendIfNotEmpty(fromBuilder, "pd.user_id", userId, params, needWhere);
 		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "pd.data_area", dataArea, params, needWhere);

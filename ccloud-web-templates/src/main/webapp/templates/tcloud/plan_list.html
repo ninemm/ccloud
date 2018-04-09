@@ -11,6 +11,7 @@
 <#macro script>	
 	$(function() {
 		$(".plansShow").css('display','none');
+		$("#productSearch").hide();
 		combo();
 	});
 	$("#datetime-picker").datetimePicker({
@@ -95,10 +96,14 @@
 			if(showType == "101205"){
 				planAmount = 0;
 				completeAmount = 0;
+				$("#userSearch").hide();
+				$("#productSearch").show();
 				showSellerProduct(params);
 				$(".userId").hide();
 				$(".sellerProductId").show();
 			}else{
+				$("#userSearch").show();
+				$("#productSearch").hide();
 				planAmount = 0;
 				completeAmount = 0;
 				showBizUser(params);
@@ -400,7 +405,8 @@
 				</div>
 				<label class="weui-search-bar__label" id="searchText">
 					<i class="weui-icon-search"></i>
-					<span>请输入业务员名称</span>
+					<span id = "userSearch">请输入业务员名称</span>
+					<span id = "productSearch">请输入产品名称</span>
 				</label>
 			</form>
 			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
