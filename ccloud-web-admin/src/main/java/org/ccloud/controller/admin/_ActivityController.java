@@ -51,6 +51,7 @@ import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.Seller;
 import org.ccloud.model.YxBasicchannelinfo;
 import org.ccloud.model.YxBasicchanneltypeinfo;
+import org.ccloud.model.activity.ActivityMaps;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityExecuteTemplateQuery;
@@ -556,12 +557,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		for (Expense qyExpense : expenseList) {
 			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
 				Activity activity = new Activity();
-				Seller seller = SellerQuery.me().findbyCode(qyExpense.getFranchiserCode());
-				if (seller == null) {
-					continue;
-				}
 				activity.setId(StrKit.getRandomUUID());
-				activity.setSellerId(seller.getId());
+				activity.setSellerId("68f9e2e4d75f4129935af5ed23e5823a");
 				activity.setCode(qyExpense.getActivityNo());
 				activity.setTitle(qyExpense.getExpenseName());
 				activity.setStartTime(DateUtils.strToDate(qyExpense.getExpenseBeginDate(), DateUtils.DEFAULT_MID_FORMATTER));
@@ -569,7 +566,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setCategory(Consts.ACTIVITY_CATEGORY_CODE);
 				String[] value = getAreaType(qyExpense.getExpenseName());
 				activity.setInvestType(DictQuery.me().findbyName(value[0]).getValue());
-				activity.setAreaType(value[1]);
+				activity.setAreaType("湖北省-武汉市-武昌区");
 				activity.setInvestAmount(new BigDecimal(qyExpense.getApplyAmount()));
 				activity.setProcCode(qyExpense.getFlowNo());
 				activity.setPlanCode(qyExpense.getActivityNo());
@@ -578,7 +575,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setIsPublish(0);
 				activity.setCreateDate(new Date());
 				acList.add(activity);
-//				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
 				getExpenseDetailsList(dlist, qyExpense.getExpenseID(), activity.getId(), activity.getInvestType(), activity.getProcCode());
 			}
 		}
@@ -630,7 +626,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			if (dict.equals("feeType_name_display")) {
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
 				String item2Value = QyBasicshowtypeQuery.me().findNameById(expenseDetail.getItem2());
-				Dict displayCode = DictQuery.me().findbyName(item2Value);
+				Dict displayCode = DictQuery.me().findShowType(item2Value);
 				expenseDetail.setItem2(displayCode.getValue());
 			}
 			if (StrKit.notBlank(expensesDetail.getChannelID())) {
@@ -894,7 +890,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				renderAjaxResultForError("同步客户失败!");
 				return;
 			}
-			Map<String, Object> map = jointMap(YxActivity);
+			Map<String, Object> map = ActivityMaps.chooseMap(YxActivity);
 			if (YxActivity.getStr("invest_type").equals(Consts.INVES_PUBLICK)) {
 				//公关赞助
 				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_PR);
@@ -1110,185 +1106,5 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			}
 		}
 		return list.toString();
-	}
-	
-	//拼接核销map
-	public Map<String, Object> jointMap(Record YxActivity) {
-		Map<String, Object>map=new HashMap<>();
-		String[] FlowIDNO = YxActivity.getStr("FlowIDNO").split("\\.");
-		map.put("FlowIDNO",Integer.parseInt(FlowIDNO[FlowIDNO.length-1]) );
-//		map.put("ResourceID", "");
-		if (YxActivity.getStr("invest_type").equals(Consts.INVES_PUBLICK)) {
-			//公关赞助
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
-			map.put("Telephone",YxActivity.getStr("Telephone"));
-			map.put("Position",YxActivity.getStr("Position"));
-			map.put("ResourceFlag",1);
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-//			map.put("SignPhoto","");		
-			map.put("Telephone",YxActivity.getStr("Telephone"));
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));
-			map.put("Flag",1);
-//			map.put("ShopOrderID",);
-//			map.put("GiftPhoto","");
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CONSUMPTION_CULTIVATION)) {
-			//消费培育
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
-//			map.put("TableNum",);
-//			map.put("DinnerType",);
-			map.put("Telephone",YxActivity.getStr("Telephone"));
-			map.put("Position",YxActivity.getStr("Position"));
-			map.put("ResourceFlag",1);
-			map.put("InvestState",2);
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-//			map.put("ShopOrderID",);
-//			map.put("IntroducerOrderID",);
-//			map.put("IntroducerName","");
-//			map.put("IntroducerTel","");
-//			map.put("SignPhotos","");
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
-			map.put("Flag",1);
-//			map.put("GiftPhoto","");
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)) {
-			//终端广告
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-//			map.put("ChannelID",);
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("Num",Integer.parseInt(YxActivity.getStr("Num")));
-			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("InvestState",2);
-			map.put("ResourceFlag",1);
-			map.put("ExecuteManName",YxActivity.getStr("ExecuteManName"));
-			map.put("ExecuteTime",YxActivity.getStr("ExecuteTime"));		
-			map.put("ExecuteState",1);
-//			map.put("ExecuteNum",);
-//			map.put("ExecuteSize","");
-//			map.put("ExecuteRemark","");
-			map.put("WriteOffNum",Integer.parseInt(YxActivity.getStr("Num")));
-//			map.put("WriteOffSize","");
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_DISPLAY)) {
-			//终端陈列 
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-//			map.put("ChannelID",);
-			map.put("ShopVisitCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
-			map.put("ShopXCJHCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
-			map.put("ResourceFlag",1);
-//			map.put("SignPhotoId","");
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("ShowType",Integer.parseInt(YxActivity.getStr("ShowType")));
-			map.put("BeginTime",YxActivity.getStr("BeginTime"));
-			map.put("EndTime",YxActivity.getStr("EndTime"));
-			map.put("InvestDay",Integer.parseInt(YxActivity.getStr("InvestDay")));
-			map.put("InvestType",1);
-//			map.put("Remark","");
-			map.put("GrantAmount",YxActivity.getBigDecimal("GrantAmount"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
-			map.put("Flag",1);
-			map.put("InvestState",2);
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-			map.put("GrantTime",YxActivity.getStr("CreateTime"));
-			map.put("AuditResult",1);
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CUSTOMER_VISITE)) {
-			//终端客情
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ChannelID",Integer.parseInt(YxActivity.getStr("ChannelID")));
-			map.put("InvestState",2);
-//			map.put("CancleReason","");
-			map.put("ResourceFlag",1);
-//			map.put("CreateManID",);
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-//			map.put("ShopOrderID",111);
-//			map.put("SignPhotos","");
-//			map.put("ModifyManID",);
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));
-			map.put("Flag",1);
-			map.put("ChannelTypeID",1);
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-			map.put("ShopVisitCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
-			map.put("ShopXCJHCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
-//			map.put("OrderMan",);
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_SUPERMARKET_GIFT)) {
-			//商超赠品
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-//			map.put("ChannelID",);
-			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("InvestState",2);
-			map.put("ResourceFlag",1);
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
-			map.put("Flag",1);
-		}else {
-			//进场费
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-//			map.put("ChannelID",);
-//			map.put("InvestType",);
-			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("InvestState",2);
-			map.put("ResourceFlag",1);
-//			map.put("CommodityID",);
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-//			map.put("ExecuteRemark","");
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
-			map.put("Flag",1);
-			map.put("ExecuteManName",YxActivity.getStr("ExecuteManName"));
-			map.put("ExecuteTime",YxActivity.getStr("ExecuteTime"));		
-			map.put("ExecuteState",1);
-		}
-		return map;
-		
 	}
 }
