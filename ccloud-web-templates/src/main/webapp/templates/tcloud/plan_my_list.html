@@ -1,5 +1,5 @@
 <#include "_inc/_layout.html"/>
-<#macro title>计划列表</#macro>
+<#macro title>业务员计划列表</#macro>
 <#macro css>
 	#my-order {
 		position: absolute;
@@ -33,33 +33,15 @@
 		completeAmount = 0;
 		 combo();
 	});
-	var cpLock = true;
-	var time;
 	var page = 1;
 	var size = 10;
 	var planAmount = 0;
 	var completeAmount = 0;
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			planAmount = 0;
-			completeAmount = 0;
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			planAmount = 0;
-			completeAmount = 0;
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		planAmount = 0;
+		completeAmount = 0;
+		combo();
+		return false;
 	}).on("click", "#searchCancel", function() {
 		planAmount = 0;
 		completeAmount = 0;
