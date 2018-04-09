@@ -928,6 +928,10 @@ public class CustomerController extends BaseFrontController {
 		// 查看客户库是否存在这个客户
 		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
 
+		if (persist != null && sellerCustomer.getId() == null) {
+			return "该客户已存在，请导入";
+		}
+
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()
 				.trimResults()

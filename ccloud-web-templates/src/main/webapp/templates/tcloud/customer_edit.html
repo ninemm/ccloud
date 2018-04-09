@@ -196,7 +196,7 @@
                 if (res.errorCode == 0) {
                     location.href = '${CPATH}/customer'
                 } else {
-                    $.alert(res.message);
+                    $.toptip(res.message, 1000, 'error');
                 }
                 layer.closeAll();
             },
