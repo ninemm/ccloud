@@ -77,6 +77,8 @@
                             }
                         });
                     </#if>
+                    $("#lng").val(lng.toFixed(6));
+                    $("#lat").val(lat.toFixed(6));
                     $('#location-span').text(address);
                     $('#location').val(address);
                 }
@@ -204,11 +206,13 @@
                     location.href = '${CPATH}/customer'
                 } else {
                     $.alert(res.message);
+                    $('._submit_btn').attr('disabled', false);
                 }
                 layer.closeAll();
             },
             error: function(res) {
                 layer.closeAll();
+                $('._submit_btn').attr('disabled', false);
             }
         });
     }
