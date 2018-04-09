@@ -80,22 +80,22 @@
 	      var id = $currentInput.attr('id');
 	 
 	      if(id == 'bigPrice'){
-	        var bPrice = parseFloat($productDetail.find("#bigPriceSpan").val());
+	        //var bPrice = parseFloat($productDetail.find("#bigPriceSpan").val());
 	        var bigPrice = $currentInput.val();
-			if(bigPrice < bPrice){
-				$currentInput.val(bPrice);
-				$.toptip('价格不能小于标准价', 'warning');
-				return;
-			}
+			//if(bigPrice < bPrice){
+			//	$currentInput.val(bPrice);
+			//	$.toptip('价格不能小于标准价', 'warning');
+			//	return;
+			//}
 			$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
 	      } else if(id == 'smallPrice'){
-	        var sPrice = parseFloat($productDetail.find("#smallPriceSpan").val());
+	        //var sPrice = parseFloat($productDetail.find("#smallPriceSpan").val());
 	        var smallPrice = $currentInput.val();
-			if(smallPrice < sPrice){
-				$currentInput.val(sPrice);
-				$.toptip('价格不能小于标准价', 'warning');
-				return;
-			}
+			//if(smallPrice < sPrice){
+			//	$currentInput.val(sPrice);
+			//	$.toptip('价格不能小于标准价', 'warning');
+			//	return;
+			//}
 			$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
 	      }
 	
