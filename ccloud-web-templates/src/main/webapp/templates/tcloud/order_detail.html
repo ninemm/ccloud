@@ -179,7 +179,7 @@
 		</div>
 		<div class="layer"></div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-			<#if order.status == 0 || (order.status == 1000 && order.is_print == 0)>
+			<#if order.status == 0 || (order.status == 1000 && !order.print_time??)>
 			<button onclick="cancel()" class="white-button-no-border weui-flex__item border-top-1px">撤销</button>
 			<#else>
 			<button onclick="getback()" class="white-button-no-border weui-flex__item">返回</button>
