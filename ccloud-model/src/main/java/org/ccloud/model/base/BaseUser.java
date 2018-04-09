@@ -259,11 +259,11 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 		return get("wechat_open_id");
 	}
 	
-	public void setWechatUseriId(java.lang.String wechatUseriId) {
+	public void setWechatUserId(java.lang.String wechatUseriId) {
 		set("wechat_userid", wechatUseriId);
 	}
 
-	public java.lang.String getWechatUseriId() {
+	public java.lang.String getWechatUserId() {
 		return get("wechat_userid");
 	}
 

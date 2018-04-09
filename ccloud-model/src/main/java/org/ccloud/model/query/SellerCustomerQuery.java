@@ -130,7 +130,6 @@ public class SellerCustomerQuery extends JBaseQuery {
 				+ ", c.prov_code, c.city_code, c.country_code, c.address" + ", t1.customerTypeNames, t2.realnames";
 
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
-		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
 //		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
 
 		if(StrKit.isBlank(customerTypeId)) {
@@ -525,7 +524,6 @@ public class SellerCustomerQuery extends JBaseQuery {
 				+ ", c.prov_code, c.city_code, c.country_code, c.address" + ", t1.customerTypeNames, t2.realnames";
 
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_seller_customer` sc ");
-		fromBuilder.append(" join `cc_customer` c on c.id = sc.customer_id ");
 //		fromBuilder.append(" left join `cc_sales_order` so on sc.id = so.customer_id ");
 
 		if(StrKit.isBlank(customerTypeId)) {
