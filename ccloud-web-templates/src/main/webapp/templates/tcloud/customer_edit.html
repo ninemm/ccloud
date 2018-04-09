@@ -70,6 +70,8 @@
                             }
                         });
                     </#if>
+                    $("#lng").val(lng.toFixed(6));
+                    $("#lat").val(lat.toFixed(6));
                     $('#location-span').text(address);
                     $('#location').val(address);
                 }
