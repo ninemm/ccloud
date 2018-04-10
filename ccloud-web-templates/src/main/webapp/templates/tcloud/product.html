@@ -56,30 +56,16 @@
 
 <#macro script>
 $(function() {
-	var cpLock = true;
-	var time;
 	var refund = '${refund!}';
 	setItemBykey("refund", refund);
 
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				keyword = $(this).val();
-				changeInit();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				keyword = $("#searchInput").val();
-				changeInit();
-			},500);
-		}
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		keyword = $("#searchInput").val();
+		changeInit();
+		return false;
+	}).on("click", "#searchCancel", function() {
+		keyword = $("#searchInput").val();
+		changeInit();
 	}).on("click", ".gift-open", function () {
         if ($(this).text() === "展开") {
 	        $(this).text("收起");
@@ -338,11 +324,14 @@ function initComposition(compositionList){
 	}
 	
 	var parentId = '';
+	var totalCount = 0;
 	$.each(compositionList, function(index, el) {
 		if(parentId != el.parent_id) {
 			parentId = el.parent_id;
 			var $type = $menuRight.find(".type:last");
-			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
+			$type.find(".composition:last").find("#comTotalCount").val(totalCount);
+			totalCount = 0;			
+			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.parent_id + "' >" + compositionHtml + "</section>");
 			var $newProductDetail = $type.find(".composition:last");
 			$newProductDetail.find("#compositionName").text(el.name);
 			
@@ -360,6 +349,7 @@ function initComposition(compositionList){
 			var smallCount = (el.main_product_count%el.main_convert).toFixed(0);
 			var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
 			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);
+			totalCount = totalCount + (el.main_product_count/el.main_convert).toFixed(2) * 1 + (el.sub_product_count/el.sub_convert).toFixed(2) * 1;
 			var bigCountHtml = "";
 			var smallCountHtml = "";
 			var sub_bigCountHtml = "";
@@ -388,7 +378,9 @@ function initComposition(compositionList){
 			}
 		}else{
 			var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
-			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);		
+			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);
+			var sub_count = (el.sub_product_count/el.sub_convert).toFixed(2);
+			totalCount = (Number(totalCount) + Number(sub_count)).toFixed(2);
 			var sub_bigCountHtml = "";
 			var sub_smallCountHtml = "";
 			var $type = $menuRight.find(".type:last");
@@ -410,6 +402,11 @@ function initComposition(compositionList){
 					$newProductDetail.find("#subProduct").append(""+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"");
 				}		
 			}
+		}
+		
+		if (index == compositionList.length-1) {
+			$type.find(".composition:last").find("#comTotalCount").val(totalCount);
+			totalCount = 0;
 		}
 
 	});
@@ -465,7 +462,7 @@ function calTotal() {
 		var total = 0;
 		var $typeEl = $(typeEl);
 		var id = $typeEl.attr('id');
-		var products = $typeEl.find('.product_detail')
+		var products = $typeEl.find('.product_detail');
 		$.each(products, function(index, el) {
 			var $el = $(el);
 			if(id == 'composition'){
@@ -564,8 +561,9 @@ function getComposition($el){
 		compositionId : $el.find("#compositionId").val(),
 
 		compositionNum : $el.find("#compositionNum").val(),
+		compositionCount : $el.find("#comTotalCount").val(),
 		
-		compositionValueName : $el.find("#compositionValueName").text(),
+		compositionValueName : $el.find("#compositionValueName").html(),
 		compositionSub : $el.find("#gift").html()
 	}
 }
@@ -711,6 +709,7 @@ function order(){
 									<input type="hidden" id="compositionPrice" value="">
 									<input type="hidden" id="product_image_list_store" value="">
 									<input type="hidden" id="product_sn" value="">
+									<input type="hidden" id="comTotalCount" value="">
 									<div class="product-top">
 										<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 										<div class="weui-cell_access product-top-right">
@@ -737,7 +736,7 @@ function order(){
 									<div id="stock"></div>
 									<div id="activityName" class="activityName"></div>
 								</div>
-								<hr>
+								<div class="hr"></div>
 								<div id="gift" class="weui-flex">
 									<span>
 										<i class="icon-tags"></i>
@@ -766,6 +765,6 @@ function order(){
 	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 		<p class="total bg-white weui-flex__item" id="totalNum"></p>
 		<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
-		<button id="placeOrder" class="place-order red-button white">下单</button>
+		<button id="placeOrder" class="place-order red-button white"><#if refund?? && refund == '1'>下一步<#else>下单</#if></button>
 	</footer>
 </@layout>

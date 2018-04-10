@@ -24,7 +24,26 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/city-picker/css/city-picker.css">
 	<link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
+<#macro css>
+.imgDiv {
+    display: inline-block;
+    position: relative;
+}
+.delete {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 32px;
+    height: 33px;
+    background: url(${CPATH}/static/plugins/goods/image/delete_1.png) repeat-x;
+    cursor: pointer;
+}
+.jp-grids-photos{
+	height:100%;
+	width:100%;
+}
 
+</#macro>
 <#macro script>
 
 	var $form = $("#form");
@@ -33,9 +52,10 @@
 
 	$(function() {
 		$('#customerTypes').select2({
-			placeholder: '请把默认类型设置为第一个'
+			width:'100%'
 		});
-
+		$("ul li:nth-child(1) input").attr("placeholder","把默认类型设置为第一个");
+		$("ul li:nth-child(1) input").css("width","");
 		$city.citypicker({
 		    simple: true,
             responsive: true,
@@ -337,7 +357,7 @@
                     </div>
                     <div class="col-sm-5 validata-box">
                         <label class="control-label col-sm-4">客户类型:</label>
-                        <div class="input-group col-sm-7" >
+                        <div class="input-group col-sm-8" >
                             <select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
 	                            <#list (customerTypeList)! as customerType>
 	                                <option value="${customerType.id}" <#if cTypeList??&&cTypeList?contains(customerType.id)>selected="selected"</#if>>${(customerType.name)!}</option>

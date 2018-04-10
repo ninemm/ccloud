@@ -148,10 +148,21 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString() + "%";
 		List<String> typeList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(customerVisit.getSellerCustomerId(), dataArea);
-
+		String imageListStore = customerVisit.getPhoto();
+		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
+		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
+		ExpenseDetail expenseDetail = new ExpenseDetail();
+		if(CustomerVisitQuery.me().findById(id).getActiveApplyId()!="" && StrKit.notBlank(CustomerVisitQuery.me().findById(id).getActiveApplyId())) {
+			if(StrKit.notBlank((ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId()))){
+				expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(CustomerVisitQuery.me().findById(id).getActiveApplyId()).getExpenseDetailId());
+				setAttr("expenseDetail",expenseDetail);
+			}
+		}
+		
 		setAttr("customerVisit", customerVisit);
 		setAttr("cTypeName", Joiner.on(",").join(typeList.iterator()));
-
+		setAttr("list",list);
+		setAttr("activityExecutes",activityExecutes);
 		User user1 = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//审核后将message中是否阅读改为是
 		Message message=MessageQuery.me().findByObjectIdAndToUserId(id, user1.getId());
@@ -365,7 +376,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	@SuppressWarnings("deprecation")
 	public void exportExcel(List<Record> dataList, String filePath) throws IOException {
 
-		filePath = filePath +  "客户拜访信息.xls";
+		filePath = filePath +  "客户拜访记录.xls";
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
@@ -448,7 +459,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 				row.createCell(13).setCellValue(record.get("review_date")!=null?(String)sdf.format(record.get("review_date")):"");
 			}
       
-		   fileOut = new FileOutputStream(filePath);
+		   fileOut = new FileOutputStream(filePath.replace("\\", "/"));
 		   wb.write(fileOut);  
 		} catch (Exception io) {
 			io.printStackTrace();
@@ -464,7 +475,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			if (wb != null)
 				wb.close();
 		}
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 
 	}
 	

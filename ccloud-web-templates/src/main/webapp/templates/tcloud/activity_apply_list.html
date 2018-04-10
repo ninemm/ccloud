@@ -1,5 +1,11 @@
 <#include "_inc/_layout.html"/>
 <#macro title>活动列表</#macro>
+<#macro script_import>
+ 	<script type='text/javascript' src="${CTPATH}/js/setStep.js"></script>
+</#macro>
+<#macro css_import>
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/ystep.css">
+</#macro>
 <#macro css>
     .customer p {
         height: auto;
@@ -51,7 +57,8 @@
             },{title: "已审核", value: "1"
             },{title: "已撤回", value: "2"
             },{title: "已拒绝", value: "3"
-            },{title: "已结束", value: "4"
+            },{title: "待核销", value: "4"
+            },{title: "已结束", value: "5"
             }]
         });
 
@@ -65,26 +72,13 @@
             }]
         })
 
-        var cpLock = true;
-        var time;
-
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-        }).on("compositionend", "#searchInput", function() {
-            cpLock = true;
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    refresh();},500);
-            }
-        }).on("input", "#searchInput", function() {
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    refresh();},500);
-            }
+        $(document).on("submit", ".weui-search-bar__form", function() {
+            setItemBykey("keyword", $("#searchInput").val());
+            refresh();			
+            return false;
+		}).on("click", "#searchCancel", function() {
+            setItemBykey("keyword", $("#searchInput").val());
+            refresh();
         }).on("change", "#status", function() {
             setItemBykey("status", $("#status").data('values'));
             setItemBykey("statusName", $("#status").val());
@@ -224,6 +218,15 @@
                 if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#applyList").html(data.html);
                 pageNumber = 2;
+                for(var i = 0 ; i < data.applyL.length; i++){
+                	var step2=new SetStep({
+			        content:'#'+data.applyL[i].activityApply.id,
+			        steps: data.applyL[i].strings,
+			        stepCounts:data.applyL[i].num,
+			        showBtn : false,
+			        clickAble:true
+			    })
+             }
             }
         });
     }
@@ -231,6 +234,10 @@
     function searchCancel() {
         $("#searchInput")[0].value = "";
         refresh();
+    }
+    
+    function warning(){
+    	alert("上一步执行还未审核通过");
     }
 </#macro>
 

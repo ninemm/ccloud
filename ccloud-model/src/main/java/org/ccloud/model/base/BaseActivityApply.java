@@ -97,6 +97,22 @@ public abstract class BaseActivityApply<M extends BaseActivityApply<M>> extends 
 	public String getId() {
 		return getStr("id");
 	}
+	
+	public void setApplyNum(java.math.BigDecimal applyNum) {
+		set("apply_num", applyNum);
+	}
+
+	public java.math.BigDecimal getApplyNum() {
+		return get("apply_num");
+	}
+	
+	public void setApplyAmount(java.math.BigDecimal applyAmount) {
+		set("apply_amount", applyAmount);
+	}
+
+	public java.math.BigDecimal getApplyAmount() {
+		return get("apply_amount");
+	}
 
 	public void setActivityId(String activityId) {
 		set("activity_id", activityId);
@@ -193,5 +209,11 @@ public abstract class BaseActivityApply<M extends BaseActivityApply<M>> extends 
 	public String getDataArea() {
 		return getStr("data_area");
 	}
+	public void setExpenseDetailId(String expenseDetailId) {
+		set("expense_detail_id", expenseDetailId);
+	}
 
+	public String getExpenseDetailId() {
+		return getStr("expense_detail_id");
+	}
 }

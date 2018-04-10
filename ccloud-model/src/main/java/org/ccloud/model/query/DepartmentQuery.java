@@ -688,4 +688,6 @@ public class DepartmentQuery extends JBaseQuery {
 		return childList;
 	}
 
+	
+
 }

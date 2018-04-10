@@ -1,0 +1,474 @@
+<#include "_inc/_layout.html"/>
+<#macro script_import>
+	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Ec4VbDTTjjuEGtVGzSvPwwQtvnvWFeGY"></script>
+	<script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
+</#macro>
+<#macro title>提交订单</#macro>
+<#macro css> 
+	#bigNum,
+	#smallNum {
+		border: 1px solid #bbb;
+	}
+
+	#order input::-webkit-input-placeholder {
+		text-align: right;
+	}
+	#deliveryDate, #customerTypeName, #discount, #receiveTypeName, #userList, #activityName {
+		text-align: right;
+		width: 70%;
+	}
+	.order-customer-info input {
+		text-align: left;
+		width: -webkit-fill-available;
+	}
+	.weui-dialog__hd {
+		padding: 1.3rem 1.6rem; 
+	}
+	#customer {
+		bottom: 0;
+	}
+
+	.icon-tags {
+		color: #ea6f5a;
+		font-size: .8rem;
+		margin-right: .2rem;
+		height: 100%;
+		line-height: 100%;
+	}
+	#valueName {
+		max-width: 7.5rem;
+	}
+
+</#macro>
+
+<#macro script>
+$(function() {
+
+	layer.open({
+		type: 2,
+		content: '加载中...'
+	});
+
+	Utils.ajax('${CPATH}/member/order/init', {"productList" : JSON.stringify(getItemBykey("productList"))}, function(data){
+		layer.closeAll();
+		initCustomer(data.customerInfo);
+		$("#deliveryDate").val(data.deliverDate);
+		$("#detail").empty();
+		initProduct(data.data);
+		total();
+	});
+
+	$(document).on("click", "#placeOrder", function () {
+		if (!flg) {
+			return;
+		}
+		var productList = getItemBykey("productList");
+		$.confirm("您确定要提交订单吗？","提交订单", function() {
+			doSubmit();
+		});
+  	}).on("click","#shoppingCart",function(){
+		window.location.href = '${CPATH}/member/product/shoppingCart';
+  	});
+
+	$("#deliveryDate").calendar();
+	});
+
+	function initCustomer(customerInfo){
+		customerInfo = JSON.parse(customerInfo);
+		if(customerInfo){
+			$("#customerId").val(customerInfo.id);
+			$("#customerName").val(customerInfo.customerName);
+			$("#contact").val(customerInfo.contact);
+			$("#mobile").val(customerInfo.mobile);
+			$("#address").val(customerInfo.provName + ' ' + customerInfo.cityName + ' ' + customerInfo.countryName + ' ' + customerInfo.address);
+			$("#deliveryAddress").val(customerInfo.provName + ' ' + customerInfo.cityName + ' ' + customerInfo.countryName + ' ' + customerInfo.address);
+		}
+	}
+
+	var $form = $('#form');
+	var dealerHtml = $(".dealer").eq(0).html();
+	var productHtml = $(".common").eq(0).html();
+	function initProduct(data){
+		for(var i = 0; i < data.length; i++) {
+			var productList = data[i].productList;
+			var customerTypeList = data[i].customerTypeList;
+			var userList = data[i].userList;
+			var seller = data[i].seller;
+
+			$("#detail").append("<section class='dealer'>" + dealerHtml + "</section>");
+			$newDetail = $("#detail").find(".dealer:last");
+			$newDetail.find(".black").html(seller);
+
+			var $product = $("#detail").find(".productList:last");
+			$product.empty();
+			$.each(productList, function(index, el) {
+				$product.append("<div class='weui-panel weui-panel_access goods-detail common'>" + productHtml + "</div>");
+				var $newProductDetail = $product.find(".common:last");
+				$newProductDetail.find("#index").val(i);
+				$newProductDetail.find("#productName").text(el.productName);
+				$newProductDetail.find("#valueName").text(el.valueName);
+
+				$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
+				$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
+				$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
+				$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
+
+				$newProductDetail.find("#bigPrice").val(el.bigPrice);
+				$newProductDetail.find("#smallPrice").val(el.smallPrice);
+				$newProductDetail.find("#bigUnit").val(el.bigUnit);
+				$newProductDetail.find("#smallUnit").val(el.smallUnit);
+				$newProductDetail.find("#sellProductId").val(el.sellProductId);
+				$newProductDetail.find("#sellerId").val(el.sellerId);
+				$newProductDetail.find("#productId").val(el.productId);
+				$newProductDetail.find("#convert").val(el.convert);
+
+				$newProductDetail.find("#bigNum").val(el.bigNum);
+				$newProductDetail.find("#smallNum").val(el.smallNum);
+
+				$newProductDetail.find("#bigAccountPrice").val(el.bigAccountPrice);
+				$newProductDetail.find("#smallAccountPrice").val(el.smallAccountPrice);
+				$newProductDetail.find("#oldBigPrice").val(el.bigPrice);
+				$newProductDetail.find("#oldSmallPrice").val(el.smallPrice);
+			});
+
+			var $customerType = $("#detail").find(".customerType:last");
+			var $customerTypeName = $("#detail").find(".customerTypeName:last");
+			$customerTypeName.select({
+				title: "客户类型",
+				items: customerTypeList,
+				onChange: function(data) {
+					var dealer = $(this.$input).parents(".dealer");
+					dealer.find(".customerType").val(data.values);
+				}
+			})
+			$customerType.val(customerTypeList[0].value);
+			$customerTypeName.val(customerTypeList[0].title);
+			$customerTypeName.attr('data-values', customerTypeList[0].value);
+
+			var $receiveType = $("#detail").find(".receiveType:last");
+			var $receiveTypeName = $("#detail").find(".receiveTypeName:last");
+
+			$receiveTypeName.select({
+				title: "收款方式",
+				items: [{
+					title: "现结", value: "1"
+				},{
+					title: "账期", value: "0"
+				}],
+				onChange: function(data) {
+					var dealer = $(this.$input).parents(".dealer");
+					var products = dealer.find(".common");
+
+					var $remark = dealer.find(".remark");
+					$receiveType.val(data.values);
+					for(var i = 0; i < products.length; i++){
+						var $productDetail = products.eq(i);
+						if (data.values == '0') {
+							$productDetail.find("#bigPrice").val($productDetail.find("#bigAccountPrice").val());
+							$productDetail.find("#smallPrice").val($productDetail.find("#smallAccountPrice").val());
+						} else {
+							$productDetail.find("#bigPrice").val($productDetail.find("#oldBigPrice").val());
+							$productDetail.find("#smallPrice").val($productDetail.find("#oldSmallPrice").val());
+						}
+					}
+
+					var re = $remark.val();
+					if (data.values == '0' && re.indexOf("账期") == -1) {
+						$remark.val("账期 " + re);
+					} else if ((data.values != '0') && re.indexOf("账期") != -1) {
+						$remark.val(re.replace(/账期 /g, ""));
+					}
+
+					total();
+				}
+			});
+			$receiveTypeName.val("现结");
+			$receiveTypeName.attr('data-values', "1");
+
+			var $user = $("#detail").find(".user:last");
+			var $userList = $("#detail").find(".userList:last");
+			$userList.select({
+				title: "业务员",
+				items: userList,
+				onChange: function(data) {
+					var dealer = $(this.$input).parents(".dealer");
+					dealer.find(".user").val(data.values);
+				}
+			})
+				$user.val(userList[0].value);
+				$userList.val(userList[0].title);
+				$userList.attr('data-values', userList[0].value);
+		}
+
+	}
+
+	function total() {
+		var products = $(".common");
+		var rowTotal = 0;
+		var total = 0;
+		var totalNum = 0;
+		$.each(products, function(index, el) {
+			var $el = $(el);
+			rowTotal = $el.find("#bigNum").val() * $el.find("#bigPrice").val() + $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+			total += rowTotal;
+			var bigNum = parseInt($el.find("#bigNum").val());
+			var convert = parseInt($el.find("#convert").val());
+			var smallNum = parseInt($el.find("#smallNum").val());
+			var number = (smallNum/convert).toFixed(2);
+			totalNum = totalNum + bigNum + number*1;
+			$el.find("#rowTotal").val(rowTotal);
+		});
+
+		$("#total").val(total);
+		$("#totalNum").val(totalNum);
+		$("#totalNumSpan").text("共" + products.length + "款,合计:" + formatNumber(total) + "元")
+	} 
+
+	var flg = true;
+	function doSubmit(){
+
+		layer.open({
+			type: 2,
+			content: '保存中...'
+		});
+
+		$form.ajaxSubmit({
+			beforeSubmit: function() {
+				flg = false;
+				return true
+			},
+			type : "post", 
+			dataType : "json", 
+			success : function(data) {
+				layer.closeAll();
+				if (data.errorCode == 0) {
+					removeItemBykey("productList");
+					removeItemBykey("customerInfo");
+					
+					$.modal({
+						title: data.message,
+						buttons: [
+							{ text: "查看订单", className: "default", onClick: function(){ 
+								location.href = "${CPATH}/member/order/myOrder";
+								} 
+							},
+							{ text: "继续下单", className: "primary", onClick: function(){
+								location.href = '${CPATH}/member/product/index';
+								} 
+							},
+						]
+					});
+					
+				} else {
+					$.toptip(data.message, 'error'); 
+				}
+				flg = true;
+			},
+			error : function() {
+				layer.closeAll();
+				alert("信息提交错误");
+				flg = true;
+			}
+		});
+	}
+
+	wx.config({
+		debug: false,
+		appId: '${appId!}',
+		timestamp: ${timestamp},
+		nonceStr: '${nonceStr!}',
+		signature: '${signature!}',
+		jsApiList: [
+			'checkJsApi',
+			'getLocation'
+		]
+	});
+
+	wx.ready(function() {
+		wx.getLocation({
+			type: 'wgs84',
+			success: function (res) {
+				var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+				var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+				var speed = res.speed;                            // 速度，以米/每秒计
+				var accuracy = res.accuracy;                      // 位置精度
+				var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+				var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+
+				translateCallback = function (point) {            // 回调函数
+					geoc.getLocation(point, function(rs) {
+						var addComp = rs.addressComponents;
+						var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+						$("#lng").val(parseFloat(point.lng).toFixed(6));
+						$("#lat").val(parseFloat(point.lat).toFixed(6));
+						$('#location').val(address);
+					});
+				};
+				setTimeout(function() {
+					BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+				}, 100);
+			},
+			cancel: function (res) {
+				console.log('用户拒绝授权获取地理位置');
+			},
+			fail: function (res) {
+				console.log(JSON.stringify(res));
+			}
+		});
+	});
+	
+	
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<div id="order">
+		<form action="${CPATH}/member/order/salesOrder" method="post" id="form">
+			<main>
+				<section class="weui-panel weui-panel_access order-customer-info">
+					<input type="hidden" id="lng" name="lng" value="">
+					<input type="hidden" id="lat" name="lat" value="">
+					<input type="hidden" id="location" name="location" value="">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<input type="hidden" id="customerId" name="customerId" value="" >
+							<input type="text" class="weui-input select-customer" id="customerName" name="customerName" value="" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<input type="text" class="weui-input" id="contact" name="contact" value="" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<input type="text" class="weui-input" id="mobile" name="mobile" value="" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<input type="hidden" id="address" name="address" value="">
+							<input type="text" class="weui-input" id="deliveryAddress" name="deliveryAddress" value="" readonly>
+						</div>
+					</div>
+					<div class="weui-cell weui-cell_access">
+					</div>
+					<div class="weui-cell weui-cell_access" style="display: none" id="pricedis">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								专享折扣&nbsp;&nbsp;
+							</div>
+							<input type="text" class="weui-input" id="discount" value="无" readonly>
+						</div>
+					</div>
+				</section>
+				<section class="weui-panel weui-panel_access delivery-info">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<div class="order-customer-info-title">
+								<i class="icon-clock-o top-btns" style="margin-top: 14px;color:#ea6f5a;"></i> 配送时间
+							</div>
+							<input type="text" class="weui-input" data-toggle='date' id="deliveryDate" name="deliveryDate" readonly>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</div>
+				</section>
+				<div id="detail">
+				<section class="dealer">
+					<div class="weui-cells__title black">经销商名称</div>
+					<div class="productList">
+						<div class="weui-panel weui-panel_access goods-detail common" style="display: none">
+							<input type="hidden" name="index" id="index" value="">
+							<input type="hidden" name="sellProductId" id="sellProductId" value="">
+							<input type="hidden" name="sellerId" id="sellerId" value="">
+							<input type="hidden" name="productId" id="productId" value="">
+							<input type="hidden" name="convert" id="convert" value="">
+							<input type="hidden" name="bigAccountPrice" id="bigAccountPrice" value="">
+							<input type="hidden" name="smallAccountPrice" id="smallAccountPrice" value="">
+							<input type="hidden" name="oldBigPrice" id="oldBigPrice" value="">
+							<input type="hidden" name="oldSmallPrice" id="oldSmallPrice" value="">
+
+							<nobr>
+								<p class="product_name" id="productName">
+								</p>
+							</nobr>
+							<div class="product_unit">
+								<p>规格：</p>
+								<span id="valueName"></span>
+							</div>
+							<div class="product_bUnit">
+								<span class="price" id="bigPriceSpan"></span>
+								<span class="unit" id="bigUnitSpan"></span>
+								<div class="spinner">
+									<input type="number" min="0" value="0" class="fl" id="bigNum" name="bigNum" readonly>
+								</div>
+								<input type="number" class="street-value"  id="bigPrice" value="0" name="bigPrice" readonly>
+							</div>
+							<div class="product_mUnit">
+								<span class="price" id="smallPriceSpan"></span>
+								<span class="unit" id="smallUnitSpan"></span>
+								<div class="spinner">
+									<input type="number" min="0" value="0" class="fl" id="smallNum" name="smallNum" readonly>
+								</div>
+								<input type="number" class="street-value" value="0" id="smallPrice" name="smallPrice" readonly>
+							</div>
+							<input type="hidden" id="rowTotal" name="rowTotal" value="">
+						</div>
+					</div>
+					<div class="order-customer-info bg-white" style="margin-top: .5rem!important;">
+						<div class="weui-cell weui-cell_access">
+							<div class="weui-cell__bd select-area">
+								<div class="order-customer-info-title">
+									客户类型
+									<span class="require">*</span>
+								</div>
+								<input type="hidden" id="customerType" class="customerType" name="customerType" value="">
+								<input type="text" placeholder="请选择客户类型" class="weui-input customerTypeName" id="customerTypeName" name="customerTypeName" value="" readonly>
+								<span class="weui-cell__ft"></span>
+							</div>
+						</div>
+						<div class="weui-cell weui-cell_access">
+							<div class="weui-cell__bd select-area">
+								<div class="order-customer-info-title">
+									收款方式
+									<span class="require">*</span>
+								</div>
+								<input type="hidden" id="receiveType" class="receiveType" name="receiveType" value="1">
+								<input type="text" placeholder="请选择收款方式" class="weui-input receiveTypeName" id="receiveTypeName" name="receiveTypeName" value="" readonly>
+								<span class="weui-cell__ft"></span>
+							</div>
+						</div>
+						<div class="weui-cell weui-cell_access">
+							<div class="weui-cell__bd select-area">
+								<div class="order-customer-info-title">
+									业务员
+									<span class="require">*</span>
+								</div>
+								<input type="hidden" id="user" class="user" name="user" value="1">
+								<input type="text" placeholder="请选择收款方式" class="weui-input userList" id="userList" name="userLis" value="" readonly>
+								<span class="weui-cell__ft"></span>
+							</div>
+						</div>
+							<div class="weui-cell weui-cell_access ft14 remark">
+								<div class="weui-cell__bd">
+									<textarea id="remark" class="remark" name="remark" placeholder="备注说明（70字以内）"></textarea>
+								</div>
+							</div>
+					</div>
+				</section>
+				</div>
+				<input type="hidden" id="total" name="total" value="">
+				<input type="hidden" id="totalNum" name="totalNum" value="">
+			</main>
+			<#include "_inc/_member_goback.html" />
+			<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+				<p class="total bg-gray weui-flex__item" id="totalNumSpan"></p>
+				<button type="button" id="shoppingCart" class="place-order yellow-button white">购物车</button>
+				<button type="button" id="placeOrder" class="place-order red-button">提交订单</button>
+			</footer>
+		</form>
+	</div>
+</div>
+</@layout>

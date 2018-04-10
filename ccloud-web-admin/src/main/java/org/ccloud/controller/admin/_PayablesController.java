@@ -218,7 +218,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
-				+ "payables.xlsx";
+				+ "应付账款.xlsx";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
 		List<Record> payablesList = page.getList();
@@ -237,7 +237,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, payablesExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -255,7 +255,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	} 
 	
 }

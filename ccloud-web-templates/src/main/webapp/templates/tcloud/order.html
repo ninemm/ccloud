@@ -53,10 +53,39 @@
 	#valueName {
 		max-width: 7.5rem;
 	}
+	.main-good {
+		width:1.5rem;
+		height:1.5rem;
+		line-height:1.5rem;
+		font-size: .7rem;
+		text-align:center;
+		border-radius:50%;
+		background-color: #ea6f5a;
+		position: absolute;
+		color: #fff;
+		top:50%;
+		margin-top:-.75rem;
+		left: .5rem;
+	}
+	#compositionValueName {
+    padding: 0 0.25rem;
+    margin-left: 2.2rem;
+    margin-right: 0.8rem;
+	}
+	#compositionValueName div {
+		white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	}
 </#macro>
 
 <#macro script>
 $(function() {
+	var refundStatus = getItemBykey("refund");
+	if (refundStatus == '1') {
+		$("#placeOrder").html("确认退货");
+	}
+
 	initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
 	wxReadyGetLocation(
@@ -166,28 +195,11 @@ $(function() {
 	total();
 	
 	//客户选择部分
-	var cpLock = true;
-	var time;
-
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		combo();
+		return false;
 	}).on("click", "#searchCancel", function() {
-			combo();
+		combo();
 	}).on("change", "#userId", function() {
 			combo();
 	}).on("change", "#customerTypeId", function() {
@@ -431,10 +443,11 @@ $(function() {
 	
 			$newProductDetail.find("#compositionPrice").val(el.compositionPrice);
 			$newProductDetail.find("#compositionId").val(el.compositionId);
+			$newProductDetail.find("#comTotalCount").val(el.compositionCount);
 			
 			$newProductDetail.find("#compositionNum").val(el.compositionNum);
 			
-			$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
+			$newProductDetail.find("#compositionValueName").html(el.compositionValueName);
 			$newProductDetail.find("#gift").html(el.compositionSub);
 		});
 	}
@@ -461,7 +474,7 @@ $(function() {
 		var compositions = $(".composition");
 		$.each(compositions, function(index, el) {
 			var $el = $(el);
-			var comNum = $el.find("#compositionNum").val();
+			var comNum = $el.find("#comTotalCount").val() * $el.find("#compositionNum").val();
 			rowTotal = $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
 			$el.find("#rowTotal").val(rowTotal);
 			total += rowTotal;
@@ -508,17 +521,26 @@ $(function() {
 					removeItemBykey("productList");
 					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
-					removeItemBykey("refund");
 					
 					$.modal({
 						title: data.message,
 						buttons: [
-							{ text: "查看订单", className: "default", onClick: function(){ 
-								location.href = "${CPATH}/order/myOrder";
+							{ text: "查看订单", className: "default", onClick: function(){
+									if (refund == '1') {
+										removeItemBykey("refund");
+										location.href = "${CPATH}/refund/myRefund";
+									} else {
+										location.href = "${CPATH}/order/myOrder";
+									}
 								} 
 							},
 							{ text: "继续下单", className: "primary", onClick: function(){
-								location.href = '${CPATH}/product';
+									if (refund == '1') {
+										removeItemBykey("refund");
+										location.href = '${CPATH}/product?refund=1';
+									} else {
+										location.href = '${CPATH}/product';
+									}
 								} 
 							},
 						]
@@ -611,7 +633,7 @@ $(function() {
 	
 	function combo() {
 		$customerList.empty();
-		loading = false;
+		loading = true;
 		page = 1;
 		initCustomerSelect();
 	}
@@ -812,17 +834,21 @@ $(function() {
 					</div>
 					<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
 						<input type="hidden" id="compositionId" name="compositionId" value="">
-						<nobr>
-							<p class="product_name" id="compositionName"></p>
-						</nobr>
+						<input type="hidden" id="comTotalCount" value="">
+						<p class="product_name" id="compositionName"></p>
+						<div class="product_unit">
+							<div class="main-good">主</div>
+							<div id="compositionValueName"></div>
+						</div>
+						<span class="weui-cell__ft"></span>
 						<div class="product_bUnit">
 							<span class="price" id="compositionPriceSpan"></span>
 							<div class="spinner">
 								<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
 							</div>
-							<input type="number" class="street-value"  id="compositionPrice" value="0" name="compositionPrice" readonly>
+							<input type="number" class="street-value" id="compositionPrice" value="0" name="compositionPrice" readonly>
 						</div>
-						<hr>
+						<div class="hr"></div>
 						<div id="gift" class="weui-flex">
 							<span>
 								<i class="icon-tags"></i>

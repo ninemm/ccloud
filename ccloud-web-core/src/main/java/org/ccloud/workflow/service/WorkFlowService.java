@@ -241,11 +241,7 @@ public class WorkFlowService {
 	 */
 	@Before(Tx.class)
 	public String startProcess(String id, String defKey, Map<String, Object> var) {
-		if (var == null) {
-			var = new HashMap<String, Object>();
-		}
 
-		var.put(Consts.WORKFLOW_APPLY_USERNAME, ShiroKit.getUsername());
 		ProcessInstance procIns = ActivitiPlugin.buildProcessEngine().getRuntimeService()
 				.startProcessInstanceByKey(defKey, id, var);
 		return procIns.getId();

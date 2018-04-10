@@ -100,8 +100,8 @@ public class _AdminController extends JBaseController {
 		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"desc"));
 		
 		Map<String, List<Record>> directBusinessAmount = Maps.newHashMap();
-		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","desc"));
-		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","desc"));
+		directBusinessAmount.put("directs_day", SalesOrderQuery.me()._querySellerSales(selDataArea, "day","desc"));
+		directBusinessAmount.put("directs_month", SalesOrderQuery.me()._querySellerSales(selDataArea, "month","desc"));
 		
 		Map<String, List<Record>> amountCollect = Maps.newHashMap();
 		amountCollect.put("amount_weeks", SalesOrderQuery.me().queryAmountBy(selDataArea, "weeks"));

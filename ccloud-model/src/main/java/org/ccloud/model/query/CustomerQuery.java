@@ -181,4 +181,14 @@ public class CustomerQuery extends JBaseQuery {
 		String sql = "select c.* from cc_customer c LEFT JOIN cc_seller_customer s on s.customer_id = c.id where s.id = ?";
 		return DAO.findFirst(sql, sellerCustomerId);
 	}
+
+	public Record findByCustomerId(String customerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT cc.mid_idno ShopID,cc.customer_name CustomerName,cc.contact LinkMan,cc.mobile LinkMobile,u.username ResponsableMan,cc.address CustomerAddress,cc.prov_name ProvinceName,cc.city_name CityName,");
+		fromBuilder.append("cc.country_name CountyName,u.username PersonName,cc.prov_code ProvinceID,cc.city_code CityID,cc.country_code CountyID,cc.create_date CreateTime,cc.modify_date ModifyTime FROM cc_customer cc");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.customer_id = cc.id");
+		fromBuilder.append(" LEFT JOIN cc_user_join_customer cujc ON cujc.seller_customer_id = csc.id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = cujc.user_id");
+		fromBuilder.append(" WHERE cc.id = '"+customerId+"'");
+		return Db.findFirst(fromBuilder.toString());
+	}
 }

@@ -30,9 +30,20 @@ input[type=number] {
   -webkit-appearance: none;
 }
 
-hr {
-  margin: 0.5rem 0;
-  border-top: #f3f5f7 1px solid;
+.hr {
+  position: relative;
+  height: .5rem;
+  margin-top: .5rem;
+}
+
+.hr::after{
+  content: ' ';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  border-top: 1px solid #bbb;
+  height: 1px;
 }
 
 select {
@@ -242,6 +253,10 @@ i.icon.icon-next {
   color: #101010;
 }
 
+.black3 {
+  color: #333;
+}
+
 .red {
   color: #e51c23;
 }
@@ -268,6 +283,10 @@ i.icon.icon-next {
 
 .border-right-1px {
   border-right: 1px solid #e5e5e5!important;
+}
+
+.border-bottom-1px {
+  border-bottom: 1px solid #e5e5e5!important;
 }
 
 .no-bg {
@@ -2125,7 +2144,7 @@ input[name=input-type] {
   top: 0.2rem;
 }
 
-.activity-detail-item .weui-cell:first-child input {
+.activity-detail-item>.weui-cell:first-child input {
   text-align: left!important;
   width: 40%;
   color: #3c8dbc;

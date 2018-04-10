@@ -72,7 +72,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 	@RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
-
+		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sort = getPara("sort");
 		String sortOrder = getPara("sortOrder");
@@ -396,9 +396,16 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	public void downloading() throws UnsupportedEncodingException {
 
 		String dataArea = getPara("data_area");
-
-		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
-				+ "customerInfo.xlsx";
+		User user = UserQuery.me().findDataArea(dataArea);
+		String filePath = "";
+		if(user == null) {
+			Department department = DepartmentQuery.me().findByDataArea(dataArea);
+			filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
+					+department.getDeptName()+ "的客户信息.xlsx";
+		}else {
+			filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
+					+user.getRealname()+ "的客户信息.xlsx";
+		}
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
@@ -424,7 +431,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, CustomerExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -442,7 +449,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		
 		ExcelExportUtil.closeExportBigExcel();
 
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}
 
 	@RequiresPermissions(value = { "/admin/sellerCustomer/uploading", "/admin/dealer/all",
@@ -973,6 +980,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
+
 			param.put("isEnable", isEnable);
 
 			WorkFlowService workflow = new WorkFlowService();

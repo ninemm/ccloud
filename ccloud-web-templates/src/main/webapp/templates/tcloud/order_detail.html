@@ -1,10 +1,13 @@
 <#include "_inc/_layout.html"/>
+<#macro script_import>
+	<script type='text/javascript' src="${CTPATH}/js/order_again.js"></script>
+</#macro>
 <#macro title>订单详细</#macro>
 <#macro css> </#macro>
 
 <#macro script>
-    function orderAgain() {
-        window.location.href = "${CPATH}/order/getOldOrder?orderId=${order.id}";
+    function orderTry() {
+        OrderAgain("${CPATH}/order/getOrderInfo?orderId=" + '${order.id}', "${CPATH}/product");
     }
 	function getback() {
 		var oldUrl = document.referrer;
@@ -49,12 +52,10 @@
 				<p>下单时间: ${(order.create_date)!}</p>
 				<p>业务员: ${(order.realname)!}</p>
 			</div>
-			<hr>
+			<div class="hr"></div>
 			<div class="ft14">
-				<#if order.receive_type = 0> <input type="checkbox"
-					name="if-account" checked disabled="disabled" class="weui-agree__checkbox"> <#else> <input
-					type="checkbox" name="if-account" disabled="disabled" class="weui-agree__checkbox">
-				</#if>是否账期
+				<#if order.receive_type = 0> <span class="tag" >账期</span> </#if>
+				<#if order.member_id ??><span class="tag" >终端下单</span> </#if>
 			</div>
 		</div>
 		<div class="weui-panel weui-panel_access">
@@ -142,7 +143,7 @@
 				</#if> 
 			</#if> 
 			</#list>
-			<hr>
+			<div class="hr"></div>
 			<div class="t-r ft14">
 				总计： <span class="red">${(order.total_amount)?string(',###.##')}元</span>
 			</div>
@@ -156,7 +157,7 @@
 				</p>
 				<p>地址详情：${(order.delivery_address)!}</p>
 			</div>
-			<hr>
+			<div class="hr"></div>
 			<div class="ft16">
 				备注信息： <span class="ft14"> <#if order.remark??>
 					${(order.remark)!} <#else>无 </#if> </span>
@@ -183,7 +184,7 @@
 			<#else>
 			<button onclick="getback()" class="white-button-no-border weui-flex__item">返回</button>
 			</#if>
-			<button onclick="orderAgain()" class="red-button weui-flex__item">再次购买</button>
+			<button onclick="orderTry()" class="red-button weui-flex__item">再次购买</button>
 		</footer>
 	</div>
 </div>

@@ -115,12 +115,12 @@ public class Consts {
 
 	public static final int SALES_ORDER_STATUS_PASS = 1000;//订单已审核
 	public static final int SALES_ORDER_STATUS_DEFAULT = 0;//订单待审核
-	public static final int SALES_ORDER_STATUS_CANCEL= 1001;//订单取消
+	public static final int SALES_ORDER_STATUS_CANCEL = 1001;//订单取消
 	public static final int SALES_ORDER_STATUS_REJECT = 1002;// 订单拒绝
-	public static final int SALES_ORDER_STATUS_PART_OUT= 2000;//订单部分出库
-	public static final int SALES_ORDER_STATUS_PART_OUT_CLOSE= 2001;//订单部分出库-订单关闭
-	public static final int SALES_ORDER_STATUS_ALL_OUT= 3000;//订单全部出库
-	public static final int SALES_ORDER_STATUS_ALL_OUT_CLOSE= 30001;//订单全部出库-订单关闭
+	public static final int SALES_ORDER_STATUS_PART_OUT = 2000;//订单部分出库
+	public static final int SALES_ORDER_STATUS_PART_OUT_CLOSE = 2001;//订单部分出库-订单关闭
+	public static final int SALES_ORDER_STATUS_ALL_OUT = 3000;//订单全部出库
+	public static final int SALES_ORDER_STATUS_ALL_OUT_CLOSE = 30001;//订单全部出库-订单关闭
 
 	public static final int SALES_ORDER_RECEIVE_TYPE_ACCOUNT = 0;//账期
 	public static final int SALES_ORDER_RECEIVE_TYPE_CASH = 1;//现金
@@ -128,15 +128,15 @@ public class Consts {
 	public static final String SALES_ORDER_ACTIVITY_APPLY_ID_OTHER = "1001";//其他活动
 
 	public static final int SALES_OUT_STOCK_STATUS_OUT = 1000;//出库单出库
-	public static final int SALES_OUT_STOCK_STATUS_PART_OUT= 2000;//出库单部分出库
+	public static final int SALES_OUT_STOCK_STATUS_PART_OUT = 2000;//出库单部分出库
 	public static final int SALES_OUT_STOCK_STATUS_DEFUALT = 0;//出库单待出库
 
 	public static final int SALES_REFUND_INSTOCK_DEFUALT = 0;//退货单待审核
 	public static final int SALES_REFUND_INSTOCK_PASS = 1000;//退货单已审核
-	public static final int SALES_REFUND_INSTOCK_CANCEL= 1001;//退货单撤销
-	public static final int SALES_REFUND_INSTOCK_REFUSE= 1002;//退货单拒绝
-	public static final int SALES_REFUND_INSTOCK_PART_OUT= 2000;//退货单部分入库
-	public static final int SALES_REFUND_INSTOCK_ALL_OUT= 3000;//退货单全部入库
+	public static final int SALES_REFUND_INSTOCK_CANCEL = 1001;//退货单撤销
+	public static final int SALES_REFUND_INSTOCK_REFUSE = 1002;//退货单拒绝
+	public static final int SALES_REFUND_INSTOCK_PART_OUT = 2000;//退货单部分入库
+	public static final int SALES_REFUND_INSTOCK_ALL_OUT = 3000;//退货单全部入库
 
 	public static final String BIZ_TYPE_INIT = "100201";//库存建账
 	public static final String BIZ_TYPE_INSTOCK = "100202";//采购入库
@@ -168,10 +168,12 @@ public class Consts {
 	public static final String OPTION_WEB_PROC_CUSTOMER_VISIT = "web_proc_customer_visit_";//新增拜访审核开关设置
 	public static final String OPTION_WEB_PROC_ACTIVITY_APPLY = "web_proc_activity_apply_";//申请活动审核开关设置
 	public static final String OPTION_DATA_UPLOAD_CUSTOMER_TYPE = "data_upload_customer_type_";//数据上传类型配置
+	public static final String OPTION_WEB_PROC_PLANS_LIMIT = "web_proc_plans_limit_";//计划起止日期配置
+	public static final String OPTION_WEB_MEMBER_NUMBER_LIMIT = "web_member_number_limit_";//数据上传类型配置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
 
 	public static final String OPTION_ON = "true";
-	public static final String OPTION_OFF= "false";
+	public static final String OPTION_OFF = "false";
 
 	public static final String CUSTOMER_SUB_TYPE_A = "100301";//A类
 	public static final String CUSTOMER_SUB_TYPE_B = "100302";//B类
@@ -191,8 +193,8 @@ public class Consts {
 	public static final String ROLE_CODE_010 = "010";//业务员
 	public static final String ROLE_CODE_011 = "011";//直营总监
 
-	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW= "订单审核";
-	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT= "订单打印";
+	public static final String OPERATE_HISTORY_TITLE_ORDER_REVIEW = "订单审核";
+	public static final String OPERATE_HISTORY_TITLE_ORDER_PRINT = "订单打印";
 
 	public static final String USER_DEFAULT_PASSWORD = "123456";// 重置初始密码
 
@@ -200,71 +202,85 @@ public class Consts {
 	public static final Integer SELLER_HAS_STORE_FALSE = 0;
 
 
-	public static final String SELLER_TYPE_DEALER= "0";//账套类型：经销商
+	public static final String SELLER_TYPE_DEALER = "0";//账套类型：经销商
 	public static final String SELLER_TYPE_SELLER = "1";//直营商
 	
-	public static final Integer SELLER_PRODUCT_SOURCE_DEALER= 0;//产品来源：经销商
+	public static final Integer SELLER_PRODUCT_SOURCE_DEALER = 0;//产品来源：经销商
 	public static final Integer SELLER_PRODUCT_SOURCE_OWN = 1;//自己	
 	
-	public static final String OBJECT_TYPE_ORDER= "order";//订单
+	public static final String OBJECT_TYPE_ORDER = "order";//订单
 	public static final String OBJECT_TYPE_CUSTOMER = "customer";//客户
-	public static final String OBJECT_TYPE_CUSTOMER_VISIT= "visit";//拜访
-	public static final String OBJECT_TYPE_ACTIVITY_APPLY= "activity";//活动
+	public static final String OBJECT_TYPE_CUSTOMER_VISIT = "visit";//拜访
+	public static final String OBJECT_TYPE_ACTIVITY_APPLY = "activity";//活动
 	//是否阅读 0:否 1:是
-	public static final Integer IS_READ= 1;
-	public static final Integer NO_READ= 0;
+	public static final Integer IS_READ = 1;
+	public static final Integer NO_READ = 0;
 	
-	//活动申请状态 0:待审 1 已审 2 撤回 3 拒绝 4 结束
+	//活动申请状态 0:待审 1 已审 2 撤回 3 拒绝 4 待核销 5 结束
 	public static final Integer ACTIVITY_APPLY_STATUS_WAIT = 0;
 	public static final Integer ACTIVITY_APPLY_STATUS_PASS = 1;
 	public static final Integer ACTIVITY_APPLY_STATUS_CANCEL = 2;
 	public static final Integer ACTIVITY_APPLY_STATUS_REJECT = 3;
-	public static final Integer ACTIVITY_APPLY_STATUS_END = 4;
+	public static final Integer ACTIVITY_APPLY_STATUS_VERIFICATION = 4;
+	public static final Integer ACTIVITY_APPLY_STATUS_END = 5;
 	
 	public static final String WAREHOUSE_TYPE_MY = "0";// 直属仓库
 	public static final String WAREHOUSE_TYPE_SELLER = "1";// 销售商仓库
 	public static final String WAREHOUSE_TYPE_CAR = "2";// 车销仓库
 	
 	//活动类型
-	public static final String CATEGORY_NORMAL="101001" ; //商品销售营销活动
-	public static final String CATEGORY_INVEST="101002" ; //投入活动
+	public static final String CATEGORY_NORMAL = "101001" ; //商品销售
+	public static final String CATEGORY_INVEST = "101002" ; //投入活动
 	
 	//投入类型
 	public static final String INVEST_TYPE = "activity_invest";//投入的类型
-	public static final String INVES_PUBLICK="101101" ; //公关赞助
-	public static final String INVEST_MATTER="101102" ; //宣传物料
-	public static final String INVEST_SHOP="101103" ; //消费培育
-	public static final String INVEST_TERMINSL_ADVERTISWMENT="101104" ; //终端广告
-	public static final String INVEST_TERMINSL_DISPLAY="101105" ; //终端陈列
-	public static final String INVEST_TERMINSL_CUSTOMER_VISITE="101106" ; //终端客情
-	public static final String INVEST_VEHICLE_COST="101107" ; //车辆费用
-	public static final String INVEST_PERSONAL_SELLING="101108" ; //人员推广
+	public static final String INVES_PUBLICK ="101101" ; //公关赞助
+	public static final String INVEST_CONSUMPTION_CULTIVATION ="101102" ; //消费培育
+	public static final String INVEST_TERMINSL_ADVERTISWMENT  ="101103" ; //终端广告
+	public static final String INVEST_TERMINSL_DISPLAY = "101104" ; //终端陈列
+	public static final String INVEST_CUSTOMER_VISITE = "101105" ; //终端客情
+	public static final String INVEST_SUPERMARKET_GIFT = "101106" ; //商超赠品
+	public static final String INVEST_SLOTTING_FEE = "101107" ; //进场费
 	
 	//客户参与活动的时间区间
-	public static final String TIME_INTERVAL_ONE="100801";//1个月
-	public static final String TIME_INTERVAL_TWO="100802";//2个月
-	public static final String TIME_INTERVAL_THREE="100803";//3个月
-	public static final String TIME_INTERVAL_FOUR="100804";//4个月
-	public static final String TIME_INTERVAL_FIVE="100805";//5个月
-	public static final String TIME_INTERVAL_SIX="100806";//6个月
-	public static final String TIME_INTERVAL_SEVEN="100807";//7个月
-	public static final String TIME_INTERVAL_EIGHT="100808";//8个月
-	public static final String TIME_INTERVAL_NINE="100809";//9个月
-	public static final String TIME_INTERVAL_TEN="100810";//10个月
-	public static final String TIME_INTERVAL_ELEVEN="100811";//11个月
-	public static final String TIME_INTERVAL_TWELVE="100812";//12个月
+	public static final String ACTIVE_TIME_INTERVAL = "activity_time_interval";
+	public static final String TIME_INTERVAL_ONE = "100801";//1个月
+	public static final String TIME_INTERVAL_TWO = "100802";//2个月
+	public static final String TIME_INTERVAL_THREE = "100803";//3个月
+	public static final String TIME_INTERVAL_FOUR = "100804";//4个月
+	public static final String TIME_INTERVAL_FIVE = "100805";//5个月
+	public static final String TIME_INTERVAL_SIX = "100806";//6个月
+	public static final String TIME_INTERVAL_SEVEN = "100807";//7个月
+	public static final String TIME_INTERVAL_EIGHT = "100808";//8个月
+	public static final String TIME_INTERVAL_NINE = "100809";//9个月
+	public static final String TIME_INTERVAL_TEN = "100810";//10个月
+	public static final String TIME_INTERVAL_ELEVEN = "100811";//11个月
+	public static final String TIME_INTERVAL_TWELVE = "100812";//12个月
 	
 	
 	public static final String PROC_CUSTOMER_REVIEW = "_customer_review";				// 客户审核
 	public static final String PROC_CUSTOMER_VISIT_REVIEW = "_customer_visit_review";	// 拜访审核
-	public static final String PROC_ORDER_REVIEW = "_order_review";						// 餐饮直供
-	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审
-	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审
-	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				// 订单3审
-	public static final String PROC_ORDER_REVIEW_FOUR = "_order_review_4";				// 订单1审（直营总监）
-	public static final String PROC_ORDER_REVIEW_FIVE = "_order_review_5";				// 订单2审（直营总监：财务）
 	public static final String PROC_ACTIVITY_APPLY_REVIEW = "_activity_apply_review";	// 活动审核
-	
+
+	//业务员下单
+	public static final String PROC_ORDER_REVIEW = "_order_review";						// 订单3审(账务→订单审核人→财务)
+	public static final String PROC_ORDER_REVIEW_ONE = "_order_review_1";				// 订单1审(订单审核人)
+	public static final String PROC_ORDER_REVIEW_TWO = "_order_review_2";				// 订单2审(订单审核人→财务)
+	public static final String PROC_ORDER_REVIEW_THREE = "_order_review_3";				//(暂未使用(准备做驳回流程))
+	public static final String PROC_ORDER_REVIEW_FOUR = "_order_review_4";				// 订单1审(直营总监)
+	public static final String PROC_ORDER_REVIEW_FIVE = "_order_review_5";				// 订单2审(直营总监→财务)
+
+	//终端下单(跟业务员下单对应,加一个业务员审核)
+	public static final String PROC_MEMBER = "_member";
+	public static final String PROC_MEMBER_ORDER_REVIEW = "_member_order_review";					// 终端订单4审(业务员→账务→订单审核人→财务)
+	public static final String PROC_MEMBER_ORDER_REVIEW_ZERO = "_member_order_review_0";			// 终端订单1审(业务员)
+	public static final String PROC_MEMBER_ORDER_REVIEW_ONE = "_member_order_review_1";				// 终端订单2审(业务员→订单审核人)
+	public static final String PROC_MEMBER_ORDER_REVIEW_TWO = "_member_order_review_2";				// 终端订单3审(业务员→订单审核人→财务)
+	public static final String PROC_MEMBER_ORDER_REVIEW_THREE = "_member_order_review_3";			//(暂未使用(准备做驳回流程))
+	public static final String PROC_MEMBER_ORDER_REVIEW_FOUR = "_member_order_review_4";		    // 终端订单2审(业务员→直营总监)
+	public static final String PROC_MEMBER_ORDER_REVIEW_FIVE = "_member_order_review_5";			// 终端订单3审(业务员→直营总监→财务)
+
+
 	public static final Integer STATUS_STATE_PUT = 1;// 通用上架
 	public static final Integer STATUS_STATE_DOWN = 0;// 通用下架
 	
@@ -282,8 +298,37 @@ public class Consts {
 	public static final String WEEK_PLAN = "101201";//周计划
 	public static final String MONTH_PLAN = "101202";//月计划
 	public static final String YEAR_PLAN = "101203";//年计划
+	//计划的显示方式
+	public static final String PLAN_SHOW_BIZUSER = "101204"; // 按业务员方式显示
+	public static final String PLAN_SHOW_SELLER_PRODUCT = "101205"; // 按产品方式显示
 	
+	public static final String ACTIVITY_CATEGORY_CODE = "101002";//活动类型(费用投入)
 	
 	public static final String WAREHOUSE_IDS_IS_NULL = "1";//当用户没有分配仓库时且不是经管时返回空值的仓库ID
+
+	public static final String COOKIE_LOGINED_MEMBER = "member";
+	public static final String SESSION_LOGINED_MEMBER = "_logined_member";
+	
+	public static final String FLOW_DICT_TYPE_NAME_SA = "feeType_name_SA"; //流程字典名: 进场费
+	public static final String FLOW_DICT_TYPE_NAME_RAISE = "feeType_name_raise";//消费培育
+	public static final String FLOW_DICT_TYPE_NAME_PR = "feeType_name_PR";//公关赞助
+	public static final String FLOW_DICT_TYPE_NAME_GIFT = "feeType_name_gift";//商超赠品
+	public static final String FLOW_DICT_TYPE_NAME_DISPLAY = "feeType_name_display";//终端陈列
+	public static final String FLOW_DICT_TYPE_NAME_AD = "feeType_name_AD";//终端广告
+	public static final String FLOW_DICT_TYPE_NAME_CHANNEL = "channel_define";//终端客情
+	public static final String CUSTOMER_IDNO="customer_idno";//终端ID
+	
+	//客户拜访状态
+	public static final String CUSTOMER_VISIT_STATUS_PASS = "100101"; //正常
+	public static final String CUSTOMER_VISIT_STATUS_DEFAULT = "100102"; //待审核
+	public static final String CUSTOMER_VISIT_STATUS_REJECT = "100103"; //拒绝
+	
+	//活动执行步骤模板类型
+	public static final String ACTIVITY_EXECUTE_TEMPLATE = "activity_execute_template"; //类型
+	public static final String ACTIVITY_EXECUTE_TEMPLATE_INPUT = "103016"; //输入框
+	public static final String ACTIVITY_EXECUTE_TEMPLATE_RADIO = "103017"; //单选
+	public static final String ACTIVITY_EXECUTE_TEMPLATE_CHECKBOX= "103018"; //多选
+	
+	public static final String GET_MID_DATA_TOTALROW = "100";//一次同步数据条数
 	
 }

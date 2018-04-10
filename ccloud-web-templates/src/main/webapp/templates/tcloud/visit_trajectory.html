@@ -96,7 +96,8 @@
         }).off("click", "#combin-filter .confirm-search-btn")
         .on("click", "#combin-filter .confirm-search-btn", function() {
             startDate = $('#start-date').val();
-            endDate = startDate + ' 23:59:59';
+            //endDate = startDate + ' 23:59:59';
+            endDate = $('#end-date').val() + ' 23:59:59';
             setItemBykey("startDate", startDate);
             setItemBykey("endDate", endDate);
             refresh();
@@ -104,13 +105,14 @@
 
         $("#start-date").calendar({
             maxDate: function() {
-                return $.today();
+                //return $.today();
+                return $('#end-date').val()
             }
         });
 
         $("#start-date").val($.today());
 
-        /*$("#end-date").calendar({
+        $("#end-date").calendar({
             minDate: function() {
                 var date = new Date($('#start-date').val().replace(/-/g,"/"));
                 date.setDate(date.getDate() - 1);
@@ -118,7 +120,7 @@
             }
         });
 
-        $("#end-date").val($.today());*/
+        $("#end-date").val($.today());
 
         $('#date').select({
             title: '选择时间',
@@ -259,11 +261,12 @@
 
 <article id="combin-filter">
     <div class="filter-item">
-        <div class="relative weui-flex" style="padding: 0 0.5rem;" id="getDate">
-            <div>拜访日期：</div>
+        <!--<div class="relative weui-flex" style="padding: 0 0.5rem;" id="getDate">-->
+        <div class="relative weui-flex" id="getDate">
+            <!--<div>拜访日期：</div>-->
             <input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
-            <!--<div style="width:1rem" class="t-c">—</div>-->
-            <!--<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>-->
+            <div style="width:1rem" class="t-c">—</div>
+            <input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
         </div>
     </div>
     <div id="list"></div>

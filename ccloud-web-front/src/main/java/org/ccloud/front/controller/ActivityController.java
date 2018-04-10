@@ -1,6 +1,7 @@
 package org.ccloud.front.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,15 +42,12 @@ import org.ccloud.workflow.service.WorkFlowService;
 public class ActivityController extends BaseFrontController {
 
 	public void index() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		List<Record> activityRecords = ActivityQuery.me().findActivityListForApp(sellerId, "", "");
 		for(int i = 0; i <activityRecords.size();i++){
 			if(activityRecords.get(i).getStr("customer_type")!="") {
 				activityRecords.get(i).set("customerTypeName", ActivityQuery.me().getCustomerTypes(activityRecords.get(i).getStr("customer_type")));}
-			if(StrKit.notBlank(activityRecords.get(i).getStr("total_customer_num"))) {
-				activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
-			}
+			//activityRecords.get(i).set("surplusNum",Integer.parseInt( activityRecords.get(i).getStr("total_customer_num"))-ActivityApplyQuery.me().findByUserIdAndActivityId(activityRecords.get(i).getStr("id"),user.getId()).size());
 		}
 		List<Map<String, Object>> activityList = new ArrayList<Map<String, Object>>();
 		
@@ -166,15 +164,35 @@ public class ActivityController extends BaseFrontController {
 			item.put("value", customer_type);
 			customerTypes.add(item);
 		}
+		List<ExpenseDetail> expenseDetails = ExpenseDetailQuery.me().findByActivityId(activity_id);
+		List<Map<String, Object>> details = new ArrayList<>();
+		for(ExpenseDetail detail:expenseDetails) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", getExpenseTitle(detail));
+			item.put("value", detail.getId());
+			details.add(item);
+		}
 
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		setAttr("customerTypeId", customer_type);
 		setAttr("areaType", activity.getStr("area_type"));
-
+		setAttr("details",JSON.toJSON(details));
 		render("activity_apply.html");
 	}
-
+	
+	private String getExpenseTitle(ExpenseDetail detail) {
+		String type = DictQuery.me().findByKey(detail.getFlowDictType(), detail.getItem1()).getName();
+		if (detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY)) {
+			String disType = DictQuery.me().findByKey(detail.getDisplayDictType(), detail.getItem2()).getName();
+			type = type + ":" + disType;
+		} else if(detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_SA)) {
+			String productName = SellerProductQuery.me().findById(detail.getItem2()).getCustomName();
+			type = type + ":" + productName;
+		}
+		return type;
+	}
+	
 	@Before(Tx.class)
 	public void apply() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -183,46 +201,99 @@ public class ActivityController extends BaseFrontController {
 		final Date createDate = new Date();
 
 		String[] sellerCustomerIdArray = getParaValues("sellerCustomerId");
+		String[] sellerCustomerNameArray = getParaValues("sellerCustomerName");
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_ACTIVITY_APPLY + sellerCode);
-		String activity_id = getPara("activity_id");
-		Integer visit_nums = 0;
-		if(StrKit.notBlank(getPara("visit_num"))) {
-			visit_nums = getParaToInt("visit_num");
-		}
-		for (String sellerCustomerId : sellerCustomerIdArray) {
-			//活动申请check
-			String result = this.check(activity_id, sellerCustomerId,user.getId());
-			Customer customer = CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
-			if(StrKit.notBlank(result)) {
-				renderAjaxResultForError(result);
-				return;
-			}
-			ActivityApply activityApply = new ActivityApply();
-			String activityApplyId = StringUtils.getUUID();
-			activityApply.setId(activityApplyId);
-			activityApply.setActivityId(activity_id);
-			activityApply.setSellerCustomerId(sellerCustomerId);
-			activityApply.setBizUserId(user.getId());
-			activityApply.setNum(visit_nums);
-			activityApply.setContent(content);
-			
-			if (startProc != null && startProc) {
-				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
-				activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
-				String procInstId = this.start(activityApplyId, customer.getCustomerName(), Consts.PROC_ACTIVITY_APPLY_REVIEW);
-				if(procInstId.equals("error")) {
-					renderAjaxResultForError("您没有配置审核人，请联系管理员");
+		String[] expenseDetailIds = getParaValues("expense_detail_id");
+		String[] activity_ids = getParaValues("activity_id");
+ 		String[] applyNum = getParaValues("apply_num");
+		String[] applyAmount = getParaValues("apply_amount");
+		if(expenseDetailIds!=null) {
+			expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
+			for (String sellerCustomerId : sellerCustomerIdArray) {
+				//活动申请check
+				String result = this.check(activity_ids[0], sellerCustomerId);
+				
+				if(StrKit.notBlank(result)) {
+					renderAjaxResultForError(result);
 					return;
 				}
-				activityApply.setProcInstId(procInstId);
-			}else {
-				activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
+				for(int j = 0; j < expenseDetailIds.length; j++) {
+					for (int i = 0; i < activity_ids.length; i++) {
+						
+						ActivityApply activityApply = new ActivityApply();
+						String activityApplyId = StringUtils.getUUID();
+						activityApply.setId(activityApplyId);
+						activityApply.setActivityId(activity_ids[i]);
+						activityApply.setSellerCustomerId(sellerCustomerId);
+						activityApply.setBizUserId(user.getId());
+						activityApply.setApplyNum(new BigDecimal(applyNum[j]));
+						activityApply.setApplyAmount(new BigDecimal(applyAmount[j]));
+						activityApply.setNum(0);
+						activityApply.setContent(content);
+						
+						if (startProc != null && startProc) {
+							activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+							activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
+							String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
+							if(procInstId.equals("error")) {
+								renderAjaxResultForError("您没有配置审核人，请联系管理员");
+								return;
+							}
+							activityApply.setProcInstId(procInstId);
+						}else {
+							activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
+						}
+						
+						activityApply.setDataArea(user.getDataArea());
+						activityApply.setCreateDate(createDate);
+						activityApply.setExpenseDetailId(expenseDetailIds[j]);
+						activityApply.save();
+					}
+				}
 			}
-			
-			activityApply.setDataArea(user.getDataArea());
-			activityApply.setCreateDate(createDate);
-			activityApply.save();
+		}else {
+			for (String sellerCustomerId : sellerCustomerIdArray) {
+				//活动申请check
+				String result = this.check(activity_ids[0], sellerCustomerId);
+				
+				if(StrKit.notBlank(result)) {
+					renderAjaxResultForError(result);
+					return;
+				}
+				for (int i = 0; i < activity_ids.length; i++) {
+					
+					ActivityApply activityApply = new ActivityApply();
+					String activityApplyId = StringUtils.getUUID();
+					activityApply.setId(activityApplyId);
+					activityApply.setActivityId(activity_ids[i]);
+					activityApply.setSellerCustomerId(sellerCustomerId);
+					activityApply.setBizUserId(user.getId());
+					activityApply.setNum(0);
+					activityApply.setContent(content);
+					activityApply.setApplyNum(new BigDecimal(applyNum[0]));
+					activityApply.setApplyAmount(new BigDecimal(applyAmount[0]));
+					
+					if (startProc != null && startProc) {
+						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
+						activityApply.setProcInstId(Consts.PROC_ACTIVITY_APPLY_REVIEW);
+						String procInstId = this.start(activityApplyId, sellerCustomerNameArray[i], Consts.PROC_ACTIVITY_APPLY_REVIEW);
+						if(procInstId.equals("error")) {
+							renderAjaxResultForError("您没有配置审核人，请联系管理员");
+							return;
+						}
+						activityApply.setProcInstId(procInstId);
+					}else {
+						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_PASS);
+					}
+					
+					activityApply.setDataArea(user.getDataArea());
+					activityApply.setCreateDate(createDate);
+					activityApply.setExpenseDetailId("");
+					activityApply.save();
+				}
+			}
 		}
+
 		renderAjaxResultForSuccess("申请成功");
 	}
 
@@ -263,9 +334,9 @@ public class ActivityController extends BaseFrontController {
 		return procInstId;
 	}
 
-	private String check(String activityId, String sellerCustomerId,String userId) {
+	private String check(String activityId, String sellerCustomerId) {
 		Activity activity = ActivityQuery.me().findById(activityId);
-//		List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
+		//List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
 		if(activity.getStartTime().after(new Date())) {
 			return "活动还没有开始";
 		}
@@ -273,10 +344,16 @@ public class ActivityController extends BaseFrontController {
 			return "活动参与的人数已经达到上限";
 		}*/
 		Customer customer = CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
-		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityId(sellerCustomerId,activityId);
+		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId);
+		if (applys.size() >= activity.getJoinNum()) {
+			return customer.getCustomerName()+"--该客户参与该活动的次数已经达到上限";
+		}
+		/*List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId,expenseDetailId);
 		if (applys.size() >= activity.getJoinNum()) {
 			return "客户 "+customer.getCustomerName()+" 参与该活动的次数已经达到上限";
 		}
+			return "该客户参与该活动的次数已经达到上限";
+		}*/
 		/*int interval = this.getStartDate(activity.getTimeInterval());
 		DateTime dateTime = new DateTime(new Date());
 		long cnt = ActivityApplyQuery.me().findBySellerCustomerIdAndActivityId(activityId, sellerCustomerId, DateUtils.format(dateTime.plusMonths(-interval).toDate()));
@@ -395,7 +472,7 @@ public class ActivityController extends BaseFrontController {
 		String activityApplyId = getPara("activityApplyId");
 		String taskId = getPara("taskId");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
-
+		ExpenseDetail expenseDetail = new ExpenseDetail();
 		boolean isCheck = false;
 		if (user != null && getPara("assignee", "").contains(user.getUsername())) {
 			isCheck = true;
@@ -408,32 +485,22 @@ public class ActivityController extends BaseFrontController {
 			message.setIsRead(Consts.IS_READ);
 			message.update();
 		}
-		String[] investTypes = activityApply.getStr("invest_type").split(",");
+		String investTypes = activityApply.getStr("invest_type");
 		String investType = "";
-		for(int i=0;i<investTypes.length;i++){
-			if(investTypes[i].equals(Consts.INVES_PUBLICK)){
-				investType +="公关赞助、";
-			}else if (investTypes[i].equals(Consts.INVEST_MATTER)){
-				investType +="宣传物料、";
-			}else if (investTypes[i].equals(Consts.INVEST_SHOP)){
-				investType +="消费培育、";
-			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)){
-				investType +="终端广告、";
-			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_DISPLAY)){
-				investType +="终端陈列、";
-			}else if (investTypes[i].equals(Consts.INVEST_TERMINSL_CUSTOMER_VISITE)){
-				investType +="终端客情、";
-			}else if (investTypes[i].equals(Consts.INVEST_VEHICLE_COST)){
-				investType +="车辆费用、";
-			}else if (investTypes[i].equals(Consts.INVEST_PERSONAL_SELLING)){
-				investType +="人员推广、";
-			}
+		if(!investTypes.equals("")) {
+			investType = DictQuery.me().findByValue(investTypes).getName();
+		}
+		if(investTypes.equals(Consts.INVES_PUBLICK) || investTypes.equals(Consts.INVEST_CONSUMPTION_CULTIVATION) || investTypes.equals(Consts.INVEST_TERMINSL_ADVERTISWMENT) || investTypes.equals(Consts.INVEST_SUPERMARKET_GIFT)){
+			expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
+		}else if (investTypes.equals(Consts.INVEST_TERMINSL_DISPLAY) || investTypes.equals(Consts.INVEST_CUSTOMER_VISITE) || investTypes.equals(Consts.INVEST_SLOTTING_FEE)){
+			expenseDetail = ExpenseDetailQuery.me()._findById(activityApply.getExpenseDetailId());
 		}
 		if(!investType.equals("")) {
-			setAttr("investType",investType.substring(0, investType.length()-1));
+			setAttr("investType",investType);
 		}
 		setAttr("taskId", taskId);
 		setAttr("activityApply", activityApply);
+		setAttr("expenseDetail",expenseDetail);
 		setAttr("statusName", getStatusName(activityApply.getInt("status")));
 		render("activity_apply_review.html");
 	}
@@ -447,6 +514,8 @@ public class ActivityController extends BaseFrontController {
 			return "申请取消";
 		if (status == Consts.ACTIVITY_APPLY_STATUS_REJECT)
 			return "审核拒绝";
+		if (status == Consts.ACTIVITY_APPLY_STATUS_VERIFICATION)
+			return "活动结束";
 		if (status == Consts.ACTIVITY_APPLY_STATUS_END)
 			return "活动结束";
 
@@ -485,12 +554,17 @@ public class ActivityController extends BaseFrontController {
 		String endDate = getPara("endDate");
 		String keyword = getPara("keyword");
 
-
+		
 		Page<Record> applyList = ActivityApplyQuery.me().findList(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, category, status, startDate, endDate, keyword);
 
 		DecimalFormat df   = new DecimalFormat("######0.00");
+		List<Map<String, Object>> applyL = new ArrayList<>();
 		StringBuilder html = new StringBuilder();
 		for (Record apply : applyList.getList()) {
+			List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityId(apply.getStr("activity_id"));
+			List<String> strings = new ArrayList<>();
+			String sellerCustomerId = apply.getStr("seller_customer_id");
+			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByApplyIdAndSellerCustomerId(apply.getStr("id"), sellerCustomerId);
 			html.append("<section>\n");
 			html.append("<div class=\"weui-cells__title\"></div>");
 
@@ -499,7 +573,6 @@ public class ActivityController extends BaseFrontController {
 			else if (apply.getStr("status").equals("2")) html.append("<div class=\"widthdraw\">\n");
 			else if (apply.getStr("status").equals("3")) html.append("<div class=\"failed\">\n");
 			else html.append("<div class=\"checking\">\n");
-
 			html.append("                        <a class=\"weui-cell weui-cell_access\" href=\"/activity/applyDetail?id=" + apply.getStr("id") + "\">\n" +
 					"                            <i class=\"icon-tags\"></i>\n" +
 					"                            <div class=\"weui-cell__bd\">" + apply.getStr("customer_name") + "</div>\n" +
@@ -508,10 +581,19 @@ public class ActivityController extends BaseFrontController {
 			else if (apply.getStr("status").equals("1")) html.append("已通过\n");
 			else if (apply.getStr("status").equals("2")) html.append("已撤回\n");
 			else if (apply.getStr("status").equals("3")) html.append("已拒绝\n");
+			else if (apply.getStr("status").equals("4")) html.append("待核销\n");
 			else html.append("结束\n");
-
+			String expenseDetailName = "";
+			if(StrKit.notBlank(apply.getStr("expenseDetailName"))) {
+				expenseDetailName = apply.getStr("expenseDetailName");
+			}
+			String applyTitle = "";
+			if(StrKit.notBlank(apply.getStr("title"))) {
+				applyTitle = apply.getStr("title");
+			}
 			html.append("                            </span>\n" +
 					"                        </a>\n" +
+					"                       <div class=\"weui-cell__bd\" style=\"text-align:center;\">" +applyTitle+"  "+ expenseDetailName+ "</div>\n" +
 					"                        <div class=\"weui-flex\">\n" +
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>开始日期</p>\n" +
@@ -528,42 +610,57 @@ public class ActivityController extends BaseFrontController {
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>预计费用</p>\n" +
 					"                                <p>");
-			if(apply.get("invest_amount")!=null) html.append(df.format(Double.parseDouble(apply.get("invest_amount").toString())));
+			if(apply.get("apply_amount")!=null) html.append(df.format(Double.parseDouble(apply.getStr("apply_amount"))));
 			else html.append("0.00");
-			html.append( "</p>\n" +
-					"                            </div>\n" +
-					"                        </div>\n" +
+			if(activityExecutes.size()>0) {
+				html.append( "						</p>\n" +
+						"						</div>\n"+
+						"						</div>\n"+
+						"                        <div class=\"weui-flex\">\n");
+				html.append("  <div class=\"stepCont stepCont2\" id =\""+apply.getStr("id")+"\">\n" + 
+						"      <!-- <div class=\"ystep\"></div> -->\n" + 
+						"      <input type = \"hidden\" class = \"orderList\" value = \""+apply.getStr("id")+"\">\n" + 
+						"      <div class='ystep-container ystep-lg ystep-blue'></div>\n" + 
+						"  </div>");				
+				for(ActivityExecute activityExecute:activityExecutes) {
+					strings.add(activityExecute.getOrderList());
+				}
+			}
+			
+			html.append( "                        </div>\n" +
 					"                    </div>\n" +
 					"                </section>");
+			Map<String, Object> map1 = new HashMap<>();
+			map1.put("activityApply", apply);
+			map1.put("strings", strings);
+			map1.put("num", customerVisits.size());
+			applyL.add(map1);
 		}
-
 		Map<String, Object> map = new HashMap<>();
 		map.put("html", html.toString());
 		map.put("totalRow", applyList.getTotalRow());
 		map.put("totalPage", applyList.getTotalPage());
+		map.put("applyL", applyL);
 		renderJson(map);
 	}
 
 	public void applyDetail() {
 		String id = getPara("id");
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(id);
-		List<Dict> dicts = DictQuery.me().findDictByType(Consts.INVEST_TYPE);
-		if(!activityApply.getStr("invest_type").equals("")) {
-			String[] investTypes = activityApply.getStr("invest_type").split(",");
-			String invesType= "";
-			for(int i=0;i<investTypes.length;i++) {
-				for(int j = 0 ;j<dicts.size();j++) {
-					if(dicts.get(j).getValue().equals(investTypes[i])) {
-						invesType += dicts.get(j).getName()+"、";
-						break;
-					}
-				}
-			}
-			setAttr("invesType", invesType.substring(0, invesType.length()-1));
+		ExpenseDetail expenseDetail = new ExpenseDetail();
+		String invesType= "";
+		String investTypes = activityApply.getStr("invest_type");
+		if(!investTypes.equals("")) {
+			invesType = DictQuery.me().findByValue(investTypes).getName();
 		}
-		
+		if(investTypes.equals(Consts.INVES_PUBLICK) || investTypes.equals(Consts.INVEST_CONSUMPTION_CULTIVATION) || investTypes.equals(Consts.INVEST_TERMINSL_ADVERTISWMENT) || investTypes.equals(Consts.INVEST_SUPERMARKET_GIFT)){
+			expenseDetail = ExpenseDetailQuery.me().findById(activityApply.getExpenseDetailId());
+		}else if (investTypes.equals(Consts.INVEST_TERMINSL_DISPLAY) || investTypes.equals(Consts.INVEST_CUSTOMER_VISITE) || investTypes.equals(Consts.INVEST_SLOTTING_FEE)){
+			expenseDetail = ExpenseDetailQuery.me()._findById(activityApply.getExpenseDetailId());
+		}
+		setAttr("invesType", invesType);
 		setAttr("apply", activityApply);
-
+		setAttr("expenseDetail",expenseDetail);
 		render("apply_detail.html");
 
 	}
@@ -628,5 +725,39 @@ public class ActivityController extends BaseFrontController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
 		renderJson(map);
+	}
+	
+	//获取活动明细剩余可申请金额与数量
+	public void getSurplusInfo() {
+		String id = getPara("ids");
+		String[] ids = new String [] {};
+		if (id != null) {
+			ids = id.split(",");
+		}
+		List<Map<String, String>> list = new ArrayList<>();
+		for (int i = 0; i < ids.length; i++) {
+			if (StrKit.isBlank(ids[i])) {
+				continue;
+			}
+			ExpenseDetail detail = ExpenseDetailQuery.me().findSurplusById(ids[i]);
+			Map<String, String> map = new HashMap<>();
+			if (detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_PR) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_RAISE)
+					||detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_AD) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_GIFT)) {
+				map.put("num", null);
+				BigDecimal surplusMoney = new BigDecimal(detail.getItem2()).subtract(new BigDecimal(detail.get("amount").toString()));
+				map.put("amount", surplusMoney.toString());
+			} else if(detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL)) {
+				BigDecimal surplusMoney = new BigDecimal(detail.getItem4()).subtract(new BigDecimal(detail.get("amount").toString()));
+				BigDecimal surplusNum = new BigDecimal(detail.getItem3()).subtract(new BigDecimal(detail.get("num").toString()));
+				map.put("num", surplusNum.toString());
+				map.put("amount", surplusMoney.toString());
+			} else {
+				BigDecimal surplusMoney = new BigDecimal(detail.getItem3()).subtract(new BigDecimal(detail.get("amount").toString()));
+				map.put("num", null);
+				map.put("amount", surplusMoney.toString());
+			}
+			list.add(map);
+		}
+		renderJson(list);
 	}
 }

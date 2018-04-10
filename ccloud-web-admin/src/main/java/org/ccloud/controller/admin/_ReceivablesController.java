@@ -212,7 +212,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
-				+ "receivables.xlsx";
+				+ "应收账款.xlsx";
 		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,keyword);
 		List<Record> receivablesList = page.getList();
 		
@@ -230,7 +230,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, receivablesExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -248,6 +248,6 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	} 
 }

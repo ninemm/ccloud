@@ -20,43 +20,24 @@
 
 <#macro script>
 $(function() {
-	var cpLock = true;
-	var time;
-
     $(document).on("click", "#sidebar li", function () {
-        $(this).addClass("active").siblings().removeClass("active");
-        var index = $(this).index();
-     	$('.type').eq(index).show().siblings('.type').hide();
-
+			$(this).addClass("active").siblings().removeClass("active");
+			var index = $(this).index();
+			$('.type').eq(index).show().siblings('.type').hide();
     }).on("click", ".product-content .swiper-slide", function () {
-        $(this).addClass("active").siblings().removeClass("active");
-		tag = $(this).text();
-		if(tag == '全部') {
-			tag = '';
-		}
-		changeInit();
-
-    }).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				keyword = $(this).val();
-				changeInit();},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				keyword = $(this).val();
-				changeInit();},500);
-		}
-	}).on("click", "#searchCancel", function () {
+      $(this).addClass("active").siblings().removeClass("active");
+      tag = $(this).text();
+      if(tag == '全部') {
+        tag = '';
+      }
+      changeInit();
+    }).on("submit", ".weui-search-bar__form", function() {
+			keyword = $(this).val();
+			changeInit();
+			return false;
+		}).on("click", "#searchCancel", function () {
     	keyword = $(this).val();
-		changeInit();
-		
+      changeInit();
     }).on("click", ".product-top", function () {
     	var $this = $(this);
     	var $activityDiv = $this.parents(".common");

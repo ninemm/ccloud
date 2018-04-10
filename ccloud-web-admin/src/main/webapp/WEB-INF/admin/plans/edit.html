@@ -47,13 +47,23 @@
 <#macro script>
 	
 	var $form = $("#form");
+	$("#userId").select2({
+		width: '100%',
+		placeholder: '请选择需要添加的业务员'
+	});
+	$(".select2-search__field").css("width","120%");
 	var num = 0;
+	var ti = ${(ti)!};
 	$(function() {
 		jQuery.mm.initValidator('#form', validatorFields)
-		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
-		jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker('form', '#month', 'month', 'yyyy-MM', 3, 10, 3);
+		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		addProduct()
-		var planType = $("#planType").find("option:selected").val();
+		$(".monthYear").show();
+		$(".month").show();
+		$("#planType").val("101202");
+		/*var planType = $("#planType").find("option:selected").val();
 		if(planType == '101201'){
 			$(".monthYear").hide();
 			$(".weekTime").show();
@@ -67,7 +77,25 @@
 			$(".year").show();
 			$(".weekTime").hide();
 			$(".month").hide();
+		}*/
+		
+	});
+	$(document).on("change", "#month", function() {
+		var date = new Date($("#month").val()+"-"+ti);
+		var year = date.getFullYear();
+	    var mon = date.getMonth()+2;     
+		if(ti == "01"){
+			mon = date.getMonth()+1;
 		}
+		if(mon == "13"){
+			year = date.getFullYear()+1;
+			mon = "01";
+		}
+	    var day=date.getTime()-1000*60*60*24; 
+	    date.setTime(day);
+	    var strDay=date.getDate();  
+		$("#startDate").val($("#month").val()+"-"+ti);
+		$("#endDate").val(year+"-"+mon+"-"+strDay);
 		
 	});
 	$(document).on("change", "#planType", function() {
@@ -88,6 +116,19 @@
 		}
 	});
 	var validatorFields = {
+		'month': {
+			validators: {
+				notEmpty: { message: '计划月份不能为空' }
+			}
+		},'startDate': {
+			validators: {
+				notEmpty: { message: '开始时间不能为空' }
+			}
+		},'endDate': {
+			validators: {
+				notEmpty: { message: '结束时间不能为空' }
+			}
+		}
 	};
 	
 	function doSubmit(){
@@ -185,19 +226,28 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">计划类型:</label>
 						<div class="input-group col-sm-8 input-group-sm">
-							<select  class="form-control" name="planType" id="planType" style="float: left;padding-right:5px;margin-right:5px;">
+							<!-- <select  class="form-control" name="planType" id="planType" style="float: left;padding-right:5px;margin-right:5px;">
 								<#if dicts??>
 									<#list dicts as dict>
 										<option value="${(dict.value)}">${(dict.name)}</option>
 									</#list>
 								</#if>
-							</select>
+							</select> -->
+							<input id="aplanType" class="form-control" type="text" value="月计划" name="aplanType" readonly>
 						</div>
 					</div>
 					<div class="col-sm-5 validata-box">
-						<label class="control-label col-sm-4">计划人员:</label>
+						<label class="control-label col-sm-4">业务人员:</label>
+						<input type = "hidden" id = "planType" name = "planType" value="">
 						<div class="input-group col-sm-8 input-group-sm">
-							<select  class="form-control" name="userId" id="userId" style="float: left;padding-right:5px;margin-right:5px;">
+							<!-- <select  class="form-control" name="userId" id="userId" style="float: left;padding-right:5px;margin-right:5px;">
+								<#if users??>
+									<#list users as user>
+										<option value="${(user.id)}">${(user.realname)}</option>
+									</#list>
+								</#if>
+							</select> -->
+							<select class="form-control input-sm" name="userId" id="userId" multiple="multiple" style = "height:30px;">
 								<#if users??>
 									<#list users as user>
 										<option value="${(user.id)}">${(user.realname)}</option>
@@ -209,8 +259,12 @@
 				</div>
 				<div class="form-group monthYear">
 					<div class="col-sm-5 validata-box month">
-						<label class="control-label col-sm-4">计划周期:</label>
-						<div class="input-group col-sm-8 input-group-sm">
+	                    <label class="control-label col-sm-4">计划月份:</label>
+	                    <div class="col-sm-8 input-group input-group-sm">
+	                        <input id="month" class="form-control" type="text" value="${month!}" name="month" placeholder="活动计划月份" >
+	                    </div>
+	                </div>
+						<!-- <div class="input-group col-sm-8 input-group-sm">
 							<select  class="form-control" name="month" id="month" style="float: left;padding-right:5px;margin-right:5px;">
 								<#if months??>
 									<#list months as month>
@@ -218,9 +272,9 @@
 									</#list>
 								</#if>
 							</select>
-						</div>
+						</div> -->
 					</div>
-					<div class="col-sm-5 validata-box year">
+					<!--<div class="col-sm-5 validata-box year">
 						<label class="control-label col-sm-4">计划周期:</label>
 						<div class="input-group col-sm-8 input-group-sm">
 							<select  class="form-control" name="year" id="year" style="float: left;padding-right:5px;margin-right:5px;">
@@ -232,7 +286,7 @@
 							</select>
 						</div>
 					</div>
-				</div>
+				</div>-->
 				<div class="form-group weekTime">
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">开始时间:</label>
@@ -246,7 +300,7 @@
 							<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 						</div>
 					</div>
-				</div>
+				</div> 
 				<h4>计划明细</h4>
 				<table id="table" class="table table-bordered table-hover text-center" width="100%" name="row">
 					<thead>
@@ -265,9 +319,9 @@
 							<td>
 								<span class="rowNum">0</span>
 							</td>
-							<td>
+							<td style = "padding-top:0px;">
 								<div class = "validata-box">
-									<select id="sellerProduct" name="sellerProduct" class="form-control">
+									<select id="sellerProduct" name="sellerProduct" class="form-control" style="height:30px;">
 										<option value="0">---请选择---</option>
 										<#if sellerProducts??>
 											<#list sellerProducts as sp>

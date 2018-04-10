@@ -34,10 +34,8 @@ datetimepicker.min.css">
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initEditTableExport3('#_customerDetailsReport_table',url, initParams,  initFields(), null);
-		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',urlGift, 
-
-	initParams, initFieldsGift(), null);
+		jQuery.mm.initEditTableExport3('#_customerDetailsReport_table',url, initParams,  initFields(), null,null,"销售详情（客户）");
+		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',urlGift, initParams, initFieldsGift(), null,null,"赠品详情（客户）");
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');

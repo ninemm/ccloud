@@ -1,14 +1,12 @@
 <#include "_inc/_layout.html"/>
 <#macro script_import>
 	<script src="${CPATH}/static/ccloud/admin/js/common.js"></script>
+	<script type='text/javascript' src="${CTPATH}/js/order_again.js"></script>
 </#macro>
 <#macro title>我的订单</#macro>
 <#macro css>
-	#orderSn {
-		color: #999;
-	}
 	#my-order {
-		top: 153px;
+		top: 44px;
 		position: absolute;
 		bottom: 0;
 	}
@@ -19,6 +17,13 @@
 		right:4rem;
 		height:3rem;
 		background: rgba(0,0,0,0);
+	}
+	.with-report-top {
+		position: absolute;
+		top: 5rem;
+		left: 0;
+		right: 0;
+		bottom: 0;
 	}
 </#macro>
 <#macro script>
@@ -40,29 +45,12 @@
 			setItemBykey("endDate", $.today() + ' 23:59:59');    			
 		</#if>
 		
-		var cpLock = true;
-        var time;
-
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-        }).on("compositionend", "#searchInput", function() {
-            cpLock = true;
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-					setItemBykey("keyword", $("#searchInput").val());
-					combo();
-				},500);
-            }
-        }).on("input", "#searchInput", function() {
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-					setItemBykey("keyword", $("#searchInput").val());
-					combo();
-                },500);
-            }
-        }).on("click", "#searchCancel", function() {
+		$(document).on("submit", ".weui-search-bar__form", function() {
+			setItemBykey("keyword", $("#searchInput").val());
+			combo();
+			return false;
+		}).on("click", "#searchCancel", function() {
+			setItemBykey("keyword", $("#searchInput").val());
 			combo();
 		}).on("change", "#status", function() {
 			setItemBykey("status", $("#status").data('values'));
@@ -144,10 +132,6 @@
 		  title: "选择客户类型",
 		  items: ${customerTypes!}
 		});
-		$("#bizUserId").select({
-		  title: "选择业务员",
-		  items: ${bizUsers!}
-		});
 		$('#date').select({
 			title: '选择时间',
 			items: [{
@@ -157,8 +141,14 @@
 				},{title: "最近30天", value: "3"
 			}]
 		})
+		showBizUser(${bizUsers!});
 	});
-  
+  function showBizUser(obj){
+		$("#bizUserId").select("update",{
+		  title: "选择业务员",
+		  items: obj
+		});
+  }
 	var newHtml = $(".weui-panel").eq(0).html();
 	var $panel = $('.weui-panel');
 	var $main = $("#main");
@@ -177,6 +167,14 @@
 		$loading.show();
 		$noMore.hide();
 		var params = getParam();
+		//业务员随着时间刷新
+		
+		Utils.ajax('${CPATH}/order/getBizUser', params, 
+			function(data) {
+				showBizUser(data);
+			}
+		);
+		
 		Utils.ajax('${CPATH}/order/orderList', params, 
 			function(data) {
 				$loading.hide();
@@ -195,6 +193,10 @@
 					
 					if(el.receive_type == 1) {
 						$newOrder.find("#receiveType").remove();
+					}
+	
+					if(el.member_id == undefined) {
+						$newOrder.find("#customerOrder").remove();
 					}
 					
 					$newOrder.find("#salesOrderId").attr('href', '${CPATH}/order/orderDetail?orderId=' + el.id);
@@ -230,7 +232,7 @@
 						$newOrder.find("#cancel").remove();
 					}
 					$newOrder.find("#orderAgain").on('click', function(){ 
- 						 window.location.href = "${CPATH}/order/getOldOrder?orderId="+el.id;
+ 						OrderAgain("${CPATH}/order/getOrderInfo?orderId=" + el.id, "${CPATH}/product");
 					});
 
 					$newOrder.find("#status").on('click', function(){ 
@@ -346,7 +348,7 @@
 	
 	function combo() {
 		$main.empty();
-		loading = false;
+		loading = true;
 		page = 1;
 		loadOrderData();
 	}
@@ -445,141 +447,191 @@
 </#macro>
 
 <@layout>
-<div class="weui-content">
-    <div class="report-top weui-flex">
-        <div class="weui-flex__item">
-            <img src="${CTPATH}/images/order.png" alt="">
-            <div class="border-right-1px">
-                <p class="ft16">订单数</p>
-                <p class="ft14" id="orderCount"></p>
-            </div>
-        </div>
-        <div class="weui-flex__item">
-            <img src="${CTPATH}/images/money.png" alt="">
-            <div>
-                <p class="ft16">订单总额</p>
-                <p class="ft14" id="orderAmount"></p>
-            </div>
-        </div>
-    </div>
-	<header>
-		<div class="weui-search-bar" id="SearchBar">
-			<form class="weui-search-bar__form">
-				<div class="weui-search-bar__box">
-					<i class="weui-icon-search"></i>
-					<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-					<a href="javascript:" class="weui-icon-clear" id="searchClear" ></a>
+	<div class="weui-content">
+		<div class="report-top weui-flex">
+			<div class="weui-flex__item">
+				<img src="${CTPATH}/images/order.png" alt="">
+				<div class="border-right-1px">
+					<p class="ft16">订单数</p>
+					<p class="ft14" id="orderCount"></p>
 				</div>
-				<label class="weui-search-bar__label" id="searchText">
-					<i class="weui-icon-search"></i>
-					<span>客户名或订单号或业务员</span>
-				</label>
-			</form>
-			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
+			</div>
+			<div class="weui-flex__item">
+				<img src="${CTPATH}/images/money.png" alt="">
+				<div>
+					<p class="ft16">订单总额</p>
+					<p class="ft14" id="orderAmount"></p>
+				</div>
+			</div>
 		</div>
-	</header>
-	<article id="my-order" class="ft14">
-	
-		<header class="has-th-list weui-flex">
-			<div class="head-search select-area weui-flex__item">
-				<div class="weui-flex">
-					<div class="weui-flex__item">
-						<input type="text" id="status" class="weui-input" readonly placeholder="订单状态">
-						<i class="icon-sort-desc"></i>
-					</div>
-					<div class="weui-flex__item">
-						<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
-						<i class="icon-sort-desc"></i>
-					</div>
-					<div class="weui-flex__item">
-						<input type="text" id="bizUserId" placeholder="业务员" class="weui-input" readonly>
-						<i class="icon-sort-desc"></i>
-					</div>
-					<div class="weui-flex__item">
-						<input type="text" id="date" placeholder="今天" class="weui-input" readonly>
-						<i class="icon-sort-desc"></i>
-					</div>
+		<div class="with-report-top">
+			<header>
+				<div class="weui-search-bar" id="SearchBar">
+					<form class="weui-search-bar__form">
+						<div class="weui-search-bar__box">
+							<i class="weui-icon-search"></i>
+							<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+							<a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+						</div>
+						<label class="weui-search-bar__label" id="searchText">
+							<i class="weui-icon-search"></i>
+							<span>客户名或订单号或业务员</span>
+						</label>
+					</form>
+					<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
 				</div>
-			</div>
-			<div id="combin-filter-btn">
-				<i class="icon-th-list"></i>
-			</div>
-		</header>
-		<main>
-			<div id="main">
-				<div class="weui-panel weui-panel_access" style="display: none">
-					<div class="list-layer"></div>
-					<div class="ft14 gray">
-						<span class="tag" id="receiveType">账期</span>
-						<span id="orderSn"></span>
-						<span class="fr orange">
-							&nbsp;<i class="icon-angle-right"></i>
-						</span>
-						<span class="fr orange" id="status"></span>
+			</header>
+			<article id="my-order" class="ft14">
+				<header class="has-th-list weui-flex">
+					<div class="head-search select-area weui-flex__item">
+						<div class="weui-flex">
+							<div class="weui-flex__item">
+								<input type="text" id="status" class="weui-input" readonly placeholder="订单状态">
+								<i class="icon-sort-desc"></i>
+							</div>
+							<div class="weui-flex__item">
+								<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
+							<div class="weui-flex__item">
+								<input type="text" id="bizUserId" placeholder="业务员" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
+							<div class="weui-flex__item">
+								<input type="text" id="date" placeholder="今天" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
+						</div>
 					</div>
-					<div class="customer_name gray">
-						<span id="customerName" class=""></span>
-						<span class="fr show-more-btn" id="showOrderProductDetail">
-							显示详情 <i class="icon-angle-down"></i>
-						</span>
-						<input type="hidden" id="oId"></input>
+					<div id="combin-filter-btn">
+						<i class="icon-th-list"></i>
 					</div>
-					<div class="none">
-						<a href="" id="salesOrderId">
-						<hr>
-							<div class="appendOrdeProductDetail">
+				</header>
+				<main style="bottom: 50px;">
+					<div id="main">
+						<div class="weui-panel weui-panel_access" style="display: none">
+							<div class="list-layer"></div>
+							<div class="ft14 black3">
+								<span class="tag" id="receiveType">账期</span>
+								<span id="orderSn"></span>
+								<span class="fr orange">
+									&nbsp;
+									<i class="icon-angle-right"></i>
+								</span>
+								<span class="fr orange" id="status"></span>
+							</div>
+							<div class="customer_name black3">
+								<span class="tag" id="customerOrder">终端下单</span>
+								<span id="customerName" class=""></span>
+								<span class="fr show-more-btn" id="showOrderProductDetail">
+									显示详情
+									<i class="icon-angle-down"></i>
+								</span>
+								<input type="hidden" id="oId"></input>
+							</div>
+							<div class="none">
+								<a href="" id="salesOrderId" class="black3">
+									<div class="hr"></div>
+									<div class="appendOrdeProductDetail">
 
+									</div>
+									<div class="hr"></div>
+									<div class="black3">
+										<p>
+											联系人：
+											<span id="contact"></span>
+											<span class="fr" id="customerType"></span>
+										</p>
+									</div>
+									<div class="black3">
+										<p>
+											金额：￥
+											<span id="amount"></span>
+											<span class="fr" id="date"></span>
+										</p>
+									</div>
+								</a>
+								<div class="hr"></div>
+								<div id="cancel" class="button white-button fl">撤销</div>
+								<div id="orderAgain" class="button red-button fr">再次购买</div>
+								<div id="pass" class="button yellow-button fr m-r-5">审核通过</div>
 							</div>
-							<hr>							
-							<div class="gray">
-								<p>
-									联系人：<span id="contact"></span>
-									<span class="fr" id="customerType"></span>
-								</p>
-							</div>
-							<div class="gray">
-								<p>
-									金额：￥<span id="amount"></span>
-									<span class="fr" id="date"></span>
-								</p>
-							</div>
-						</a>
-						<hr>
-						<div id="cancel" class="button white-button fl">撤销</div>
-						<div id="orderAgain" class="button red-button fr">再次购买</div>
-						<div id="pass" class="button yellow-button fr m-r-5">审核通过</div>
+						</div>
 					</div>
-				</div>
-			</div>
-			<div class="weui-loadmore" id="loading" style="display: none;">
-			  <i class="weui-loading"></i>
-			  <span class="weui-loadmore__tips">正在加载</span>
-			</div>
-			<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-			  <span class="weui-loadmore__tips">暂无数据</span>
-			</div>
-		</main>
-	</article>
-</div>
-<article id="combin-filter" >
-	<div class="filter-item">
-		<h4>日期区间</h4>
-		<div class="relative weui-flex" id="getDate">
-			<input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
-			<div style="width:1rem" class="t-c">—</div>
-			<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+					<div class="weui-loadmore" id="loading" style="display: none;">
+						<i class="weui-loading"></i>
+						<span class="weui-loadmore__tips">正在加载</span>
+					</div>
+					<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+						<span class="weui-loadmore__tips">暂无数据</span>
+					</div>
+				</main>
+			</article>
 		</div>
 	</div>
-	<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
-		<button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
-		<button class="red-button confirm-search-btn weui-flex__item">确定</button>
-	</footer>
-</article>
-<div class="layer"></div>
-<@shiro.hasPermission name="/admin/salesOrder/add,/admin/salesOrder/seller">
-<a class="hidden-menu" href="${CPATH}/product">
-    <img src="${CTPATH}/images/order_add.png" alt="">
-</a>
-</@shiro.hasPermission>
-<#include "_inc/_footer_nav.html" />
+	<article id="combin-filter">
+		<div class="filter-item">
+			<h4>日期区间</h4>
+			<div class="relative weui-flex" id="getDate">
+				<input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+				<div style="width:1rem" class="t-c">—</div>
+				<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+			</div>
+		</div>
+		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+			<button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+			<button class="red-button confirm-search-btn weui-flex__item">确定</button>
+		</footer>
+	</article>
+	<div class="layer"></div>
+	<@shiro.hasPermission name="/admin/salesOrder/add,/admin/salesOrder/seller">
+		<a class="hidden-menu" href="${CPATH}/product">
+			<img src="${CTPATH}/images/order_add.png" alt="">
+		</a>
+	</@shiro.hasPermission>
+	<div class="" style="display: none">
+		<section class="product_detail weui-panel weui-panel_access composition">
+			<div>
+				<div class="product-top">
+					<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
+					<div class="weui-cell_access product-top-right">
+						<p class="product_name" id="compositionName"></p>
+						<div class="product_unit">
+							<div class="main-good">主</div>
+							<div id="compositionValueName"></div>
+						</div>
+						<span class="weui-cell__ft"></span>
+					</div>
+				</div>
+				<div class="product_bUnit">
+					<span class="price" id="compositionPriceSpan"></span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
+						</div>
+						<input type="number" min="0" value="0" class="fl" id="compositionNum">
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
+						</div>
+					</div>
+				</div>
+				<div id="stock"></div>
+				<div id="activityName" class="activityName"></div>
+			</div>
+			<hr>
+			<div id="gift" class="weui-flex">
+				<span>
+					<i class="icon-tags"></i>
+				</span>
+				<div class="weui-flex__item">
+					<p id="sub">
+						<span id="subProduct"> </span>
+					</p>
+					<p id="subsubProduct" class="none">
+					</p>
+				</div>
+			</div>
+		</section>
+	</div>	
+	<#include "_inc/_footer_nav.html" />
 </@layout>

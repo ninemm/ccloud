@@ -1,4 +1,4 @@
-package org.ccloud.front.controller;
+package org.ccloud.sms;
 
 import java.util.Date;
 

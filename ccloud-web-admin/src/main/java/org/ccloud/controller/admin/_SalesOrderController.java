@@ -30,8 +30,10 @@ import java.util.Map;
 import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -92,8 +94,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		Seller seller = SellerQuery.me().findById(sellerId);
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Seller> sellers = SellerQuery.me().findByDataArea(dataArea);
+		List<Seller> sellers = new ArrayList<>();
+		Subject subject = SecurityUtils.getSubject();
+		if(subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+			sellers = SellerQuery.me().findByDataArea(seller.getStr("data_area") + "%");
+		}else {
+			sellers = SellerQuery.me().findByDataArea(seller.getStr("data_area"));
+		}
 
 		List<Activity> actList = new ArrayList<Activity>();
 		for (Seller se : sellers) {
@@ -815,7 +822,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getPara("sellerId");
 		String activityId = getPara("activity");
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
-				+ "salesOrderInfo.xlsx";
+				+ "销售订单.xlsx";
 		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId);
 		List<Record> salesOderList = page.getList();
 		
@@ -872,7 +879,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, SalesOrderExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -890,7 +897,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}
 	
 	public SalesOrderExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String activity) {
