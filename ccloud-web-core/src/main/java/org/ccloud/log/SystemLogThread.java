@@ -40,7 +40,7 @@ public class SystemLogThread {
 							if (null == systemLog) {
 								Thread.sleep(200);
 							} else {
-								systemLog.save();
+								//systemLog.save();
 								systemLog = null;
 							}
 						} catch (InterruptedException e) {

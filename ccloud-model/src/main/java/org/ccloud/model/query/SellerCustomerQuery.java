@@ -273,12 +273,10 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("GROUP BY c1.id) t1 ON csc.id = t1.id ");
 
 		if (StrKit.notBlank(searchKey)) {
-			sql.append(" WHERE ( c.customer_name LIKE ? OR c.contact LIKE ? ) ");
+			sql.append(" WHERE c.customer_name LIKE ? ");
 			if (searchKey.contains("%")) {
 				params.add(searchKey);
-				params.add(searchKey);
 			} else {
-				params.add("%" + searchKey + "%");
 				params.add("%" + searchKey + "%");
 			}
 		} else {
