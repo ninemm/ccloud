@@ -811,6 +811,22 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(map);
 	}
 	
+	public void orderDetailsList() {
+		String activityApplyId = getPara("activityApplyId");
+		String startDate = getPara("startDate");
+		
+		String endDate = getPara("endDate");
+//		String keyword = getPara("k");
+//		if (StrKit.notBlank(keyword)) {
+//			keyword = StringUtils.urlDecode(keyword);
+//			setAttr("k", keyword);
+//		}
+		Page<Record> page = ActivityQuery.me().orderDetailsPaginate(getPageNumber(), getPageSize(),startDate, endDate,activityApplyId);
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+	
+	
 	//活动的所有拜访详情
 	public void visitAllDetails() {
 		String id = getPara("id");
@@ -882,8 +898,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				ScenePhoto=addPhoto(list);
 				if (ScenePhoto==null) {
 					ScenePhoto="";
-//					renderAjaxResultForError("同步图片失败!");
-//					return;
+					renderAjaxResultForError("同步图片失败!");
+					return;
 				}else {
 					ScenePhoto=ScenePhoto.substring(1, ScenePhoto.length()-1);
 				}
