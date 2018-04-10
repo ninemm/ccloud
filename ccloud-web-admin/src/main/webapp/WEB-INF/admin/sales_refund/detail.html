@@ -70,8 +70,8 @@
 						<td>${detail_index + 1}</td>
 						<td>${detail.custom_name!}</td>
 						<td>${detail.valueName!}</td>
-						<td>${(detail.reject_product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
-						<td>${detail.reject_product_count % detail.convert_relate} ${detail.small_unit}</td>
+						<td>${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
+						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
 						<td><#if detail.is_composite?? && detail.is_composite == 1>是<#else>否</#if></td>
 						<td><#if detail.is_gift?? && detail.is_gift == 1>是<#else>否</#if></td>
 						<@shiro.hasRole name="021"> 
