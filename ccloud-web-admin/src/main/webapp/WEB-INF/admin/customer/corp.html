@@ -52,13 +52,7 @@
         var fields =
         [
             {field: "id", title: "ID", align: "center", visible:false, edit:false},
-            {field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%',
-                formatter: function(value, row, rowIndex) {
-                return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
-                },
-                edit:false
-            },
-            {field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false},
+            {field: "customer_name", title: "客户名称", align: "center", width: '10%', edit:false},
             {field: "customer_code", title: "客户编码", align: "center", width: '5%', edit: false},
             {field: "contact", title: "联系人", align: "center", width: '5%', edit: false},
             {field: "mobile", title: "手机号", align: "center", width: '5%', edit: false},
@@ -68,29 +62,29 @@
                 },
                 edit: false
             },
-            {field: "is_enabled", title: "状态", align: "center", width: '5%',
+            {field: "is_enabled", title: "状态", align: "center", width: '15%',
                 formatter: function(value, row, rowIndex) {
                     return value == 1 ? '启用' : '停用';
                 },
                 edit: false
-            },
-            {field: "action", title: "操作", align: "center", width: '10%',
+            }
+            /*,{field: "action", title: "操作", align: "center", width: '10%',
                 formatter: function(value, row, rowIndex) {
                     var url = '${CPATH}/admin/customer/edit?id=' + row.id + '&c=${c}&p=${p}';
                     var strHtml='';
-                    /*var strHtml = '<@shiro.hasPermission name="/admin/all"> ';
+                    var strHtml = '<@shiro.hasPermission name="/admin/all"> ';
                     strHtml = strHtml + '<a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a> ';
                     if(row.is_enabled == 1){
                         strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-warning btn-flat" onclick="enable(\''+row.id+'\'' + ',0' + ')">停用</a>';
                     } else {
                         strHtml = strHtml + ' <a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" onclick="enable(\''+row.id+'\'' + ',1' + ')">启用</a>';
                     }
-                    strHtml = strHtml + '</@shiro.hasPermission> ';*/
+                    strHtml = strHtml + '</@shiro.hasPermission> ';
 
                     return strHtml;
                 },
                 edit:false
-            }
+            }*/
         ];
         return fields;
     }
