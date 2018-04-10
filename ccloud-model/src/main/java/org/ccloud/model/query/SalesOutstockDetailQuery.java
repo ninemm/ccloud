@@ -165,6 +165,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		for (Record record : records) {
 			orderProductInfo orderProductInfo = new orderProductInfo();
 			orderProductInfo.setProductName(record.getStr("custom_name"));//产品名称		
+			orderProductInfo.setValueName(record.getStr("valueName"));//产品规格		
 			orderProductInfo.setBarCode(record.getStr("bar_code"));//条码
 			orderProductInfo.setBigUnit(record.getStr("big_unit"));//产品大单位
 			orderProductInfo.setSmallUnit(record.getStr("small_unit"));//产品小单位

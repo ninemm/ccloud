@@ -17,8 +17,10 @@ public class printAllNeedInfo {
 	private String placeOrderMan; //业务员姓名
     private String placeOrderPhone;//业务员电话
 	private Date placeOrderTime;//下单时间
+	private String sellerPhone;//经销商电话
 	private String warehouseName;//发货仓库名字
 	private BigDecimal salesAmount;//订单应收合计
+	private BigDecimal totalCount;//订单商品总数量
 	private String remark;//备注
 	private String warehousePhone;//仓库电话
 	private String deliveryAddress;//配送地址
@@ -52,6 +54,12 @@ public class printAllNeedInfo {
 	}
 	public String getCustomerAddress() {
 		return customerAddress;
+	}
+	public String getSellerPhone() {
+		return sellerPhone;
+	}
+	public void setSellerPhone(String sellerPhone) {
+		this.sellerPhone = sellerPhone;
 	}
 	public void setCustomerAddress(String customerAddress) {
 		this.customerAddress = customerAddress;
@@ -194,6 +202,10 @@ public class printAllNeedInfo {
 	public void setOrderQrcodeUrl(String orderQrcodeUrl) {
 		this.orderQrcodeUrl = orderQrcodeUrl;
 	}
-	
-	
+	public BigDecimal getTotalCount() {
+		return totalCount;
+	}
+	public void setTotalCount(BigDecimal totalCount) {
+		this.totalCount = totalCount;
+	}
 }
