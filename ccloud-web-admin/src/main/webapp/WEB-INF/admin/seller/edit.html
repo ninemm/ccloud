@@ -151,8 +151,13 @@
 	};
 	
 	function doSubmit(){
+		var deptId = $("#parent_id").val();
+		if(deptId == "0"){
+			toastr.error("部门不能选中总部，请重新选择！");
+			return;
+		}
 		if(flang==false){
-			alert("销售商编码错误，请重新输入");
+			toastr.error("销售商编码错误，请重新输入");
 			return;
 		}
 		
