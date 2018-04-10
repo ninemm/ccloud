@@ -558,7 +558,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
 				Activity activity = new Activity();
 				activity.setId(StrKit.getRandomUUID());
-				activity.setSellerId("68f9e2e4d75f4129935af5ed23e5823a");
+				activity.setSellerId("03b4197eaaff438389647892b7151bf5");
 				activity.setCode(qyExpense.getActivityNo());
 				activity.setTitle(qyExpense.getExpenseName());
 				activity.setStartTime(DateUtils.strToDate(qyExpense.getExpenseBeginDate(), DateUtils.DEFAULT_MID_FORMATTER));
