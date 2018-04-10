@@ -137,7 +137,7 @@
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/salesOutstock/getDetail?id=' + row.id + '&c=${c}&p=${p}';
-					var strHtml ='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
+					var strHtml ='<div style = "white-space:nowrap"><a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
 
                     <@shiro.hasPermission name="/admin/salesOutstock/print">
                     <@shiro.lacksRole name="021">  
@@ -154,7 +154,7 @@
 							strHtml = strHtml + '<div class="btn btn-xs" style="visibility: hidden;"><font style="color:transparent">已出</font></div> ';
 						}
 					</@shiro.hasPermission>						
-					
+					strHtml += '</div>';
 					return strHtml;
 				},
 				edit:false

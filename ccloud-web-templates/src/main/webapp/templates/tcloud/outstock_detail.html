@@ -20,8 +20,12 @@
 									if (result.errorCode > 0) {
 									    $.toptip(result.message, 'error');
 									} else {
-										location.reload();
+//										location.reload();
 										$.toptip(result.message, 'success');
+										$(".getBack").attr("disabled",true);
+										setTimeout( function(){
+										location.href = "${CPATH}/outstock/index";
+													}, 1 * 1000 );
 									}
 									Utils.closeLoadingWin();
 								}
@@ -180,7 +184,7 @@
 			<#else>
 			<button class="white-button-no-border weui-flex__item _submit_btn border-top-1px return_index">首页</button>
 			</#if>
-			<button onclick="getback()" class="red-button weui-flex__item">返回</button>
+			<button onclick="getback()" class="red-button weui-flex__item getBack">返回</button>
 		</footer>
 	</div>
 </div>
