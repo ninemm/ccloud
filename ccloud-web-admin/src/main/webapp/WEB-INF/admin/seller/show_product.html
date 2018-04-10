@@ -428,7 +428,6 @@
 			return;		 
 		 }
 		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
-		 	console.log($(this));
 		  	var obj = {
 								"id": $(this).find('td').eq(0).find("input").val(),
 							};
@@ -500,7 +499,6 @@
 					data : {id : id},
 					success:function(data){
 						var url = data.qrcode_url;
-						console.log(url);
 						$(".modal-body").html("");
 						var html = '<img src="'+url.substring(url.indexOf('qrcode')-1,url.length)+'" alt="二维码" class="jp-grids-photos img-responsive">'
 						$(".modal-body").append(html);

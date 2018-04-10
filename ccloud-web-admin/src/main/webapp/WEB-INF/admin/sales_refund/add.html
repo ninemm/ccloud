@@ -192,7 +192,6 @@
 			rowTotal = rowTotal.toFixed(2);
 			var countNew = parseInt(bigNum*convert + smallNum);
 			var count = parseInt(_bigNum*convert + _smallNum);
-			console.log(countNew +"-"+count);
 			if(countNew > count){
 				toastr.error('商品退货数量不能大于出库单的数量!');
 				return 

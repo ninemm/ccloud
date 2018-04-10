@@ -123,7 +123,7 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml ='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
+					var strHtml ='<div style = "white-space:nowrap"><a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
 					strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="history(\'' + row.id + '\',\'' +row.proc_inst_id + '\')" >操作记录</a> ';
 					
 					<@shiro.hasPermission name="/admin/salesOrder/check">
@@ -134,6 +134,7 @@
 					</@shiro.hasPermission>			
                     /*strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="proc(\''+row.id+'\')" >proc</a> ';
                     strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="cancel(\''+row.id+'\')" >取消</a> ';*/
+					strHtml += '</div>';
 					return strHtml;
 				},
 				edit:false
