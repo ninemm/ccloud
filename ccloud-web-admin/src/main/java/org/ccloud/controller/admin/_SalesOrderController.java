@@ -482,6 +482,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 			List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
 			if (orderReviewers == null || orderReviewers.size() == 0) {
+				renderAjaxResultForError("您没有配置审核人,请联系管理员");
 				return false;
 			}
 
