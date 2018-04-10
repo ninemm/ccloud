@@ -2328,7 +2328,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 
 		if (StrKit.notBlank(keyword)) {
-			fromBuilder.append(" and (o.order_sn like '%" + keyword + "%' or c.customer_name like '%" + keyword + "%' or u.realname like '%" + keyword + "%')");
+			fromBuilder.append(" and  c.customer_name like '%" + keyword + "%' ");
 		}
 
 		if (StrKit.notBlank(startDate)) {

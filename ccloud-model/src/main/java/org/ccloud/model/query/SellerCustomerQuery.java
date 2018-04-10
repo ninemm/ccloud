@@ -161,7 +161,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		appendIfNotEmpty(fromBuilder, "c.country_name", countryName, params, false);
 
 		if (StrKit.notBlank(keyword)) {
-			fromBuilder.append(" and (c.customer_name like '%" + keyword + "%' or c.contact like '%" + keyword + "%')");
+			fromBuilder.append(" and c.customer_name like '%" + keyword + "%' ");
 		}
 
 		if (StrKit.notBlank(isOrdered)) {
@@ -465,12 +465,10 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("GROUP BY cujc.seller_customer_id ) AS a ON a.seller_customer_id = csc.id ");
 
 		if (StrKit.notBlank(searchKey)) {
-			sql.append("WHERE ( c.customer_name LIKE ? OR c.contact LIKE ? ) ");
+			sql.append("WHERE c.customer_name LIKE ? ");
 			if (searchKey.contains("%")) {
 				params.add(searchKey);
-				params.add(searchKey);
 			} else {
-				params.add("%" + searchKey + "%");
 				params.add("%" + searchKey + "%");
 			}
 		} else {
