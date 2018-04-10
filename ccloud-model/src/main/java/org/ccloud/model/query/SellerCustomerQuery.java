@@ -280,7 +280,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 				params.add("%" + searchKey + "%");
 			}
 		} else {
-			sql.append(" WHERE c.customer_name is not null ");
+			sql.append(" WHERE 1=1 ");
 			needwhere = false;
 		}
 
