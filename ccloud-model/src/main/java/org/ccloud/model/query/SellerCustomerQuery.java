@@ -120,6 +120,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	@Deprecated
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String userId,
 			String customerTypeId, String isOrdered, String customerKind, String provName, String cityName, String countryName) {
 
@@ -237,7 +238,51 @@ public class SellerCustomerQuery extends JBaseQuery {
 	public void findUserListAsTree() {
 
 	}
+	
+	public Page<Record> findByDataAreaInCurUser(int pageNumber, int pageSize, String selectDataArea, String dealerDataArea, String customerTypeId,
+			String custName, String userId, String dealerId) {
+		
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,sc.id as sellerCustomerId, sc.image_list_store, sc.customer_kind, cust_type.name";
+		
+		StringBuilder builder = new StringBuilder("FROM cc_user_join_customer ujc");
+		builder.append(" LEFT JOIN cc_seller_customer sc ON ujc.seller_customer_id = sc.id");
+		builder.append(" JOIN cc_customer c ON sc.customer_id = c.id");
+		builder.append(" LEFT JOIN cc_customer_join_customer_type ccust_type on sc.id = ccust_type.seller_customer_id");
+		builder.append(" LEFT JOIN cc_customer_type cust_type on ccust_type.customer_type_id = cust_type.id");
+		
+		needWhere = appendIfNotEmptyWithLike(builder, "c.customer_name", custName, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(builder, "ujc.data_area", selectDataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "sc.is_enabled", 1, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "cust_type.id", customerTypeId, params, needWhere);
+		
+		builder.append("ORDER BY sc.create_date DESC ");
+		
+		return Db.paginate(pageNumber, pageSize, select, builder.toString(), params.toArray());
+	}
+	
+	public Long findOrderedCustomerCountByDataArea(String selectDataArea, String dealerDataArea, String customerTypeId, String custName) {
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		StringBuilder builder = new StringBuilder("SELECT count(o.customer_id)");
+		builder.append(" FROM cc_sales_order o");
+		builder.append(" JOIN cc_seller_customer sc on sc.id = o.customer_id");
+		builder.append(" JOIN cc_customer c on sc.customer_id = c.id");
+		
+		needWhere = appendIfNotEmptyWithLike(builder, "c.customer_name", custName, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(builder, "o.data_area", selectDataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "o.customer_type_id", customerTypeId, params, needWhere);
+		
+		builder.append(" group by o.customer_id");
+		
+		return Db.queryLong(builder.toString(), params.toArray());
+	}
+	
 
+	@Deprecated
 	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, String selectDataArea, String dealerDataArea, String customerType,
 			String isOrdered, String searchKey, String userId, String dealerId) {
 
@@ -308,6 +353,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 	}
 
+	@Deprecated
 	public Record getOrderNumber( String selectDataArea, String dealerDataArea, String customerType, String isOrdered, String searchKey) {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
