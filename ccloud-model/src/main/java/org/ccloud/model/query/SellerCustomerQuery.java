@@ -494,6 +494,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.find(sql.toString(), param.toArray());
 	}
 
+	@Deprecated
 	public Page<Record> findImportCustomer(int pageNumber, int pageSize, String userDataArea, String searchKey, String corpSellerId, String dealerDataArea) {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -537,6 +538,33 @@ public class SellerCustomerQuery extends JBaseQuery {
 //		params.add(userDataArea);
 
 		sql.append("GROUP BY c.id ");
+		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
+
+	}
+
+	public Page<Record> _findImportCustomer(int pageNumber, int pageSize, String userDataArea, String searchKey, String corpSellerId, String dealerDataArea) {
+		boolean needwhere = false;
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		String select = "SELECT cc.*, GROUP_CONCAT(u.realname) AS getted ";
+		StringBuilder sql = new StringBuilder("FROM ( SELECT c.id , c.customer_name , c.contact , c.mobile , c.prov_name , c.city_name , " +
+				"c.country_name , c.address , csc.id AS sellerCustomerId, cct.id as cust_type_id ");
+		sql.append("FROM cc_customer_join_corp ccjc ");
+		sql.append("JOIN cc_customer c ON ccjc.customer_id = c.id ");
+		sql.append("JOIN cc_seller_customer csc ON csc.customer_id = c.id ");
+		sql.append("JOIN cc_customer_join_customer_type ccjct ON ccjct.seller_customer_id = csc.id ");
+		sql.append("JOIN cc_customer_type cct ON ccjct.customer_type_id = cct.id ");
+
+		appendIfNotEmpty(sql, "ccjc.seller_id", corpSellerId, params, true);
+		sql.append("AND cct.code != ? ");
+		params.add("G");
+		appendIfNotEmptyWithLike(sql, "c.customer_name", searchKey, params, false);
+
+		sql.append(") as cc, cc_user_join_customer user_cust, `user` u ");
+		sql.append("WHERE user_cust.user_id = u.id ");
+		sql.append("AND user_cust.seller_customer_id = cc.sellerCustomerId ");
+		appendIfNotEmptyWithLike(sql, "u.data_area", dealerDataArea, params, false);
+		sql.append("GROUP BY cc.id");
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 
 	}
