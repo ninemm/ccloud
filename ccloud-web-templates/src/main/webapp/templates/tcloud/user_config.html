@@ -134,14 +134,19 @@
 			<div class="weui-cell__ft"></div>
 		</a>
 	</div>
-	<div class="weui-cells">
-		<a class="weui-cell weui-cell_access" href="${CPATH}/user/choice"> 
-			<div class="weui-cell__bd">
-				<p>切换账套</p>
-			</div>
-			<div class="weui-cell__ft">${(session.sellerName)!}</div>
-		</a>
-	</div>
+	
+	<#if session['sellerList']?? && session['sellerList']?size gt 1>
+		<div class="weui-cells">
+			<a class="weui-cell weui-cell_access" href="${CPATH}/user/choice"> 
+				<div class="weui-cell__bd">
+					<p>切换账套</p>
+				</div>
+				<div class="weui-cell__ft">${(session.sellerName)!}</div>
+			</a>
+		</div>
+	</#if>
+	
+	
 	<div class="weui-cells">
 		<a class="weui-cell weui-cell_access">
 			<div class="weui-cell__bd">
