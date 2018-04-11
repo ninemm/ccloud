@@ -262,6 +262,24 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, builder.toString(), params.toArray());
 	}
 	
+	public Long findOrderedCustomerCountByDataArea(String selectDataArea, String dealerDataArea, String customerTypeId, String custName) {
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		StringBuilder builder = new StringBuilder("SELECT count(o.customer_id)");
+		builder.append(" FROM cc_sales_order o");
+		builder.append(" JOIN cc_seller_customer sc on sc.id = o.customer_id");
+		builder.append(" JOIN cc_customer c on sc.customer_id = c.id");
+		
+		needWhere = appendIfNotEmptyWithLike(builder, "c.customer_name", custName, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(builder, "o.data_area", selectDataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "o.customer_type_id", customerTypeId, params, needWhere);
+		
+		builder.append(" group by o.customer_id");
+		
+		return Db.queryLong(builder.toString(), params.toArray());
+	}
+	
 
 	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, String selectDataArea, String dealerDataArea, String customerType,
 			String isOrdered, String searchKey, String userId, String dealerId) {
@@ -332,6 +350,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 
 	}
+	
+	
+	
 
 	public Record getOrderNumber( String selectDataArea, String dealerDataArea, String customerType, String isOrdered, String searchKey) {
 		boolean needwhere = false;
