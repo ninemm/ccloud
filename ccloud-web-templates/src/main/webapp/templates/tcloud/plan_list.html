@@ -252,6 +252,7 @@
 
 		$loading.show();
 		$noMore.hide();
+		$.showLoading();
 	
 		var params = {
 			"page": page,
@@ -272,7 +273,7 @@
 			showSellerProduct(params);
 			$(".userId").hide();
 			$(".sellerProductId").show();
-		}else{
+		} else {
 			showBizUser(params);
 			$(".userId").show();
 			$(".sellerProductId").hide();
@@ -281,9 +282,11 @@
 	}
 
 	function showBizUser(params){	
+		$.showLoading();
 		Utils.ajax('${CPATH}/plans/planList', params,
 			function(data) {
 				$loading.hide();
+				$.hideLoading();
 				if(data.planList.length == 0) {
 					if($('.planList').length == 0) $noMore.show();
 					$("#planAmount").text(planAmount.toFixed(2));
@@ -321,9 +324,11 @@
 	
 	
 	function showSellerProduct(params){
+		$.showLoading();
 		Utils.ajax('${CPATH}/plans/planList', params,
 			function(data) {
 				$loading.hide();
+				$.hideLoading();
 				$("#planAmount").html("");
 				$("#completeAmount").html("");
 				

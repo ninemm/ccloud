@@ -93,6 +93,7 @@
 
         $loading.show();
         $noMore.hide();
+        $.showLoading();
 
         var params = {
             "page": page,
@@ -105,6 +106,7 @@
         Utils.ajax('${CPATH}/product/customerList', params,
         function(data){
             $loading.hide();
+            $.hideLoading();
             if(data.customerList.length == 0){
                 if($('.weui-panel').length == 0) $noMore.show();
                 loading = true;

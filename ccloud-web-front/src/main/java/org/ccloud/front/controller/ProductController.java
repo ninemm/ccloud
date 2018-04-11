@@ -290,7 +290,7 @@ public class ProductController extends BaseFrontController {
 		String lat = getPara("lat");
 
 		if(getPara("dist")!=null)
-			dist = Double.valueOf(getPara("nearby", "100")).doubleValue();
+			dist = Double.valueOf(getPara("dist", "100")).doubleValue();
 
 
 		BigDecimal latitude = new BigDecimal(lat);
