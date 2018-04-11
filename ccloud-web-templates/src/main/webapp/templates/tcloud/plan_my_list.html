@@ -95,6 +95,7 @@
 
 		$loading.show();
 		$noMore.hide();
+		$.showLoading();
 		var dd = $("#datetime-picker").val();
 		var params = {
 			"page": page,
@@ -111,6 +112,7 @@
 		Utils.ajax('${CPATH}/plans/myPlanList', params,
 			function(data) {
 				$loading.hide();
+				$.hideLoading();
 				$("#planAmount").html("");
 				$("#completeAmount").html("");
 				if(data.planList.length == 0) {

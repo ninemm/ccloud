@@ -149,10 +149,12 @@
 		
 		$loading.show();
 		$noMore.hide();
+		$.showLoading();
 		var params = getParam();
 		Utils.ajax('${CPATH}/outstock/outstockList', params,
 			function(data) {
 				$loading.hide();
+				$.hideLoading();
 				if(data.outstockList.length == 0) {
 					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;
