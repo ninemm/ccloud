@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.SecurityUtils;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -65,6 +66,7 @@ import org.ccloud.model.query.SellerJoinTemplateQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
@@ -926,6 +928,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		String customName = getPara("customName");
 		List<SellerProduct> products = SellerProductQuery.me().checkSellerProduct(customName, getSessionAttr(Consts.SESSION_SELLER_ID).toString(),cpsName);
 		renderJson(products.size());
+	}
+	
+	public void department_tree() {
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		List<Map<String, Object>> list = DepartmentQuery.me().findDeptListAsTree(1, dataArea, isSuperAdmin);
+		setAttr("treeData", JSON.toJSON(list));
 	}
 }
 
