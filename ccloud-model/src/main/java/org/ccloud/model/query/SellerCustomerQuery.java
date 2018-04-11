@@ -120,6 +120,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	@Deprecated
 	public Page<Record> paginateForApp(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String userId,
 			String customerTypeId, String isOrdered, String customerKind, String provName, String cityName, String countryName) {
 
@@ -244,7 +245,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId,csc.image_list_store,csc.customer_kind";
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,sc.id as sellerCustomerId, sc.image_list_store, sc.customer_kind, cust_type.name";
 		
 		StringBuilder builder = new StringBuilder("FROM cc_user_join_customer ujc");
 		builder.append(" LEFT JOIN cc_seller_customer sc ON ujc.seller_customer_id = sc.id");
@@ -281,6 +282,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 	}
 	
 
+	@Deprecated
 	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, String selectDataArea, String dealerDataArea, String customerType,
 			String isOrdered, String searchKey, String userId, String dealerId) {
 
@@ -350,10 +352,8 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, sql.toString(), params.toArray());
 
 	}
-	
-	
-	
 
+	@Deprecated
 	public Record getOrderNumber( String selectDataArea, String dealerDataArea, String customerType, String isOrdered, String searchKey) {
 		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();

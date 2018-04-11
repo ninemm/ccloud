@@ -78,7 +78,7 @@ public class CustomerController extends BaseFrontController {
 		for(CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypeList2.add(item);
 		}
 
@@ -110,7 +110,7 @@ public class CustomerController extends BaseFrontController {
 		boolean salesOrderAdd = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/add");
 		boolean salesOrder = SecurityUtils.getSubject().isPermitted("/admin/salesOrder");
 		boolean visit = SecurityUtils.getSubject().isPermitted("/admin/customerVisit");
-		
+
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String region = getPara("region");
 		
@@ -120,9 +120,9 @@ public class CustomerController extends BaseFrontController {
 		Integer pageNumber = getParaToInt("pageNumber");
 		
 		if (StrKit.notBlank(region)) {
-			selectDataArea = UserQuery.me().findById(region).getDataArea();
-		} 
-		
+			selectDataArea = UserQuery.me().findById(region).getDataArea() + "%";
+		}
+
 		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, dealerDataArea, custTypeId, custName, user.getId(), seller.getId());
 		Long OrderedCustomerCount = SellerCustomerQuery.me().findOrderedCustomerCountByDataArea(selectDataArea, dealerDataArea, custTypeId, custName);
 		String customerOrderCount = OrderedCustomerCount != null ? OrderedCustomerCount.toString() : "0";
@@ -135,6 +135,7 @@ public class CustomerController extends BaseFrontController {
 			html.append("		<div class=\"weui-flex__item customer-info\">\n");
 			html.append("			<p class=\"ft14\">" + customer.getStr("customer_name") + "</p>\n");
 			html.append("			<p class=\"gray\">" + customer.getStr("contact") + "/" + customer.getStr("mobile")+ "</p>\n");
+			html.append("			<p class=\"gray\"> 客户类型：" + customer.getStr("name") +  "</p>\n");
 			html.append("		</div>\n");
 			html.append("		<div class=\"weui-flex__item customer-href\">\n");
 			html.append("			<div class=\"weui-flex\">\n");

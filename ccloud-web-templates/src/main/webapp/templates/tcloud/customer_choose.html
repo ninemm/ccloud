@@ -26,8 +26,6 @@
 					combo();
 			}).on("change", "#customerTypeId", function() {
 					combo();
-			}).on("change", "#isOrdered", function() {
-					combo();
 			}).on("click", "#customerInfo", function() {
 			var el = $(this);
 	        var customerInfo = {
@@ -55,25 +53,6 @@
      title: "选择客户类型",
      items: ${customerTypes!}
     });
-
-    $("#isOrdered").select({
-		 title: "是否下单",
-		 items: [{
-			 title: "全部客户", value: ""
-			 },{
-			 title: "已下单", value: "0"
-			 },{
-			 title: "未下单", value: "1"
-			 },{
-			 title: "近一周未下单", value: "2"
-			 },{
-			 title: "近一月未下单", value: "3"
-			 },{
-			 title: "近三月未下单", value: "4"
-			 },{
-			 title: "近六月未下单", value: "5"
-		 }]
-    });
     
 	var newHtml = $(".weui-panel").eq(0).html();
 	var $loading = $("#loading");
@@ -99,8 +78,7 @@
 				"size": size,
 				"keyword": $("#searchInput").val(),
 				"userId": $("#userId").data('values'),
-				"customerTypeId": $("#customerTypeId").data('values'),
-				"isOrdered": $("#isOrdered").data('values')
+				"customerTypeId": $("#customerTypeId").data('values')
 	    }
 
 			Utils.ajax('${CPATH}/product/customerList', params, 
@@ -116,10 +94,10 @@
 						$customerList.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
 						var $newCustomer = $customerList.find(".weui-panel:last");
 						$newCustomer.find("#customerName").text(el.customer_name);
-						$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
+						$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile + "  " + el.name);
 						$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
 
-						$newCustomer.find("#sellerCustomerId").val(el.id);
+						$newCustomer.find("#sellerCustomerId").val(el.sellerCustomerId);
 						$newCustomer.find("#contact").val(el.contact);
 						$newCustomer.find("#mobile").val(el.mobile);
 						$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
@@ -167,22 +145,16 @@
 				<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
 			</div>
 		</header>
-		<article class="customer">
-			<header class="has-th-list weui-flex">
+		<article class="customer" style="top:44px;width: 100%;">
+			<header class="weui-flex has-th-list">
 				<div class="head-search select-area weui-flex__item">
-					<div class="weui-flex">
-						<div class="weui-flex__item">
-							<input type="text" id="userId" class="weui-input" placeholder="业务员" readonly>
-							<i class="icon-sort-desc"></i>
-						</div>
-						<div class="weui-flex__item">
-							<input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型"  readonly>
-							<i class="icon-sort-desc"></i>
-						</div>
-						<div class="weui-flex__item">
-							<input type="text" id="isOrdered" class="weui-input" placeholder="是否下单" readonly>
-							<i class="icon-sort-desc"></i>
-						</div>
+					<div class="weui-flex__item">
+						<input type="text" id="userId" class="weui-input" placeholder="业务员" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型"  readonly>
+						<i class="icon-sort-desc"></i>
 					</div>
 				</div>
 				<div id="combin-filter-btn">
