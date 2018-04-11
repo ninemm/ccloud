@@ -422,4 +422,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}
 	
+	public List<CustomerVisit> getCustomerListByActivity(String id) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT c.*,u.realname FROM cc_customer_visit c LEFT JOIN `user` u ON c.user_id = u.id ");
+		fromBuilder.append("WHERE c.active_apply_id = ? and c.status != ? ");
+		return DAO.find(fromBuilder.toString(), id, Consts.CUSTOMER_VISIT_STATUS_REJECT);
+	}
+	
 }

@@ -52,8 +52,10 @@ public class MidDataUtil {
     private static final String GET_JINGPAI_EXPENSESDETAIL= "http://yxmiddb.jingpai.com/WebAPI/api/ExpensesDetail";
 
 	public static void main(String[] args) throws RemoteException {
-//		List<YxBasicchannelinfo> list = getBasicChannel();
-//		System.out.println(list.size());
+//		List<Expense> list = getExpensesInfo("2018-02-01", "2018-03-01", "1", "100");
+//		System.out.println(list.get(0).getExpenseName());
+//		System.out.println(list.get(1).getExpenseName());
+//		List<ExpensesDetail> list = getExpenseDetail("3f2881e9612ce2fc016130f1c1401414", "INVEST_CUSTOMER_VISITE");
 	}
 
 	public static List<Mid_ActivityInfo> getActivityInfo(String startTime, String endTime, String pageIndex, String pageSize) {
@@ -188,6 +190,7 @@ public class MidDataUtil {
         map.put("strExpenseID", expenseID);
 		try {
 			String result = HttpUtils.get(GET_JINGPAI_EXPENSESDETAIL, map);
+			System.out.println(result);
 			String response = getResponseType(type);
 			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray(response);
 			list = jsonArray.toJavaList(ExpensesDetail.class);
