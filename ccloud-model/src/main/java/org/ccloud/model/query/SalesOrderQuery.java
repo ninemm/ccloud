@@ -463,6 +463,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		return DAO.find(sb.toString(), username);
 	}
 	
+	public Long findToDoOrderReviewCount(String username) {
+		StringBuilder sb = new StringBuilder("SELECT count(*)");
+		sb.append(" FROM cc_sales_order o ");
+		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+		sb.append(" where o.status = 0 AND FIND_IN_SET(?, a.ASSIGNEE_) ");
+		return Db.queryLong(sb.toString(), username);
+	}
+	
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
 
 		String select = "SELECT o.*, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime, mso.member_id  ";

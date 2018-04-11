@@ -192,6 +192,18 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.find(sql.toString(), username);
 	}
 	
+	public Long findToDoCustomerVisitReviewCount(String username) {
+		StringBuilder sb = new StringBuilder("SELECT count(*)");
+		sb.append(" FROM cc_customer_visit cv ");
+//		sb.append(" JOIN cc_seller_customer sc on cv.seller_customer_id = sc.id");
+//		sb.append(" JOIN cc_customer c on sc.customer_id = c.id");
+		sb.append(" JOIN act_ru_task a on cv.proc_inst_id = a.PROC_INST_ID_");
+//		sb.append(" JOIN act_ru_identitylink u on cv.proc_inst_id = u.PROC_INST_ID_");
+//		sb.append(" where c.is_enabled = 1 AND FIND_IN_SET(?, a.ASSIGNEE_) ");
+		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_) ");
+		return Db.queryLong(sb.toString(), username);
+	}
+	
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
 		
 		String select = "select cv.*, sc.nickname, c.customer_name, c.customer_code, c.contact, c.mobile, c.prov_name, c.city_name, c.country_name, c.address,i.TASK_ID_ taskId, i.ACT_NAME_ taskName, i.ASSIGNEE_ assignee, i.END_TIME_ endTime ";
