@@ -422,6 +422,15 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sb.append(" GROUP BY sc.id");
 		return DAO.find(sb.toString(), username);
 	}
+	
+	public Long findToDoCustomerReviewCount(String username) {
+		StringBuilder sb = new StringBuilder("SELECT count(*)");
+		sb.append(" FROM cc_seller_customer sc ");
+		sb.append(" JOIN cc_customer c ON sc.customer_id = c.id");
+		sb.append(" JOIN act_ru_identitylink u ON sc.proc_inst_id = u.PROC_INST_ID_");
+		sb.append(" where FIND_IN_SET(?, u.USER_ID_) AND c.is_enabled = 1");
+		return Db.queryLong(sb.toString(), username);
+	}
 
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
 
