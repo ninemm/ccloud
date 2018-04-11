@@ -32,7 +32,7 @@ import com.jfinal.plugin.ehcache.CacheKit;
 public class MenuManager {
 
 	public static final String ACTION_INIT_MENU = "_INIT_MENU";
-	public static final String CACHE_NAME = "user_menu";
+	public static final String  CACHE_NAME = "user_menu";
 
 	static MenuManager manager = new MenuManager();
 	static final LinkedList<MenuGroup> menuGroups = new LinkedList<MenuGroup>();

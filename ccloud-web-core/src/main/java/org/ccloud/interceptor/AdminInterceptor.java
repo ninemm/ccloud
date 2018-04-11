@@ -15,6 +15,7 @@
  */
 package org.ccloud.interceptor;
 
+import com.jfinal.kit.StrKit;
 import org.ccloud.menu.MenuManager;
 import org.ccloud.model.User;
 
@@ -51,7 +52,7 @@ public class AdminInterceptor implements Interceptor {
 		if (user != null) {
 //			controller.setAttr("_menu_html", MenuManager.me().generateHtml());
 			String htmlBuilder = CacheKit.get(MenuManager.CACHE_NAME, user.getId());
-			if (htmlBuilder != null) {
+			if (StrKit.notBlank(htmlBuilder)) {
 				controller.setAttr("_menu_html", htmlBuilder);
 			} else {
 				MenuManager.me().refresh();

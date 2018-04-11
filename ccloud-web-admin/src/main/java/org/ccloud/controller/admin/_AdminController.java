@@ -74,8 +74,6 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 		
-		setAttr("identity",SecurityUtils.getSubject().isPermitted("/admin/manager"));
-
 		render("index.html");
 	}
 	@Clear(AdminInterceptor.class)
@@ -116,14 +114,7 @@ public class _AdminController extends JBaseController {
 			MessageKit.sendMessage(Actions.USER_LOGINED, user);
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
-//			String change=CookieUtils.get(this, mobile);
-//			if (!mobile.equals(change)) {
-//				if (password.equals(EncryptUtils.encryptPassword("123456", _user.getSalt()))) {
-//					CookieUtils.put(this, mobile,mobile);
-//					renderAjaxResultForSuccess("change");
-//					return;
-//				}
-//			}
+
 			renderJson(true);
 			//redirect("/admin/index");
 		} catch (AuthenticationException e) {
@@ -133,26 +124,12 @@ public class _AdminController extends JBaseController {
 			return;
 		}
 	}
-	
-	@Clear(AdminInterceptor.class)
-	public void choice() { 
-		List<Map<String, String>> sellerList = getSessionAttr("sellerList");
-		String moblie = getPara("mobile");
-		setAttr("sellerList", sellerList);
-		setAttr("mobile",moblie);
-		//keepPara();
-		render("choice.html");
-		
-	}
+
 
 	@Before(UCodeInterceptor.class)
 	public void logout() {
 		removeSessionAttr(Consts.SESSION_LOGINED_USER);
-		removeSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		removeSessionAttr(Consts.SESSION_SELLER_ID);
-		removeSessionAttr(Consts.SESSION_SELLER_CODE);
-		removeSessionAttr(Consts.SESSION_SELLER_NAME);
-		removeSessionAttr("sellerList");
+
 		CookieUtils.remove(this, Consts.COOKIE_LOGINED_USER);
 		Subject subject = SecurityUtils.getSubject();
 		subject.logout();
@@ -161,72 +138,6 @@ public class _AdminController extends JBaseController {
 
 	public void checkRole() {
 		render("404.html");
-	}
-	
-	@Clear(AdminInterceptor.class)
-	public void change() {
-		String mobile = getPara("mobile");
-		String sellerId = getPara("sellerId");
-		if(StrKit.isBlank(sellerId)) {
-			String userId = getSessionAttr("isUserID");
-			mobile = UserQuery.me().findById(userId).getMobile();
-			sellerId = CookieUtils.get(this, "_seller"+mobile);
-		}
-		User curUser = null;
-		
-		List<User> userList = UserQuery.me().findByMobile(mobile);
-		
-		for (User user : userList) {
-			if (curUser != null)
-				break;
-			
-			List<Department> deptList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
-			for (Department dept : deptList) {
-				if (StrKit.equals(sellerId, dept.getStr("seller_id"))) {
-					curUser = user;
-					String dealerDataArea = DepartmentQuery.me().getDealerDataArea(deptList);
-					setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);					
-					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
-					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
-					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
-					setSessionAttr(Consts.SESSION_SELLER_HAS_STORE, dept.get("has_store"));
-					break;
-				}
-			}
-		}
-		
-		if (curUser == null) {
-			renderError(404);
-			return ;
-		}
-		
-		init(curUser.getUsername(), curUser.getPassword(), true);
-		
-		redirect("/admin/index");
-	}
-	
-	private void init(String username, String password, Boolean rememberMe) {
-		
-		Subject subject = SecurityUtils.getSubject();
-		CaptchaUsernamePasswordToken token = new CaptchaUsernamePasswordToken(username, password, rememberMe, "", "");
-		try {
-			subject.login(token);
-			User user = (User) subject.getPrincipal();
-			if (user != null) {
-				// 数据查看时的数据域
-				if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA,
-							DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
-				} else {
-					setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea() + "%");
-				}
-			}
-			MessageKit.sendMessage(Actions.USER_LOGINED, user);
-			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
-			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
-		} catch (AuthenticationException e) {
-			e.printStackTrace();
-		}
 	}
 
 }

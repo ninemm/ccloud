@@ -144,13 +144,13 @@
 			<scope>compile</scope>
 		</dependency> -->
 		
-<!--		<dependency>
+		<dependency>
             <groupId>org.ccloud</groupId>
             <artifactId>ccloud-shiro</artifactId>
             <version>${project.version}</version>
             <type>jar</type> 
             <scope>compile</scope>
-        </dependency>-->
+        </dependency>
 		
 		<dependency>
 			<groupId>org.ccloud</groupId>
@@ -178,7 +178,7 @@
 	        	<groupId>com.adobe.xmp</groupId>
 	        	<artifactId>xmpcore</artifactId>
 	        	<version>5.1.3</version>
-        </dependency>
+        </dependency><dependency><groupId>org.ccloud</groupId><artifactId>ccloud-shiro</artifactId><version>0.0.1</version></dependency>
         
 		
 	</dependencies>

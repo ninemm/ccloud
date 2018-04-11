@@ -15,27 +15,21 @@
  */
 package org.ccloud;
 
+import com.jfinal.kit.PropKit;
+import com.jfinal.qyweixin.sdk.api.ApiConfig;
 import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
+import com.jfinal.render.FreeMarkerRender;
+import com.jfinal.template.Engine;
+import org.apache.shiro.web.tags.PermissionTag;
 import org.ccloud.core.CCloud;
 import org.ccloud.core.CCloudConfig;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.ui.freemarker.function.DictBox;
-import org.ccloud.ui.freemarker.function.DictName;
-import org.ccloud.ui.freemarker.function.MetadataChecked;
-import org.ccloud.ui.freemarker.function.MetadataSelected;
-import org.ccloud.ui.freemarker.function.OptionChecked;
-import org.ccloud.ui.freemarker.function.OptionSelected;
-import org.ccloud.ui.freemarker.function.OptionValue;
-import org.ccloud.ui.freemarker.function.TaxonomyBox;
+import org.ccloud.shiro.tag.ShiroTags;
+import org.ccloud.ui.freemarker.function.*;
 import org.ccloud.ui.freemarker.tag.ContentTag;
 import org.ccloud.ui.freemarker.tag.ContentsTag;
 import org.ccloud.ui.freemarker.tag.DictTag;
-
-import com.jfinal.kit.PropKit;
-import com.jfinal.qyweixin.sdk.api.ApiConfig;
-import com.jfinal.render.FreeMarkerRender;
-import com.jfinal.template.Engine;
 
 public class Config extends CCloudConfig {
 
@@ -58,7 +52,7 @@ public class Config extends CCloudConfig {
 
 		ApiConfigKit.putApiConfig(getApiConfig());
 
-//		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
+		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
 		
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
 	}

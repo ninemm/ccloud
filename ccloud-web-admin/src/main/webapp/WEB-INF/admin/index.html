@@ -1,8 +1,4 @@
 <#include "_inc/_layout.html"/>
-<#macro script_import>
-    <!--Echarts-->
-    <script src="${CPATH}/static/plugins/echarts/echarts.js"></script>
-</#macro>
 <#macro script>
 function trash(id){
 	$.get("${CPATH}/admin/comment/trash?ucode=${ucode}&id="+id, function(result){
@@ -68,271 +64,6 @@ function reply(id){
 	}); 
 }
 
-$(function(){
-
-	var changePassword = ${changePassword!};
-	if(changePassword){
-		layer.confirm('你的密码为初始密码,您需要修改吗？', {
-			btn : ['确定', '取消']},
-			function() {
-				layer.closeAll();
-				location.href = "${CPATH}/admin/user/updatePassword";
-			},
-			function() {
-				layer.close();
-				location.href = "${CPATH}/admin/index";
-			}
-		); 
-	};
-	
-	var identity = ${identity?c};
-    if(identity){
-        $("#salesBoardInfo").attr('href','${CPATH}/admin/report/departSalesman?p=report&c=departSalesman');
-    }else{
-        $("#salesBoardInfo").attr('href','${CPATH}/admin/report/customerDetails?p=report&c=customerDetails');
-    }	
-    //业务员当日当月
-    var salesManData = ${salesManAmount!};
-    var salesToDay = salesManData.sales_day;
-    var salesToDayChart = echarts.init(document.getElementById('salesManViewByD'));
-    viewCreate('业务员当日销售额排行',salesToDayChart,salesToDay);
-
-    //商品当日汇总
-    var goodsSalesData = ${goodsSales!};
-    var goodsToDay = goodsSalesData.goodsSalesToDay;
-    var goodsChart = echarts.init(document.getElementById('goodsViewByD'));
-    viewCreate('商品当日销售额排行',goodsChart,goodsToDay);
-
-    //直营商当日当月
-    var directAmountData = ${directAmount!};
-    var directToDay = directAmountData.directs_day;
-    var directChart = echarts.init(document.getElementById('directViewByD'));
-    viewCreate('直营商当日销售额排行',directChart,directToDay);
-
-    //销售额走势(暂时隐藏)
-    /*var amountCollectData = ${amountCollect!};
-    var amountToMonths = amountCollectData.amount_months;
-    var amountChart = echarts.init(document.getElementById('salesChart'));
-    //销售额走势(月统计)
-    lineChartCreate('',amountChart,amountToMonths);*/
-});
-
-$('li[name="salesViewByD"]').on("click",function(){
-
-    var salesToMonthsChart = echarts.getInstanceByDom(document.getElementById('salesManViewByM'));
-    $("#salesManViewByD").css("display","block");
-    $("#salesManViewByM").css("display","none");
-    if(typeof(salesToMonthsChart)!="undefined"){
-        salesToMonthsChart.clear();
-        salesToMonthsChart.dispose();
-    }
-
-    var salesManData = ${salesManAmount!};
-    var salesToDay = salesManData.sales_day;
-    $("#salesManViewByD").width($("#salesManViewByD").parent().width());
-    var salesToDayChart = echarts.init(document.getElementById('salesManViewByD'));
-
-    viewCreate('业务员当日销售额排行',salesToDayChart,salesToDay);
-});
-$('li[name="salesViewByM"]').on("click",function(){
-
-    var salesToDayChart = echarts.getInstanceByDom(document.getElementById('salesManViewByD'));
-    $("#salesManViewByD").css("display","none");
-    $("#salesManViewByM").css("display","block");
-    if(typeof(salesToDayChart)!="undefined"){
-        salesToDayChart.clear();
-        salesToDayChart.dispose();
-    }
-
-    var salesManData = ${salesManAmount!};
-    var salesToMonths = salesManData.sales_month;
-    $("#salesManViewByM").width($("#salesManViewByM").parent().width());
-    var salesToMonthsChart = echarts.init(document.getElementById('salesManViewByM'));
-
-    viewCreate('业务员当月销售额排行',salesToMonthsChart,salesToMonths);
-});
-
-$("#goodsByD").on("click",function(){
-
-    var goodsToAllChart = echarts.getInstanceByDom(document.getElementById('goodsViewByA'));
-    $("#goodsViewByD").css("display","block");
-    $("#goodsViewByA").css("display","none");
-    if(typeof(goodsToAllChart)!="undefined"){
-        goodsToAllChart.clear();
-        goodsToAllChart.dispose();
-    }
-
-    var goodsSalesData = ${goodsSales!};
-    var goodsToDay = goodsSalesData.goodsSalesToDay;
-    $("#goodsViewByD").width($("#goodsViewByD").parent().width());
-    var goodsToDayChart = echarts.init(document.getElementById('goodsViewByD'));
-
-    viewCreate('商品当日销售额排行',goodsToDayChart,goodsToDay);
-});
-
-$("#goodsByA").on("click",function(){
-    var goodsToDayChart = echarts.getInstanceByDom(document.getElementById('goodsViewByD'));
-    $("#goodsViewByA").css("display","block");
-    $("#goodsViewByD").css("display","none");
-    if(typeof(goodsToDayChart)!="undefined"){
-        goodsToDayChart.clear();
-        goodsToDayChart.dispose();
-    }
-
-    var goodsSalesData = ${goodsSales!};
-    var goodsToAll = goodsSalesData.goodsSalesAll;
-    $("#goodsViewByA").width($("#goodsViewByA").parent().width());
-    var goodsToAllChart = echarts.init(document.getElementById('goodsViewByA'));
-
-    viewCreate('商品销售额汇总排行',goodsToAllChart,goodsToAll);
-
-});
-
-$("#directByD").on("click",function(){
-    var directToMonthsChart = echarts.getInstanceByDom(document.getElementById('directViewByM'));
-    $("#directViewByD").css("display","block");
-    $("#directViewByM").css("display","none");
-    if(typeof(directToMonthsChart)!="undefined"){
-        directToMonthsChart.clear();
-        directToMonthsChart.dispose();
-    }
-
-    var directData = ${directAmount!};
-    var directToDay = directData.directs_day;
-    $("#directViewByD").width($("#directViewByD").parent().width());
-    var directToDayChart = echarts.init(document.getElementById('directViewByD'));
-
-    viewCreate('直营商当日销售额排行',directToDayChart,directToDay);
-});
-
-$("#directByM").on("click",function(){
-    var directToDayChart = echarts.getInstanceByDom(document.getElementById('directViewByD'));
-    $("#directViewByM").css("display","block");
-    $("#directViewByD").css("display","none");
-    if(typeof(directToDayChart)!="undefined"){
-        directToDayChart.clear();
-        directToDayChart.dispose();
-    }
-
-    var directData = ${directAmount!};
-    var directToMonths = directData.directs_month;
-    $("#directViewByM").width($("#directViewByM").parent().width());
-    var directToMonthsChart = echarts.init(document.getElementById('directViewByM'));
-
-    viewCreate('直营商当月销售额排行',directToMonthsChart,directToMonths);
-});
-
-function viewCreate(title,myChart,viewData){
-    var yTitle = [],xData = [];
-    var t_val = '';
-    for(var i =0;i<viewData.length;i++){
-        var data =  viewData[i].columns;
-        yTitle.push(data.title);
-        xData.push(data.sumamount);
-    }
-    myChart.setOption(barGraphOptions(title,yTitle,xData));
-}
-
-function lineChartCreate(title,myChart,viewData){
-    var salesYTitle = [],salesXData = [];
-        for(var i =0;i<viewData.length;i++){
-        var salesData =  viewData[i].columns;
-        yTitle.push(salesData.title);
-        xData.push(salesData.sumamount);
-    }
-    myChart.setOption(lineChartOptions(title,yTitle,xData));
-}
-
-function barGraphOptions(title,yTitle,data){
-    var options = {
-        title: {
-            text: title
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-            type: 'shadow'
-            }
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'value',
-            boundaryGap: [0, 0.01]
-        },
-        yAxis: {
-            type: 'category',
-            data: yTitle
-        },
-        series: [
-            {
-                type: 'bar',
-                barWidth : 15,
-                itemStyle: {
-                normal: {
-                    color: function(params) {
-                    var colorList = [
-                        '#C1232B','#2E8B57','#1E90FF','#E87C25','#27727B'
-                    ];
-                    return colorList[params.dataIndex]
-                    },
-                    label: {
-                        show: true,
-                        position: 'right',
-                        formatter: '{b}\n{c}'
-                    }
-                    }
-                },
-                data: data
-            }
-        ]
-    };
-    return options;
-}
-
-function lineChartOptions(viewTitle,xTitle,yData){
-    var options = {
-        title: {
-            text: viewTitle
-        },
-        tooltip: {
-            trigger: 'axis'
-        },
-        xAxis:  {
-            type: 'category',
-            boundaryGap: false,
-            data: xTitle
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [
-            {
-                name:'销售额度走势',
-                type:'line',
-                data:yData
-            }
-        ]
-    };
-    return options;
-}
-
-$("#orderBoardInfo").on("click",function(){
-    window.location.href = '${CPATH}/admin/salesOrder?p=sales&c=orderList';
-});
-
-$("#customerCountBoard").on("click",function(){
-    window.location.href = '${CPATH}/admin/sellerCustomer?p=customManage&c=customList';
-});
-
-$("#newCustomerBoard").on("click",function(){
-    window.location.href = '${CPATH}/admin/sellerCustomer?p=customManage&c=customList';
-});
-
 </#macro> 
 <@layout active_id="dashboard" >
 <!-- Content Header (Page header) -->
@@ -350,382 +81,63 @@ $("#newCustomerBoard").on("click",function(){
 <!-- Main content -->
 <section class="content">
 	
-	<!-- Small boxes (Stat box) -->
-	<div class="row">
-		<div class="col-lg-3 col-xs-6">
-			<!-- small box -->
-			<div class="small-box bg-aqua">
-				<div class="inner">
-					<#if (count_order??)>
-						<h3>${count_order!}</h3>
-					<#else>
-						<h3>0</h3>
-					</#if>
-					<p>订单总数</p>
-				</div>
-				<div class="icon">
-					<i class="fa fa-shopping-bag"></i>
-				</div>
-				<a href="#" id="orderBoardInfo" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
-			</div>
-		</div>
-		<!-- ./col -->
-		<div class="col-lg-3 col-xs-6">
-			<!-- small box -->
-			<div class="small-box bg-green">
-				<div class="inner">
-					<#if (sum_amount??)>
-						<h3>${sum_amount!}<sup style="font-size: 20px"></sup></h3>
-					<#else>
-						<h3>0.00<sup style="font-size: 20px"></sup></h3>
-					</#if>
-					<p>今日销售额</p>
-				</div>
-				<div class="icon">
-					<i class="fa fa-bar-chart"></i>
-				</div>
-				<a href="#" id="salesBoardInfo" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
-			</div>
-		</div>
-		<!-- ./col -->
-		<div class="col-lg-3 col-xs-6">
-			<!-- small box -->
-			<div class="small-box bg-yellow">
-				<div class="inner">
-					<#if (customerCount??)>
-						<h3>${customerCount!}</h3>
-						<#else>
-							<h3>0</h3>
-					</#if>
-					<p>客户总数</p>
-				</div>
-				<div class="icon">
-					<i class="fa fa-user-plus"></i>
-				</div>
-				<a href="#" id="customerCountBoard" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
-			</div>
-		</div>
-		<!-- ./col -->
-		<div class="col-lg-3 col-xs-6">
-			<!-- small box -->
-			<div class="small-box bg-red">
-				<div class="inner">
-					<#if (newCustomerCount??)>
-                        <h3>${newCustomerCount!}</h3>
-                        <#else>
-                            <h3>0</h3>
-                    </#if>
-					<p>本周新增客户数</p>
-				</div>
-				<div class="icon">
-					<i class="fa fa-pie-chart"></i>
-				</div>
-				<a href="#" id="newCustomerBoard" class="small-box-footer">详情 <i class="fa fa-arrow-circle-right"></i></a>
-			</div>
-		</div>
-		<!-- ./col -->
-	</div>
-	<!-- /.row -->
-    <!-- Main row -->
-	<div class="row">
-	    <div class="col-md-6">
-            <!-- Line chart -->
-            <div class="box box-primary">
-                <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-user text-primary"></i> 待审核 - 客户</h3>
-                    <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="box-body">
-                    <div id="subsubsub" class="rss-widget">
-                        <ul class="list-unstyled ">
-                            <#if (toDoCustomerList?size > 0)>
-                            <#list toDoCustomerList! as bean>
-                            <li>
-                                <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/sellerCustomer/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.customer_name!}</a>
-                            </li>
-                            </#list>
-                            <#else>
-                            <li>
-                                无待办记录!
-                            </li>
-                            </#if>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.box-body-->
-            </div>
-            <!-- /.box -->
-        </div>
-        <!-- /.col -->
-        <div class="col-md-6">
-            <!-- Line chart -->
-            <div class="box box-info">
-                <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-file-text-o text-aqua"></i> 待审核 - 订单</h3>
-                    <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="box-body">
-                    <div id="subsubsub" class="rss-widget">
-                        <ul class="list-unstyled ">
-                            <#if (toDoOrdersList?size > 0)>
-                            <#list toDoOrdersList! as bean>
-                            <li>
-                                <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/salesOrder/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.orderSn!}</a>
-                            </li>
-                            </#list>
-                            <#else>
-                            <li>
-                                无待办记录!
-                            </li>
-                            </#if>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.box-body-->
-            </div>
-            <!-- /.box -->
-        </div>
-        <!-- /.col -->
-	</div>
-	
-	<div class="row">
-        <div class="col-md-6">
-            <!-- Line chart -->
-            <div class="box box-warning">
-                <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-paw text-yellow"></i> 待审核 - 客户拜访</h3>
-                    <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="box-body">
-                    <div id="subsubsub" class="rss-widget">
-                        <ul class="list-unstyled ">
-                            <#if (toDoCustomerVisitList?size > 0)>
-                            <#list toDoCustomerVisitList! as bean>
-                            <li>
-                                <span>${bean.createTime!}</span>
-                                <a href="${CPATH}/admin/customerVisit/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.customer_name!}</a>
-                            </li>
-                            </#list>
-                            <#else>
-                            <li>
-                                无待办记录!
-                            </li>
-                            </#if>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.box-body-->
-            </div>
-            <!-- /.box -->
-        </div>
-    </div>
-	
-	<div class="row">
-	    <section class="col-lg-6 connectedSortable">
-	        <div class="nav-tabs-custom">
-	            <ul class="nav nav-tabs pull-right">
-	                <li class="active" name="salesViewByD"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
-	                <li name="salesViewByM"><a href="#sales-chart" data-toggle="tab">当月</a></li>
-	                <!-- <li><a href="#sales-chart" data-toggle="tab">本月</a></li> -->
-	                <li class="pull-left header"><i class="fa fa-list-ol"></i> 业务员销售排行</li>
-                </ul>
-                <div class="tab-content no-padding">
-	                <!-- Morris chart - Sales -->
-	                <div class="chart tab-pane active" id="salesManViewByD" style="position: relative; height: 300px;"></div>
-	                <div class="chart tab-pane" id="salesManViewByM" style="position: relative; height: 300px;"></div>
-                </div>
+	<!-- <div class="row">
+		<#list modules! as module>
+		<div class="col-md-3 col-sm-6 col-xs-12">
+          	<div class="info-box <#if module_index==1>bg-aqua</#if>">
+            	<span class="info-box-icon <#if module_index==0>bg-aqua</#if>"><i class="fa fa-gear"></i></span>
+            	<div class="info-box-content">
+              		<span class="info-box-text">${module.title!} - 总计</span>
+              		<span class="info-box-number">${module.findNotDeleteContentCount()!}</span>
+            	</div>
+            	/.info-box-content
 	        </div>
-	    </section>
-	    <section class="col-lg-6 connectedSortable">
-            <div class="nav-tabs-custom">
-                <ul class="nav nav-tabs pull-right">
-                    <li class="active" id="goodsByD"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
-                    <li id="goodsByA"><a href="#sales-chart" data-toggle="tab">汇总</a></li>
-                    <!-- <li><a href="#sales-chart" data-toggle="tab">本月</a></li> -->
-                    <li class="pull-left header"><i class="fa fa-list-ol"></i> 商品销售排行</li>
-                </ul>
-                <div class="tab-content no-padding">
-                    <!-- Morris chart - Sales -->
-                    <div class="chart tab-pane active" id="goodsViewByD" style="position: relative; height: 300px;"></div>
-                    <div class="chart tab-pane" id="goodsViewByA" style="position: relative; height: 300px;"></div>
-                </div>
-            </div>
-        </section>
-	</div>
-	
-	<div class="row">
-        <section class="col-lg-6 connectedSortable">
-            <div class="nav-tabs-custom">
-                <ul class="nav nav-tabs pull-right">
-                    <li class="active" id="directByD"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
-                    <li id="directByM"><a href="#sales-chart" data-toggle="tab">当月</a></li>
-                    <!-- <li><a href="#sales-chart" data-toggle="tab">本月</a></li> -->
-                    <li class="pull-left header"><i class="fa fa-list-ol"></i> 直营商销售排行</li>
-                </ul>
-                <div class="tab-content no-padding">
-                    <!-- Morris chart - Sales -->
-                    <div class="chart tab-pane active" id="directViewByD" style="position: relative; height: 300px;"></div>
-                    <div class="chart tab-pane" id="directViewByM" style="position: relative; height: 300px;"></div>
-                </div>
-            </div>
-        </section>
-<!--        <section class="col-lg-6 connectedSortable">
-            <div class="nav-tabs-custom">
-                <ul class="nav nav-tabs pull-right">
-                    <li class="active"><a href="#revenue-chart" data-toggle="tab">今日</a></li>
-                    <li><a href="#sales-chart" data-toggle="tab">本周</a></li>
-                    &lt;!&ndash; <li><a href="#sales-chart" data-toggle="tab">本月</a></li> &ndash;&gt;
-                    <li class="pull-left header"><i class="fa fa-file-text-o"></i> 订单完成统计</li>
-                </ul>
-                <div class="tab-content no-padding">
-                    &lt;!&ndash; Morris chart - Sales &ndash;&gt;
-                    <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;"></div>
-                    <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;"></div>
-                </div>
-            </div>
-        </section>-->
-    </div>
-    <!-- 
-    <div class="row">
-        <div class="col-md-12">
-          <div class="box">
-            <div class="box-header with-border">
-              <h3 class="box-title">月度销售走势</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                <div class="btn-group">
-                  <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
-                    <i class="fa fa-wrench"></i></button>
-                    <ul class="dropdown-menu" role="menu">
-	                    <li><a href="#">Action</a></li>
-	                    <li><a href="#">Another action</a></li>
-	                    <li><a href="#">Something else here</a></li>
-	                    <li class="divider"></li>
-	                    <li><a href="#">Separated link</a></li>
-                    </ul>
-                </div>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>
-            /.box-header
-            <div class="box-body">
-              <div class="row">
-                <div class="col-md-8">
-                  <div class="chart">
-                    Sales Chart Canvas
-                    <canvas id="salesChart" style="height: 200px;"></canvas>
-                  </div>
-                  /.chart-responsive
-                </div>
-                /.col
-                <div class="col-md-4">
-                  <p class="text-center">
-                    <strong>Goal Completion</strong>
-                  </p>
-
-                  <div class="progress-group">
-                    <span class="progress-text">Add Products to Cart</span>
-                    <span class="progress-number"><b>160</b>/200</span>
-
-                    <div class="progress sm">
-                      <div class="progress-bar progress-bar-aqua" style="width: 80%"></div>
-                    </div>
-                  </div>
-                  /.progress-group
-                  <div class="progress-group">
-                    <span class="progress-text">Complete Purchase</span>
-                    <span class="progress-number"><b>310</b>/400</span>
-
-                    <div class="progress sm">
-                      <div class="progress-bar progress-bar-red" style="width: 80%"></div>
-                    </div>
-                  </div>
-                  /.progress-group
-                  <div class="progress-group">
-                    <span class="progress-text">Visit Premium Page</span>
-                    <span class="progress-number"><b>480</b>/800</span>
-
-                    <div class="progress sm">
-                      <div class="progress-bar progress-bar-green" style="width: 80%"></div>
-                    </div>
-                  </div>
-                  /.progress-group
-                  <div class="progress-group">
-                    <span class="progress-text">Send Inquiries</span>
-                    <span class="progress-number"><b>250</b>/500</span>
-
-                    <div class="progress sm">
-                      <div class="progress-bar progress-bar-yellow" style="width: 80%"></div>
-                    </div>
-                  </div>
-                  /.progress-group
-                </div>
-                /.col
-              </div>
-              /.row
-            </div>
-            ./box-body
-            <div class="box-footer">
-              <div class="row">
-                <div class="col-sm-3 col-xs-6">
-                  <div class="description-block border-right">
-                    <span class="description-percentage text-green"><i class="fa fa-caret-up"></i> 17%</span>
-                    <h5 class="description-header">$35,210.43</h5>
-                    <span class="description-text">TOTAL REVENUE</span>
-                  </div>
-                  /.description-block
-                </div>
-                /.col
-                <div class="col-sm-3 col-xs-6">
-                  <div class="description-block border-right">
-                    <span class="description-percentage text-yellow"><i class="fa fa-caret-left"></i> 0%</span>
-                    <h5 class="description-header">$10,390.90</h5>
-                    <span class="description-text">TOTAL COST</span>
-                  </div>
-                  /.description-block
-                </div>
-                /.col
-                <div class="col-sm-3 col-xs-6">
-                  <div class="description-block border-right">
-                    <span class="description-percentage text-green"><i class="fa fa-caret-up"></i> 20%</span>
-                    <h5 class="description-header">$24,813.53</h5>
-                    <span class="description-text">TOTAL PROFIT</span>
-                  </div>
-                  /.description-block
-                </div>
-                /.col
-                <div class="col-sm-3 col-xs-6">
-                  <div class="description-block">
-                    <span class="description-percentage text-red"><i class="fa fa-caret-down"></i> 18%</span>
-                    <h5 class="description-header">1200</h5>
-                    <span class="description-text">GOAL COMPLETIONS</span>
-                  </div>
-                  /.description-block
-                </div>
-              </div>
-              /.row
-            </div>
-            /.box-footer
-          </div>
-          /.box
+	        /.info-box
         </div>
         /.col
-      </div> -->
-      <!-- /.row -->
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          	<div class="info-box <#if module_index==1>bg-red</#if>">
+            	<span class="info-box-icon <#if module_index==0>bg-red</#if>"><i class="fa fa-file-text-o"></i></span>
+            	<div class="info-box-content">
+              		<span class="info-box-text">${module.title!} - 草稿</span>
+              		<span class="info-box-number">${module.findDraftContentCount()!}</span>
+            	</div>
+            	/.info-box-content
+	        </div>
+	        /.info-box
+        </div>
+        /.col
+        
+        fix for small devices only
+        <div class="clearfix visible-sm-block"></div>
+        
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          	<div class="info-box <#if module_index==1>bg-green</#if>">
+            	<span class="info-box-icon <#if module_index==0>bg-green</#if>"><i class="fa fa-trash"></i></span>
+            	<div class="info-box-content">
+              		<span class="info-box-text">${module.title!} - 垃圾箱</span>
+              		<span class="info-box-number">${module.findDeleteContentCount()!}</span>
+            	</div>
+            	/.info-box-content
+	        </div>
+	        /.info-box
+        </div>
+        /.col
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          	<div class="info-box <#if module_index==1>bg-yellow</#if>">
+            	<span class="info-box-icon <#if module_index==0>bg-yellow</#if>"><i class="fa fa-files-o"></i></span>
+            	<div class="info-box-content">
+              		<span class="info-box-text">${module.title!} - 正常</span>
+              		<span class="info-box-number">${module.findNormalContentCount()!}</span>
+            	</div>
+            	/.info-box-content
+	        </div>
+	        /.info-box
+        </div>
+        /.col
+        </#list>
+	</div> -->
+	
 </section>
 <!-- /.content -->
 </@layout>

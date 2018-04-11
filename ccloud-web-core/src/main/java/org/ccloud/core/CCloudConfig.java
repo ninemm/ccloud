@@ -15,39 +15,8 @@
  */
 package org.ccloud.core;
 
-import java.io.File;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.util.Enumeration;
-import java.util.List;
-
-import org.ccloud.Consts;
-import org.ccloud.cache.JCachePlugin;
-import org.ccloud.core.cache.ActionCacheHandler;
-import org.ccloud.core.interceptor.HookInterceptor;
-import org.ccloud.core.interceptor.JI18nInterceptor;
-import org.ccloud.core.render.CCloudRenderFactory;
-import org.ccloud.interceptor.AdminInterceptor;
-import org.ccloud.interceptor.GlobelInterceptor;
-import org.ccloud.interceptor.PublicInterceptor;
-import org.ccloud.interceptor.SessionInterceptor;
-import org.ccloud.log.SystemLogThread;
-import org.ccloud.message.plugin.MessagePlugin;
-import org.ccloud.model.core.JModelMapping;
-import org.ccloud.model.core.Table;
-import org.ccloud.qiniu.QiniuPlugin;
-import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.ClassUtils;
-import org.ccloud.utils.StringUtils;
-import org.ccloud.wechat.WechatApi;
-
 import com.alibaba.druid.filter.stat.StatFilter;
-import com.jfinal.config.Constants;
-import com.jfinal.config.Handlers;
-import com.jfinal.config.Interceptors;
-import com.jfinal.config.JFinalConfig;
-import com.jfinal.config.Plugins;
-import com.jfinal.config.Routes;
+import com.jfinal.config.*;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.ext.handler.UrlSkipHandler;
@@ -65,11 +34,37 @@ import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.render.ViewType;
 import com.jfinal.weixin.sdk.api.ApiConfigKit;
 import com.mysql.jdbc.AbandonedConnectionCleanupThread;
-
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
+import org.ccloud.Consts;
+import org.ccloud.cache.JCachePlugin;
+import org.ccloud.core.cache.ActionCacheHandler;
+import org.ccloud.core.interceptor.HookInterceptor;
+import org.ccloud.core.interceptor.JI18nInterceptor;
+import org.ccloud.core.render.CCloudRenderFactory;
+import org.ccloud.interceptor.AdminInterceptor;
+import org.ccloud.interceptor.GlobelInterceptor;
+import org.ccloud.interceptor.PublicInterceptor;
+import org.ccloud.interceptor.SessionInterceptor;
+import org.ccloud.log.SystemLogThread;
+import org.ccloud.message.plugin.MessagePlugin;
+import org.ccloud.model.core.JModelMapping;
+import org.ccloud.model.core.Table;
+import org.ccloud.qiniu.QiniuPlugin;
+import org.ccloud.route.RouterMapping;
+import org.ccloud.shiro.core.ShiroInterceptor;
+import org.ccloud.shiro.core.ShiroPlugin;
+import org.ccloud.utils.ClassUtils;
+import org.ccloud.utils.StringUtils;
+import org.ccloud.wechat.WechatApi;
+
+import java.io.File;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.util.Enumeration;
+import java.util.List;
 
 public abstract class CCloudConfig extends JFinalConfig {
 
@@ -144,8 +139,8 @@ public abstract class CCloudConfig extends JFinalConfig {
 			
 //			plugins.add(createQiniuPlugin());
 			
-//			ShiroPlugin shiroPlugin = createShiroPlugin();
-//			plugins.add(shiroPlugin);
+			ShiroPlugin shiroPlugin = createShiroPlugin();
+			plugins.add(shiroPlugin);
 		}
 	}
 
@@ -209,14 +204,14 @@ public abstract class CCloudConfig extends JFinalConfig {
 		return cron4jPlugin;
 	}
 	
-//	public ShiroPlugin createShiroPlugin() {
-//		ShiroPlugin shiroPlugin = new ShiroPlugin(this.routes);
-//	    shiroPlugin.setLoginUrl("/admin/login");//登陆url：未验证成功跳转
-//	    shiroPlugin.setSuccessUrl("/admin");//登陆成功url：验证成功自动跳转
-//	    shiroPlugin.setUnauthorizedUrl("/admin/checkRole");//授权url：未授权成功自动跳转
-//
-//	    return shiroPlugin;
-//	}
+	public ShiroPlugin createShiroPlugin() {
+		ShiroPlugin shiroPlugin = new ShiroPlugin(this.routes);
+	    shiroPlugin.setLoginUrl("/admin/login");//登陆url：未验证成功跳转
+	    shiroPlugin.setSuccessUrl("/admin");//登陆成功url：验证成功自动跳转
+	    shiroPlugin.setUnauthorizedUrl("/admin/checkRole");//授权url：未授权成功自动跳转
+
+	    return shiroPlugin;
+	}
 	
 	public QiniuPlugin createQiniuPlugin() {
 		QiniuPlugin qiniuPlugin = new QiniuPlugin("ccloud.properties");
@@ -228,7 +223,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		interceptors.add(new GlobelInterceptor());
 		interceptors.add(new AdminInterceptor());
 		interceptors.add(new HookInterceptor());
-//		interceptors.add(new ShiroInterceptor());
+		interceptors.add(new ShiroInterceptor());
 		interceptors.add(new PublicInterceptor());
 		interceptors.add(new SessionInterceptor());
 	}
