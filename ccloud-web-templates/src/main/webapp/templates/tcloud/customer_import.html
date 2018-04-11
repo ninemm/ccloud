@@ -103,6 +103,7 @@
 
         $loading.show();
         $noMore.hide();
+        $.showLoading()
 
         var params;
         var url;
@@ -130,6 +131,7 @@
         Utils.ajax(url, params,
         function(data){
             $loading.hide();
+            $.hideLoading();
             if(data.customerList.length == 0){
                 $noMore.show();
                 loading = true;

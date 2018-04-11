@@ -586,6 +586,7 @@ $(function() {
 
 		$loading.show();
 		$noMore.hide();
+		$.showLoading();
 
 	    var params = {
 		    "page": page,
@@ -599,6 +600,7 @@ $(function() {
 		Utils.ajax('${CPATH}/product/customerList', params, 
 			function(data){
 				$loading.hide();
+				$.hideLoading();
 				if(data.customerList.length == 0){
 					if($('.customerSelect').length == 0) $noMore.show();
 					loading = true;

@@ -199,6 +199,7 @@
 
     function refresh() {
         pageNumber = 1;
+        $.showLoading();
         $.ajax({
             url:"${CPATH}/activity/refreshApply",
             type:"post",
@@ -220,13 +221,14 @@
                 pageNumber = 2;
                 for(var i = 0 ; i < data.applyL.length; i++){
                 	var step2=new SetStep({
-			        content:'#'+data.applyL[i].activityApply.id,
-			        steps: data.applyL[i].strings,
-			        stepCounts:data.applyL[i].num,
-			        showBtn : false,
-			        clickAble:true
-			    })
-             }
+                        content:'#'+data.applyL[i].activityApply.id,
+                        steps: data.applyL[i].strings,
+                        stepCounts:data.applyL[i].num,
+                        showBtn : false,
+                        clickAble:true
+                    })
+                }
+                $.hideLoading();
             }
         });
     }

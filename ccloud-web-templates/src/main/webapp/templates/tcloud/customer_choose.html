@@ -90,42 +90,44 @@
     
     function initCustomer() {
 
-		$loading.show();
-		$noMore.hide();
+			$loading.show();
+			$noMore.hide();
+			$.showLoading();
 
 	    var params = {
 		    "page": page,
-	        "size": size,
-	        "keyword": $("#searchInput").val(),
-	        "userId": $("#userId").data('values'),
-	        "customerTypeId": $("#customerTypeId").data('values'),
-	        "isOrdered": $("#isOrdered").data('values')
+				"size": size,
+				"keyword": $("#searchInput").val(),
+				"userId": $("#userId").data('values'),
+				"customerTypeId": $("#customerTypeId").data('values'),
+				"isOrdered": $("#isOrdered").data('values')
 	    }
 
-		Utils.ajax('${CPATH}/product/customerList', params, 
-			function(data){
-				$loading.hide();
-				if(data.customerList.length == 0){
-					if($('.weui-panel').length == 0) $noMore.show();
-					loading = true;
-					return;
-				}
-				$.each(data.customerList, function(index, el) {
-					$customerList.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
-					var $newCustomer = $customerList.find(".weui-panel:last");
-					$newCustomer.find("#customerName").text(el.customer_name);
-					$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
-					$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+			Utils.ajax('${CPATH}/product/customerList', params, 
+				function(data){
+					$loading.hide();
+					$.hideLoading();					
+					if(data.customerList.length == 0){
+						if($('.weui-panel').length == 0) $noMore.show();
+						loading = true;
+						return;
+					}
+					$.each(data.customerList, function(index, el) {
+						$customerList.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
+						var $newCustomer = $customerList.find(".weui-panel:last");
+						$newCustomer.find("#customerName").text(el.customer_name);
+						$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
+						$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
 
-					$newCustomer.find("#sellerCustomerId").val(el.id);
-					$newCustomer.find("#contact").val(el.contact);
-					$newCustomer.find("#mobile").val(el.mobile);
-					$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
-				});
-				page++;
-				loading = false;
-			}
-		);
+						$newCustomer.find("#sellerCustomerId").val(el.id);
+						$newCustomer.find("#contact").val(el.contact);
+						$newCustomer.find("#mobile").val(el.mobile);
+						$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
+					});
+					page++;
+					loading = false;
+				}
+			);
     }
 
 	//滑动方法
