@@ -13,9 +13,21 @@
  */
 package org.ccloud.controller.bi;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.ccloud.Consts;
+import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.query.Bi2SalesQuery;
+import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DateUtils;
+import org.joda.time.DateTime;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.jfinal.aop.Before;
 import com.jfinal.kit.HashKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
@@ -23,15 +35,6 @@ import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.qyweixin.sdk.api.JsTicket;
 import com.jfinal.qyweixin.sdk.api.JsTicketApi;
-import org.ccloud.Consts;
-import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.query.Bi2SalesQuery;
-import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DateUtils;
-import org.ccloud.wechat.WechatJSSDKInterceptor;
-import org.joda.time.DateTime;
-
-import java.util.*;
 
 @RouterMapping(url = "/biIndex")
 public class BiIndexController extends BaseFrontController {

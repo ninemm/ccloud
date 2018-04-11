@@ -20,7 +20,6 @@ import org.ccloud.core.CCloud;
 import org.ccloud.core.CCloudConfig;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.shiro.tag.ShiroTags;
 import org.ccloud.ui.freemarker.function.DictBox;
 import org.ccloud.ui.freemarker.function.DictName;
 import org.ccloud.ui.freemarker.function.MetadataChecked;
@@ -59,7 +58,7 @@ public class Config extends CCloudConfig {
 
 		ApiConfigKit.putApiConfig(getApiConfig());
 
-		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
+//		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
 		
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
 	}

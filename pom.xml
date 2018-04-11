@@ -29,8 +29,6 @@
 		<module>ccloud-bi2</module>
 		<module>ccloud-web-admin</module>
 		<module>ccloud-web-templates</module>
-		<module>ccloud-web-bi</module>
-		<module>ccloud-web-front</module>
 	</modules>
 	
 	<properties>

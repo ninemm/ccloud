@@ -101,20 +101,7 @@
 			</exclusions>
 		</dependency> -->
 		
-		<dependency>
-			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-web-front</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-web-bi</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-			<scope>compile</scope>
-		</dependency>
+
 		<!-- <dependency>
 			<groupId>org.ccloud</groupId>
 			<artifactId>ccloud-web-auth</artifactId>
@@ -124,13 +111,6 @@
 			<scope>provided</scope>
 		</dependency> -->
 		
-		<dependency>
-			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-web-templates</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-			<scope>compile</scope>
-		</dependency>
 		<!-- <dependency>
 	    	<groupId>com.jfinal</groupId>
 	    	<artifactId>jetty-server</artifactId>
@@ -197,18 +177,6 @@
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-upms-admin</artifactId>
 						</overlay> -->
-						<overlay>
-							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-front</artifactId>
-						</overlay>
-						<overlay>
-							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-templates</artifactId>
-						</overlay>
-						<overlay>
-							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-bi</artifactId>
-						</overlay>
 					</overlays>
 				</configuration>
 			</plugin>

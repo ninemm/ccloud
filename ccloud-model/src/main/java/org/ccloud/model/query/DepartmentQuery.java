@@ -22,16 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
 import org.ccloud.model.Group;
 import org.ccloud.model.ModelSorter;
 import org.ccloud.model.Role;
-import org.ccloud.model.Seller;
 import org.ccloud.model.User;
-import org.ccloud.model.UserJoinWarehouse;
-import org.ccloud.model.Warehouse;
 
 import com.google.common.collect.Lists;
 import com.jfinal.kit.StrKit;
@@ -182,19 +177,6 @@ public class DepartmentQuery extends JBaseQuery {
 		return deptTreeList;
 	}
 	
-	public List<Map<String, Object>> findDeptListAsTree(String dataArea, boolean hasUser,
-			List<UserJoinWarehouse> listUserJoinWarehouse) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		List<Department> list = findDeptList(dataArea, "order_list asc");
-		List<Map<String, Object>> deptTreeList = new ArrayList<Map<String, Object>>();
-		Department department = list.get(0);
-		map.put("text", department.getDeptName());// 父子表第一级名称,以后可以存储在字典表或字典类
-		map.put("tags", Lists.newArrayList(0));
-		ModelSorter.tree(list);
-		map.put("nodes", doBuild(list, hasUser,listUserJoinWarehouse));
-		deptTreeList.add(map);
-		return deptTreeList;
-	}
 
 	
 	public List<Map<String, Object>> findDeptListAsTree(int i, String dataArea, boolean isAdmin) {
@@ -391,57 +373,7 @@ public class DepartmentQuery extends JBaseQuery {
 		return childList;
 	}
 
-	public List<Map<String, Object>> findWareHouse(String id) {
-		List<Warehouse> list = WarehouseQuery.me().findWareHouseByDept(id);
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		Map<String, Object> map = new HashMap<>();
-		String title = "所有仓库";
-		if (list.size() == 0) {
-			title = "暂无数据";
-		}		
-		map.put("text", title);
-		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuildByWareHouse(list));
-		resTreeList.add(map);
-		return resTreeList;		
-	}
 
-	private List<Map<String, Object>> doBuildByWareHouse(List<Warehouse> list) {
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		for (Warehouse ware : list) {
-			Map<String, Object> map = new HashMap<>();
-			map.put("text", ware.getName());
-			map.put("tags", Lists.newArrayList(ware.getId()));
-			resTreeList.add(map);
-		}
-		return resTreeList;
-	}
-
-	public List<Map<String, Object>> findSeller(String id) {
-		List<Seller> list = SellerQuery.me().querySellIdByDept(id);
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		Map<String, Object> map = new HashMap<>();
-		String title = "所有账套";
-		if (list.size() == 0) {
-			title = "暂无数据";
-		}		
-		map.put("text", title);
-		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuildBySeller(list));
-		resTreeList.add(map);
-		return resTreeList;	
-	}
-
-	private List<Map<String, Object>> doBuildBySeller(List<Seller> list) {
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		for (Seller seller : list) {
-			Map<String, Object> map = new HashMap<>();
-			map.put("text", seller.getSellerName());
-			map.put("tags", Lists.newArrayList(seller.getId()));
-			resTreeList.add(map);
-		}
-		return resTreeList;
-	}
 
 	public List<Map<String, Object>> findGroup(String id) {
 		List<Group> list = GroupQuery.me().findByDeptId(id);
@@ -467,100 +399,6 @@ public class DepartmentQuery extends JBaseQuery {
 			resTreeList.add(map);
 		}
 		return resTreeList;
-	}
-
-	public List<Map<String, Object>> findCustomType(String id) {
-		List<CustomerType> list = CustomerTypeQuery.me().findByDept(id);
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		Map<String, Object> map = new HashMap<>();
-		String title = "所有客户类型";
-		if (list.size() == 0) {
-			title = "暂无数据";
-		}		
-		map.put("text", title);
-		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuildCustom(list));
-		resTreeList.add(map);
-		return resTreeList;	
-	}
-
-	private List<Map<String, Object>> doBuildCustom(List<CustomerType> list) {
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		for (CustomerType type : list) {
-			Map<String, Object> map = new HashMap<>();
-			map.put("text", type.getName());
-			map.put("tags", Lists.newArrayList(type.getId()));
-			resTreeList.add(map);
-		}
-		return resTreeList;
-	}
-
-	public List<Map<String, Object>> findCustomer(String id) {
-		List<Customer> list = CustomerQuery.me().findByUserId(id);
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		Map<String, Object> map = new HashMap<>();
-		String title = "所有客户";
-		if (list.size() == 0) {
-			title = "暂无数据";
-		}		
-		map.put("text", title);
-		map.put("tags", Lists.newArrayList(0));
-		map.put("nodes", doBuildCustomer(list));
-		resTreeList.add(map);
-		return resTreeList;	
-	}
-
-	private List<Map<String, Object>> doBuildCustomer(List<Customer> list) {
-		List<Map<String, Object>> resTreeList = new ArrayList<>();
-		for (Customer customer : list) {
-			Map<String, Object> map = new HashMap<>();
-			map.put("text", customer.getCustomerName());
-			map.put("tags", Lists.newArrayList(customer.getId()));
-			resTreeList.add(map);
-		}
-		return resTreeList;
-	}
-	
-	private List<Map<String, Object>> doBuild(List<Department> list, boolean addUserFlg,List<UserJoinWarehouse> listUserJoinWarehouse) {
-		List<Map<String, Object>> resTreeList = new ArrayList<Map<String, Object>>();
-		for (Department dept : list) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("text", dept.getDeptName());
-			map.put("tags", Lists.newArrayList(dept.getId(), dept.getDataArea()));
-			List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
-			if (dept.getChildList() != null && dept.getChildList().size() > 0) {
-				childList = doBuild(dept.getChildList(), addUserFlg,listUserJoinWarehouse);
-			}
-			if (addUserFlg) {
-				childList = addDeptUser(dept.getId(), childList,listUserJoinWarehouse);
-			}
-			map.put("nodes", childList);
-			resTreeList.add(map);
-		}
-		return resTreeList;
-	}
-
-	private List<Map<String, Object>> addDeptUser(String deptId, List<Map<String, Object>> childList,
-			List<UserJoinWarehouse> listUserJoinWarehouse) {
-		List<User> list = UserQuery.me().findByDeptId(deptId);
-		for (User user : list) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("text", user.getRealname());
-			map.put("tags", Lists.newArrayList(user.getId(), "user"));
-			for (int i = 0; i < listUserJoinWarehouse.size(); i++) {
-				if (user.getId().equals(listUserJoinWarehouse.get(i).getUserId())) {
-					Map<String, Object> stateMap = new HashMap<>();
-					stateMap.put("checked", true);
-					stateMap.put("selected", true);
-					stateMap.put("disabled", false);
-					stateMap.put("expanded", true);
-					map.put("state", stateMap);
-				}
-			}
-			childList.add(map);
-
-		}
-		return childList;
 	}
 
 	public List<Department> findAllParentDepartmentsBySubDeptId(String subDeptId) {

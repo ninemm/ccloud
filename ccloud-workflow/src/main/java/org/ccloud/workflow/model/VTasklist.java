@@ -25,15 +25,15 @@ import org.ccloud.workflow.model.base.BaseVTasklist;
  */
 @SuppressWarnings("serial")
 public class VTasklist extends BaseVTasklist<VTasklist> {
-	
+
 	public static final VTasklist DAO = new VTasklist();
-	
+
 	public List<VTasklist> getTaskByInsId(String INSID){
 		return DAO.find("select * from v_tasklist where INSID='"+INSID+"'");
 	}
-	
+
 //	public Page<ActReProcdef> getDefPage(Integer curr , Integer pagesize){
 //		return ActReProcdef.DAO.paginate(curr, pagesize, "select * ", " from (select def.*,dep.DEPLOY_TIME_ from act_re_procdef def ,act_re_deployment dep where def.DEPLOYMENT_ID_=dep.ID_ ORDER BY VERSION_ DESC) a group by KEY_");
 //	}
-	
+
 }

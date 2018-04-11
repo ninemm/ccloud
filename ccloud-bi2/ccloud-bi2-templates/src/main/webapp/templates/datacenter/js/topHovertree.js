@@ -1,4 +1,4 @@
-﻿/*
+﻿﻿/*
 jQuery返回顶部
 使用方法：initTopHoverTree("tophovertree",500,30,20); }
 tophovertree是返回顶部按钮的ID，500是返回顶部时间（毫秒）,30是距离右边距离，20是距离底部距离

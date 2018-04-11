@@ -24,7 +24,6 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -41,7 +40,7 @@ public class _OptionController extends JBaseController {
 	@RequiresPermissions(value={"/admin/option","/admin/all","/admin/option/seller"},logical=Logical.OR)
 	public void index() {
 		if("seller".equals(getPara())){
-			setAttr("customerTypeList", CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
+			//setAttr("customerTypeList", CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
 		}
 		render((getPara() == null ? "web" : getPara()) + ".html");
 	}

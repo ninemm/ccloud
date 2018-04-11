@@ -37,12 +37,9 @@ import org.ccloud.model.core.JModelMapping;
 import org.ccloud.model.core.Table;
 import org.ccloud.qiniu.QiniuPlugin;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.shiro.core.ShiroInterceptor;
-import org.ccloud.shiro.core.ShiroPlugin;
 import org.ccloud.utils.ClassUtils;
 import org.ccloud.utils.StringUtils;
 import org.ccloud.wechat.WechatApi;
-import org.ccloud.workflow.plugin.ActivitiPlugin;
 
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.jfinal.config.Constants;
@@ -139,16 +136,16 @@ public abstract class CCloudConfig extends JFinalConfig {
 
 			//plugins.add(new SearcherPlugin());
 			
-			plugins.add(createCron4jPlugin());
+//			plugins.add(createCron4jPlugin());
 
 			plugins.add(new MessagePlugin());
 			
-			plugins.add(new ActivitiPlugin());
+//			plugins.add(new ActivitiPlugin());
 			
-			plugins.add(createQiniuPlugin());
+//			plugins.add(createQiniuPlugin());
 			
-			ShiroPlugin shiroPlugin = createShiroPlugin();
-			plugins.add(shiroPlugin);
+//			ShiroPlugin shiroPlugin = createShiroPlugin();
+//			plugins.add(shiroPlugin);
 		}
 	}
 
@@ -212,14 +209,14 @@ public abstract class CCloudConfig extends JFinalConfig {
 		return cron4jPlugin;
 	}
 	
-	public ShiroPlugin createShiroPlugin() {
-		ShiroPlugin shiroPlugin = new ShiroPlugin(this.routes);
-	    shiroPlugin.setLoginUrl("/admin/login");//登陆url：未验证成功跳转
-	    shiroPlugin.setSuccessUrl("/admin");//登陆成功url：验证成功自动跳转
-	    shiroPlugin.setUnauthorizedUrl("/admin/checkRole");//授权url：未授权成功自动跳转
-	    
-	    return shiroPlugin;
-	}
+//	public ShiroPlugin createShiroPlugin() {
+//		ShiroPlugin shiroPlugin = new ShiroPlugin(this.routes);
+//	    shiroPlugin.setLoginUrl("/admin/login");//登陆url：未验证成功跳转
+//	    shiroPlugin.setSuccessUrl("/admin");//登陆成功url：验证成功自动跳转
+//	    shiroPlugin.setUnauthorizedUrl("/admin/checkRole");//授权url：未授权成功自动跳转
+//
+//	    return shiroPlugin;
+//	}
 	
 	public QiniuPlugin createQiniuPlugin() {
 		QiniuPlugin qiniuPlugin = new QiniuPlugin("ccloud.properties");
@@ -231,7 +228,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		interceptors.add(new GlobelInterceptor());
 		interceptors.add(new AdminInterceptor());
 		interceptors.add(new HookInterceptor());
-		interceptors.add(new ShiroInterceptor());
+//		interceptors.add(new ShiroInterceptor());
 		interceptors.add(new PublicInterceptor());
 		interceptors.add(new SessionInterceptor());
 	}

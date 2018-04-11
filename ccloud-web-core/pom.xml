@@ -144,13 +144,13 @@
 			<scope>compile</scope>
 		</dependency> -->
 		
-		<dependency>
+<!--		<dependency>
             <groupId>org.ccloud</groupId>
             <artifactId>ccloud-shiro</artifactId>
             <version>${project.version}</version>
             <type>jar</type> 
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
 		
 		<dependency>
 			<groupId>org.ccloud</groupId>
@@ -160,13 +160,13 @@
 			<scope>compile</scope>
 		</dependency>
 		
-		<dependency>
+<!--		<dependency>
             <groupId>org.ccloud</groupId>
             <artifactId>ccloud-workflow</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
         
         <dependency>
 	        	<groupId>com.drewnoakes</groupId>

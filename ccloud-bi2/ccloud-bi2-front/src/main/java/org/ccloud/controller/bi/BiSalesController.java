@@ -25,7 +25,6 @@ import org.ccloud.model.callback.AroundCustomerBiSalesCallback;
 import org.ccloud.model.callback.AroundCustomerBiUndevelopedCallback;
 import org.ccloud.model.callback.AroundCustomerBiVisitCallback;
 import org.ccloud.model.query.Bi2SalesQuery;
-import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.joda.time.DateTime;
