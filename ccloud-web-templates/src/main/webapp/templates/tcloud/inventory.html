@@ -130,7 +130,8 @@
     
     function loadInventoryDetail(){
 		$loading.show();
-		$noMore.hide();
+        $noMore.hide();
+        $.showLoading();
 		var params = {
             "search": $("#searchInput")[0].value,
             "page": page,
@@ -144,7 +145,7 @@
 		Utils.ajax('${CPATH}/inventory/inventory', params, 
 			function(data) {
 				$loading.hide();
-				
+				$.hideLoading();
 				if(data.rows.length == 0) {
 					$noMore.show();
 					loading = true;

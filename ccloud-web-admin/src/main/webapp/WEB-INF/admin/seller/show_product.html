@@ -326,18 +326,18 @@
 		if(price>accountPrice){
 			toastr.error('销售价格不可大于账期价格！');
 			setTimeout( function(){
-						location.reload();
+						$(obj).parent().parent().find('td').eq(7).find("input[name='bigPrice']").val($(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val());
 								}, 2 * 1000 );
-		}
-		if(price < cost){
+		} else if(price < cost){
 			toastr.error('销售价格不可小于成本价格！');
 			setTimeout( function(){
-						location.reload();
+						$(obj).parent().parent().find('td').eq(7).find("input[name='bigPrice']").val($(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val());
 								}, 2 * 1000 );
+		}else {
+			var smallprice=(price/$(obj).parent().parent().find("td").eq(8).html()).toFixed(2);
+			$(obj).parent().parent().find("td").eq(9).find("input[name='smallPrice']").val(smallprice);
+			$(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val(price);
 		}
-		var smallprice=(price/$(obj).parent().parent().find("td").eq(8).html()).toFixed(2);
-		$(obj).parent().parent().find("td").eq(9).find("input[name='smallPrice']").val(smallprice);
-		$(obj).parent().parent().find('td').eq(7).find("input[name='_bigPrice']").val(price);
 	}
 	
 	function changeCostPrice(obj){
@@ -351,16 +351,17 @@
 		if(cost>price){
 			toastr.error('销售价格不可小于成本价格！');
 			setTimeout( function(){
-						location.reload();
+						$(obj).parent().parent().find("td").eq(10).find("input").eq(0).val($(obj).parent().parent().find("td").eq(10).find("input").eq(1).val());
 								}, 2 * 1000 );
+		}else{
+			$(obj).parent().parent().find("td").eq(10).find("input").eq(1).val(cost);
 		}
-		$(obj).parent().parent().find("td").eq(10).find("input").eq(1).val(cost);
 	}
 	
 	function changeAccountPrice(obj){
 		var accountPrice = $(obj).val();
 		if(accountPrice.indexOf(",") != -1){
-			accountPrice = $(obj).parent().parent().find('td').eq(12).find("input").eq(1).val()
+			accountPrice = $(obj).parent().parent().find('td').eq(12).find("input").eq(1).val();
 		}else{
 			accountPrice = parseInt($(obj).val());
 		}
@@ -368,10 +369,11 @@
 		if(price>accountPrice){
 			toastr.error('销售价格不可大于账期价格！');
 			setTimeout( function(){
-						location.reload();
+						$(obj).parent().parent().find('td').eq(12).find("input").eq(0).val($(obj).parent().parent().find('td').eq(12).find("input").eq(1).val());
 								}, 2 * 1000 );
+		}else{
+			$(obj).parent().parent().find('td').eq(12).find("input").eq(1).val(accountPrice);
 		}
-		$(obj).parent().parent().find('td').eq(12).find("input").eq(1).val(accountPrice);
 	}
 	
 	function changeTaxPrice(obj){
@@ -428,7 +430,6 @@
 			return;		 
 		 }
 		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
-		 	console.log($(this));
 		  	var obj = {
 								"id": $(this).find('td').eq(0).find("input").val(),
 							};
@@ -500,7 +501,6 @@
 					data : {id : id},
 					success:function(data){
 						var url = data.qrcode_url;
-						console.log(url);
 						$(".modal-body").html("");
 						var html = '<img src="'+url.substring(url.indexOf('qrcode')-1,url.length)+'" alt="二维码" class="jp-grids-photos img-responsive">'
 						$(".modal-body").append(html);

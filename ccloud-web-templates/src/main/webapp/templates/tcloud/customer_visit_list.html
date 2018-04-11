@@ -159,6 +159,7 @@
     
     function refresh() {
         pageNumber = 1;
+        $.showLoading();
         $.ajax({
             url:"${CPATH}/customerVisit/refresh",
             type:"post",
@@ -178,6 +179,7 @@
                 if(data.html.length ==0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#visitList").html(data.html);
                 pageNumber = 2;
+                $.hideLoading();
             }
         });
     }

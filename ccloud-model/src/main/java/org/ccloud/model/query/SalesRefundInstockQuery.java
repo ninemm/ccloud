@@ -495,14 +495,27 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 	
 	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String printStatus,String stockInStatus ,String dataArea,String sort,String order) {
-		String select = "select r.*, c.customer_name,c.contact,c.mobile,w.name as warehouseName,ct.name as customerTypeName,u.realname ";
+		LinkedList<Object> params = new LinkedList<Object>();
+		String select = "select r.*, c.customer_name,c.contact,c.mobile,w.name as warehouseName,ct.name as customerTypeName,u.realname,t1.rejectAmount ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_sales_refund_instock` r");
+		fromBuilder.append(" LEFT JOIN (SELECT SUM(sd.reject_amount) as rejectAmount,sd.refund_instock_id ");
+		fromBuilder.append(" from cc_sales_refund_instock_detail sd ");
+		fromBuilder.append(" WHERE 	sd.data_area LIKE '"+dataArea+"' ");
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and sd.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and sd.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append(" GROUP BY sd.refund_instock_id) t1 on t1.refund_instock_id = r.id ");
 		fromBuilder.append(" left join cc_seller_customer cc ON r.customer_id = cc.id ");
 		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append(" left join cc_warehouse w on r.warehouse_id = w.id ");
 		fromBuilder.append(" left join cc_customer_type ct on r.customer_type_id = ct.id ");
 		fromBuilder.append(" left join user u on r.biz_user_id = u.id ");
-		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		

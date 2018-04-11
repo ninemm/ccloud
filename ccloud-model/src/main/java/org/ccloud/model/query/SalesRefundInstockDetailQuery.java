@@ -385,7 +385,13 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		map.put("status", detail.save());
 		return map;
 	}
-
+	public SalesRefundInstockDetail findByInstockId(String instockDetailId) {
+		String sql = "SELECT SUM(sd.reject_amount) as rejectAmount,sd.refund_instock_id " + 
+				"from cc_sales_refund_instock_detail sd " + 
+				"WHERE sd.refund_instock_id = '"+instockDetailId+"' " + 
+				"GROUP BY sd.refund_instock_id ";
+		return DAO.findFirst(sql);
+	}
 
 
 }

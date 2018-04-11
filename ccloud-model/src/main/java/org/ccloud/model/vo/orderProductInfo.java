@@ -21,6 +21,7 @@ public class orderProductInfo {
 	private String salesOutDetaliId;//出库单子表Id
 	private String wareHouseId;//出库单仓库
 	private String productId;
+	private String valueName;
 	public String getProductName() {
 		return productName;
 	}
@@ -123,6 +124,12 @@ public class orderProductInfo {
 	}
 	public void setProductId(String productId) {
 		this.productId = productId;
+	}
+	public String getValueName() {
+		return valueName;
+	}
+	public void setValueName(String valueName) {
+		this.valueName = valueName;
 	}
 	
 }

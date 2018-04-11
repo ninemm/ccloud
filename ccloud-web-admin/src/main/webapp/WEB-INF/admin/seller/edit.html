@@ -76,9 +76,9 @@
 		    type: 2,
 		    area: ['580px', '530px'],
 		    fix: false, //不固定
-		    content: '${CPATH}/admin/department/department_tree'
-		});
-	});	
+		    content: '${CPATH}/admin/seller/department_tree'
+			});
+		});	
 		
 		jQuery.mm.initValidator('#form', validatorFields)
 		
@@ -152,7 +152,7 @@
 	
 	function doSubmit(){
 		if(flang==false){
-			alert("销售商编码错误，请重新输入");
+			toastr.error("销售商编码错误，请重新输入");
 			return;
 		}
 		

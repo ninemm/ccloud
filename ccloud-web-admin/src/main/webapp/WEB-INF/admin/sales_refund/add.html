@@ -62,7 +62,8 @@
 		$newTr.find("#bigPrice").attr("name", bigPriceName)
 		
 		var bigNumName = "bigNum" + newTrIdx;
-		$newTr.find("#bigNum").attr("name", bigNumName)
+		$newTr.find("#bigNum").attr("name", bigNumName);
+		$newTr.find("#_bigNum").attr("name", "_bigNum" + newTrIdx);
 		$form.data('bootstrapValidator').addField(bigNumName,
 			{
 				validators: {
@@ -73,9 +74,9 @@
 		
 		var smallPriceName = "smallPrice" + newTrIdx;
 		$newTr.find("#smallPrice").attr("name", smallPriceName)
-		
 		var smallNumName = "smallNum" + newTrIdx;
 		$newTr.find("#smallNum").attr("name", smallNumName)
+		$newTr.find("#_smallNum").attr("name", "_smallNum" + newTrIdx)
 		$form.data('bootstrapValidator').addField(smallNumName,
 			{
 				validators: {
@@ -136,12 +137,13 @@
 			$tr.find("#bigUnit-span").text(product.big_unit + "(x" + convert + smallUnit + ")");
 			
 			$tr.find("#bigNum").val(Math.floor(productCount/convert));
-			
+			$tr.find("#_bigNum").val(Math.floor(productCount/convert));
 			$tr.find("#smallPrice").val(smallPrice);
 			$tr.find("#smallPrice-span").text(smallPrice);
 			$tr.find("#smallUnit-span").text(smallUnit);
 			
 			$tr.find("#smallNum").val(productCount%convert);
+			$tr.find("#_smallNum").val(productCount%convert);
 			if(product.is_gift == 1){
 				$tr.find("#isGift").attr("checked", true);
 			}
@@ -155,7 +157,9 @@
 		var $tr = $(obj).parent().parent();
 		var trIndex = $tr.attr("id").replace("tr", "");
 		$form.bootstrapValidator('removeField', 'bigNum' + trIndex);
+		$form.bootstrapValidator('removeField', '_bigNum' + trIndex);
 		$form.bootstrapValidator('removeField', 'smallNum' + trIndex);
+		$form.bootstrapValidator('removeField', '_smallNum' + trIndex);
 		
 		$tr.remove();
 		
@@ -177,12 +181,21 @@
 
 		var isCheck = $curTr.find("input[type='checkbox']").is(':checked');
 		if (!isCheck) {
+			var convert = $curTr.find("#convert").val();
 			var bigPrice = $curTr.find("#bigPrice").val();
 			var bigNum = $curTr.find("#bigNum").val();
+			var _bigNum = $curTr.find("#_bigNum").val();
 			var smallPrice = $curTr.find("#smallPrice").val();
 			var smallNum = $curTr.find("#smallNum").val();
+			var _smallNum = $curTr.find("#_smallNum").val();
 			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
 			rowTotal = rowTotal.toFixed(2);
+			var countNew = parseInt(bigNum*convert + smallNum);
+			var count = parseInt(_bigNum*convert + _smallNum);
+			if(countNew > count){
+				toastr.error('商品退货数量不能大于出库单的数量!');
+				return 
+			}
 		}
 		$curTr.find(".rowTotal").text(rowTotal);
 		$curTr.find("#inputRowTotal").val(rowTotal);
@@ -403,6 +416,7 @@
 							<td>
 								<div class = "validata-box">
 									<input type="text" id="bigNum" name="bigNum" style="width: 30%" onblur="rowTotalF(this)" value="1" />
+									<input type="hidden" id="_bigNum" name="_bigNum" />
 									<span id="bigUnit-span"></span>
 								</div>
 							</td>
@@ -415,6 +429,7 @@
 							<td>
 								<div class = "validata-box">
 									<input type="text" id="smallNum" name="smallNum" style="width: 30%" onblur="rowTotalF(this)" value="0" />
+									<input type="hidden" id="_smallNum" name="_smallNum" value="" />
 									<span id="smallUnit-span"></span>
 								</div>
 							</td>

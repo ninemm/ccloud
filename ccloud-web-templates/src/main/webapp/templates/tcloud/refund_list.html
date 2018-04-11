@@ -115,12 +115,12 @@
 	function initMyOrder(){
 		$loading.show();
 		$noMore.hide();
-
+		$.showLoading();
 		var params = getParam();
 		Utils.ajax('${CPATH}/refund/list', params, 
 			function(data){
 				$loading.hide();
-
+				$.hideLoading();
 				if(data.refundList.length == 0) {
 					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;
