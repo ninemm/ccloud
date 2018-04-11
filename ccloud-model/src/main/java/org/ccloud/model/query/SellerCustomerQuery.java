@@ -237,6 +237,31 @@ public class SellerCustomerQuery extends JBaseQuery {
 	public void findUserListAsTree() {
 
 	}
+	
+	public Page<Record> findByDataAreaInCurUser(int pageNumber, int pageSize, String selectDataArea, String dealerDataArea, String customerTypeId,
+			String custName, String userId, String dealerId) {
+		
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,csc.id as sellerCustomerId,csc.image_list_store,csc.customer_kind";
+		
+		StringBuilder builder = new StringBuilder("FROM cc_user_join_customer ujc");
+		builder.append(" LEFT JOIN cc_seller_customer sc ON ujc.seller_customer_id = sc.id");
+		builder.append(" JOIN cc_customer c ON sc.customer_id = c.id");
+		builder.append(" LEFT JOIN cc_customer_join_customer_type ccust_type on sc.id = ccust_type.seller_customer_id");
+		builder.append(" LEFT JOIN cc_customer_type cust_type on ccust_type.customer_type_id = cust_type.id");
+		
+		needWhere = appendIfNotEmptyWithLike(builder, "c.customer_name", custName, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(builder, "ujc.data_area", selectDataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "sc.is_enabled", 1, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "cust_type.id", customerTypeId, params, needWhere);
+		
+		builder.append("ORDER BY sc.create_date DESC ");
+		
+		return Db.paginate(pageNumber, pageSize, select, builder.toString(), params.toArray());
+	}
+	
 
 	public Page<Record> findByUserTypeForApp(int pageNumber, int pageSize, String selectDataArea, String dealerDataArea, String customerType,
 			String isOrdered, String searchKey, String userId, String dealerId) {

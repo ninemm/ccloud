@@ -114,14 +114,24 @@ public class CustomerController extends BaseFrontController {
 		Page<Record> customerList = new Page<>();
 		String customerOrderCount = "0";
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		if (StrKit.notBlank(getPara("region"))) {
-			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
-			Record r = SellerCustomerQuery.me().getOrderNumber(dataArea,dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
+		String region = getPara("region");
+		
+		String custName = getPara("searchKey");
+		String custTypeId = getPara("customerType");
+		Integer pageSize = getParaToInt("pageSize");
+		Integer pageNumber = getParaToInt("pageNumber");
+		
+		if (StrKit.notBlank(region)) {
+			String userDataArea = UserQuery.me().findById(region).getDataArea();
+			
+			customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, userDataArea, dealerDataArea, custTypeId, custName, user.getId(), seller.getId());
+			//customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
+			Record r = SellerCustomerQuery.me().getOrderNumber(userDataArea, dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
 			if (r != null)customerOrderCount = r.getStr("orderCount");
 		} else {
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea,dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
-			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea,dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
+			customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, dealerDataArea, custTypeId, custName, user.getId(), seller.getId());
+			//customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea,dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
+			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea, dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
 			if (r != null)customerOrderCount = r.getStr("orderCount");
 		}
 
