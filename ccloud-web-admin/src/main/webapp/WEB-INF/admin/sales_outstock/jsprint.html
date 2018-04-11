@@ -25,7 +25,7 @@
 	}
 	
 	#print-content {
-	    width: 450px;
+	    width: 340px;
 	}
 </#macro>
 
@@ -42,7 +42,7 @@
 var headerInfo =
 	'<div class="header clear clearheader">' +
 	    '<div class="titleArea">' +
-			'<h1>{0}出库单</h1>' +
+			'<h1>锦时出库单</h1>' +
 		'</div>' +
 	'</div>';
 
@@ -50,21 +50,18 @@ var headerStr =
 	'<table class="printContent clearcontent">' +
 		'<thead>' +
 		'<tr>' +
-			'<td >开单时间:</td>' +
-			'<td colspan="2">{2}</td>' +
-			'<td >发货单号:</td>' +
-			'<td colspan="3">{0}</td>' +
+			'<td colspan="8" style="text-align:left;">开单时间: {2}  单号: {0}</td>' +
 		'</tr>' +
 		'<tr>' +
-			'<td >客户名称:</td>' +
+			'<td colspan="2" style="text-align:left;">客户名称:</td>' +
 			'<td >{4}</td>' +
 		'</tr>' +
 		'<tr>' +
-			'<td >客户电话:</td>' +
+			'<td colspan="2" style="text-align:left;">客户电话:</td>' +
 			'<td >{5}</td>' +
 		'</tr>' +
 		'<tr>' +
-			'<td colspan="2">货品名称</td>' +
+			'<td colspan="2" style="text-align:left;">货品名称</td>' +
 			'<td>规格</td>' +
 			'<td>单位</td>' +
 			'<td>数量</td>' +
@@ -76,7 +73,7 @@ var headerStr =
 
 		var contentStr = '<tr>' +
 			'<td colspan="2">{1}</td>' +
-			'<td >{6}</td>' +
+			'<td >{7}</td>' +
 			'<td >{9}</td>' +
 			'<td >{2}</td>' +
 			'<td >{3}</td>' +
@@ -84,31 +81,35 @@ var headerStr =
 			'<td style="visibility: hidden; ">&nbsp;</td>'+
 			'</tr>';
 
-		var footerStr =
-			'<div class="signatureArea clearfooter">' +
-				'<div class="stat">' + 
-					'<span style="float: left;">合计：</span>' + 
-					'{6}'+
-					'<span style="float: right;">{1}元</span>' + 
-				'</div>' + 
-				'<div class="stat">' +
-					'<div><span>友情提示:支付宝账号2229893130@qq.com请备注客户名称</span></div>' +
-				'</div>' +
-				'<div style="text-align: left; width: inherit; font-size: 10px; line-height: 12px;">' +
-					'<span class="width200">备注：{3}</span><span style="float: right;">{4}</span>' +
-				'</div>' +
-				'<div style="text-align: left; width: inherit; font-size: 10px; line-height: 12px;">' +
-					'<span class="width200">公司名称：{5}</span><span style="float: right;">{4}</span>' +
-				'</div>' +
-				'<div class="stat">' +
-					'<div><span>公司电话：{7}</span></div>' +
-				'</div>' +
-				'<div class="stat">' +
-					'<div><span>客户签名&nbsp&nbsp&nbsp</span><span>仓管&nbsp&nbsp&nbsp</span><span>业务员&nbsp&nbsp&nbsp</span>'+
-					'<span>电话&nbsp&nbsp&nbsp</span><span>开单人&nbsp&nbsp&nbsp</span><span>系统管理员&nbsp&nbsp&nbsp</span></div>' +
-				'</div>' +
-			'</div>';
-
+		var footerStr = 
+			'<tr>' +
+				'<td style="text-align:left;">合计：</td>' +
+				'<td >&nbsp;</td>' +
+				'<td >&nbsp;</td>' +
+				'<td >&nbsp;</td>' +
+				'<td >{6}</td>' +
+				'<td >&nbsp;</td>' +
+				'<td >{1}</td>' +
+				'<td style="visibility: hidden; ">&nbsp;</td>'+
+			'</tr>'+
+			'<tr>' +
+				'<td colspan="8" style="text-align:left;">友情提示:支付宝账号2229893130@qq.com请备注客户名称</td>' +
+			'</tr>'+
+			'<tr>' +
+				'<td colspan="8" style="text-align:left;">备注:{3}</td>' +
+			'</tr>'+
+			'<tr>' +
+				'<td colspan="8" style="text-align:left;">公司名称：{5}</td>' +
+			'</tr>'+
+			'<tr>' +
+				'<td colspan="8" style="text-align:left;">公司电话：{7}</td>' +
+			'</tr>'+
+			'<tr>' +
+				'<td colspan="8" style="text-align:left;">客户签名： 仓管 {8} {9} 开单人 系统管理员</td>' +
+			'</tr>'+
+			'</tbody></table>'
+			;
+			
 
 function queryPrintDetail(financePrint) {
 
@@ -126,7 +127,7 @@ function queryPrintDetail(financePrint) {
         async: false,
         success: function(data) {
             if (data && data.rows) {
-                var curDate = new Date().Format("yyyy-MM-dd hh:mm");
+                var curDate = new Date().Format("yyyy-MM-dd");
                 $.each(data.rows,
                 function(index, item) {
                     var content = '<tbody>';
@@ -149,10 +150,14 @@ function queryPrintDetail(financePrint) {
 										saleMoney = saleMoney + totalMoney;
                             }
                             var productAmout = subitem.productAmout
+                            var convertRelate=""
+                            if(subitem.convertRelate!=null){
+                            		convertRelate="1*"+	subitem.convertRelate;
+                            }
                             if(financePrint == 0){
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元',subitem.valueName, isGift,productAmout+ '元',subitem.bigUnit)
+                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,productAmout,subitem.bigUnit)
                             }else{
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元',subitem.valueName, isGift,totalMoney+ '元',subitem.bigUnit)
+                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,totalMoney,subitem.bigUnit,subitem.convertRelate)
                             }
                         });
 
@@ -161,7 +166,6 @@ function queryPrintDetail(financePrint) {
                             content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
                         }
                     }
-                    content += '</tbody></table>';
 
                     headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '送');
 
@@ -171,7 +175,7 @@ function queryPrintDetail(financePrint) {
                     let remark = item.remark;
                     if (!warehousePhone) warehousePhone = '无';
                     if (!remark) remark = '';
-                    let placeOrderTime = new Date(item.placeOrderTime).Format("yyyy-MM-dd hh:mm");;
+                    let placeOrderTime = new Date(item.placeOrderTime).Format("yyyy-MM-dd");;
 
                     headerContent = $.format(headerStr, item.outstockSn, placeOrderTime, curDate, item.customerName, item.customerContacts, item.customerPhone, item.deliveryAddress, placeOrderMan, placeOrderPhone, item.warehouseName);
 
@@ -179,10 +183,10 @@ function queryPrintDetail(financePrint) {
                     if (!printFootContext) printFootContext = '';
                     if(financePrint == 0){
                     var salesAmount = DX(item.salesAmount);
-                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone);
+                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone,);
                     }else{
                     var salesAmount = DX(saleMoney);
-                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone);
+                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone,);
                     }
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
