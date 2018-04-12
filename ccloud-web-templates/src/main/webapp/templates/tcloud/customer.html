@@ -55,6 +55,7 @@
         refresh();
         
         $(document).on("submit", ".weui-search-bar__form", function() {
+            layer.open({type: 2,content: '加载中'});
             setItemBykey("keyword", $("#searchInput").val());
             refresh();			
             return false;
@@ -141,7 +142,6 @@
 
     function refresh() {
         pageNumber = 1;
-        $.showLoading();
         $.ajax({
             url:"${CPATH}/customer/refresh",
             type:"post",
@@ -162,7 +162,7 @@
                 if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#customerList").html(data.html);
                 pageNumber = 2;
-                $.hideLoading();
+                layer.closeAll();
             }
         });
     }
@@ -217,6 +217,7 @@
 
     //搜索框叉掉和取消时，先清input值，再调用接口
     function searchCancel() {
+        layer.open({type: 2,content: '加载中'});
         $("#searchInput")[0].value = "";
         setItemBykey("keyword", $("#searchInput").val());
         refresh();
