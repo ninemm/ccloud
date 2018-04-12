@@ -625,7 +625,7 @@ public class OrderController extends BaseFrontController {
 				String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 				stringBuilder.append(comments);
 				WorkFlowService workflowService = new WorkFlowService();
-				workflowService.completeTask(taskId, comments, var);
+				workflowService.completeTask(taskId, stringBuilder.toString(), var);
 
 				//审核订单后将message中是否阅读改为是
 				Message message = MessageQuery.me().findByObjectIdAndToUserId(orderId, user.getId());
