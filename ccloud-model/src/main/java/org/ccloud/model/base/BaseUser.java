@@ -124,16 +124,7 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 	}
 
 	public java.lang.String getNickname() {
-		String nickname = get("nickname");
-		try {
-			if (StrKit.notBlank(nickname)) {
-				nickname = URLDecoder.decode((String) get("nickname"), "utf-8");
-			}
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return nickname;
+		return get("nickname");
 	}
 
 	public void setMobile(java.lang.String mobile) {
