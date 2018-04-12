@@ -78,7 +78,7 @@ public class CustomerController extends BaseFrontController {
 		for(CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypeList2.add(item);
 		}
 
@@ -110,20 +110,22 @@ public class CustomerController extends BaseFrontController {
 		boolean salesOrderAdd = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/add");
 		boolean salesOrder = SecurityUtils.getSubject().isPermitted("/admin/salesOrder");
 		boolean visit = SecurityUtils.getSubject().isPermitted("/admin/customerVisit");
-		
-		Page<Record> customerList = new Page<>();
-		String customerOrderCount = "0";
+
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		if (StrKit.notBlank(getPara("region"))) {
-			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
-			Record r = SellerCustomerQuery.me().getOrderNumber(dataArea,dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
-			if (r != null)customerOrderCount = r.getStr("orderCount");
-		} else {
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea,dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"), user.getId(), seller.getId());
-			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea,dealerDataArea, getPara("customerType"), "0", getPara("searchKey"));
-			if (r != null)customerOrderCount = r.getStr("orderCount");
+		String region = getPara("region");
+		
+		String custName = getPara("searchKey");
+		String custTypeId = getPara("customerType");
+		Integer pageSize = getParaToInt("pageSize");
+		Integer pageNumber = getParaToInt("pageNumber");
+		
+		if (StrKit.notBlank(region)) {
+			selectDataArea = UserQuery.me().findById(region).getDataArea() + "%";
 		}
+
+		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, dealerDataArea, custTypeId, custName, user.getId(), seller.getId());
+		Long OrderedCustomerCount = SellerCustomerQuery.me().findOrderedCustomerCountByDataArea(selectDataArea, dealerDataArea, custTypeId, custName);
+		String customerOrderCount = OrderedCustomerCount != null ? OrderedCustomerCount.toString() : "0";
 
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
@@ -133,6 +135,7 @@ public class CustomerController extends BaseFrontController {
 			html.append("		<div class=\"weui-flex__item customer-info\">\n");
 			html.append("			<p class=\"ft14\">" + customer.getStr("customer_name") + "</p>\n");
 			html.append("			<p class=\"gray\">" + customer.getStr("contact") + "/" + customer.getStr("mobile")+ "</p>\n");
+			html.append("			<p class=\"gray\"> 客户类型：" + customer.getStr("name") +  "</p>\n");
 			html.append("		</div>\n");
 			html.append("		<div class=\"weui-flex__item customer-href\">\n");
 			html.append("			<div class=\"weui-flex\">\n");
@@ -1105,7 +1108,7 @@ public class CustomerController extends BaseFrontController {
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
 
-		Page<Record> customerList = SellerCustomerQuery.me().findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
+		Page<Record> customerList = SellerCustomerQuery.me()._findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
 		renderJson(map);

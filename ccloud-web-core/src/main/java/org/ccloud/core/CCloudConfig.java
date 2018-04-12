@@ -173,7 +173,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		String db_password = dbProp.get("db_password").trim();
 
 		String jdbc_url = "jdbc:mysql://" + db_host + ":" + db_host_port + "/" + db_name + "?" + "useUnicode=true&"
-				+ "characterEncoding=utf8&" + "zeroDateTimeBehavior=convertToNull&useSSL=false"; 
+				+ "characterEncoding=utf8&" + "autoReconnect=true&" + "zeroDateTimeBehavior=convertToNull&useSSL=false"; 
 
 		DruidPlugin druidPlugin = new DruidPlugin(jdbc_url, db_user, db_password);
 		druidPlugin.addFilter(new StatFilter());
