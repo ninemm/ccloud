@@ -105,16 +105,16 @@ public class _UserController extends JBaseCRUDController<User> {
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
-		String groupName = getPara("groupName");
+//		String groupName = getPara("groupName", "");
 		//用于判断操作人员点击的是编辑按钮还是转用按钮
 		String t = getPara("t");
-		String NewGroupName = groupName.substring(0, groupName.length() -1);
+//		String NewGroupName = groupName.substring(0, groupName.length() -1);
 		String deptName = getPara("parent_name");
 		user.setDepartmentName(deptName);
 		user.setStationId(stationList);
 		user.setStationName(stationName);
 		// user.setGroupId(groupList);
-		 user.setGroupName(NewGroupName);
+//		 user.setGroupName(NewGroupName);
 		 if(StringUtils.isBlank(user.getId())) {
 			 User u = UserQuery.me()._findUserByUsername(user.getUsername());
 			 if(u!=null) {

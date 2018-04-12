@@ -470,7 +470,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		sqlBuilder.append(" FROM cc_sales_outstock so ");
 		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
 		sqlBuilder.append(" JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" JOIN department d ON so.dealer_data_area = d.data_area");
+		sqlBuilder.append(" JOIN cc_department d ON so.dealer_data_area = d.data_area");
 		sqlBuilder.append(" JOIN cc_seller s ON d.id=s.dept_id ");
 
 		if (!isDealer) {
@@ -797,7 +797,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 		StringBuilder sqlBuilder = new StringBuilder(" SELECT d.name AS typeName, u.realname, cv.create_date  ");
 		sqlBuilder.append("FROM cc_customer_visit cv ");
-		sqlBuilder.append("LEFT JOIN user u ON cv.user_id = u.id ");
+		sqlBuilder.append("LEFT JOIN cc_user u ON cv.user_id = u.id ");
 		sqlBuilder.append("LEFT JOIN dict d ON cv.question_type = d.value ");
 		sqlBuilder.append("WHERE cv.lng is not null and cv.lat is not null");
 
@@ -898,7 +898,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		StringBuilder sqlBuilder = new StringBuilder(" select d.data_area, s.seller_name, s.prov_name, s.city_name, s.country_name ");
 
 		sqlBuilder.append(" from cc_sales_outstock so ");
-		sqlBuilder.append(" join department d on so.dealer_data_area = d.data_area ");
+		sqlBuilder.append(" join cc_department d on so.dealer_data_area = d.data_area ");
 		sqlBuilder.append(" join cc_seller s on d.id = s.dept_id ");
 		sqlBuilder.append(" join cc_seller_brand sb on s.id = sb.seller_id ");
 		sqlBuilder.append(" join cc_brand b on sb.brand_id = b.id ");
@@ -923,7 +923,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	public List<Record> findSellerByDataArea(String dataArea) {
-		return Db.find(" select s.prov_name, s.city_name, s.country_name from cc_seller s join department d on s.dept_id = d.id where d.data_area = ? ", dataArea);
+		return Db.find(" select s.prov_name, s.city_name, s.country_name from cc_seller s join cc_department d on s.dept_id = d.id where d.data_area = ? ", dataArea);
 	}
 
 }
