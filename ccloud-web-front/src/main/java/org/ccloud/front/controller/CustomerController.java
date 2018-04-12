@@ -687,6 +687,12 @@ public class CustomerController extends BaseFrontController {
 		Integer status = getParaToInt("status");
 		String sellerCustomerId = getPara("id");
 		String comment = getPara("comment");
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
+		if (sellerCustomer.getIsChecked()==1) {
+			renderAjaxResultForError("客户已审核");
+			return;
+		}
+		
 		if (StrKit.isBlank(comment)) comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
 
 		boolean updated = true;
@@ -696,7 +702,6 @@ public class CustomerController extends BaseFrontController {
 			oldMessage.setIsRead(Consts.IS_READ);
 			oldMessage.update();
 		}
-		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
 		sellerCustomer.setStatus(status == 1 ? SellerCustomer.CUSTOMER_NORMAL : SellerCustomer.CUSTOMER_REJECT);
 
 		WorkFlowService workFlowService = new WorkFlowService();
@@ -1149,7 +1154,7 @@ public class CustomerController extends BaseFrontController {
 
 		}
 		setAttr("type", "company");
-		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		setAttr("customerType", JSON.toJSONString(getCustomerType1()));
 		render("customer_edit.html");
 	}
 
@@ -1171,7 +1176,7 @@ public class CustomerController extends BaseFrontController {
 			setAttr("storeId", id);
 		}
 		setAttr("type", "around");
-		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		setAttr("customerType", JSON.toJSONString(getCustomerType1()));
 		render("customer_edit.html");
 	}
 
