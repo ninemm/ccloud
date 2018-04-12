@@ -418,7 +418,7 @@ public class CustomerController extends BaseFrontController {
 		
 		Customer customer = getModel(Customer.class);
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
-
+		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
 		if(StrKit.notBlank(storeId)) {
 			CustomerStore customerStore = CustomerStoreQuery.me().findById(storeId);
@@ -690,11 +690,11 @@ public class CustomerController extends BaseFrontController {
 		String sellerCustomerId = getPara("id");
 		String comment = getPara("comment");
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
-		if (sellerCustomer.getIsChecked()==1) {
+		if (null!=sellerCustomer.getIsChecked()&&sellerCustomer.getIsChecked()==1) {
 			renderAjaxResultForError("客户已审核");
 			return;
 		}
-		
+		sellerCustomer.setIsChecked(1);
 		if (StrKit.isBlank(comment)) comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
 
 		boolean updated = true;

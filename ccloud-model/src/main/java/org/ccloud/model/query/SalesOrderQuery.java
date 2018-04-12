@@ -861,7 +861,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			}
 			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
-		fromBuilder.append("u.realname '业务员名称'");
+		fromBuilder.append("u.realname '业务员名称',so.total_amount '小计'");
 		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");

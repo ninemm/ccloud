@@ -456,6 +456,7 @@ public class _ReportController extends JBaseController {
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("业务员名称");
+		watchHead.add("小计");
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();

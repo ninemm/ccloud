@@ -177,7 +177,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Customer customer = getModel(Customer.class);
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
-
+		sellerCustomer.setIsChecked(0);
 		String[] customerTypes = getParaValues("customerTypes");
 		List<String> custTypeNameList = new ArrayList<>();
 		for(String customerType : customerTypes)
@@ -751,6 +751,12 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		Integer status = getParaToInt("status");
 		String sellerCustomerId = getPara("id");
 		String comment;
+		SellerCustomer sellerCustomer =  SellerCustomerQuery.me().findById(sellerCustomerId);
+		if (null!=sellerCustomer.getIsChecked()&&sellerCustomer.getIsChecked()==1) {
+			renderAjaxResultForError("客户已审核");
+			return;
+		}
+		sellerCustomer.setIsChecked(1);
 		if (StrKit.notBlank(getPara("comment"))) comment = getPara("comment");
 		else comment = "客户审核批准";
 
@@ -759,7 +765,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		
 		boolean updated = true;
 
-		SellerCustomer sellerCustomer =  SellerCustomerQuery.me().findById(sellerCustomerId);
 		sellerCustomer.setStatus(status == 1 ? SellerCustomer.CUSTOMER_NORMAL : SellerCustomer.CUSTOMER_REJECT);
 
 		WorkFlowService workFlowService = new WorkFlowService();
