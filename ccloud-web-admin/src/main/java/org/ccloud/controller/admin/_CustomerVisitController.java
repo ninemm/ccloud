@@ -254,6 +254,10 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String commentDesc = getPara("comment");
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
+		if (!customerVisit.getStatus().equals(Consts.CUSTOMER_VISIT_STATUS_DEFAULT)) {
+			renderAjaxResultForError("拜访已审核");
+			return;
+		}
 		Integer status = getParaToInt("status");
 		String comment = (status == 1) ? "批准" : "拒绝";
 
