@@ -9,7 +9,7 @@
 
 	$(function(){
 		var index;
-		$uploaderFiles.on("click", "li", function() {
+		$(document).on("click", ".uploaderFiles li", function() {
 			index = $(this).index();
 			$galleryImg.attr("style", this.getAttribute("style"));
 			$gallery.fadeIn(100);
@@ -19,7 +19,7 @@
 			$gallery.fadeOut(100);
 		});
 
-		$uploaderFilesReview.on("click", "li", function() {
+		$(document).on("click", ".uploaderFiles li", function() {
 			index = $(this).index();
 			$galleryImgReview.attr("style", this.getAttribute("style"));
 			$galleryReview.fadeIn(100);
@@ -142,7 +142,7 @@
                                     <span class="weui-uploader__info">${list.remark}</span>
                                     <hr style="border:1px dashed #0000fff"/>
 		                    <div class="weui-uploader__bd">
-		                        <ul class="weui-uploader__files" id="uploaderFilesReview">
+		                        <ul class="weui-uploader__files uploaderFiles" id="uploaderFilesReview">
 		                            <#if (visit.photoList) ??>
 		                                <#list visit.photoList as bean>
                                             <#if (list.orderList == bean.orderList)>

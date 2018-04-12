@@ -24,7 +24,7 @@
 	var numImage = 0;
     var Orientation = null;
     var MAX_HEIGHT = 1000;
-
+	var newImage = 0;
     $(function() {
     	$("#customerVisitId").val("${(customerVisit.id)!}");
         $("#customer_name").val("${(customerVisit.customer_name)!}");
@@ -101,6 +101,9 @@
 					                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
 				                           			imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imgeList[j].savePath});
 				                            	}
+				                            	if(i == orderListNum && imgeList[j].orderList == activityExecute[orderListNum].orderList){
+				                            		newImage++;
+				                            	}
 				                            }
 			                          }
 			                          if((i+1)>orderListNum){
@@ -131,6 +134,8 @@
 		        			}
 		        			$(".imgeActivity").html("");
 		        			$(".imgeActivity").append(html);
+		        			console.log(imageArr);
+		        			console.log(newImage);
 		        		}
 		        }
 	        });
@@ -172,10 +177,15 @@
 
         //删除图片  删除图片的代码也贴出来。
         $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
+        	console.log(_index);
+        	console.log(newImage);
+        	console.log(imageArr);
+        	
             $uploaderFiles.find("li").eq(index).remove();
             $uploaderFiles.parent().parent().find('.weui-uploader__info').text($uploaderFiles.children.length + '/' + count);
-            imageArr.splice(_index, 1);
+            imageArr.splice(_index-newImage, 1);
             $(".pic").val(JSON.stringify(imageArr));
+            console.log(imageArr);
         });
 
     });
