@@ -1213,6 +1213,11 @@ public class CustomerController extends BaseFrontController {
 		} else sellerCustomerId = sellerCustomer1.getId();
 
 
+		if(UserJoinCustomerQuery.me().findBySellerCustomerIdAndUserId(sellerCustomerId, user.getId()) != null) {
+			renderAjaxResultForError("该客户已存在，请不要重复导入");
+			return;
+		}
+
 		String customerTypeIds = getPara("customerTypeIds", "");
 
 		List<String> custTypeList = Splitter.on(",")
