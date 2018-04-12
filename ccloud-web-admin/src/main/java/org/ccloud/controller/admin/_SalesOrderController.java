@@ -655,9 +655,6 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 					+ (refuseReson == "undefined" ? "" : refuseReson);
 			var.put("comment", comment);
 		}
-
-		
-		
 		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 		stringBuilder.append(comments);
 		WorkFlowService workflowService = new WorkFlowService();
@@ -821,7 +818,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		String outstockInfo = buildOutstockInfo(id);
 		setAttr("outstockInfo", outstockInfo);
-		if (comments==null) {
+		if (comments.size()==0) {
 			String modifyPrice = modifyPrice(id);
 			setAttr("modifyPrice", modifyPrice);
 		}
