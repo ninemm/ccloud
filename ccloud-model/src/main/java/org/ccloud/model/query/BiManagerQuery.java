@@ -52,7 +52,7 @@ public class BiManagerQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder(" select dealer_data_area ");
 		sqlBuilder.append(" from bi_user_join_seller ");
-		appendIfNotEmptyWithLike(sqlBuilder, "user_id", id, params, true);
+		appendIfNotEmpty(sqlBuilder, "user_id", id, params, true);
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
@@ -75,7 +75,7 @@ public class BiManagerQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder(" select brand_id ");
 		sqlBuilder.append(" from bi_user_join_brand ");
-		appendIfNotEmptyWithLike(sqlBuilder, "user_id", id, params, true);
+		appendIfNotEmpty(sqlBuilder, "user_id", id, params, true);
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
@@ -101,7 +101,7 @@ public class BiManagerQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder(" select product_id ");
 		sqlBuilder.append(" from bi_user_join_product ");
-		appendIfNotEmptyWithLike(sqlBuilder, "user_id", id, params, true);
+		appendIfNotEmpty(sqlBuilder, "user_id", id, params, true);
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}

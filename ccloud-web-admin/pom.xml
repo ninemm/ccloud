@@ -71,7 +71,14 @@
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-bi2-front</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+			<scope>compile</scope>
+		</dependency>
 		<!-- <dependency>
 			<groupId>org.ccloud</groupId>
 			<artifactId>ccloud-upms-admin</artifactId>
@@ -172,6 +179,10 @@
 						<overlay>
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-core</artifactId>
+						</overlay>
+						<overlay>
+							<groupId>org.ccloud</groupId>
+							<artifactId>ccloud-bi2-front</artifactId>
 						</overlay>
 						<!-- <overlay>
 							<groupId>org.ccloud</groupId>

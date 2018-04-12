@@ -29,11 +29,17 @@ public class Consts {
 
 	public static final String SESSION_LOGINED_USER = "_logined_user";
 	public static final String SESSION_SELECT_DATAAREA = "_data_area";//数据查看时的数据域
+	public static final String SESSION_DEALER_DATA_AREA = "_dealer_data_area";//经销商数据域
+
+
 	public static final String SESSION_SELLER_ID = "sellerId";
 	public static final String SESSION_SELLER_CODE = "sellerCode";
 	public static final String SESSION_SELLER_NAME = "sellerName";
 	public static final String SESSION_SELLER_HAS_STORE = "hasStore";
-	public static final String SESSION_DEALER_DATA_AREA = "dealer_data_area";//经销商ID
+
+	public static final String SESSION_DEALER_DATA_AREA_ARRAY = "_dealer_data_area_array";//经销商ID
+	public static final String SESSION_BRAND_ID_ARRAY = "_brand_id_array";//商品ID
+	public static final String SESSION_PRODUCT_ID_ARRAY = "_product_id_array";//商品ID
 
 	public static final String WORKFLOW_APPLY_USER = "applyUser";
 	public static final String WORKFLOW_APPLY_COMFIRM = "applyComfirm";

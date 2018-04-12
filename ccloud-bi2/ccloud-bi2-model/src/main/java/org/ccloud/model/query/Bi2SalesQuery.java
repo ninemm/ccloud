@@ -36,7 +36,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	// 订单总金额
-	public Double findTotalAmount(String dataArea, String provName, String cityName, String countryName,
+	public Double findTotalAmount(String[] dataArea, String provName, String cityName, String countryName,
 	                              String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -73,7 +73,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	// 订单记录总数
-	public Long findOrderCount(String dataArea, String provName, String cityName, String countryName,
+	public Long findOrderCount(String[] dataArea, String provName, String cityName, String countryName,
 	                           String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -103,7 +103,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	// 订单客户总数
-	public Long findCustomerCount(String dataArea, String provName, String cityName, String countryName,
+	public Long findCustomerCount(String[] dataArea, String provName, String cityName, String countryName,
 	                              String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -137,7 +137,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	// 客户总数
-	public Long findAllCustomerCount(String dataArea, String provName, String cityName, String countryName) {
+	public Long findAllCustomerCount(String[] dataArea, String provName, String cityName, String countryName) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder("SELECT count(1) FROM cc_seller_customer csc");
@@ -157,7 +157,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	// 订单平均金额
-	public List<Record> findOrderAvgAmountList(String dataArea, String provName, String cityName, String countryName,
+	public List<Record> findOrderAvgAmountList(String[] dataArea, String provName, String cityName, String countryName,
 	                                           String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -195,7 +195,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	//产品区域分布
-	public List<Record> findAreaListByProduct(String dataArea, String provName, String cityName, String countryName,
+	public List<Record> findAreaListByProduct(String[] dataArea, String provName, String cityName, String countryName,
 	                                          String startDate, String endDate, String cInvCode) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -258,7 +258,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 	}
 
-	public List<Record> findCustomerTypeList(String dataArea, String provName, String cityName, String countryName,
+	public List<Record> findCustomerTypeList(String[] dataArea, String provName, String cityName, String countryName,
 	                                         String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -297,7 +297,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	//产品客户分布
-	public List<Record> findCustomerTypeListByProduct(String dataArea, String provName, String cityName,
+	public List<Record> findCustomerTypeListByProduct(String[] dataArea, String provName, String cityName,
 	                                                  String countryName, String startDate, String endDate, String cInvCode) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -344,7 +344,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	//产品销售排行
-	public List<Record> findProductList(String dataArea, String provName, String cityName, String countryName,
+	public List<Record> findProductList(String[] dataArea, String provName, String cityName, String countryName,
 	                                    String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -390,7 +390,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Record> findOrderAmount(String dataArea, String provName, String cityName, String countryName,
+	public List<Record> findOrderAmount(String[] dataArea, String provName, String cityName, String countryName,
 	                                    String startDate, String endDate, int divideFlg) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -457,7 +457,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 	//经销商销售排行和销售情况
 	public List<Record> findsalesList(boolean isDealer, String provName, String cityName, String countryName,
-	                                  String dataArea, String startDate, String endDate) {
+	                                  String[] dataArea, String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -561,7 +561,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 	}
 
-	public List<Record> findByCusTypeId(String dataArea, String provName, String cityName, String countryName,
+	public List<Record> findByCusTypeId(String[] dataArea, String provName, String cityName, String countryName,
 	                                    String startDate, String endDate) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -597,7 +597,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Record> findProductListByCusType(String dataArea, String provName, String cityName, String countryName,
+	public List<Record> findProductListByCusType(String[] dataArea, String provName, String cityName, String countryName,
 	                                             String startDate, String endDate, String customerTypeName) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -652,7 +652,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Record> findAreaListByCusTypeId(String dataArea, String provName, String cityName, String countryName,
+	public List<Record> findAreaListByCusTypeId(String[] dataArea, String provName, String cityName, String countryName,
 	                                            String startDate, String endDate, String customerTypeName) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -704,7 +704,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Map<String, Object>> findAreaArray(String dataArea, String provName, String cityName,
+	public List<Map<String, Object>> findAreaArray(String[] dataArea, String provName, String cityName,
 	                                               String countryName, String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -818,7 +818,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Record> findAreaSales(String dataArea, String provName, String cityName,
+	public List<Record> findAreaSales(String[] dataArea, String provName, String cityName,
 	                                  String countryName, String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -856,7 +856,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
-	public List<Record> findAreaCustomer(String dataArea, String provName, String cityName,
+	public List<Record> findAreaCustomer(String[] dataArea, String provName, String cityName,
 	                                     String countryName, String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();

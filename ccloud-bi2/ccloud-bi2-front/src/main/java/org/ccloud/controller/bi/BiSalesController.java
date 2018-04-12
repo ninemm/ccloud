@@ -42,7 +42,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void area() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
@@ -59,7 +59,7 @@ public class BiSalesController extends BaseFrontController {
 	}
 
 	public void areaByCustomerType() {
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -81,7 +81,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void customerType() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -101,7 +101,7 @@ public class BiSalesController extends BaseFrontController {
 	//产品销售排行
 	public void product() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -122,7 +122,7 @@ public class BiSalesController extends BaseFrontController {
 	//产品客户分布
 	public void customerTypeByProduct() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -144,7 +144,7 @@ public class BiSalesController extends BaseFrontController {
 	//产品区域分布
 	public void areaByProduct() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -166,7 +166,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void productByAreaList() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -203,7 +203,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void productByCustomerTypeList() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -230,7 +230,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void productByCustomerType() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -251,7 +251,7 @@ public class BiSalesController extends BaseFrontController {
 	//经销商销售排行
 	public void dealer() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -273,6 +273,7 @@ public class BiSalesController extends BaseFrontController {
 	public void dealerDetail() {
 
 		String dataArea = getPara("dataArea", "").trim();
+		String dataAreaArray[] = new String[]{dataArea};
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -285,8 +286,8 @@ public class BiSalesController extends BaseFrontController {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
-		//经销商销售情况
-		List<Record> sellerList = Bi2SalesQuery.me().findsalesList(false, provName, cityName, countryName, dataArea
+		//直营商销售情况
+		List<Record> sellerList = Bi2SalesQuery.me().findsalesList(false, provName, cityName, countryName, dataAreaArray
 				, startDate, endDate);
 		//经销商产品销售排行
 		List<Record> productList = Bi2SalesQuery.me().findProductListByDealer(provName, cityName, countryName,
@@ -301,7 +302,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void productBySeller() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -321,7 +322,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void queryMapData() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -340,7 +341,7 @@ public class BiSalesController extends BaseFrontController {
 	@SuppressWarnings("unchecked")
 	public void aroundCustomer() throws SQLException {
 
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
@@ -356,9 +357,7 @@ public class BiSalesController extends BaseFrontController {
 		salesCallback.setDist(dist);
 		salesCallback.setStartDate(startDate);
 		salesCallback.setEndDate(endDate);
-		if(StrKit.notBlank(dealerDataArea)) {
-			salesCallback.setDataArea(dealerDataArea + '%');
-		}
+		salesCallback.setDataArea(dealerDataArea.toString());
 		salesCallback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
 
 		AroundCustomerBiVisitCallback visitCallback = new AroundCustomerBiVisitCallback();
@@ -367,9 +366,7 @@ public class BiSalesController extends BaseFrontController {
 		visitCallback.setDist(dist);
 		visitCallback.setStartDate(startDate);
 		visitCallback.setEndDate(endDate);
-		if(StrKit.notBlank(dealerDataArea)) {
-			visitCallback.setDataArea(dealerDataArea + '%');
-		}
+		visitCallback.setDataArea(dealerDataArea.toString());
 		visitCallback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
 
 		Connection conn = null;
@@ -394,9 +391,9 @@ public class BiSalesController extends BaseFrontController {
 		for (int i = 0; i < salesList.size(); i++) {
 			String customerId = salesList.get(i).get("customerId").toString();
 			for (int j = 0; j < visitList.size(); j++) {
-				if(customerId.equals(visitList.get(j).get("customerId"))){
+				if (customerId.equals(visitList.get(j).get("customerId"))) {
 					Map<String, Object> allMap = salesList.get(i);
-					allMap.put("totalNum",visitList.get(j).get("totalNum"));
+					allMap.put("totalNum", visitList.get(j).get("totalNum"));
 					allList.add(allMap);
 					salesList.remove(i);
 					visitList.remove(j);
@@ -444,7 +441,7 @@ public class BiSalesController extends BaseFrontController {
 	@SuppressWarnings("unchecked")
 	public void aroundCustomerPosition() throws SQLException {
 
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
@@ -460,9 +457,7 @@ public class BiSalesController extends BaseFrontController {
 		callback.setDist(dist);
 		callback.setStartDate(startDate);
 		callback.setEndDate(endDate);
-		if(StrKit.notBlank(dealerDataArea)) {
-			callback.setDataArea(dealerDataArea + '%');
-		}
+		callback.setDataArea(dealerDataArea.toString());
 		callback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
 
 		Connection conn = null;
@@ -516,7 +511,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void salesHotMap() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -535,7 +530,7 @@ public class BiSalesController extends BaseFrontController {
 
 	public void customerHotMap() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();

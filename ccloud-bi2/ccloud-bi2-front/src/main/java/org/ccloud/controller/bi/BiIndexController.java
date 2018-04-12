@@ -21,7 +21,10 @@ import java.util.UUID;
 
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.User;
 import org.ccloud.model.query.Bi2SalesQuery;
+import org.ccloud.model.query.BiManagerQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.joda.time.DateTime;
@@ -41,9 +44,29 @@ public class BiIndexController extends BaseFrontController {
 
 	public void index() {
 		initWechatConfig();
-		String dataArea = "001012";
+//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		User user = UserQuery.me().findById("7aee55cb56534e92a346467b9f3a262a");
+		List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
+		String sellerArray[] = new String[sellerByUser.size()];
+		for (int i = 0; i < sellerByUser.size(); i++) {
+			sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
+		}
 
-		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dataArea);
+		List<Record> brandByUser = BiManagerQuery.me().findBrandByUser(user.getId());
+		String brandArray[] = new String[brandByUser.size()];
+		for (int i = 0; i < brandByUser.size(); i++) {
+			brandArray[i] = brandByUser.get(i).getStr("brand_id");
+		}
+
+		List<Record> productByUser = BiManagerQuery.me().findProductByUser(user.getId());
+		String productArray[] = new String[productByUser.size()];
+		for (int i = 0; i < productByUser.size(); i++) {
+			productArray[i] = productByUser.get(i).getStr("product_id");
+		}
+
+		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
+		setSessionAttr(Consts.SESSION_BRAND_ID_ARRAY, brandArray);
+		setSessionAttr(Consts.SESSION_PRODUCT_ID_ARRAY, productArray);
 
 		render("bi_index.html");
 	}
@@ -51,7 +74,7 @@ public class BiIndexController extends BaseFrontController {
 	// 顶部统计
 	public void topTotal() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -69,7 +92,7 @@ public class BiIndexController extends BaseFrontController {
 
 	public void total() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -96,7 +119,7 @@ public class BiIndexController extends BaseFrontController {
 
 	public void orderAmount() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -162,15 +185,10 @@ public class BiIndexController extends BaseFrontController {
 
 	public void dealerList(){
 
-//		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-		String dateType = "0"; // 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("dealerList",
-				Bi2SalesQuery.me().findDealerList(startDate,endDate));
+				BiManagerQuery.me());
 
 		renderJson(result);
 	}
@@ -178,8 +196,8 @@ public class BiIndexController extends BaseFrontController {
 	public void selectSeller() {
 
 		String dataArea = getPara("dataArea");
-
-		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dataArea);
+		String dataAreaArray[] = new String[]{dataArea};
+		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, dataAreaArray);
 		List<Record> seller = Bi2SalesQuery.me().findSellerByDataArea(dataArea);
 
 		renderJson(seller);

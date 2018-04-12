@@ -158,16 +158,16 @@ public class JHandler extends Handler {
 
 		request.setAttribute(MenusTag.TAG_NAME, new MenusTag(request));
 
-//		if (null != TemplateManager.me().currentTemplate()) {
-//			request.setAttribute("TPATH", TemplateManager.me().currentTemplate().getPath());
-//			request.setAttribute("CTPATH", request.getContextPath() + TemplateManager.me().currentTemplate().getPath());
-//		} else {
-//			request.setAttribute("TPATH", "");
-//			request.setAttribute("CTPATH", request.getContextPath());
-//		}
+		if (null != TemplateManager.me().currentTemplate()) {
+			request.setAttribute("TPATH", TemplateManager.me().currentTemplate().getPath());
+			request.setAttribute("CTPATH", request.getContextPath() + TemplateManager.me().currentTemplate().getPath());
+		} else {
+			request.setAttribute("TPATH", "");
+			request.setAttribute("CTPATH", request.getContextPath());
+		}
 
-		request.setAttribute("TPATH", "");
-		request.setAttribute("CTPATH", request.getContextPath());
+//		request.setAttribute("TPATH", "");
+//		request.setAttribute("CTPATH", request.getContextPath());
 		
 		Boolean cdnEnable = OptionQuery.me().findValueAsBool("cdn_enable");
 		if (cdnEnable != null && cdnEnable == true) {
