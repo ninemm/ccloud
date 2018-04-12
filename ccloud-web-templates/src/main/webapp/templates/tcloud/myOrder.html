@@ -165,13 +165,11 @@
 		
 		$loading.show();
 		$noMore.hide();
-		$.showLoading();
 		var params = getParam();
 		
 		Utils.ajax('${CPATH}/order/orderList', params, 
 			function(data) {
 				$loading.hide();
-				$.hideLoading();
 				$("#orderCount").html(data.orderCount+" 单");
 				$("#orderAmount").html(data.orderAmount+" 元");				
 				if(data.orderList.length == 0) {

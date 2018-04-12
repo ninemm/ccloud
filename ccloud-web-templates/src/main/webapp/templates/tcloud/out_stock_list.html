@@ -105,13 +105,13 @@
 	function initMyOrder(){
 		$loading.show();
 		$noMore.hide();
-		$.showLoading();
+		layer.open({type: 2,content: '加载中'});
 
 		var params = getParam();
 		Utils.ajax('${CPATH}/receivables/stockOrder', params, 
 			function(data){
 				$loading.hide();
-				$.hideLoading();
+				layer.closeAll();
 				if(data.outStockList.length == 0){
 				    var childCount = $('.weui-panel').length;
                     if (childCount == 1) 

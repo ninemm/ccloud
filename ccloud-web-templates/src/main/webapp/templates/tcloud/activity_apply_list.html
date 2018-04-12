@@ -199,7 +199,7 @@
 
     function refresh() {
         pageNumber = 1;
-        $.showLoading();
+        layer.open({type: 2,content: '加载中'});
         $.ajax({
             url:"${CPATH}/activity/refreshApply",
             type:"post",
@@ -228,7 +228,7 @@
                         clickAble:true
                     })
                 }
-                $.hideLoading();
+                layer.closeAll();
             }
         });
     }

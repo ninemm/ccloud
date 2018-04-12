@@ -447,7 +447,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("LEFT JOIN act_hi_actinst i on c.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append("LEFT JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
 		sql.append("WHERE p.KEY_ = ? and FIND_IN_SET(?, ASSIGNEE_) AND i.DURATION_ is not null ");
-		sql.append("group by c.id ");
+		sql.append("group by c.modify_date DESC ");
 
 
 		return Db.paginate(pageNumber, pageSize, true, select, sql.toString(), params.toArray());

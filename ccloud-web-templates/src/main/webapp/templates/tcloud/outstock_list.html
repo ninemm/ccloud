@@ -149,12 +149,12 @@
 		
 		$loading.show();
 		$noMore.hide();
-		$.showLoading();
+		layer.open({type: 2,content: '加载中'});
 		var params = getParam();
 		Utils.ajax('${CPATH}/outstock/outstockList', params,
 			function(data) {
 				$loading.hide();
-				$.hideLoading();
+				layer.closeAll();
 				if(data.outstockList.length == 0) {
 					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;

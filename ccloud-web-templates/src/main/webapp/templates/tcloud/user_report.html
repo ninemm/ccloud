@@ -97,10 +97,10 @@
   
   	var customerObj = [];
     function customerCount(params) {
-    	$.showLoading();
+    	layer.open({type: 2,content: '加载中'});
 		Utils.ajax('${CPATH}/report/customerCount', params, 
 			function(data){
-				$.hideLoading();
+				layer.closeAll();
 	            var length = data.length;
 	            var $tbody = $("#customerCount tbody");
 	            $tbody.empty();
@@ -146,10 +146,10 @@
     }
     
     function productCount(params) {
-    	$.showLoading();
+    	layer.open({type: 2,content: '加载中'});
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
-				$.hideLoading();
+				layer.closeAll();
 	            var length = data.length;
 	            var $tbody = $("#userCount tbody");
 	            $tbody.empty();
@@ -162,10 +162,10 @@
     }
     
     function giftCount(params) {
-		$.showLoading();   
+		layer.open({type: 2,content: '加载中'});   
 		Utils.ajax('${CPATH}/report/productCount', params, 
 			function(data){
-				$.hideLoading();
+				layer.closeAll();
 	            var length = data.length;
 	            var $tbody = $("#giftCount tbody");
 	            $tbody.empty();
