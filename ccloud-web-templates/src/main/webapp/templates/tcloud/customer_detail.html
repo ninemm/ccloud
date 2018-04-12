@@ -4,7 +4,6 @@
 	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 	var $uploaderFiles = $('#uploaderFiles');
 
-	$(function(){
 		var index;
 		$uploaderFiles.on("click", "li", function() {
 			index = $(this).index();
@@ -14,7 +13,6 @@
 
 	$gallery.on("click", function() {
 		$gallery.fadeOut(100);
-	});
 	});
 </#macro>
 <@layout>
@@ -66,6 +64,9 @@
 	            </div>
 	        </div>
 	    </section>
+		<div class="weui-gallery" id="gallery">
+			<span class="weui-gallery__img" id="galleryImg"></span>
+		</div>
 	    <section class="weui-cells weui-cells_form">
 	        <div class="weui-cell">
 	            <div class="weui-cell__bd">

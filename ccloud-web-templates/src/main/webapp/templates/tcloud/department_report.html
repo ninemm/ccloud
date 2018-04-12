@@ -209,10 +209,10 @@
     }
     
     function productCount(params) {
-    	$.showLoading();
+    	layer.open({type: 2,content: '加载中'});
 		Utils.ajax('${CPATH}/report/productCountMenu', params, 
 			function(data){
-				$.hideLoading();
+				layer.closeAll();
 	            var length = data.length;
 	            var $tbody = $("#productCount tbody");
 	            $tbody.empty();

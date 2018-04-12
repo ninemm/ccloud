@@ -115,12 +115,12 @@
 	function initMyOrder(){
 		$loading.show();
 		$noMore.hide();
-		$.showLoading();
+		layer.open({type: 2,content: '加载中'});
 		var params = getParam();
 		Utils.ajax('${CPATH}/refund/list', params, 
 			function(data){
 				$loading.hide();
-				$.hideLoading();
+				layer.closeAll();
 				if(data.refundList.length == 0) {
 					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;

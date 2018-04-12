@@ -239,20 +239,20 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 	}
 	
-	public Page<Record> findByDataAreaInCurUser(int pageNumber, int pageSize, String selectDataArea, String dealerDataArea, String customerTypeId,
-			String custName, String userId, String dealerId) {
+	public Page<Record> findByDataAreaInCurUser(int pageNumber, int pageSize, String selectDataArea, String customerTypeId, String custName, String customerKind) {
 		
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		String select = "SELECT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,sc.id as sellerCustomerId, sc.image_list_store, sc.customer_kind, cust_type.name";
+		String select = "SELECT DISTINCT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,sc.id as sellerCustomerId, sc.image_list_store, sc.customer_kind ";
 		
 		StringBuilder builder = new StringBuilder("FROM cc_user_join_customer ujc");
 		builder.append(" LEFT JOIN cc_seller_customer sc ON ujc.seller_customer_id = sc.id");
 		builder.append(" JOIN cc_customer c ON sc.customer_id = c.id");
 		builder.append(" LEFT JOIN cc_customer_join_customer_type ccust_type on sc.id = ccust_type.seller_customer_id");
 		builder.append(" LEFT JOIN cc_customer_type cust_type on ccust_type.customer_type_id = cust_type.id");
-		
+
+		needWhere = appendIfNotEmpty(builder, "sc.customer_kind", customerKind, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(builder, "c.customer_name", custName, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(builder, "ujc.data_area", selectDataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(builder, "sc.is_enabled", 1, params, needWhere);
@@ -447,7 +447,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("LEFT JOIN act_hi_actinst i on c.proc_inst_id = i.PROC_INST_ID_ ");
 		sql.append("LEFT JOIN act_re_procdef p on p.ID_ = i.PROC_DEF_ID_ ");
 		sql.append("WHERE p.KEY_ = ? and FIND_IN_SET(?, ASSIGNEE_) AND i.DURATION_ is not null ");
-		sql.append("group by c.id ");
+		sql.append("group by c.modify_date DESC ");
 
 
 		return Db.paginate(pageNumber, pageSize, true, select, sql.toString(), params.toArray());

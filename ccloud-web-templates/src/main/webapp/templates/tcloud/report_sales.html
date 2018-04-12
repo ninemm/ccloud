@@ -165,10 +165,10 @@
     
     var unit = '件';
     function customerCount(params) {
-    	$.showLoading();
+    	layer.open({type: 2,content: '加载中'});
 		Utils.ajax('${CPATH}/report/customerCountMenu', params, 
 			function(data){
-				$.hideLoading();
+				layer.closeAll();
 	            var length = data.length;
 	            var $tbody = $("#customerCount tbody");
 	            $tbody.empty();
@@ -182,10 +182,10 @@
     }
     
     function productCount(params) {
-    	$.showLoading();
+    	layer.open({type: 2,content: '加载中'});
 		Utils.ajax('${CPATH}/report/productCountMenu', params, 
 			function(data){
-				$.hideLoading();
+				layer.closeAll();
 	            var length = data.length;
 	            var $tbody = $("#productCanve tbody");
 	            $tbody.empty();
@@ -198,10 +198,10 @@
     }
     
     function giftCount(params2) {
-    	$.showLoading();
+    	layer.open({type: 2,content: '加载中'});
 		Utils.ajax('${CPATH}/report/productCountMenu', params2, 
 			function(data){
-				$.hideLoading();
+				layer.closeAll();
 	            var length = data.length;
 	            var $tbody = $("#productGift tbody");
 	            $tbody.empty();

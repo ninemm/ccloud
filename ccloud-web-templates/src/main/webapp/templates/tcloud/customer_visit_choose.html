@@ -72,7 +72,7 @@
 
         $loading.show();
         $noMore.hide();
-        $.showLoading();
+        layer.open({type: 2,content: '加载中'});
 
         var params = {
             "page": page,
@@ -84,7 +84,7 @@
         Utils.ajax('${CPATH}/product/customerList', params,
         function(data){
             $loading.hide();
-            $.hideLoading();
+            layer.closeAll();
             if(data.customerList.length == 0){
                 if($('.weui-panel').length == 0) $noMore.show();
                 loading = true;

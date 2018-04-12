@@ -108,6 +108,7 @@ public class CustomerController extends BaseFrontController {
 
 		boolean visitAdd = SecurityUtils.getSubject().isPermitted("/admin/customerVisit/add");
 		boolean salesOrderAdd = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/add");
+		boolean salesOrderSeller = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/seller");
 		boolean salesOrder = SecurityUtils.getSubject().isPermitted("/admin/salesOrder");
 		boolean visit = SecurityUtils.getSubject().isPermitted("/admin/customerVisit");
 
@@ -123,7 +124,7 @@ public class CustomerController extends BaseFrontController {
 			selectDataArea = UserQuery.me().findById(region).getDataArea() + "%";
 		}
 
-		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, dealerDataArea, custTypeId, custName, user.getId(), seller.getId());
+		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, custTypeId, custName, "");
 		Long OrderedCustomerCount = SellerCustomerQuery.me().findOrderedCustomerCountByDataArea(selectDataArea, dealerDataArea, custTypeId, custName);
 		String customerOrderCount = OrderedCustomerCount != null ? OrderedCustomerCount.toString() : "0";
 
@@ -135,7 +136,6 @@ public class CustomerController extends BaseFrontController {
 			html.append("		<div class=\"weui-flex__item customer-info\">\n");
 			html.append("			<p class=\"ft14\">" + customer.getStr("customer_name") + "</p>\n");
 			html.append("			<p class=\"gray\">" + customer.getStr("contact") + "/" + customer.getStr("mobile")+ "</p>\n");
-			html.append("			<p class=\"gray\"> 客户类型：" + customer.getStr("name") +  "</p>\n");
 			html.append("		</div>\n");
 			html.append("		<div class=\"weui-flex__item customer-href\">\n");
 			html.append("			<div class=\"weui-flex\">\n");
@@ -176,7 +176,8 @@ public class CustomerController extends BaseFrontController {
 			html.append("	</div>\n");
 			html.append("	<div class=\"hr\"></div>");
 
-			if (visitAdd || salesOrderAdd) {
+			if (visitAdd || (salesOrderAdd && !customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))
+					|| (salesOrderSeller && customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))) {
 				html.append("	<div class=\"operate-btn\">\n");
 				if (visitAdd) {
 					html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.getStr("customer_name") + "',\n" +
@@ -185,7 +186,8 @@ public class CustomerController extends BaseFrontController {
 							"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
 							"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");				
 				}
-				if (salesOrderAdd) {
+				if ((salesOrderAdd && !customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))
+						|| (salesOrderSeller && customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))) {
 					html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
 							"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
 							"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
@@ -1217,6 +1219,11 @@ public class CustomerController extends BaseFrontController {
 
 		} else sellerCustomerId = sellerCustomer1.getId();
 
+
+		if(UserJoinCustomerQuery.me().findBySellerCustomerIdAndUserId(sellerCustomerId, user.getId()) != null) {
+			renderAjaxResultForError("该客户已存在，请不要重复导入");
+			return;
+		}
 
 		String customerTypeIds = getPara("customerTypeIds", "");
 
