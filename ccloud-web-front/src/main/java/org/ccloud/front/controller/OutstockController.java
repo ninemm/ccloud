@@ -44,7 +44,7 @@ public class OutstockController extends BaseFrontController {
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
 
@@ -185,7 +185,7 @@ public class OutstockController extends BaseFrontController {
 					inventoryDetail.setOutCount(storeCount);
 					inventoryDetail.setOutPrice(inventory.getOutPrice());
 					inventoryDetail.setBalanceAmount(oldDetail.getBalanceAmount().subtract(record.getBigDecimal("product_amount")));
-					inventoryDetail.setBalanceCount(storeCount);
+					inventoryDetail.setBalanceCount(oldBalanceCount.subtract(storeCount));
 					inventoryDetail.setBalancePrice(oldDetail.getBalancePrice());
 					inventoryDetail.setBizBillSn(salesOutstock.getOutstockSn());
 					inventoryDetail.setBizDate(record.getDate("create_date"));

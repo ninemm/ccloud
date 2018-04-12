@@ -331,7 +331,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.id", customerTypeId, params, needWhere);
 		// needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id",
 		// customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
@@ -425,8 +425,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	public printAllNeedInfo findStockOutForPrint(final String id) {
-		StringBuilder fromBuilder = new StringBuilder("select o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, cs.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
-		fromBuilder.append(" w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,so.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id,so.order_qrcode_url, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
+		StringBuilder fromBuilder = new StringBuilder("select so.total_count,o.outstock_sn,o.receive_type,o.remark as stockOutRemark,o.delivery_address,o.total_amount, cs.customer_kind, cs.id as customerId, c.customer_name, c.contact as ccontact, c.mobile as cmobile, c.address as caddress, ct.name as customerTypeName, ct.code as customerTypeCode, u.realname, u.mobile, ");
+		fromBuilder.append(" sn.phone sellerPhone,w.code as warehouseCode, cp.factor,w.`name` as warehouseName,w.phone as warehousePhone,so.create_date as placeOrderTime,so.remark,sn.seller_name,so.total_amount,so.id as orderId,so.biz_user_id, so.activity_apply_id,so.order_qrcode_url, o.id as salesOutStockId,sn.id as sellerId,pt.context as printFootContext ");
 		fromBuilder.append(" from `cc_sales_outstock` o ");
 		fromBuilder.append(" left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sj on sj.outstock_id = o.id ");
@@ -441,7 +441,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_print_template pt on pt.id = cjt.print_template_id ");
 		fromBuilder.append(" where o.id = ? ");
 		printAllNeedInfo printAllNeedInfo = new printAllNeedInfo();
-		Record record = Db.findFirst(fromBuilder.toString(), id);	 
+		Record record = Db.findFirst(fromBuilder.toString(), id);	
 			printAllNeedInfo.setOutstockSn(record.getStr("outstock_sn"));
 			printAllNeedInfo.setDeliveryAddress(record.getStr("delivery_address"));
 			printAllNeedInfo.setCustomerName(record.getStr("customer_name"));
@@ -450,8 +450,10 @@ public class SalesOutstockQuery extends JBaseQuery {
 			printAllNeedInfo.setCustomerKind(record.getStr("customer_kind"));
 			printAllNeedInfo.setPlaceOrderMan(record.getStr("realname"));
 			printAllNeedInfo.setPlaceOrderPhone(record.getStr("mobile"));
+			printAllNeedInfo.setSellerPhone(record.getStr("sellerPhone"));
 			printAllNeedInfo.setWarehouseName(record.getStr("warehouseName"));
 			printAllNeedInfo.setWarehousePhone(record.getStr("warehousePhone"));
+			printAllNeedInfo.setTotalCount(record.getBigDecimal("total_count"));
 			printAllNeedInfo.setSalesAmount(record.getBigDecimal("total_amount"));
 			printAllNeedInfo.setSellerName(record.getStr("seller_name"));
 			printAllNeedInfo.setRemark(record.getStr("remark"));
@@ -665,7 +667,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", bizUserId, params, needWhere);

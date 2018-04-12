@@ -12,14 +12,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Dict;
-import org.ccloud.model.User;
-import org.ccloud.model.Warehouse;
+import org.ccloud.model.*;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
@@ -227,24 +222,31 @@ public class ProductController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		String userId = getPara("userId");
 		String customerTypeId = getPara("customerTypeId");
-		String isOrdered = getPara("isOrdered");
-		String provName = getPara("provName", "");
-		String cityName = getPara("cityName", "");
-		String countryName = getPara("countryName", "");
+//		String isOrdered = getPara("isOrdered");
+//		String provName = getPara("provName", "");
+//		String cityName = getPara("cityName", "");
+//		String countryName = getPara("countryName", "");
 
-		String customerKind = "";
-		Subject subject = SecurityUtils.getSubject();
-		if (subject.isPermitted("/admin/salesOrder/add") && subject.isPermitted("/admin/salesOrder/seller")) {
-			customerKind = "";
-		} else if (subject.isPermitted("/admin/salesOrder/add")) {
-			customerKind = Consts.CUSTOMER_KIND_COMMON;
-		} else if (subject.isPermitted("/admin/salesOrder/seller")) {
-			customerKind = Consts.CUSTOMER_KIND_SELLER;
+		if (StrKit.notBlank(userId)) {
+			selectDataArea = UserQuery.me().findById(userId).getDataArea() + "%";
 		}
 
+//		String customerKind = "";
+//		Subject subject = SecurityUtils.getSubject();
+//		if (subject.isPermitted("/admin/salesOrder/add") && subject.isPermitted("/admin/salesOrder/seller")) {
+//			customerKind = "";
+//		} else if (subject.isPermitted("/admin/salesOrder/add")) {
+//			customerKind = Consts.CUSTOMER_KIND_COMMON;
+//		} else if (subject.isPermitted("/admin/salesOrder/seller")) {
+//			customerKind = Consts.CUSTOMER_KIND_SELLER;
+//		}
+
+		Seller seller = SellerQuery.me()._findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				selectDataArea, dealerDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
+		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(getPageNumber(), getPageSize(), selectDataArea, dealerDataArea, customerTypeId, keyword, userId, seller.getId());
+//				SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
+//				selectDataArea, dealerDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
@@ -290,7 +292,7 @@ public class ProductController extends BaseFrontController {
 		String lat = getPara("lat");
 
 		if(getPara("dist")!=null)
-			dist = Double.valueOf(getPara("nearby", "100")).doubleValue();
+			dist = Double.valueOf(getPara("dist", "100")).doubleValue();
 
 
 		BigDecimal latitude = new BigDecimal(lat);

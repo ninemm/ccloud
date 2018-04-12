@@ -610,10 +610,10 @@ $(function() {
 					$customerList.append("<div class='weui-panel weui-panel_access customerSelect'>" + customerHtml + "</div>");
 					var $newCustomer = $customerList.find(".weui-panel:last");
 					$newCustomer.find("#customerName").text(el.customer_name);
-					$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
+					$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile + "  " + el.name);
 					$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
 
-					$newCustomer.find("#sellerCustomerId").val(el.id);
+					$newCustomer.find("#sellerCustomerId").val(el.sellerCustomerId);
 					$newCustomer.find("#contact").val(el.contact);
 					$newCustomer.find("#mobile").val(el.mobile);
 					$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
@@ -890,7 +890,7 @@ $(function() {
 						</div>
 						<label class="weui-search-bar__label" id="searchText">
 							<i class="weui-icon-search"></i>
-							<span>请输入客户名或联系人</span>
+							<span>请输入客户名</span>
 						</label>
 					</form>
 					<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>

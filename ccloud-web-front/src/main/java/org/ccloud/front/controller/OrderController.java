@@ -1,5 +1,6 @@
 package org.ccloud.front.controller;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,8 +11,10 @@ import java.util.Map;
 
 import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
@@ -58,8 +61,8 @@ public class OrderController extends BaseFrontController {
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -72,23 +75,28 @@ public class OrderController extends BaseFrontController {
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
 
 		List<Map<String, Object>> bizUsers = new ArrayList<>();
 		bizUsers.add(all);
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String startDate = sdf.format(date);
-		String endDate = sdf.format(date)+" 23:59:59";
-		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerIdAndDataArea(sellerId,dataArea,startDate,endDate);
-		for (SalesOrder order : orders) {
+		List<User> users = new ArrayList<User>();
+		
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+			users = UserQuery.me().findByDeptDataArea(dataArea);
+		} else {
+			users.add(user);
+		}
+		
+		for (User u : users) {
 			Map<String, Object> items = new HashMap<>();
-			items.put("title", order.getStr("realname"));
-			items.put("value", order.getBizUserId());
+			items.put("title", u.getRealname());
+			items.put("value", u.getId());
 			bizUsers.add(items);
 		}
+		
 		String history = getPara("history");
 		setAttr("history", history);
 		setAttr("bizUsers",JSON.toJSON(bizUsers));
@@ -243,9 +251,32 @@ public class OrderController extends BaseFrontController {
 
 		String outstockInfo = buildOutstockInfo(id);
 		setAttr("outstockInfo", outstockInfo);
-
+		String modifyPrice = modifyPrice(id);
+		setAttr("modifyPrice", modifyPrice);
 		render("operate_history.html");
 	}
+	
+	private String modifyPrice(String ordedId) {
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
+			if (!record.getInt("price").equals(record.getInt("product_price"))) {
+				double conver_relate = Double.parseDouble(record.getStr("convert_relate"));
+				double price = Double.parseDouble(record.getStr("price"));
+				double product_price = Double.parseDouble(record.getStr("product_price"));
+				double smallproductPrice=product_price/conver_relate;
+				double smallprice=price/conver_relate;
+				smallproductPrice=new BigDecimal(smallproductPrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
+				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ price+ "(" + product_price+ ")<br>");
+				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallprice+ "(" + smallproductPrice + ")<br>");
+			}
+		}
+		
+		return stringBuilder.toString();
+	}
+	
 
 	private String buildOutstockInfo(String ordedId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
