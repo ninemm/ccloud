@@ -598,6 +598,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String[] bigPriceSpans = getParaValues("bigPriceSpan");
 		String[] smallPriceSpans = getParaValues("smallPriceSpan");
 		Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
+		if (Integer.parseInt(salesOrder.getStr("status"))!=Consts.SALES_ORDER_STATUS_DEFAULT) {
+			renderAjaxResultForError("订单已审核");
+			return;
+		}
 		String salesOrderName="";
 		if (null==salesOrder.getStr("customer_name")){
 			salesOrderName=salesOrder.getStr("salesName");
