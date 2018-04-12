@@ -94,7 +94,7 @@
 						$customerList.append("<div class='weui-panel weui-panel_access'>" + newHtml + "</div>");
 						var $newCustomer = $customerList.find(".weui-panel:last");
 						$newCustomer.find("#customerName").text(el.customer_name);
-						$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile + "  " + el.name);
+						$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
 						$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
 
 						$newCustomer.find("#sellerCustomerId").val(el.sellerCustomerId);

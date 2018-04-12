@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.*;
@@ -231,20 +233,17 @@ public class ProductController extends BaseFrontController {
 			selectDataArea = UserQuery.me().findById(userId).getDataArea() + "%";
 		}
 
-//		String customerKind = "";
-//		Subject subject = SecurityUtils.getSubject();
-//		if (subject.isPermitted("/admin/salesOrder/add") && subject.isPermitted("/admin/salesOrder/seller")) {
-//			customerKind = "";
-//		} else if (subject.isPermitted("/admin/salesOrder/add")) {
-//			customerKind = Consts.CUSTOMER_KIND_COMMON;
-//		} else if (subject.isPermitted("/admin/salesOrder/seller")) {
-//			customerKind = Consts.CUSTOMER_KIND_SELLER;
-//		}
+		String customerKind = "";
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isPermitted("/admin/salesOrder/add") && subject.isPermitted("/admin/salesOrder/seller")) {
+			customerKind = "";
+		} else if (subject.isPermitted("/admin/salesOrder/add")) {
+			customerKind = Consts.CUSTOMER_KIND_COMMON;
+		} else if (subject.isPermitted("/admin/salesOrder/seller")) {
+			customerKind = Consts.CUSTOMER_KIND_SELLER;
+		}
 
-		Seller seller = SellerQuery.me()._findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
-
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(getPageNumber(), getPageSize(), selectDataArea, dealerDataArea, customerTypeId, keyword, userId, seller.getId());
+		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(getPageNumber(), getPageSize(), selectDataArea, customerTypeId, keyword, customerKind);
 //				SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
 //				selectDataArea, dealerDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
 
