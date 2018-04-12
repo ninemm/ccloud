@@ -264,19 +264,18 @@ public class SellerCustomerQuery extends JBaseQuery {
 	}
 	
 	public Long findOrderedCustomerCountByDataArea(String selectDataArea, String dealerDataArea, String customerTypeId, String custName) {
-		boolean needWhere = true;
+		boolean needWhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		StringBuilder builder = new StringBuilder("SELECT count(o.customer_id)");
+		StringBuilder builder = new StringBuilder("SELECT count(DISTINCT(o.customer_id)) count");
 		builder.append(" FROM cc_sales_order o");
 		builder.append(" JOIN cc_seller_customer sc on sc.id = o.customer_id");
 		builder.append(" JOIN cc_customer c on sc.customer_id = c.id");
+		builder.append(" WHERE o.status in (1001, 1002)");
 		
 		needWhere = appendIfNotEmptyWithLike(builder, "c.customer_name", custName, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(builder, "o.data_area", selectDataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(builder, "o.customer_type_id", customerTypeId, params, needWhere);
-		
-		builder.append(" group by o.customer_id");
 		
 		return Db.queryLong(builder.toString(), params.toArray());
 	}
