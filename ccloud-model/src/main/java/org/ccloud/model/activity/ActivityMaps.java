@@ -8,6 +8,7 @@ import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.YxBasicchannelinfo;
 import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.QyBasicshowtypeQuery;
 import org.ccloud.model.query.YxBasicchannelinfoQuery;
 
 import com.jfinal.kit.StrKit;
@@ -127,7 +128,8 @@ public class ActivityMaps {
 		map.put("ResourceFlag", 1);
 		 map.put("SignPhotoId",photo);
 		map.put("FeeTypeID", YxActivity.getStr("CostType"));
-		map.put("ShowType", Integer.parseInt(YxActivity.getStr("ShowType")));
+		String shopTypeID = QyBasicshowtypeQuery.me().findIdByDict(YxActivity.getStr("ShowType"));
+		map.put("ShowTypeID", shopTypeID);
 		map.put("BeginTime", YxActivity.getStr("BeginTime"));
 		map.put("EndTime", YxActivity.getStr("EndTime"));
 		map.put("InvestDay", Integer.parseInt(YxActivity.getStr("InvestDay")));
@@ -163,7 +165,8 @@ public class ActivityMaps {
 		map.put("ModifyTime", customerVisit.getModifyDate());
 		map.put("CancleFlag", 0);
 		map.put("ResourceFlag", 1);
-		map.put("SignPhoto", scenePhoto);
+		String image = scenePhoto.substring(1, scenePhoto.length() - 1);
+		map.put("SignPhoto", image);
 		return map;
 	}	
 
@@ -313,7 +316,7 @@ public class ActivityMaps {
 	}	
 
 	// 订单
-	public static Map<String, Object> orderMap(String orderId, Record YxActivity, String shopId, Date createDate) {
+	public static Map<String, Object> orderMap(String orderId, Record YxActivity, String shopId, String createDate) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("OrderID", orderId);
 		map.put("FlowNo", YxActivity.getStr("FlowIDNO"));

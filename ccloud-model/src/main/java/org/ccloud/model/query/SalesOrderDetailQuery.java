@@ -518,7 +518,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	public List<SalesOrderDetail> findByActivityApplyId(String activityApplyID) {
 		StringBuilder sqlBuilder = new StringBuilder("select o.id, MOD(o.product_count, cp.convert_relate) as smallCount, FLOOR(o.product_count/cp.convert_relate) as bigCount, ");
-		sqlBuilder.append("cu.mid_idno,cp.product_sn,o.is_gift from cc_sales_order_detail o ");
+		sqlBuilder.append("cu.mid_idno,cp.product_sn,o.is_gift, cc.create_date from cc_sales_order_detail o ");
 		sqlBuilder.append("LEFT JOIN cc_sales_order cc ON o.order_id = cc.id ");
 		sqlBuilder.append("LEFT JOIN cc_seller_customer cs on cs.id = cc.customer_id ");
 		sqlBuilder.append("LEFT JOIN cc_customer cu on cu.id = cs.customer_id ");

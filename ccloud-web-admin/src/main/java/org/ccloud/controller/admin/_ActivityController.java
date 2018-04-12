@@ -893,7 +893,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 //					renderAjaxResultForError("同步图片失败!");
 //					return;
 				}else {
-					ScenePhoto = ScenePhoto.substring(1, ScenePhoto.length()-1);
+					ScenePhoto = ScenePhoto.substring(1, ScenePhoto.length() - 1);
 				}
 			}
 			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
@@ -1007,18 +1007,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 					orderID = null;
 				}
 				List<String> list = Lists.newArrayList();
-				JSONArray picList = JSON.parseArray(vistitList.get(i).getImageListStore());
-				for (int  a= 0; a <picList.size(); a++) {
+				JSONArray picList = JSON.parseArray(vistitList.get(i).getPhoto());
+				for (int a = 0; a < picList.size(); a++) {
 					JSONObject obj = picList.getJSONObject(a);
 					String savePath = obj.getString("savePath");
 //					String photoId = StrKit.getRandomUUID();
 					list.add(savePath);
-					try {
-						HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/PhotoInfo", map);
-					} catch (Exception e) {
-						e.printStackTrace();
-						return null;
-					}
 				}	
 				Map<String, Object> detailMap = ActivityMaps.INVEST_TERMINSL_ADVERTISWMENT_DETAIL_MAP(vistitList.get(i), SYN_ID, list.toString(), shopId, orderID);
 				HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopShowInfoDetail", detailMap);
@@ -1103,20 +1097,21 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	private String synOrder(String activityApplyId, Record YxActivity, String shopId) {
 		List<SalesOrderDetail> salesOrderDetail = SalesOrderDetailQuery.me().findByActivityApplyId(activityApplyId);	
 		String orderId = "";
-		if(salesOrderDetail.size() > 1) {
+		if(salesOrderDetail.size() > 0) {
 			orderId = StrKit.getRandomUUID();
 		}
 		try {
 			for (int i = 0; i < salesOrderDetail.size(); i++) {
 				if (i == 0) {
-					Map<String, Object> orderMap = ActivityMaps.orderMap(orderId, YxActivity, shopId, salesOrderDetail.get(i).getCreateDate());
-					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityEntryCostInfo", orderMap);
+					Map<String, Object> orderMap = ActivityMaps.orderMap(orderId, YxActivity, shopId, salesOrderDetail.get(i).getStr("create_date"));
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/Order", orderMap);
 				}
 				Map<String, Object> orderDetailMap = ActivityMaps.orderDetailMap(orderId, salesOrderDetail.get(i));
-				HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityEntryCostInfo", orderDetailMap);				
+				HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/OrderDetail", orderDetailMap);				
 			}
 			return orderId;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

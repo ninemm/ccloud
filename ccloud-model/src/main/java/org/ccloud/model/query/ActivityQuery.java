@@ -285,7 +285,7 @@ public class ActivityQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_activity ca on ca.id = a.activity_id ");
 		fromBuilder.append(" LEFT JOIN cc_expense_detail cea on a.expense_detail_id = cea.id ");
 		fromBuilder.append(" LEFT JOIN dict d on d.type=cea.flow_dict_type and d.`value` = cea.item1 ");
-		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` = '"+Consts.ACTIVITY_APPLY_STATUS_PASS+"'");
+		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` in ( '"+Consts.ACTIVITY_APPLY_STATUS_PASS+"','"+Consts.ACTIVITY_APPLY_STATUS_VERIFICATION+"')");
 		fromBuilder.append(" GROUP BY a.id");
 		return Db.find(fromBuilder.toString());
 	}
