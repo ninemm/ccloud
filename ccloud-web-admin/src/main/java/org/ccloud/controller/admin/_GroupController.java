@@ -62,13 +62,14 @@ public class _GroupController extends JBaseCRUDController<Group> {
     public void index() {
 
         String keyword = getPara("k");
-        if (StrKit.notBlank(keyword)) setAttr("k", keyword);
+if (StrKit.notBlank(keyword)) setAttr("k", keyword);
         
-        boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+//		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
-		if (isSuperAdmin) {
+		/*if (isSuperAdmin) {
 			dataArea = null;
-		}
+		}*/
+		if(dataArea.equals("001%")) dataArea = dataArea.substring(0, dataArea.length()-1);
         Page<Group> page = GroupQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea, "g.order_list");
         if (page != null) {
             setAttr("page", page);
