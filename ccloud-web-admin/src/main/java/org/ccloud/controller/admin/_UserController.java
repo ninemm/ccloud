@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -95,9 +96,30 @@ public class _UserController extends JBaseCRUDController<User> {
 
 		Page<User> page = UserQuery.me().paginateUser(getPageNumber(), getPageSize(), keyword, dataArea, "u.create_date",
 				userId);
+		List<User> list = page.getList();
+		for (User user : list) {
+			try {
+				if (StrKit.notBlank(user.getNickname())) {
+					String nickname = URLDecoder.decode(user.getNickname(), "utf-8");
+					user.setNickname(nickname);
+				}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
 		if (page != null) {
 			setAttr("page", page);
 		}
+//		String nickname = get("nickname");
+//		try {
+//			if (StrKit.notBlank(nickname)) {
+//				nickname = URLDecoder.decode((String) get("nickname"), "utf-8");
+//			}
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return nickname;
 
 	}
 
