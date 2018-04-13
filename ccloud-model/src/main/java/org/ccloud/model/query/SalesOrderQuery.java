@@ -861,7 +861,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			}
 			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
-		fromBuilder.append("u.realname '业务员名称',so.total_amount '小计'");
+		fromBuilder.append("u.realname '业务员名称',u.id userId");
 		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
@@ -885,6 +885,29 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 
+	public Record findTotalAmountByUserId(String startDate, String endDate, String keyword, String userId) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		StringBuilder fromBuilder = new StringBuilder();
+			if (keyword.equals("sok.biz_date")) {
+				fromBuilder.append("SELECT SUM(sok.total_amount) totalAmount  FROM cc_sales_outstock sok ");
+				needWhere = appendIfNotEmpty(fromBuilder, "sok.biz_user_id", userId, params, needWhere);
+			}else {
+				fromBuilder.append("SELECT SUM(so.total_amount) totalAmount  FROM cc_sales_order so ");
+				needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", userId, params, needWhere);
+			}
+			if (StrKit.notBlank(startDate)) {
+				fromBuilder.append(" and "+keyword+" >= ? ");
+				params.add(startDate);
+			}
+			if (StrKit.notBlank(endDate)) {
+				fromBuilder.append(" and "+keyword+" <= ? ");
+				params.add(endDate);
+			}
+		
+		return Db.findFirst(fromBuilder.toString(), params.toArray());
+	}
+	
 	//我客户的详情
 	public List<Record> findByCustomerDetail(String startDate, String endDate, String keyword, String userId,
 			String sellerId, boolean ifGift) {
