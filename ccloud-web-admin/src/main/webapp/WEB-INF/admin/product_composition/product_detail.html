@@ -35,7 +35,8 @@
 							<th style="width: 30%">商品名称</th>
 							<th>商品规格</th>
 							<th>商品单价</th>
-							<th>商品数量</th>
+							<th>商品大数量</th>
+							<th>商品小数量</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -46,14 +47,16 @@
 									<td>${bean.product_name!}</td>
 									<td>${bean.product_sp!}</td>
 									<td>${bean.price!}</td>
-									<td>1</td>
+									<td>${((bean.main_product_count)?number/bean.main_convert)?floor!}${bean.main_bunit}</td>
+									<td>${((bean.main_product_count)?number%bean.main_convert)?floor!}${bean.main_sunit}</td>
 								</tr>					
 							</#if>
 							<tr class="jp-onmouse">
 								<td>${bean.sub_product_name!}</td>
 								<td>${bean.sub_product_sp!}</td>
 								<td>${bean.sub_price!}</td>
-								<td>${bean.sub_product_count!}</td>
+								<td>${((bean.sub_product_count)?number/bean.sub_convert)?floor!}${bean.sub_bunit!}</td>
+								<td>${((bean.sub_product_count)?number%bean.sub_convert)?floor!}${bean.sub_sunit!}</td>
 							</tr>
 							</#list>
 						</#if>
