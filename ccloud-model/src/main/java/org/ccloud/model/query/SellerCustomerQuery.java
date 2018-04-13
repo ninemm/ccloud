@@ -307,7 +307,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		builder.append(" FROM cc_sales_order o");
 		builder.append(" JOIN cc_seller_customer sc on sc.id = o.customer_id");
 		builder.append(" JOIN cc_customer c on sc.customer_id = c.id");
-		builder.append(" WHERE o.status in (1001, 1002)");
+		builder.append(" WHERE o.status not in (1001, 1002)");
 		
 		needWhere = appendIfNotEmptyWithLike(builder, "c.customer_name", custName, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(builder, "o.data_area", selectDataArea, params, needWhere);
