@@ -90,7 +90,6 @@ public class IndexController extends BaseFrontController {
 			setAttr("orderTotal", SalesOrderQuery.me().findToDoOrderReviewCount(user.getUsername()));
 			setAttr("customerVisitTotal", CustomerVisitQuery.me().findToDoCustomerVisitReviewCount(user.getUsername()));
 			setAttr("customerTotal", SellerCustomerQuery.me().findToDoCustomerReviewCount(user.getUsername()));
-//			setAttr("activityApplyTotal", ActivityApplyQuery.me().getToDo(user.getUsername(), dealerDataArea).size());
 			setAttr("activityApplyTotal", ActivityApplyQuery.me().findToDoActivityReviewCount(user.getUsername()));
 
 			List<User> userList = UserQuery.me().findByMobile(user.getMobile());
