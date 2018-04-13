@@ -691,7 +691,7 @@
     }
     function customerClick(param) {
         countryName = '';
-        post('${CPATH}/biSales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
+        //post('${CPATH}/biSales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
     }
 
     //区域
@@ -705,6 +705,7 @@
         }).done(function(data){
             var areaYData = [];
             var areaSeriesData = [];
+            var length = data.length > 5 ? 5 : data.length;
             var length = data.length > 5 ? 5 : data.length;
 
             for(var i = 0; i < length; i++){
@@ -771,7 +772,7 @@
     
     function areaClick(param) {
         countryName = '';
-        post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
+        //post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
     }
     
     var $prTR;
