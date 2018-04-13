@@ -435,8 +435,9 @@ public class ReportController extends BaseFrontController {
 		String orderTag = getPara("orderTag");
 		User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
+		
 		String receiveType = getPara("receiveType");
-		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea,receiveType);
+		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea+"%",receiveType);
 		renderJson(record);
 	}
 	
