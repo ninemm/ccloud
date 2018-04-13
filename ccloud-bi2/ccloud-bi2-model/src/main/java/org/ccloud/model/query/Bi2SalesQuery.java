@@ -465,7 +465,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		if (isDealer) {
 			sqlBuilder.append(" s.id, d.data_area, TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, s.seller_name dealerName,s.id dealerCode ");
 		} else {
-			sqlBuilder.append(" so.seller_id, d.data_area, TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, se.seller_name sellerName,se.id dealerCode ");
+			sqlBuilder.append(" TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, se.seller_name sellerName,se.id dealerCode ");
 		}
 		sqlBuilder.append(" FROM cc_sales_outstock so ");
 		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
@@ -514,7 +514,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	//经销商产品销售排行
-	public List<Record> findProductListByDealer(String provName, String cityName, String countryName, String dataArea,
+	public List<Record> findProductListByDealer(boolean isDealer,String provName, String cityName, String countryName, String dataArea,
 	                                            String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -542,7 +542,11 @@ public class Bi2SalesQuery extends JBaseQuery {
 		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
-		appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
+		if(isDealer) {
+			appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
+		}else {
+			appendIfNotEmpty(sqlBuilder, "so.seller_id", dataArea, params, false);
+		}
 
 		if (startDate != null) {
 			sqlBuilder.append(" and so.biz_date >= ?");

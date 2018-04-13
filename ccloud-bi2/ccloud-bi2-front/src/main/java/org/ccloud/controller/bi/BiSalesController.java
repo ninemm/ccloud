@@ -290,7 +290,7 @@ public class BiSalesController extends BaseFrontController {
 		List<Record> sellerList = Bi2SalesQuery.me().findsalesList(false, provName, cityName, countryName, dataAreaArray
 				, startDate, endDate);
 		//经销商产品销售排行
-		List<Record> productList = Bi2SalesQuery.me().findProductListByDealer(provName, cityName, countryName,
+		List<Record> productList = Bi2SalesQuery.me().findProductListByDealer(true, provName, cityName, countryName,
 				dataArea, startDate, endDate);
 
 		result.put("sellerList", sellerList);
@@ -302,19 +302,17 @@ public class BiSalesController extends BaseFrontController {
 
 	public void productBySeller() {
 
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
-		if (StrKit.notBlank(getPara("dataArea"))) dataArea = getPara("dataArea").trim();
+		String dataArea = getPara("sellerId").trim();
 
 		String startDate = DateUtils.getDateByType(dateType);
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
-		List<Record> result = Bi2SalesQuery.me().findProductListByDealer(provName, cityName, countryName, dataArea, startDate, endDate);
+		List<Record> result = Bi2SalesQuery.me().findProductListByDealer(false, provName, cityName, countryName, dataArea, startDate, endDate);
 
 		renderJson(result);
 
