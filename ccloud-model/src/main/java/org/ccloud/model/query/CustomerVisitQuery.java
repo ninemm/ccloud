@@ -70,7 +70,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cc.customer_name", keyword, params, needWhere);
 
 		if(StrKit.notBlank(customerType)) {
-			needWhere = appendIfNotEmpty(fromBuilder, "cc_t.`name`", customerType, params, needWhere);
+			needWhere = appendIfNotEmpty(fromBuilder, "cc_t.`id`", customerType, params, needWhere);
 		}
 
 		if(StrKit.notBlank(questionType)) {
@@ -304,6 +304,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 
+	@Deprecated
 	public List<Record> findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea){
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -326,6 +327,32 @@ public class CustomerVisitQuery extends JBaseQuery {
 		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
 		appendIfNotEmpty(sql, "ccv.question_type", questionType, params, false);
 		appendIfNotEmptyWithLike(sql,"t1.customerTypeNames", customerType, params, false);
+		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
+
+		sql.append("GROUP BY u.realname, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
+		sql.append("ORDER BY ccv.create_date ");
+
+		return Db.find(sql.toString(), params.toArray());
+	}
+
+	public List<Record> _findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea){
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, u.realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
+
+		sql.append("FROM cc_customer_visit ccv ");
+		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = ccv.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer cc ON cc.id = csc.customer_id ");
+
+		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON csc.id = cjct.seller_customer_id ");
+		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+
+		sql.append("LEFT JOIN `user` u ON u.id = ccv.user_id ");
+		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
+
+		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
+		appendIfNotEmpty(sql, "ccv.question_type", questionType, params, false);
+		appendIfNotEmptyWithLike(sql,"ct.id", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
 
 		sql.append("GROUP BY u.realname, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
