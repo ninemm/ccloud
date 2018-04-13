@@ -41,6 +41,7 @@ public class ProductController extends BaseFrontController {
 		String tag = getPara("tag");
 
 		List<Record> productList = MemberJoinSellerQuery.me().findProductListForApp(member.getId(), keyword, tag);
+		List<Record> compositionList = MemberJoinSellerQuery.me().findDetailByProductId("", member.getId(), keyword, tag);
 
 		Set<String> tagSet = new LinkedHashSet<String>();
 
@@ -54,7 +55,7 @@ public class ProductController extends BaseFrontController {
 			}
 		}
 
-		Map<String, Collection<? extends Serializable>> map = ImmutableMap.of("productList", productList, "tags", tagSet);
+		Map<String, Collection<? extends Serializable>> map = ImmutableMap.of("productList", productList, "compositionList", compositionList, "tags", tagSet);
 		renderJson(map);
 	}
 

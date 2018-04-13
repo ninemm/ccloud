@@ -40,11 +40,22 @@ public class OrderController extends BaseFrontController {
 		List<Map<String, Object>> dataList = new ArrayList<>();
 
 		JSONArray productList = JSON.parseArray(getPara("productList"));
+		JSONArray compositionList = JSON.parseArray(getPara("compositionList"));
+
+		//处理null问题
+		if(productList == null) productList = new JSONArray();
+		if(compositionList == null) compositionList = new JSONArray();
 		List<String> sellerIdList = new ArrayList<>();
 
 		//抽sellerId
 		for (int i = 0; i < productList.size(); i++) {
 			JSONObject obj = productList.getJSONObject(i);
+			String sellerId = obj.getString("sellerId");
+			if(!sellerIdList.contains(sellerId)) sellerIdList.add(sellerId);
+		}
+
+		for (int i = 0; i < compositionList.size(); i++) {
+			JSONObject obj = compositionList.getJSONObject(i);
 			String sellerId = obj.getString("sellerId");
 			if(!sellerIdList.contains(sellerId)) sellerIdList.add(sellerId);
 		}
@@ -56,6 +67,13 @@ public class OrderController extends BaseFrontController {
 				JSONObject obj = productList.getJSONObject(j);
 				if(obj.getString("sellerId").equals(sellerIdList.get(i))) prodList.add(productList.get(j));
 			}
+
+			List<Object> composList = new ArrayList<>();
+			for(int j = 0 ; j < compositionList.size(); j++){
+				JSONObject obj = compositionList.getJSONObject(j);
+				if(obj.getString("sellerId").equals(sellerIdList.get(i))) composList.add(compositionList.get(j));
+			}
+
 			String dealerSellerId = getDealerSellerId(sellerIdList.get(i));
 			List<Record> customerTypes =  CustomerTypeQuery.me().findByMember(member.getCustomerId(), dealerSellerId);
 
@@ -74,6 +92,7 @@ public class OrderController extends BaseFrontController {
 
 			Map<String, Object> map = new HashMap<>();
 			map.put("productList", prodList);
+			map.put("compositionList", composList);
 			map.put("customerTypeList", customerTypeList);
 
 			Seller seller = SellerQuery.me().findById(sellerIdList.get(i));
@@ -126,24 +145,34 @@ public class OrderController extends BaseFrontController {
 				moreInfo.put("location", StringUtils.getArrayFirst(paraMap.get("location")));
 
 				String[] sellerIds = paraMap.get("sellerId");
+				String[] composSellerIds = paraMap.get("composSellerId");
+
+				//处理空指针
+				if(sellerIds == null) sellerIds = new String[0];
+				if(composSellerIds == null) composSellerIds = new String[0];
 
 				List<String> sellerIdList = new ArrayList<>();
 				//找出所有sellerId
 				for (int i = 0; i < sellerIds.length; i++)
 					if (!sellerIdList.contains(sellerIds[i])) sellerIdList.add(sellerIds[i]);
 
+				for (int i = 0; i < composSellerIds.length; i++)
+					if (!sellerIdList.contains(composSellerIds[i])) sellerIdList.add(composSellerIds[i]);
+
 				for (int i = 0; i < sellerIdList.size(); i++) {
 					String sellerId = sellerIdList.get(i);
 					String sellerCode = SellerQuery.me().findById(sellerId).getSellerCode();
 
 					List<Map<String, String>> paraList = new ArrayList<>();
+					List<Map<String, String>> composParaList = new ArrayList<>();
+
 					Double totalNum = 0.00;
 					double total = 0;
 					Integer memberProcNumber = OptionQuery.me().findValueAsInteger(Consts.OPTION_WEB_MEMBER_NUMBER_LIMIT + sellerCode);
 					int index = 0;
 
 					for (int j = 0; j < sellerIds.length; j++) {
-						//根据sellerId筛选产品
+						//根据sellerId筛选常规产品
 						if (sellerIds[j].equals(sellerId)) {
 							index = Integer.valueOf(paraMap.get("index")[j]);
 							Map<String, String> para = new HashMap<>();
@@ -171,6 +200,30 @@ public class OrderController extends BaseFrontController {
 							}
 						}
 					}
+
+					for (int j = 0; j < composSellerIds.length; j++) {
+						//根据sellerId筛选组合产品
+						if(composSellerIds[j].equals(sellerId)) {
+							index = Integer.valueOf(paraMap.get("composIndex")[j]);
+							Map<String, String> para = new HashMap<>();
+							para.put("compositionId", paraMap.get("compositionId")[j]);
+							para.put("compositionNum", paraMap.get("compositionNum")[j]);
+
+							total = total + Double.parseDouble(paraMap.get("composRowTotal")[j]);
+
+							Double prodTotalNum = Double.parseDouble(paraMap.get("compositionNum")[j]);
+
+							totalNum = totalNum + prodTotalNum;
+							composParaList.add(para);
+
+							if(memberProcNumber != null) {
+								if(prodTotalNum > memberProcNumber) {
+									renderAjaxResultForError(ProductCompositionQuery.me().findById(paraMap.get("compositionId")[j]).getName() + "数量超过上限" + memberProcNumber.toString());
+									return false;
+								}
+							}
+						}
+					}
 					total = new BigDecimal(total).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 					totalNum = new BigDecimal(totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 
@@ -192,7 +245,7 @@ public class OrderController extends BaseFrontController {
 					String userId = paraMap.get("user")[index];
 					User user = UserQuery.me().findById(userId);
 					//一个sellerId去生产一个订单
-					String result = saveOrder(paraList, moreInfo, user, sellerId, sellerCode, member.getId());
+					String result = saveOrder(paraList, composParaList, moreInfo, user, sellerId, sellerCode, member.getId());
 
 					if (StrKit.notBlank(result)) {
 						renderAjaxResultForError(result);
@@ -205,7 +258,7 @@ public class OrderController extends BaseFrontController {
 		});
 	}
 
-	private String saveOrder(List<Map<String, String>> paraList, Map<String, String> moreInfo, User user,
+	private String saveOrder(List<Map<String, String>> paraList, List<Map<String, String>> composParaList, Map<String, String> moreInfo, User user,
 							 String sellerId, String sellerCode, String memberId) {
 
 		String orderId = StrKit.getRandomUUID();
@@ -235,10 +288,27 @@ public class OrderController extends BaseFrontController {
 		// 常规商品
 		if (paraList != null && paraList.size() > 0) {
 			for (int index = 0; index < paraList.size(); index++) {
-				String message = SalesOrderDetailQuery.me().memberInsert(paraList.get(index), orderId, sellerId, sellerCode, user.getId(), date,
+				String message = SalesOrderDetailQuery.me().memberInsertNormal(paraList.get(index), orderId, sellerId, sellerCode, user.getId(), date,
 							user.getDepartmentId(), user.getDataArea());
 				if (StrKit.notBlank(message)) {
 					return message;
+				}
+			}
+		}
+
+		// 组合商品
+		if (composParaList != null && composParaList.size() > 0) {
+			for (int index = 0; index < composParaList.size(); index++) {
+				String productId = composParaList.get(index).get("compositionId");
+				String number = composParaList.get(index).get("compositionNum");
+				List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
+				for (SellerProduct sellerProduct : list) {
+					String message = SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId, sellerCode,
+							user.getId(), date, user.getDepartmentId(), user.getDataArea(),
+							Integer.parseInt(number), user.getId());
+					if (StrKit.notBlank(message)) {
+						return message;
+					}
 				}
 			}
 		}

@@ -1,6 +1,13 @@
 <#include "_inc/_layout.html"/>
 <#macro title>购物车</#macro>
 <#macro css>
+	#gift .icon-tags {
+		color: #ea6f5a;
+		font-size: .8rem;
+		margin-right: .2rem;
+		height: 100%;
+		line-height: 100%;
+	}
 	#valueName {
 		max-width: 7.5rem;
 	}
@@ -18,7 +25,7 @@
 </#macro>  
 <#macro script>
 $(function() {
-	$(document).on("click", function () {
+	$(document).on("click", ".gift-open", function () {
         if ($(this).text() === "展开") {
 	        $(this).text("收起");
 	        $(this).prev().find('#subsubProduct').show();
@@ -27,65 +34,82 @@ $(function() {
 	        $(this).prev().find('#subsubProduct').hide();
         }
     }).on("click", ".icon-trash-o", function() {
-    var _this = $(this);
-    $.confirm("确认删除商品？", function() {
-      var $el = _this.parents(".common");
-      if($el.length > 0){
-        $el.find("#bigNum").val(0);
-        $el.find("#smallNum").val(0);
-      	var product = getProduct($el);
-      	cart.changeProduct(product);
-      }
-      _this.parents(".weui-panel").remove();
-      total();
+		var _this = $(this);
+		$.confirm("确认删除商品？", function() {
+			var $el = _this.parents(".common");
+			if($el.length > 0){
+				$el.find("#bigNum").val(0);
+				$el.find("#smallNum").val(0);
+				var product = getProduct($el);
+				cart.changeProduct(product);
+			}else{
+				var $co = _this.parents(".composition");
+				if($co.length > 0){
+				$co.find("#compositionNum").val(0);
+				var composition = getComposition($co);
+				cart.changeComposition(composition);
+			}
+		}
+		_this.parents(".weui-panel").remove();
+		total();
     }, function() {
     })
-  }).on("click", "#placeOrder", function () {
-      order();
-  }).on("click", "#addGoods", function () {
-       window.location.href = '${CPATH}/member/product';
-  }).on("click", ".operate:first-child", function () { //减少商品数量
-      productChange($(this));
-  }).on("click", ".operate:last-child", function () { //增加商品数量
-      productChange($(this));
-  }).on('click', '#confirm-input', function () {
-      var val = parseFloat($currentInput.val());
-      if(val < 0 || val == ""){
-        $currentInput.val(0);
-      }else{
-        $currentInput.val(val);
-      }
-  
-      var $productDetail = $currentInput.parent().parent();
-      var convert = $productDetail.find("#convert").val();
-      var id = $currentInput.attr('id');
- 
-      if(id == 'bigPrice'){
-        var bPrice = parseFloat($productDetail.find("#bigCost").val());
-        var bigPrice = $currentInput.val();
-		if(bigPrice < bPrice){
-			$currentInput.val(bPrice);
-			$.toptip("价格不能小于成本价!", 'warning');
-			return;
+	}).on("click", "#placeOrder", function () {
+		order();
+	}).on("click", "#addGoods", function () {
+		window.location.href = '${CPATH}/member/product';
+	}).on("click", ".operate:first-child", function () { //减少商品数量
+		productChange($(this));
+	}).on("click", ".operate:last-child", function () { //增加商品数量
+		productChange($(this));
+	}).on('click', '#confirm-input', function () {
+		var val = parseFloat($currentInput.val());
+		if(val < 0 || val == ""){
+			$currentInput.val(0);
+		}else{
+			$currentInput.val(val);
 		}
-		$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
-      } else if(id == 'smallPrice'){
-        var sPrice = parseFloat($productDetail.find("#smallCost").val());
-        var smallPrice = $currentInput.val();
-		if(smallPrice < sPrice){
-			$currentInput.val(sPrice);
-			$.toptip("价格不能小于成本价!", 'warning');
-			return;
+
+		var $productDetail = $currentInput.parent().parent();
+		var convert = $productDetail.find("#convert").val();
+		var id = $currentInput.attr('id');
+
+		if(id == 'bigPrice'){
+			var bPrice = parseFloat($productDetail.find("#bigCost").val());
+        	var bigPrice = $currentInput.val();
+			if(bigPrice < bPrice){
+				$currentInput.val(bPrice);
+				$.toptip("价格不能小于成本价!", 'warning');
+				return;
+			}
+			$productDetail.find("#smallPrice").val((bigPrice/convert).toFixed(2));
+      	} else if(id == 'smallPrice'){
+        	var sPrice = parseFloat($productDetail.find("#smallCost").val());
+        	var smallPrice = $currentInput.val();
+			if(smallPrice < sPrice){
+				$currentInput.val(sPrice);
+				$.toptip("价格不能小于成本价!", 'warning');
+				return;
+			}
+			$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
+		} else if(id == 'compositionPrice'){
+			var cPrice = parseFloat($productDetail.find("#compositionPriceSpan").text().replace("￥", ""));
+			var compositionPrice = $currentInput.val();
+			if(compositionPrice < cPrice){
+				$currentInput.val(cPrice);
+				$.toptip("价格不能小于销售价!", 'warning');
+				return;
+			}
 		}
-		$productDetail.find("#bigPrice").val((smallPrice*convert).toFixed(2));
-      }
-      productChange($currentInput);
-  });
-  
-  $main.empty();
-  initProduct();
-  total();
-  
+
+		productChange($currentInput);
+	});
+
+	$main.empty();
+	initProduct();
+	initProductComposition();
+	total();
+
 });
 
 var sellerProductInfoMap = ${sellerProductInfoMap!};
@@ -95,62 +119,145 @@ var $main = $("main");
 
 function initProduct(){
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
-	if(productList.length == 0){
+
+	/*if(productList.length == 0){
 		$main.append("<p style='text-align: center; margin-top:50px;'>购物车空空的，快挑选商品吧</p>");
-	}
+	}*/
+
 	$.each(productList, function(index, el) {
-			$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
-			var $newProductDetail = $main.find(".common:last");
-			$newProductDetail.find("#productName").text(el.productName);
-			$newProductDetail.find("#valueName").text(el.valueName);
-	
-			$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
-			$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
-			$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
-			$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
+		$main.append("<div class='weui-panel weui-panel_access common'>" + newHtml + "</div>");
+		var $newProductDetail = $main.find(".common:last");
+		$newProductDetail.find("#productName").text(el.productName);
+		$newProductDetail.find("#valueName").text(el.valueName);
 
-			$newProductDetail.find("#bigCost").val(el.bigCost);
-			$newProductDetail.find("#smallCost").val(el.smallCost);
-			$newProductDetail.find("#bigAccountPrice").val(el.bigAccountPrice);
-			$newProductDetail.find("#smallAccountPrice").val(el.smallAccountPrice);
+		$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
+		$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
+		$newProductDetail.find("#bigUnitSpan").text(el.bigUnitSpan);
+		$newProductDetail.find("#smallUnitSpan").text(el.smallUnitSpan);
 
-			$newProductDetail.find("#bigPrice").val(el.bigPrice);
-			$newProductDetail.find("#smallPrice").val(el.smallPrice);
-			$newProductDetail.find("#bigUnit").val(el.bigUnit);
-			$newProductDetail.find("#smallUnit").val(el.smallUnit);
-			$newProductDetail.find("#sellProductId").val(el.sellProductId);
-			$newProductDetail.find("#sellerId").val(el.sellerId);
-			$newProductDetail.find("#productId").val(el.productId);
-			$newProductDetail.find("#convert").val(el.convert);
-			
-			$newProductDetail.find("#bigNum").val(el.bigNum);
-			$newProductDetail.find("#smallNum").val(el.smallNum);
+		$newProductDetail.find("#bigCost").val(el.bigCost);
+		$newProductDetail.find("#smallCost").val(el.smallCost);
+		$newProductDetail.find("#bigAccountPrice").val(el.bigAccountPrice);
+		$newProductDetail.find("#smallAccountPrice").val(el.smallAccountPrice);
+
+		$newProductDetail.find("#bigPrice").val(el.bigPrice);
+		$newProductDetail.find("#smallPrice").val(el.smallPrice);
+		$newProductDetail.find("#bigUnit").val(el.bigUnit);
+		$newProductDetail.find("#smallUnit").val(el.smallUnit);
+		$newProductDetail.find("#sellProductId").val(el.sellProductId);
+		$newProductDetail.find("#sellerId").val(el.sellerId);
+		$newProductDetail.find("#productId").val(el.productId);
+		$newProductDetail.find("#convert").val(el.convert);
+
+		$newProductDetail.find("#bigNum").val(el.bigNum);
+		$newProductDetail.find("#smallNum").val(el.smallNum);
 	});
 }
+
+	var compositionHtml = $(".composition").eq(0).html();
+	function initProductComposition(){
+		var compositionList = getItemBykey("compositionList");
+
+		$.each(compositionList, function(index, el) {
+			$main.append("<div class='weui-panel weui-panel_access composition'>" + compositionHtml + "</div>");
+			var $newProductDetail = $main.find(".composition:last");
+			$newProductDetail.find("#compositionName").text(el.compositionName);
+
+			$newProductDetail.find("#compositionPriceSpan").text(el.compositionPriceSpan);
+
+			$newProductDetail.find("#compositionPrice").val(el.compositionPrice);
+			$newProductDetail.find("#compositionId").val(el.compositionId);
+
+			$newProductDetail.find("#sellerId").val(el.sellerId);
+
+			$newProductDetail.find("#compositionNum").val(el.compositionNum);
+
+			$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
+
+			$newProductDetail.find("#gift").html(el.compositionSub);
+		});
+	}
 
 function total(){
 	var products = $(".common");
 	var total = 0;
 	$.each(products, function(index, el) {
 		var $el = $(el);
-		total += $el.find("#bigNum").val() * $el.find("#bigPrice").val();
-		total += $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+		if($el.find("[id^=isGift]").is(':checked') == false) {
+			total += $el.find("#bigNum").val() * $el.find("#bigPrice").val();
+			total += $el.find("#smallNum").val() * $el.find("#smallPrice").val();
+		}
 	});
 
-	$("#totalNum").text("共" + (products.length) + "款,合计:" + total + "元")
+	var compositions = $(".composition");
+	$.each(compositions, function(index, el) {
+		var $el = $(el);
+		total += $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
+	});
+	$("#totalNum").text("共" + (products.length + compositions.length) + "款,合计:" + total.toFixed(2) + "元")
 
-} 
+}
 
 function productChange(obj){
-      var $el = obj.parents(".common");
-      if($el.length > 0){
+	var $el = obj.parents(".common");
+	if($el.length > 0){
       	var product = getProduct($el);
       	cart.changeProduct(product);
-      }
-      total();
+	}else{
+		var $co = obj.parents(".composition");
+		if($co.length > 0){
+			var composition = getComposition($co);
+			cart.changeComposition(composition);
+		}
+	}
+	total();
 }
 
 function getProduct($el){
+	var isGift = $el.find("[id^=isGift]").is(':checked') == true ? 1 : 0;
+	var productNameGift = "";
+	var valueNameGift = "";
+
+	var bigPriceSpanGift = "";
+	var smallPriceSpanGift = "";
+	var bigUnitSpanGift = "";
+	var smallUnitSpanGift = "";
+	var stockGift = "";
+
+	var bigPriceGift = "";
+	var smallPriceGift = "";
+	var bigUnitGift = "";
+	var smallUnitGift = "";
+	var sellProductIdGift = "";
+	var productIdGift = "";
+	var convertGift = "";
+
+	var bigNumGift = "";
+	var smallNumGift = "";
+
+	//赠品
+	var flag = $el.find("[id^=addGift]").is(':checked');
+	if(isGift == 0 && flag){
+
+		var giftNum = $el.find("#giftNum").val();
+		var giftUnitName = $el.find("#giftUnitName").val();
+		var giftUnit = $el.find("#giftUnit").val();
+		if(giftUnit == "bigUnit"){
+			bigUnitSpanGift = giftUnitName;
+			bigUnitGift = giftUnit;
+			bigNumGift = giftNum;
+		} else {
+			smallUnitSpanGift = giftUnitName;
+			smallUnitGift = giftUnit;
+			smallNumGift = giftNum;
+		}
+
+		productNameGift = $el.find("#giftProduct").val();
+		bigPriceGift = $el.find("#giftBigPrice").val();
+		sellProductIdGift = $el.find("#giftSellProductId").val();
+		productIdGift = $el.find("#giftProductId").val();
+		convertGift = $el.find("#giftConvert").val();
+	}
 	
 	return product = {
 		productName : $el.find("#productName").text(),
@@ -178,15 +285,56 @@ function getProduct($el){
 
 		bigNum : $el.find("#bigNum").val(),
 		smallNum : $el.find("#smallNum").val(),
-		isGift : 0
+		isGift : 0,
+		subProduct : [{
+			productName : productNameGift,
+			valueName : valueNameGift,
+
+			bigPriceSpan : bigPriceSpanGift,
+			smallPriceSpan : smallPriceSpanGift,
+			bigUnitSpan : bigUnitSpanGift,
+			smallUnitSpan : smallUnitSpanGift,
+			stock : stockGift,
+
+			bigPrice : bigPriceGift,
+			smallPrice : smallPriceGift,
+			bigUnit : bigUnitGift,
+			smallUnit : smallUnitGift,
+			sellProductId : sellProductIdGift,
+			productId : productIdGift,
+			convert : convertGift,
+
+			bigNum : bigNumGift,
+			smallNum : smallNumGift,
+			isGift : 1
+		}]
 	}
 }
 
+function getComposition($el){
+	return composition = {
+		compositionName : $el.find("#compositionName").text(),
+
+		compositionPriceSpan : $el.find("#compositionPriceSpan").text(),
+		stock : $el.find("#stock").text(),
+
+		compositionPrice : $el.find("#compositionPrice").val(),
+		compositionId : $el.find("#compositionId").val(),
+
+		sellerId : $el.find("#sellerId").val(),
+
+		compositionNum : $el.find("#compositionNum").val(),
+
+		compositionValueName : $el.find("#compositionValueName").text()
+		//compositionSub : $el.find("#gift").html()
+	}
+}
 function order(){
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 
-	if(productList.length == 0) {
-		$.toptip("你的购物车内没有商品!", 'warning'); 
+	if(productList.length == 0 && compositionList.length == 0) {
+		$.toptip("你的购物车空空的快去挑选商品吧!", 'warning');
 		return;
 	}
 	window.location.href = '${CPATH}/member/product/order';
@@ -242,6 +390,45 @@ function order(){
 					</div>
 					<input type="number" class="street-value smallPrice" id="smallPrice" value="0" readonly>
 					<i class="icon-trash-o fr ft30 gray"></i>
+				</div>
+			</div>
+			<div class="weui-panel weui-panel_access composition" style="display: none">
+				<input type="hidden" id="compositionId" value="">
+				<input type="hidden" id="sellerId" value="">
+				<nobr>
+					<p class="product_name" id="compositionName"></p>
+				</nobr>
+				<div class="product_unit">
+					<p>规格：</p>
+					<span id="compositionValueName"></span>
+				</div>
+				<div class="product_bUnit">
+					<span class="price" id="compositionPriceSpan"></span>
+					<div class="spinner">
+						<div class="operate fl">
+							<i class="icon-minus2"></i>
+						</div>
+						<input type="number" min="0" value="0" class="fl" id="compositionNum" >
+						<div class="operate fl">
+							<i class="icon-plus2"></i>
+						</div>
+					</div>
+					<input type="number" class="street-value" id="compositionPrice" value="0" readonly>
+
+					<i class="icon-trash-o fr ft30 gray"></i>
+				</div>
+				<hr>
+				<div id="gift" class="weui-flex">
+					<span>
+						<i class="icon-tags"></i>
+					</span>
+					<div class="weui-flex__item">
+						<p id="sub">
+							<span id="subProduct"> </span>
+						</p>
+						<p id="subsubProduct" class="none">
+						</p>
+					</div>
 				</div>
 			</div>
 		</main>

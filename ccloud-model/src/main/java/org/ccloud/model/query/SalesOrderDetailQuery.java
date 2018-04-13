@@ -596,7 +596,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 
 	@SuppressWarnings("unchecked")
-	public String memberInsert(Map<String, String> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
+	public String memberInsertNormal(Map<String, String> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
 							   String deptId, String dataArea) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String sellerProductId = paraMap.get("sellProductId");

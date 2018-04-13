@@ -6,7 +6,8 @@
 	<script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 </#macro>
 <#macro title>提交订单</#macro>
-<#macro css> 
+<#macro css>
+	#compositionNum,
 	#bigNum,
 	#smallNum {
 		border: 1px solid #bbb;
@@ -51,7 +52,7 @@ $(function() {
 		content: '加载中...'
 	});
 
-	Utils.ajax('${CPATH}/member/order/init', {"productList" : JSON.stringify(getItemBykey("productList"))}, function(data){
+	Utils.ajax('${CPATH}/member/order/init', {"productList" : JSON.stringify(getItemBykey("productList")), "compositionList" : JSON.stringify(getItemBykey("compositionList"))}, function(data){
 		layer.closeAll();
 		initCustomer(data.customerInfo);
 		$("#deliveryDate").val(data.deliverDate);
@@ -90,12 +91,14 @@ $(function() {
 	var $form = $('#form');
 	var dealerHtml = $(".dealer").eq(0).html();
 	var productHtml = $(".common").eq(0).html();
+	var compositionHtml = $(".composition").eq(0).html();
 	function initProduct(data){
 		for(var i = 0; i < data.length; i++) {
 			var productList = data[i].productList;
 			var customerTypeList = data[i].customerTypeList;
 			var userList = data[i].userList;
 			var seller = data[i].seller;
+			var compositionList = data[i].compositionList;
 
 			$("#detail").append("<section class='dealer'>" + dealerHtml + "</section>");
 			$newDetail = $("#detail").find(".dealer:last");
@@ -131,6 +134,25 @@ $(function() {
 				$newProductDetail.find("#smallAccountPrice").val(el.smallAccountPrice);
 				$newProductDetail.find("#oldBigPrice").val(el.bigPrice);
 				$newProductDetail.find("#oldSmallPrice").val(el.smallPrice);
+			});
+			$.each(compositionList, function(index, el){
+				$product.append("<div class='weui-panel weui-panel_access goods-detail composition'>" + compositionHtml + "</div>");
+				var $newProductDetail = $product.find(".composition:last");
+				$newProductDetail.find("#composIndex").val(i);
+
+				$newProductDetail.find("#compositionName").text(el.compositionName);
+
+				$newProductDetail.find("#compositionPriceSpan").text(el.compositionPriceSpan);
+
+				$newProductDetail.find("#compositionPrice").val(el.compositionPrice);
+				$newProductDetail.find("#compositionId").val(el.compositionId);
+
+				$newProductDetail.find("#composSellerId").val(el.sellerId);
+
+				$newProductDetail.find("#compositionNum").val(el.compositionNum);
+
+				$newProductDetail.find("#compositionValueName").text(el.compositionValueName);
+				$newProductDetail.find("#gift").html(el.compositionSub);
 			});
 
 			var $customerType = $("#detail").find(".customerType:last");
@@ -207,6 +229,7 @@ $(function() {
 	function total() {
 		var products = $(".common");
 		var rowTotal = 0;
+		var composRowTotal = 0;
 		var total = 0;
 		var totalNum = 0;
 		$.each(products, function(index, el) {
@@ -221,9 +244,24 @@ $(function() {
 			$el.find("#rowTotal").val(rowTotal);
 		});
 
+		var compositions = $(".composition");
+		$.each(compositions, function(index, el) {
+			var $el = $(el);
+			var comNum = $el.find("#compositionNum").val();
+			composRowTotal = $el.find("#compositionNum").val() * $el.find("#compositionPrice").val();
+			$el.find("#composRowTotal").val(composRowTotal);
+			total += composRowTotal;
+			if (!comNum) {
+				comNum = 0;
+			}
+			totalNum = totalNum + comNum*1;
+		});
+
+		total = total.toFixed(2);
+
 		$("#total").val(total);
 		$("#totalNum").val(totalNum);
-		$("#totalNumSpan").text("共" + products.length + "款,合计:" + formatNumber(total) + "元")
+		$("#totalNumSpan").text("共" + (products.length + compositions.length) + "款,合计:" + total + "元")
 	} 
 
 	var flg = true;
@@ -245,6 +283,7 @@ $(function() {
 				layer.closeAll();
 				if (data.errorCode == 0) {
 					removeItemBykey("productList");
+					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
 					
 					$.modal({
@@ -415,6 +454,39 @@ $(function() {
 								<input type="number" class="street-value" value="0" id="smallPrice" name="smallPrice" readonly>
 							</div>
 							<input type="hidden" id="rowTotal" name="rowTotal" value="">
+						</div>
+						<div class="weui-panel weui-panel_access goods-detail composition" style="display: none">
+							<input type="hidden" id="compositionId" name="compositionId" value="">
+							<input type="hidden" name="composSellerId" id="composSellerId" value="">
+							<input type="hidden" name="composIndex" id="composIndex" value="">
+							<nobr>
+								<p class="product_name" id="compositionName"></p>
+							</nobr>
+							<div class="product_unit">
+								<p>规格：</p>
+								<span id="compositionValueName"></span>
+							</div>
+							<div class="product_bUnit">
+								<span class="price" id="compositionPriceSpan"></span>
+								<div class="spinner">
+									<input type="number" min="0" value="0" class="fl" id="compositionNum" name="compositionNum" readonly>
+								</div>
+								<input type="number" class="street-value"  id="compositionPrice" value="0" name="compositionPrice" readonly>
+							</div>
+							<hr>
+							<div id="gift" class="weui-flex">
+							<span>
+								<i class="icon-tags"></i>
+							</span>
+								<div class="weui-flex__item">
+									<p id="sub">
+										<span id="subProduct"> </span>
+									</p>
+									<p id="subsubProduct" class="none">
+									</p>
+								</div>
+							</div>
+							<input type="hidden" id="composRowTotal" name="composRowTotal" value="">
 						</div>
 					</div>
 					<div class="order-customer-info bg-white" style="margin-top: .5rem!important;">

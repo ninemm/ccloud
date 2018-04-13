@@ -25,6 +25,44 @@
 	.weui-footer_fixed-bottom {
 		bottom: 50px;
 	}
+
+	#gift .icon-tags {
+		color: #ea6f5a;
+		font-size: .8rem;
+		margin-right: .2rem;
+		height: 100%;
+		line-height: 100%;
+	}
+	.activityName {
+		color: #ea6f5a;
+	}
+	#compositionValueName {
+		padding: 0 0.25rem;
+		margin-left: 2.2rem;
+		margin-right: 0.8rem;
+	}
+	#compositionValueName div {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.composition-detail {
+		padding-left: .5rem;
+	}
+	.main-good {
+		width:1.5rem;
+		height:1.5rem;
+		line-height:1.5rem;
+		font-size: .7rem;
+		text-align:center;
+		border-radius:50%;
+		background-color: #ea6f5a;
+		position: absolute;
+		color: #fff;
+		top:50%;
+		margin-top:-.75rem;
+		left: .5rem;
+	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
@@ -46,6 +84,14 @@ $(function() {
 				keyword = $(this).val();
 				changeInit();
 			},500);
+		}
+	}).on("click", ".gift-open", function () {
+		if ($(this).text() === "展开") {
+			$(this).text("收起");
+			$(this).prev().find('#subsubProduct').show();
+		} else {
+			$(this).text("展开");
+			$(this).prev().find('#subsubProduct').hide();
 		}
 	}).on("input", "#searchInput", function() {
 		if(cpLock) {
@@ -135,7 +181,48 @@ $(function() {
 			imgSwiper.destroy();
 		  }
 		});
+
+	}).on("click", ".composition .product-top .weui-cell__ft, #compositionName", function () {
+		var $this = $(this).parents(".composition");
+		var compositionName = $this.find("#compositionName").text();
+		var compositionValueName = $this.find("#compositionValueName").text();
+		var subProduct = $this.find("#subProduct").text();
+		var subsubProduct = $this.find("#subsubProduct").text();
+		var product_image_list_store = $this.find("#product_image_list_store").val();
+		var product_sn = $this.find("#product_sn").val();
+		var imageS = getImageS(product_image_list_store, product_sn);
+		var imgSwiper;
+
+		layer.open({
+			type: 1,
+			title: ['商品详情',
+				'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+			],
+			content: '<div class="swiper-container">' +
+			'<div class="swiper-wrapper">' + imageS + '</div>' +
+			'<div class="swiper-pagination"></div>' +
+			'</div>' +
+			'<p>名称：' +
+			'<div class="composition-detail">' + compositionName + '</div>' +
+			'</p>' +
+			'<p>主商品：</p>' +
+			'<div class="composition-detail">' + compositionValueName + '</div>' +
+			'<div>赠品：<div class="composition-detail">' + subProduct + '</div>' + subsubProduct + '</div>',
+			anim: 'scale',
+			className: 'product-detail',
+			success: function () {
+				imgSwiper = new Swiper('.product-detail .swiper-container', {
+				pagination: {
+					el: '.swiper-pagination',
+				},
+			})
+		},
+		btn: '关闭',
+		end: function () {
+			imgSwiper.destroy();
+		}
 	});
+});
 
     firstInit();
     total();
@@ -152,7 +239,7 @@ function firstInit(){
 	Utils.ajax('${CPATH}/member/product/productList', {'tag' : tag, 'keyword' : keyword},
 		function(data){
 			initTags(data.tags);
-			combo(data.productList);
+			combo(data.productList, data.compositionList);
 		}
 	);
 }
@@ -168,14 +255,16 @@ function changeInit(){
 	Utils.ajax('${CPATH}/member/product/productList', {'tag' : tag, 'keyword' : keyword},
 		function(data){
 			layer.closeAll();
-			combo(data.productList);
+			combo(data.productList, data.compositionList);
 		}
 	);
 }
 
-function combo(productList){
+function combo(productList, compositionList){
 	initProduct(productList);
+	initComposition(compositionList);
 	productNum();
+	compositionNum();
 	calTotal();
 }
 
@@ -261,6 +350,101 @@ function productNum(){
 		});
 }
 
+	var compositionHtml = $(".composition").eq(0).html();
+	function initComposition(compositionList){
+		if(compositionList.length > 0) {
+			$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'>8</span> </li>");
+			$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
+		}
+
+		var parentId = '';
+		$.each(compositionList, function(index, el) {
+			if(parentId != el.parent_id) {
+				parentId = el.parent_id;
+				var $type = $menuRight.find(".type:last");
+				$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
+				var $newProductDetail = $type.find(".composition:last");
+				$newProductDetail.find("#compositionName").text(el.name);
+
+				$newProductDetail.find("#compositionPriceSpan").text('￥' + el.price);
+
+				$newProductDetail.find("#compositionPrice").val(el.price);
+				$newProductDetail.find("#compositionId").val(el.parent_id);
+
+				$newProductDetail.find("#sellerId").val(el.seller_id);
+
+				//$newProductDetail.find("#compositionValueName").text(el.product_sp);
+
+				$newProductDetail.find("#compositionImage").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
+				$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
+				$newProductDetail.find("#product_sn").val(el.product_sn);
+				$newProductDetail.find("#gift").append("<a class='gift-open' >展开</a>");
+				var bigCount = (el.main_product_count/el.main_convert).toFixed(0);
+				var smallCount = (el.main_product_count%el.main_convert).toFixed(0);
+				var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
+				var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);
+				var bigCountHtml = "";
+				var smallCountHtml = "";
+				var sub_bigCountHtml = "";
+				var sub_smallCountHtml = "";
+				if (bigCount != 0) {
+					bigCountHtml = "" + bigCount + el.main_bunit + "";
+				}
+				if (smallCount != 0) {
+					smallCountHtml = "" + smallCount + el.main_sunit + "";
+				}
+				if (sub_bigCount != 0) {
+					sub_bigCountHtml = "" + sub_bigCount + el.sub_bunit + "";
+				}
+
+				if (sub_smallCount != 0) {
+					sub_smallCountHtml = "" + sub_smallCount + el.sub_sunit + "";
+				}
+				$newProductDetail.find("#compositionValueName").html('<div>'+el.product_name + ' ' + bigCountHtml + smallCountHtml+'</div>');
+				if (el.is_gift == 0) {
+					$newProductDetail.find("#compositionValueName").append('<div>'+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml+'</div>');
+				} else {
+					$newProductDetail.find("#subProduct").text(el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml);
+				}
+				if (el.activity_name) {
+					$newProductDetail.find("#activityName").append("活动: " + el.activity_name);
+				}
+			}else{
+				var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
+				var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);
+				var sub_bigCountHtml = "";
+				var sub_smallCountHtml = "";
+				var $type = $menuRight.find(".type:last");
+				var $newProductDetail = $type.find(".composition:last");
+				if (sub_bigCount != 0) {
+					sub_bigCountHtml = "" + sub_bigCount + el.sub_bunit + "";
+				}
+
+				if (sub_smallCount != 0) {
+					sub_smallCountHtml = "" + sub_smallCount + el.sub_sunit + "";
+				}
+				var html = $newProductDetail.find("#subProduct").html().trim();
+				if (el.is_gift == 0) {
+					$newProductDetail.find("#compositionValueName").append('<div>'+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml+'</div>');
+				} else {
+					if (html) {
+						$newProductDetail.find("#subsubProduct").append("<p>"+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"</p>");
+					} else {
+						$newProductDetail.find("#subProduct").append(""+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"");
+					}
+				}
+			}
+		});
+	}
+
+	function compositionNum(){
+		var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
+		$.each(compositionList, function(index, el){
+			var $newProductDetail =$("#" + el.compositionId);
+			$newProductDetail.find("#compositionNum").val(el.compositionNum);
+		});
+	}
+
 function getImageUrl(product_image_list_store, product_sn) {
 	var imageUrl = "${CTPATH}/images/jp.jpg";
 	$.each(JSON.parse(product_image_list_store), function(index, el) {
@@ -306,7 +490,11 @@ function calTotal() {
 		var products = $typeEl.find('.product_detail')
 		$.each(products, function(index, el) {
 			var $el = $(el);
-			total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
+			if(id == 'composition'){
+				total += Number($el.find("#compositionNum").val());
+			}else{
+				total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
+			}
 		});
 
 		var $total = $sidebar.find("#" + id + " .goods-num");
@@ -323,7 +511,13 @@ function productChange(obj){
       if($el.length > 0){
       	var product = getProduct($el);
       	cart.changeProduct(product);
-      }
+      }else{
+			var $co = obj.parents(".composition");
+			if($co.length > 0){
+				var composition = getComposition($co);
+				cart.changeComposition(composition);
+			}
+		}
       calTotal();
       total();
 }
@@ -355,9 +549,51 @@ function getProduct($el){
 
 		bigNum : $el.find("#bigNum").val(),
 		smallNum : $el.find("#smallNum").val(),
-		isGift : 0
+		isGift : 0,
+
+		subProduct : [{
+			productName : "",
+			valueName : "",
+
+			bigPriceSpan : "",
+			smallPriceSpan : "",
+			bigUnitSpan : "",
+			smallUnitSpan : "",
+			stock : "",
+
+			bigPrice : "",
+			smallPrice : "",
+			bigUnit : "",
+			smallUnit : "",
+			sellProductId : "",
+			productId : "",
+			convert : "",
+
+			bigNum : "",
+			smallNum : "",
+			isGift : 1
+		}]
 	}
 }
+
+	function getComposition($el){
+		return composition = {
+			compositionName : $el.find("#compositionName").text(),
+
+			compositionPriceSpan : $el.find("#compositionPriceSpan").text(),
+			stock : $el.find("#stock").text(),
+
+			compositionPrice : $el.find("#compositionPrice").val(),
+			compositionId : $el.find("#compositionId").val(),
+
+			sellerId : $el.find("#sellerId").val(),
+
+			compositionNum : $el.find("#compositionNum").val(),
+
+			compositionValueName : $el.find("#compositionValueName").text()
+			//compositionSub : $el.find("#gift").html()
+	}
+	}
 
 function total(){
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");;
@@ -368,16 +604,20 @@ function total(){
 			total += el.smallNum * el.smallPrice;
 		}
 	});
-
-	$("#totalNum").text("共" + (productList.length) + "款,合计:" + total + "元")
+	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
+	$.each(compositionList, function(index, el) {
+		total += el.compositionNum * el.compositionPrice;
+	});
+	$("#totalNum").text("共" + (productList.length + compositionList.length) + "款,合计:" + total + "元")
 
 } 
 
 function shoppingCart(){	
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
-	
-	if(productList.length == 0) {
-		$.toptip("你还没有选择商品!", 'warning'); 
+	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
+
+	if(productList.length == 0 && compositionList.length == 0) {
+		$.toptip("你还没有选择商品!", 'warning');
 		return;
 	}
 	window.location.href = '${CPATH}/member/product/shoppingCart';
@@ -385,9 +625,10 @@ function shoppingCart(){
 
 function order(){
 	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+	var compositionList = getItemBykey("compositionList") == undefined ? [] : getItemBykey("compositionList");
 
-	if(productList.length == 0) {
-		$.toptip("你的购物车内没有商品!", 'warning'); 
+	if(productList.length == 0 && compositionList.length == 0) {
+		$.toptip("你的购物车内没有商品!", 'warning');
 		return;
 	}
 	window.location.href = '${CPATH}/member/product/order';
@@ -489,6 +730,45 @@ function order(){
 									</div>
 								</div>
 								<div id="stock"></div>
+							</div>
+						</section>
+					</div>
+					<div class="" style="display: none">
+						<section class="product_detail weui-panel weui-panel_access composition">
+							<div>
+								<input type="hidden" id="sellerId" value="">
+								<input type="hidden" id="compositionId" value="">
+								<input type="hidden" id="compositionPrice" value="">
+								<input type="hidden" id="product_image_list_store" value="">
+								<input type="hidden" id="product_sn" value="">
+								<div class="product-top">
+									<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
+									<div class="weui-cell_access product-top-right">
+										<p class="product_name" id="compositionName"></p>
+										<div class="product_unit">
+											<div class="main-good">主</div>
+											<div id="compositionValueName"></div>
+										</div>
+										<span class="weui-cell__ft"></span>
+									</div>
+								</div>
+								<div class="product_bUnit">
+									<span class="price" id="compositionPriceSpan"></span>
+									<div class="spinner">
+										<div class="operate fl">
+											<i class="icon-minus2"></i>
+										</div>
+										<input type="number" min="0" value="0" class="fl" id="compositionNum">
+										<div class="operate fl">
+											<i class="icon-plus2"></i>
+										</div>
+									</div>
+								</div>
+								<div id="stock"></div>
+								<div id="activityName" class="activityName"></div>
+							</div>
+							<hr>
+							<div id="gift" class="weui-flex"><span><i class='icon-tags'></i></span><div class='weui-flex__item'><p id='sub'><span id='subProduct'> </span></p><p id='subsubProduct' class='none'></p></div>
 							</div>
 						</section>
 					</div>
