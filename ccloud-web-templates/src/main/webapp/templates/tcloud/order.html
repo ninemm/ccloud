@@ -116,17 +116,29 @@ $(function() {
 	}
 	<#if !isMix>
 		var productList = getItemBykey("productList");
+		var compositionList = getItemBykey("compositionList");
 		var mix = false;
-		var isGift = productList[0].isGift;
-		$.each(productList, function(index, el){
-			if(isGift != el.isGift || (isGift == 0 && el.subProduct[0].sellProductId != "")){
+		if (productList && productList.length > 0) {
+			var isGift = productList[0].isGift;
+			$.each(productList, function(index, el){
+				if(isGift != el.isGift || (isGift == 0 && el.subProduct[0].sellProductId != "")){
+					mix = true;
+					return;
+				}
+			});
+			if (compositionList && compositionList.length > 0) {
 				mix = true;
+			}
+			if (mix) {
+			  	$.toptip("该帐套未开启赠品混下功能，请单独下赠品", 'warning');
 				return;
 			}
-		});
-		if (mix) {
-		  	$.toptip("该帐套未开启赠品混下功能，请单独下赠品", 'warning');
-			return;
+		}
+		if (compositionList && compositionList.length > 0) {
+			if (productList && productList.length > 0) {
+			  	$.toptip("该帐套未开启赠品混下功能，请联系管理员", 'warning');
+				return;			
+			}
 		}
 	</#if>
 	
