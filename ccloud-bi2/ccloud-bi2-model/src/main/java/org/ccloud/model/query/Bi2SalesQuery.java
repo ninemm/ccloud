@@ -117,7 +117,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 		sqlBuilder.append(" and cso.biz_date is not null ");
 
-		appendIfNotEmpty(sqlBuilder, "cso.dealer_data_area", dataArea, params, false);
+		appendIfNotEmptyWithLike(sqlBuilder, "cso.dealer_data_area", dataArea, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
@@ -147,7 +147,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		sqlBuilder.append(" and csc.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		appendIfNotEmptyWithLike(sqlBuilder, "csc.data_area", dataArea + "%", params, false);
+		appendIfNotEmptyWithLike(sqlBuilder, "csc.data_area", dataArea, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);

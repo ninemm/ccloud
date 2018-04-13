@@ -342,6 +342,10 @@ public class BiSalesController extends BaseFrontController {
 	public void aroundCustomer() throws SQLException {
 
 		String[] dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+//		String dataAreaIn = "'" + dealerDataArea[0] + "'";
+//		for (int i = 1 ;i<dealerDataArea.length;i++){
+//			dataAreaIn += "," + "'" + dealerDataArea[i] + "'";
+//		}
 
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
@@ -357,7 +361,9 @@ public class BiSalesController extends BaseFrontController {
 		salesCallback.setDist(dist);
 		salesCallback.setStartDate(startDate);
 		salesCallback.setEndDate(endDate);
-		salesCallback.setDataArea(dealerDataArea.toString());
+		if(dealerDataArea.length == 1) {
+			salesCallback.setDataArea(dealerDataArea[0]);
+		}
 		salesCallback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
 
 		AroundCustomerBiVisitCallback visitCallback = new AroundCustomerBiVisitCallback();
@@ -366,7 +372,9 @@ public class BiSalesController extends BaseFrontController {
 		visitCallback.setDist(dist);
 		visitCallback.setStartDate(startDate);
 		visitCallback.setEndDate(endDate);
-		visitCallback.setDataArea(dealerDataArea.toString());
+		if(dealerDataArea.length == 1) {
+			visitCallback.setDataArea(dealerDataArea[0]);
+		}
 		visitCallback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
 
 		Connection conn = null;
@@ -457,7 +465,9 @@ public class BiSalesController extends BaseFrontController {
 		callback.setDist(dist);
 		callback.setStartDate(startDate);
 		callback.setEndDate(endDate);
-		callback.setDataArea(dealerDataArea.toString());
+		if(dealerDataArea.length == 1) {
+			callback.setDataArea(dealerDataArea[0] + "%");
+		}
 		callback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
 
 		Connection conn = null;
@@ -480,6 +490,7 @@ public class BiSalesController extends BaseFrontController {
 	@SuppressWarnings("unchecked")
 	public void aroundCustomerUndeveloped() throws SQLException {
 
+		String[] dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
 		BigDecimal longitude = new BigDecimal(getPara("longitude"));
 		BigDecimal latitude = new BigDecimal(getPara("latitude"));
@@ -490,7 +501,7 @@ public class BiSalesController extends BaseFrontController {
 		callback.setLat(latitude);
 		callback.setDist(dist);
 		callback.setSearchKey("");
-		callback.setSellerId("e232ac4aa2074f108b5588e75f472f4c");
+		callback.setSellerId(dealerDataArea[0] + "%");
 
 		Connection conn = null;
 		List<Map<String, Object>> result = null;
