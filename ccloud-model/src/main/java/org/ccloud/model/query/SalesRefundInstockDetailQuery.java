@@ -81,7 +81,7 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productPrice = StringUtils.getArrayFirst(paraMap.get("bigPrice" + index));
 		String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
-		String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
+		String isGift = StringUtils.getArrayFirst(paraMap.get("_isGift" + index));
 		
 		detail.setProductCount(productCount);
 		detail.setProductPrice(new BigDecimal(productPrice));
