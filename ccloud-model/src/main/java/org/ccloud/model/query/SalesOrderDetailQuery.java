@@ -60,7 +60,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		sqlBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
 		sqlBuilder.append(" WHERE order_id = ? ");
-		sqlBuilder.append(" ORDER BY sod.warehouse_id, sod.is_gift ");
+		sqlBuilder.append(" ORDER BY sod.warehouse_id, sod.is_composite, sod.is_gift ");
 
 		return Db.find(sqlBuilder.toString(), orderId);
 	}
