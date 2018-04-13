@@ -230,15 +230,16 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		if (!sellerProduct.update()) {
 			return false;
 		}
-
-		//更新计划
-		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
-		if (StrKit.notBlank(order_user)) {
-			if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
-				return false;
+		String isGift = StringUtils.getArrayFirst(paraMap.get("_isGift" + index));
+		if(isGift.equals("0")) {
+			//更新计划
+			BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
+			if (StrKit.notBlank(order_user)) {
+				if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
+					return false;
+				}
 			}
 		}
-		
 		return true;
 	}
 

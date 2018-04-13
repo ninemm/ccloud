@@ -99,6 +99,7 @@
 		$newTr.find("#productId").attr("name", "productId" + newTrIdx);
 		$newTr.find("#convert").attr("name", "convert" + newTrIdx);
 		$newTr.find("#isGift").attr("name", "isGift" + newTrIdx);
+		$newTr.find("#_isGift").attr("name", "_isGift" + newTrIdx);
 		$newTr.find("#inputRowTotal").attr("name", "rowTotal" + newTrIdx);
 		$newTr.find("#outstockDetailId").attr("name", "outstockDetailId" + newTrIdx);
 
@@ -149,6 +150,9 @@
 			$tr.find("#smallNum").val(productCount%convert);
 			if(product.is_gift == 1){
 				$tr.find("#isGift").attr("checked", true);
+				$tr.find("#_isGift").val(1);
+			}else{
+				$tr.find("#_isGift").val(0);
 			}
 
 			$tr.find("#outstockDetailId").val(product.id);
@@ -181,6 +185,7 @@
 		var rowTotal = 0;
 
 		var isCheck = $curTr.find("input[type='checkbox']").is(':checked');
+		
 		if (!isCheck) {
 			var bigPrice = $curTr.find("#bigPrice").val();
 			var bigNum = $curTr.find("#bigNum").val();
@@ -188,6 +193,7 @@
 			var smallNum = $curTr.find("#smallNum").val();
 			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
 			rowTotal = rowTotal.toFixed(2);
+			$curTr.find("input[type='checkbox']")
 		}
 		$curTr.find(".rowTotal").text(rowTotal);
 		$curTr.find("#inputRowTotal").val(rowTotal);
@@ -422,6 +428,7 @@
 							<td>
 								<div class = "validata-box">
 									<input type="checkbox" id="isGift" name="isGift" value ="1" onclick="rowTotalF(this)" disabled="disabled"/>
+									<input type="hidden" id="_isGift" name="_isGift" value ="1"/>
 								</div>
 							</td>
 							<td>￥<span class="rowTotal">0</span> <input type="hidden" name="rowTotal" id="inputRowTotal" value="0" /></td>
