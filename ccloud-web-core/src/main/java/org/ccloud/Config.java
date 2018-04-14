@@ -15,21 +15,27 @@
  */
 package org.ccloud;
 
-import com.jfinal.kit.PropKit;
-import com.jfinal.qyweixin.sdk.api.ApiConfig;
-import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
-import com.jfinal.render.FreeMarkerRender;
-import com.jfinal.template.Engine;
-import org.apache.shiro.web.tags.PermissionTag;
 import org.ccloud.core.CCloud;
 import org.ccloud.core.CCloudConfig;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.shiro.tag.ShiroTags;
-import org.ccloud.ui.freemarker.function.*;
+import org.ccloud.ui.freemarker.function.DictBox;
+import org.ccloud.ui.freemarker.function.DictName;
+import org.ccloud.ui.freemarker.function.MetadataChecked;
+import org.ccloud.ui.freemarker.function.MetadataSelected;
+import org.ccloud.ui.freemarker.function.OptionChecked;
+import org.ccloud.ui.freemarker.function.OptionSelected;
+import org.ccloud.ui.freemarker.function.OptionValue;
+import org.ccloud.ui.freemarker.function.TaxonomyBox;
 import org.ccloud.ui.freemarker.tag.ContentTag;
 import org.ccloud.ui.freemarker.tag.ContentsTag;
 import org.ccloud.ui.freemarker.tag.DictTag;
+import org.ccloud.wwechat.WorkWechatApi;
+
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
+import com.jfinal.render.FreeMarkerRender;
+import com.jfinal.template.Engine;
 
 public class Config extends CCloudConfig {
 
@@ -50,7 +56,7 @@ public class Config extends CCloudConfig {
 		CCloud.addFunction("METADATA_CHECKED", new MetadataChecked());
 		CCloud.addFunction("METADATA_SELECTED", new MetadataSelected());
 
-		ApiConfigKit.putApiConfig(getApiConfig());
+		ApiConfigKit.putApiConfig(WorkWechatApi.getApiConfig());
 
 		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
 		
@@ -60,25 +66,5 @@ public class Config extends CCloudConfig {
 	@Override
 	public void configEngine(Engine me) {
 		
-	}
-	
-	public ApiConfig getApiConfig() {
-
-		ApiConfig ac = new ApiConfig();
-		
-		// 配置微信 API 相关常量
-		ac.setToken(PropKit.get("token"));
-		ac.setCorpId(PropKit.get("corpId"));
-		ac.setCorpSecret(PropKit.get("secret"));
-		ac.setAgentId(PropKit.get("agentId"));		
-		
-		/**
-		 *  是否对消息进行加密，对应于微信平台的消息加解密方式：
-		 *  1：true进行加密且必须配置 encodingAesKey
-		 *  2：false采用明文模式，同时也支持混合模式
-		 */
-		ac.setEncryptMessage(PropKit.getBoolean("encryptMessage", false));
-		ac.setEncodingAesKey(PropKit.get("encodingAesKey", "setting it in config file"));
-		return ac;
 	}
 }
