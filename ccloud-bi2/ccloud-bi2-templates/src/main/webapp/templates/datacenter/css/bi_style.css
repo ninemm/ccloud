@@ -520,6 +520,11 @@ header {
 	line-height: 1.5rem;
 }
 
+.weui-search-bar__label {
+	font-weight: normal;
+	margin-bottom: 0;
+}
+
 /*分类*/
 .weui-grid__icon {
 	width: 10vw;
@@ -774,4 +779,78 @@ img {
 
 .left-back img {
 	width: 1rem;
+}
+
+/* 侧边筛选 */
+
+#combin-filter {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 80%;
+  right: 0;
+  z-index: 2002;
+	background: #fff;
+	display: none;
+	
+}
+
+#combin-filter #infinite {
+	position: absolute;
+	top: 44px;
+	bottom: 2rem;
+	left: 0;
+	right: 0;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	margin-top: 0;
+}
+
+#combin-filter .weui-cells {
+	margin-top: 0;
+}
+
+#combin-filter .weui-cell {
+	font-size: .7rem;
+}
+
+.layer {
+  height: 200%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 2000;
+  position: fixed;
+}
+
+.layer-show {
+  opacity: 1;
+  visibility: visible;
+}
+
+body.modal-open {
+  position: fixed;
+  width: 100%;
+}
+
+#dealer-select {
+	width: 1.5rem;
+	position: fixed;
+	bottom: 4rem;
+	right: .5rem;
+}
+
+.cancel-search-btn {
+	height: 2rem;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	background: #ea6f5a;
+	color: #fff;
+	width: 100%;
 }

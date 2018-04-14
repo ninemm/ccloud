@@ -71,6 +71,7 @@
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/index_map.js"></script>
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="${CTPATH}/js/headroom.min.js"></script>    
 </#macro>
 <#macro script>
     
@@ -107,6 +108,62 @@
         $(document).on('click', '#combin-filter', function() {
         
         }).off("click", "#combin-filter");
+
+        var $combinSearch = $('#combin-filter');
+        var $layer = $(".layer");
+
+
+        $(document).on("click", ".layer", function () { //点击遮罩关闭菜单、组合筛选
+            closeCombinSearch();
+        }).on('click', '#combin-filter-btn, #dealer-select', function () { //打开组合筛选
+            openCombinSearch();
+        }).on('click', '#combin-filter .cancel-search-btn', function () { //关闭组合筛选
+            closeCombinSearch();
+        })
+
+        var dealerSelect = new Headroom($("#dealer-select")[0], {
+            tolerance: 5,
+            offset: 200,
+            classes: {
+                initial: "animated",
+                pinned: "slideInRight",
+                unpinned: "slideOutRight"
+            }
+        });
+
+        dealerSelect.init();
+
+        
+        //打开组合搜索
+        function openCombinSearch() {
+            ModalHelper.afterOpen();            
+            $layer.addClass("layer-show");
+            $combinSearch.show().removeClass("slideOutRight").addClass("slideInRight");
+        }
+
+        //关闭组合搜索
+        function closeCombinSearch() {
+            ModalHelper.beforeClose();
+            $combinSearch.removeClass("slideInRight").addClass("slideOutRight");
+            setTimeout(function() {
+                $layer.removeClass("layer-show");
+            }, 300);
+        }
+
+        var ModalHelper = (function (bodyCls) {
+            var scrollTop;
+            return {
+              afterOpen: function () {
+                scrollTop = document.scrollingElement.scrollTop;
+                document.body.classList.add(bodyCls);
+                document.body.style.top = -scrollTop + "px";
+              },
+              beforeClose: function () {
+                document.body.classList.remove(bodyCls);
+                document.scrollingElement.scrollTop = scrollTop;
+              }
+            };
+          })("modal-open");
         
     });
 
@@ -206,7 +263,9 @@
         
     </div>
 </section>
-<article id="combin-filter" >
+<img src="${CTPATH}/images/dealer-select.svg" alt="" id="dealer-select">
+<div class="layer"></div>
+<article id="combin-filter" class="animated slideOutRight">
     <div id="customer">
         <header>
             <div class="weui-search-bar" id="searchBar">
@@ -224,35 +283,72 @@
                 <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
             </div>
         </header>
-        <article class="customer">
-            <article id="infinite">
-                <div id="customerList">
-                    <div class="weui-panel weui-panel_access customerSelect" style="display: none">
-                        <div class="weui-flex">
-                            <div class="weui-flex__item customer-info" id="customerInfo">
-                                <p class="ft14" id="customerName"></p>
-                                <p class="gray" id="contactP"></p>
-                                <input type="hidden" id="sellerCustomerId" value="">
-                                <input type="hidden" id="contact" value="">
-                                <input type="hidden" id="mobile" value="">
-                                <input type="hidden" id="address" value="">
-                            </div>
-                        </div>
-                        <p class="gray">
-                            <span class="icon-map-marker ft16 green"></span>
-                            <span id="addressSpan"></span>
-                        </p>
-                    </div>
+        <article id="infinite">
+            <div class="weui-cells">
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">启光</div>
                 </div>
-                <div class="weui-loadmore" id="loading" style="display: none;">
-                    <i class="weui-loading"></i>
-                    <span class="weui-loadmore__tips">正在加载</span>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">劲牌</div>
                 </div>
-                <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-                    <span class="weui-loadmore__tips">暂无数据</span>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">大冶</div>
                 </div>
-            </article>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">黄石</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">龙泉</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">武汉</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">启光</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">劲牌</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">大冶</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">黄石</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">龙泉</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">武汉</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">启光</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">劲牌</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">大冶</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">黄石</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">龙泉</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">武汉</div>
+                </div>
+            </div>
+            <div class="weui-loadmore" id="loading" style="display: none;">
+                <i class="weui-loading"></i>
+                <span class="weui-loadmore__tips">正在加载</span>
+            </div>
+            <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+                <span class="weui-loadmore__tips">暂无数据</span>
+            </div>
         </article>
+        <button class="cancel-search-btn">取消</button>
     </div>
 </article>
 <#include "_inc/_nav_box.html"/>
