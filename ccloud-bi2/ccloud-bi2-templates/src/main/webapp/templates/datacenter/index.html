@@ -250,7 +250,20 @@
             $.cookie(Utils.provCacheName, data.provName, { expires: 7 });
             $.cookie(Utils.cityCacheName, data.cityName, { expires: 7 });
             $.cookie(Utils.countryCacheName, data.countryName, { expires: 7 });
-
+            $.ajax({
+            async: false,
+                type: "GET",
+                dataType: 'jsonp',
+                jsonp: 'callback',
+                jsonpCallback: 'callbackfunction',
+                url: "http://api.map.baidu.com/geocoder/v2/?city="+ data.cityName +"&address=" + data.countryName +"&output=json&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t&callback=showLocation",
+                contentType: "application/json;utf-8"
+            }).done(function(data){
+                if(data.status == 0){
+                    $.cookie(Utils.longitudeCache, data.result.location.lng, { expires: 7 });
+                    $.cookie(Utils.latitudeCache, data.result.location.lat, { expires: 7 });
+                }
+            });
             total();
             closeCombinSearch();
         });
