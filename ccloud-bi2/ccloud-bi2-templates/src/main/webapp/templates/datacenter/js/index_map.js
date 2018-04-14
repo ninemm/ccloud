@@ -1,5 +1,5 @@
 var data = [
-     {name: '海门', value: 9},
+    /* {name: '海门', value: 9},
      {name: '鄂尔多斯', value: 12},
      {name: '招远', value: 12},
      {name: '舟山', value: 12},
@@ -120,8 +120,8 @@ var data = [
      {name: '潍坊', value: 65},
      {name: '重庆', value: 66},
      {name: '台州', value: 67},
-     {name: '南京', value: 67}
-     /*{name: '滨州', value: 70},
+     {name: '南京', value: 67},
+     {name: '滨州', value: 70},
      {name: '贵阳', value: 71},
      {name: '无锡', value: 71},
      {name: '本溪', value: 71},
@@ -312,8 +312,8 @@ var geoCoordMap = {
     '潍坊':[119.1,36.62],
     '重庆':[106.54,29.59],
     '台州':[121.420757,28.656386],
-    '南京':[118.78,32.04]
-    /*'滨州':[118.03,37.36],
+    '南京':[118.78,32.04],
+    '滨州':[118.03,37.36],
     '贵阳':[106.71,26.57],
     '无锡':[120.29,31.59],
     '本溪':[123.73,41.3],
@@ -380,119 +380,124 @@ var geoCoordMap = {
     '菏泽':[115.480656,35.23375],
     '合肥':[117.27,31.86],
     '武汉':[114.31,30.52],
-    '大庆':[125.03,46.58]*/
+    '大庆':[125.03,46.58],
+    '新余':[114.923624,27.823660],
+    '咸宁':[114.328997,29.847023]
 };
 
-var convertData = function (data) {
+var convertData = function (dataValue) {
     var res = [];
-    for (var i = 0; i < data.length; i++) {
-        var geoCoord = geoCoordMap[data[i].name];
+    for (var i = 0; i < dataValue.length; i++) {
+        var geoCoord = geoCoordMap[dataValue[i].name];
         if (geoCoord) {
             res.push({
-                name: data[i].name,
-                value: geoCoord.concat(data[i].value)
+                name: dataValue[i].name,
+                value: geoCoord.concat(dataValue[i].value)
             });
         }
     }
     return res;
 };
+function initOption(dataValue) {
 
-option = {
-    backgroundColor: '#404a59',
-    title: {
-        //text: '全国经销商分布',
-        //subtext: 'data from PM25.in',
-        //sublink: 'http://www.pm25.in',
-        left: 'center',
-        textStyle: {
-            color: '#fff'
-        }
-    },
-    tooltip : {
-        trigger: 'item'
-    },
-    legend: {
-        orient: 'vertical',
-        y: 'bottom',
-        x:'right',
-        data:['经销商'],
-        textStyle: {
-            color: '#fff'
-        }
-    },
-    geo: {
-        map: 'china',
-        label: {
-            emphasis: {
-                show: false
-            }
-        },
-        roam: true,
-        itemStyle: {
-            normal: {
-                areaColor: '#323c48',
-                borderColor: '#111'
-            },
-            emphasis: {
-                areaColor: '#2a333d'
-            }
-        }
-    },
-    series : [
-        {
-            name: 'pm2.5',
-            type: 'scatter',
-            coordinateSystem: 'geo',
-            data: convertData(data),
-            symbolSize: function (val) {
-                return val[2] / 10;
-            },
-            label: {
-                normal: {
-                    formatter: '{b}',
-                    position: 'right',
-                    show: false
-                },
-                emphasis: {
-                    show: true
-                }
-            },
-            itemStyle: {
-                normal: {
-                    color: '#ddb926'
-                }
-            }
-        },
-        {
-            name: 'Top 5',
-            type: 'effectScatter',
-            coordinateSystem: 'geo',
-            data: convertData(data.sort(function (a, b) {
-                return b.value - a.value;
-            }).slice(0, 6)),
-            symbolSize: function (val) {
-                return val[2] / 10;
-            },
-            showEffectOn: 'render',
-            rippleEffect: {
-                brushType: 'stroke'
-            },
-            hoverAnimation: true,
-            label: {
-                normal: {
-                    formatter: '{b}',
-                    position: 'right',
-                    show: true
-                }
-            },
-            itemStyle: {
-                normal: {
-                    color: '#f4e925',
-                    shadowBlur: 10,
-                    shadowColor: '#333'
-                }
-            },
-            zlevel: 1
-        }
-    ]
-};
+	return {
+		backgroundColor: '#404a59',
+		title: {
+			//text: '全国经销商分布',
+			//subtext: 'data from PM25.in',
+			//sublink: 'http://www.pm25.in',
+			left: 'center',
+			textStyle: {
+				color: '#fff'
+			}
+		},
+		tooltip: {
+			trigger: 'item'
+		},
+		legend: {
+			orient: 'vertical',
+			y: 'bottom',
+			x: 'right',
+			data: ['经销商'],
+			textStyle: {
+				color: '#fff'
+			}
+		},
+		geo: {
+			map: 'china',
+			label: {
+				emphasis: {
+					show: false
+				}
+			},
+			roam: true,
+			itemStyle: {
+				normal: {
+					areaColor: '#323c48',
+					borderColor: '#111'
+				},
+				emphasis: {
+					areaColor: '#2a333d'
+				}
+			}
+		},
+		series: [
+			{
+				name: 'pm2.5',
+				type: 'scatter',
+				coordinateSystem: 'geo',
+				data: convertData(dataValue),
+				symbolSize: function (val) {
+					return val[2] / 10;
+				},
+				label: {
+					normal: {
+						formatter: '{b}',
+						position: 'right',
+						show: false
+					},
+					emphasis: {
+						show: true
+					}
+				},
+				itemStyle: {
+					normal: {
+						color: '#ddb926'
+					}
+				}
+			},
+			{
+				name: 'Top 5',
+				type: 'effectScatter',
+				coordinateSystem: 'geo',
+				data: convertData(dataValue.sort(function (a, b) {
+					return b.value - a.value;
+				}).slice(0, 6)),
+				symbolSize: function (val) {
+					return val[2] / 10;
+				},
+				showEffectOn: 'render',
+				rippleEffect: {
+					brushType: 'stroke'
+				},
+				hoverAnimation: true,
+				label: {
+					normal: {
+						formatter: '{b}',
+						position: 'right',
+						show: true
+					}
+				},
+				itemStyle: {
+					normal: {
+						color: '#f4e925',
+						shadowBlur: 10,
+						shadowColor: '#333'
+					}
+				},
+				zlevel: 1
+			}
+		]
+	};
+}
+

@@ -36,35 +36,39 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	// 订单总金额
-	public Double findTotalAmount(String[] dataArea, String provName, String cityName, String countryName,
-	                              String startDate, String endDate) {
+	public Double findTotalAmount(String[] dataArea, String startDate, String endDate, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder(" SELECT ifnull(SUM(cso.total_amount), 0) - ifnull(SUM(t.totalAmount), 0) AS totalAmount ");
-		sqlBuilder.append(" FROM cc_sales_outstock cso ");
-		sqlBuilder.append(" JOIN cc_seller_customer csc ON cso.customer_id = csc.id ");
-		sqlBuilder.append(" JOIN cc_customer cc ON csc.customer_id = cc.id ");
-		sqlBuilder.append(" LEFT JOIN ");
-		sqlBuilder.append(" (SELECT csri.outstock_id, ifnull(SUM(csri.total_reject_amount),0) AS totalAmount ");
-		sqlBuilder.append(" FROM cc_sales_refund_instock csri ");
-		sqlBuilder.append(" WHERE csri.biz_date IS NOT NULL ");
-		sqlBuilder.append(" GROUP BY csri.outstock_id)t ON cso.id = t.outstock_id ");
+		StringBuilder sqlBuilder = new StringBuilder(" SELECT ");
+		sqlBuilder.append("  TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0)),2) as totalAmount  ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
 
-		sqlBuilder.append(" WHERE csc.customer_kind = ? ");
+		sqlBuilder.append(" LEFT JOIN (SELECT cd.outstock_detail_id, SUM(cd.product_amount) as refundAmount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock_detail cd ");
+		sqlBuilder.append(" JOIN cc_sales_refund_instock cr on cr.id = cd.refund_instock_id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp on cd.sell_product_id = sp.id ");
+		sqlBuilder.append(" JOIN cc_product pr on pr.id = sp.product_id ");
+		sqlBuilder.append(" WHERE cr.`biz_date` is not null ");
+		sqlBuilder.append(" GROUP BY cd.outstock_detail_id) t1 on t1.outstock_detail_id = cc.id ");
+
+		sqlBuilder.append(" WHERE csu.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		appendIfNotEmpty(sqlBuilder, "cso.dealer_data_area", dataArea, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
+		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 
 		if (startDate != null) {
-			sqlBuilder.append(" and cso.biz_date >= ?");
+			sqlBuilder.append(" and o.biz_date >= ?");
 			params.add(startDate);
 		}
 
 		if (endDate != null) {
-			sqlBuilder.append(" and cso.biz_date <= ?");
+			sqlBuilder.append(" and o.biz_date <= ?");
 			params.add(endDate);
 		}
 
@@ -73,29 +77,30 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	// 订单记录总数
-	public Long findOrderCount(String[] dataArea, String provName, String cityName, String countryName,
-	                           String startDate, String endDate) {
+	public Long findOrderCount(String[] dataArea, String startDate, String endDate, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder(" SELECT count(1) FROM cc_sales_outstock cso ");
-		sqlBuilder.append(" JOIN cc_seller_customer csc ON csc.id = cso.customer_id ");
-		sqlBuilder.append(" JOIN cc_customer cc ON cc.id = csc.customer_id ");
+		StringBuilder sqlBuilder = new StringBuilder(" SELECT count(distinct o.id) ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
 
-		sqlBuilder.append(" WHERE csc.customer_kind = ? ");
+		sqlBuilder.append(" WHERE csu.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		appendIfNotEmpty(sqlBuilder, "cso.dealer_data_area", dataArea, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
+		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 
 		if (startDate != null) {
-			sqlBuilder.append(" and cso.biz_date >= ?");
+			sqlBuilder.append(" and o.biz_date >= ?");
 			params.add(startDate);
 		}
 
 		if (endDate != null) {
-			sqlBuilder.append(" and cso.biz_date <= ?");
+			sqlBuilder.append(" and o.biz_date <= ?");
 			params.add(endDate);
 		}
 
@@ -103,37 +108,33 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	// 订单客户总数
-	public Long findCustomerCount(String[] dataArea, String provName, String cityName, String countryName,
-	                              String startDate, String endDate) {
+	public Long findCustomerCount(String[] dataArea, String startDate, String endDate, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder("select count(1) from (");
-		sqlBuilder.append(" SELECT cso.customer_id ");
-		sqlBuilder.append(" FROM cc_sales_outstock cso ");
-		sqlBuilder.append(" JOIN cc_seller_customer csc ON cso.customer_id = csc.id ");
-		sqlBuilder.append(" JOIN cc_customer cc ON csc.customer_id = cc.id ");
+		StringBuilder sqlBuilder = new StringBuilder("select count(distinct o.customer_id) ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
 
-		sqlBuilder.append(" WHERE csc.customer_kind = ? ");
+		sqlBuilder.append(" WHERE csu.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
-		sqlBuilder.append(" and cso.biz_date is not null ");
 
-		appendIfNotEmptyWithLike(sqlBuilder, "cso.dealer_data_area", dataArea, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
-		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
+		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 
 		if (startDate != null) {
-			sqlBuilder.append(" and cso.biz_date >= ?");
+			sqlBuilder.append(" and o.biz_date >= ?");
 			params.add(startDate);
 		}
 
 		if (endDate != null) {
-			sqlBuilder.append(" and cso.biz_date <= ?");
+			sqlBuilder.append(" and o.biz_date <= ?");
 			params.add(endDate);
 		}
-		sqlBuilder.append(" GROUP BY cso.customer_id ) t1");
 		return Db.queryLong(sqlBuilder.toString(), params.toArray());
-
 	}
 
 	// 客户总数
@@ -469,7 +470,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 		StringBuilder sqlBuilder = new StringBuilder("SELECT ");
 		if (isDealer) {
-			sqlBuilder.append(" d.data_area, s.seller_name dealerName,s.id dealerCode ");
+			sqlBuilder.append(" d.data_area, s.seller_name dealerName,s.id dealerCode, s.city_name ");
 		} else {
 			sqlBuilder.append(" se.seller_name sellerName,se.id dealerCode ");
 		}
@@ -958,43 +959,6 @@ public class Bi2SalesQuery extends JBaseQuery {
 		}
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
-	}
-
-
-	//经销商
-	public List<Record> findDealerList(String startDate, String endDate) {
-
-		LinkedList<Object> params = new LinkedList<Object>();
-
-		StringBuilder sqlBuilder = new StringBuilder(" select d.data_area, s.seller_name, s.prov_name, s.city_name, s.country_name ");
-
-		sqlBuilder.append(" from cc_sales_outstock so ");
-		sqlBuilder.append(" join cc_department d on so.dealer_data_area = d.data_area ");
-		sqlBuilder.append(" join cc_seller s on d.id = s.dept_id ");
-		sqlBuilder.append(" join cc_seller_brand sb on s.id = sb.seller_id ");
-		sqlBuilder.append(" join cc_brand b on sb.brand_id = b.id ");
-
-		sqlBuilder.append(" where d.data_area > '001001' ");
-		sqlBuilder.append(" and b.code = 'B001' ");
-
-		if (startDate != null) {
-			sqlBuilder.append(" and so.biz_date >= ?");
-			params.add(startDate);
-		}
-
-		if (endDate != null) {
-			sqlBuilder.append(" and so.biz_date <= ?");
-			params.add(endDate);
-		}
-
-		sqlBuilder.append(" GROUP BY s.id");
-
-		return Db.find(sqlBuilder.toString(), params.toArray());
-
-	}
-
-	public List<Record> findSellerByDataArea(String dataArea) {
-		return Db.find(" select s.prov_name, s.city_name, s.country_name from cc_seller s join cc_department d on s.dept_id = d.id where d.data_area = ? ", dataArea);
 	}
 
 }

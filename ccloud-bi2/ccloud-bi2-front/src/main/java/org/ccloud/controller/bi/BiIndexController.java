@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.alibaba.fastjson.JSON;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.User;
@@ -39,7 +40,7 @@ import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.qyweixin.sdk.api.JsTicket;
 import com.jfinal.qyweixin.sdk.api.JsTicketApi;
 
-@RouterMapping(url = "/biIndex")
+@RouterMapping(url = "/")
 public class BiIndexController extends BaseFrontController {
 
 	public void index() {
@@ -68,64 +69,77 @@ public class BiIndexController extends BaseFrontController {
 		setSessionAttr(Consts.SESSION_BRAND_ID_ARRAY, brandArray);
 		setSessionAttr(Consts.SESSION_PRODUCT_ID_ARRAY, productArray);
 
+
+		//从session取
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+
+		setAttr("dealerCount", dataArea.length);
+		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(dataArea,null, null, brandId));
+
+
 		render("index.html");
 	}
 
-	// 顶部统计
-	public void topTotal() {
+	public void dealerList(){
 
 		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] dataAreaLike = new String[dataArea.length];
-		for (int i = 0 ;i<dataArea.length;i++){
-			dataAreaLike[i] = dataArea[i] + "%";
+		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+
+		String startDate = DateUtils.getDateByType("2");
+		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+
+		renderJson(Bi2SalesQuery.me().findsalesList(true,null,null,null,dataArea, startDate, endDate, brandId));
+	}
+
+	public void selectDealer() {
+
+		String dataArea = getPara("dataArea");
+		if("all".equals(dataArea)){
+			User user = UserQuery.me().findById("7aee55cb56534e92a346467b9f3a262a");
+			List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
+			String sellerArray[] = new String[sellerByUser.size()];
+			for (int i = 0; i < sellerByUser.size(); i++) {
+				sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
+			}
+			setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
+		}else{
+			String dataAreaArray[] = new String[]{dataArea};
+			setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, dataAreaArray);
 		}
 
-		String provName = getPara("provName", "").trim();
-		String cityName = getPara("cityName", "").trim();
-		String countryName = getPara("countryName", "").trim();
 
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("totalAllCustomerCount",
-				Bi2SalesQuery.me().findAllCustomerCount(dataAreaLike, provName, cityName, countryName));
-		result.put("totalCustomerCount",
-				Bi2SalesQuery.me().findCustomerCount(dataAreaLike, provName, cityName, countryName, null, null));
-
-		renderJson(result);
-
+		renderAjaxResultForSuccess();
 	}
+
 
 	public void total() {
 
 		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] dataAreaLike = new String[dataArea.length];
-		for (int i = 0 ;i<dataArea.length;i++){
-			dataAreaLike[i] = dataArea[i] + "%";
-		}
+		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
 
-		String provName = getPara("provName", "").trim();
-		String cityName = getPara("cityName", "").trim();
-		String countryName = getPara("countryName", "").trim();
+//		String provName = getPara("provName", "").trim();
+//		String cityName = getPara("cityName", "").trim();
+//		String countryName = getPara("countryName", "").trim();
 		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
 
 		String startDate = DateUtils.getDateByType(dateType);
 		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
 
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("orderAvg", Bi2SalesQuery.me().findOrderAvgAmountList(dataArea, provName, cityName, countryName,
-				DateUtils.plusDays(startDate, -2), endDate));
 
 		result.put("totalCustomerCount",
-				Bi2SalesQuery.me().findCustomerCount(dataAreaLike, provName, cityName, countryName, startDate, endDate));
+				Bi2SalesQuery.me().findCustomerCount(dataArea, startDate, endDate, brandId));
 		result.put("totalOrderCount",
-				Bi2SalesQuery.me().findOrderCount(dataArea, provName, cityName, countryName, startDate, endDate));
+				Bi2SalesQuery.me().findOrderCount(dataArea, startDate, endDate, brandId));
 		result.put("totalOrderAmount",
-				Bi2SalesQuery.me().findTotalAmount(dataArea, provName, cityName, countryName, startDate, endDate));
+				Bi2SalesQuery.me().findTotalAmount(dataArea,startDate, endDate, brandId));
 
 		renderJson(result);
 
 	}
 
-	public void orderAmount() {
+/*	public void orderAmount() {
 
 		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 
@@ -168,7 +182,7 @@ public class BiIndexController extends BaseFrontController {
 		}
 
 		renderJson(result);
-	}
+	}*/
 
 	public void area() {
 		setAttr("cur_nav", "area");
@@ -189,26 +203,6 @@ public class BiIndexController extends BaseFrontController {
 	public void dealer() {
 		setAttr("cur_nav", "dealer");
 		render("bi_dealer.html");
-	}
-
-	public void dealerList(){
-
-
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("dealerList",
-				BiManagerQuery.me());
-
-		renderJson(result);
-	}
-
-	public void selectSeller() {
-
-		String dataArea = getPara("dataArea");
-		String dataAreaArray[] = new String[]{dataArea};
-		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, dataAreaArray);
-		List<Record> seller = Bi2SalesQuery.me().findSellerByDataArea(dataArea);
-
-		renderJson(seller);
 	}
 
 	public void initWechatConfig() {

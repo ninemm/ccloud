@@ -95,97 +95,137 @@
         //        $("#lat").val(lat.toFixed(6));
         //    }
         //);
-        
-        initDealerInChinaMap(); 
-        
-        // 时间切换选择, 如近一天，近一周等
-	    $(".date").click(function(e) {
-	        var $a = $(e.currentTarget);
-	        $a.parent().find(".date").removeClass("active-date");
-	        $a.addClass("active-date");
-	    });
-        
-        $(document).on('click', '#combin-filter', function() {
-        
-        }).off("click", "#combin-filter");
 
-        var $combinSearch = $('#combin-filter');
-        var $layer = $(".layer");
-
-
-        $(document).on("click", ".layer", function () { //点击遮罩关闭菜单、组合筛选
-            closeCombinSearch();
-        }).on('click', '#combin-filter-btn, #dealer-select', function () { //打开组合筛选
-            openCombinSearch();
-        }).on('click', '#combin-filter .cancel-search-btn', function () { //关闭组合筛选
-            closeCombinSearch();
-        })
-
-        var dealerSelect = new Headroom($("#dealer-select")[0], {
-            tolerance: 5,
-            offset: 200,
-            classes: {
-                initial: "animated",
-                pinned: "slideInRight",
-                unpinned: "slideOutRight"
-            }
-        });
 
         dealerSelect.init();
+        topTotal();
+        initDealerInChinaMap();
+        total();
 
-        
-        //打开组合搜索
-        function openCombinSearch() {
-            ModalHelper.afterOpen();            
-            $layer.addClass("layer-show");
-            $combinSearch.show().removeClass("slideOutRight").addClass("slideInRight");
-        }
-
-        //关闭组合搜索
-        function closeCombinSearch() {
-            ModalHelper.beforeClose();
-            $combinSearch.removeClass("slideInRight").addClass("slideOutRight");
-            setTimeout(function() {
-                $layer.removeClass("layer-show");
-            }, 300);
-        }
-
-        var ModalHelper = (function (bodyCls) {
-            var scrollTop;
-            return {
-              afterOpen: function () {
-                scrollTop = document.scrollingElement.scrollTop;
-                document.body.classList.add(bodyCls);
-                document.body.style.top = -scrollTop + "px";
-              },
-              beforeClose: function () {
-                document.body.classList.remove(bodyCls);
-                document.scrollingElement.scrollTop = scrollTop;
-              }
-            };
-          })("modal-open");
-        
     });
 
+
+    // 时间切换选择, 如近一天，近一周等
+    $(".date").click(function(e) {
+        var $a = $(e.currentTarget);
+        $a.parent().find(".date").removeClass("active-date");
+        $a.addClass("active-date");
+    });
+    function setDateType(type){
+        dateType = type;
+        total();
+    }
+    
+    $(document).on('click', '#combin-filter', function() {
+    
+    }).off("click", "#combin-filter");
+
+    var $combinSearch = $('#combin-filter');
+    var $layer = $(".layer");
+
+
+    $(document).on("click", ".layer", function () { //点击遮罩关闭菜单、组合筛选
+        closeCombinSearch();
+    }).on('click', '#combin-filter-btn, #dealer-select', function () { //打开组合筛选
+        openCombinSearch();
+    }).on('click', '#combin-filter .cancel-search-btn', function () { //关闭组合筛选
+        closeCombinSearch();
+    })
+
+    var dealerSelect = new Headroom($("#dealer-select")[0], {
+        tolerance: 5,
+        offset: 200,
+        classes: {
+            initial: "animated",
+            pinned: "slideInRight",
+            unpinned: "slideOutRight"
+        }
+    });
+    
+    //打开组合搜索
+    function openCombinSearch() {
+        ModalHelper.afterOpen();
+        $layer.addClass("layer-show");
+        $combinSearch.show().removeClass("slideOutRight").addClass("slideInRight");
+    }
+
+    //关闭组合搜索
+    function closeCombinSearch() {
+        ModalHelper.beforeClose();
+        $combinSearch.removeClass("slideInRight").addClass("slideOutRight");
+        setTimeout(function() {
+            $layer.removeClass("layer-show");
+        }, 300);
+    }
+
+    var ModalHelper = (function (bodyCls) {
+        var scrollTop;
+        return {
+          afterOpen: function () {
+            scrollTop = document.scrollingElement.scrollTop;
+            document.body.classList.add(bodyCls);
+            document.body.style.top = -scrollTop + "px";
+          },
+          beforeClose: function () {
+            document.body.classList.remove(bodyCls);
+            document.scrollingElement.scrollTop = scrollTop;
+          }
+        };
+      })("modal-open");
+
+    //顶部统计
+    function topTotal(){
+        
+        var dealerCount = new CountUp("dealerCount",0, parseInt(${dealerCount!}));
+        dealerCount.start();
+        var orderCustomerCount = new CountUp("orderCustomerCount",0, parseInt(${orderCustomerCount!}));
+        orderCustomerCount.start();
+        
+        setTimeout(function() {
+            $("#dealerCount").addClass('animated pulse');
+            setTimeout(function() {
+                $("#orderCustomerCount").addClass('animated pulse');
+            }, 1000);
+        }, 2000);
+    }
+
+    var dealerMapId = document.getElementById("dealer_in_china_map");
+    var chinaMapCharts = echarts.init(dealerMapId);
     function initDealerInChinaMap() {
-        var dealerMapId = document.getElementById("dealer_in_china_map");
-        var chinaMapCharts = echarts.init(dealerMapId);
-        $(dealerMapId).height(400);
-        chinaMapCharts.clear();
-        chinaMapCharts.resize();
-        $.getJSON(getMapDataUrl(), function(data) {
-            echarts.registerMap('china', data);
-            chinaMapCharts.setOption(option);
-            Utils.close();
+
+        chinaMapCharts.showLoading({
+            text: '加载中...',
+            effect: 'whirling'
         });
-        
-        //chinaMapCharts.showLoading({
-        //    text: '加载中...',
-        //    effect: 'whirling'
-        //});
-        
-        
-        //chinaMapCharts.hideLoading();
+        dataValue = [];
+        $.ajax({
+            url:"${CPATH}/dealerList",
+            type:"post",
+            data:{},
+            dataType:"json"
+        }).done(function(data){
+            var dataValue = [];
+            var $dealerList = $("#dealerList");
+            $dealerList.empty();
+            $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + "all" + "')\"><div class='weui-cell__hd'>" + "全部" + "</div></div>");
+            $.each(data,function(index,el){
+                var cityName = el.city_name.replace('市','');
+                dataValue.push({'name': cityName, 'value': el.totalAmount});
+                $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + el.data_area + "')\"><div class='weui-cell__hd'>" + el.dealerName + "</div></div>");
+            });
+            var option = initOption(dataValue);
+            var dealerMapId = document.getElementById("dealer_in_china_map");
+            var chinaMapCharts = echarts.init(dealerMapId);
+            $(dealerMapId).height(400);
+            chinaMapCharts.clear();
+            chinaMapCharts.resize();
+            $.getJSON(getMapDataUrl(), function(data) {
+                echarts.registerMap('china', data);
+                chinaMapCharts.setOption(option);
+                chinaMapCharts.hideLoading();
+                Utils.close();
+            });
+        });
     }
     
     function getMapDataUrl() {
@@ -197,6 +237,47 @@
         return '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
     }
 
+    function selectDealer(dataArea) {
+        Utils.loading();
+        $.ajax({
+            url:"${CPATH}/selectDealer",
+            type:"post",
+            data:{dataArea: dataArea},
+            dataType:"json"
+        }).done(function(data){
+            total();
+            closeCombinSearch();
+        });
+    }
+
+    function total(){
+        Utils.loading();
+        $.ajax({
+            url:"${CPATH}/total",
+            type:"post",
+            data:{dateType: dateType},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+            var salesTotal = new CountUp("order-sales", 0, parseInt(data.totalOrderAmount));
+            salesTotal.start();
+            var orderTotal = new CountUp("order-total",0, parseInt(data.totalOrderCount));
+            orderTotal.start();
+            var customerTotal = new CountUp("order-customer",0, parseInt(data.totalCustomerCount));
+            customerTotal.start();
+        
+            setTimeout(function() {
+            $("#order-sales").addClass('animated pulse');
+            setTimeout(function() {
+            $("#order-total").addClass('animated pulse');
+            setTimeout(function() {
+            $("#order-customer").addClass('animated pulse');
+            }, 1000);
+            }, 1000);
+            }, 2000);
+        });
+    }
+
 </#macro>
 
 <@layout>
@@ -204,17 +285,16 @@
 
     <div class="bi-body">
         <#include "_inc/_bi_search_box.html"/>
-        <#include "_inc/_location_box.html"/>
 
         <div class="compare">
             <div class="gather">
                 <p>
-                    经销商总数(个):<br/><span id="all-customer"></span>
+                    经销商总数(个):<br/><span id="dealerCount"></span>
                 </p>
             </div>
             <div class="gather">
                 <p>
-                    总下单客户数(个):<br/><span id="all-order-customer"></span>
+                    总下单客户数(个):<br/><span id="orderCustomerCount"></span>
                 </p>
             </div>
             <div class="clearfix"></div>
@@ -268,8 +348,8 @@
 <article id="combin-filter" class="animated slideOutRight">
     <div id="customer">
         <header>
-            <div class="weui-search-bar" id="searchBar">
-                <form class="weui-search-bar__form">
+            <div class="weui-search-bar" style="text-align: center" id="searchBar"> <p>选择经销商</p>
+<!--                <form class="weui-search-bar__form">
                     <div class="weui-search-bar__box">
                         <i class="weui-icon-search"></i>
                         <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
@@ -280,65 +360,12 @@
                         <span>请输入经销商名称</span>
                     </label>
                 </form>
-                <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+                <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>-->
             </div>
         </header>
         <article id="infinite">
-            <div class="weui-cells">
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">启光</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">劲牌</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">大冶</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">黄石</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">龙泉</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">武汉</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">启光</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">劲牌</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">大冶</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">黄石</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">龙泉</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">武汉</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">启光</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">劲牌</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">大冶</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">黄石</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">龙泉</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd">武汉</div>
-                </div>
+            <div class="weui-cells" id="dealerList">
+                <div class="weui-cell"><div class="weui-cell__hd">加载中。。</div></div>
             </div>
             <div class="weui-loadmore" id="loading" style="display: none;">
                 <i class="weui-loading"></i>
