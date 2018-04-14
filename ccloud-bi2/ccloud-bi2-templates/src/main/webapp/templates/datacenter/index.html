@@ -1,0 +1,259 @@
+<#include "_inc/_bi_layout.html"/>
+<#macro css>
+    section {
+        background: #fff;
+    }
+    .location-wrapper {
+        margin-top: 2.4rem;
+    }
+    .wy-header-title{
+        display:inline;
+        margin: 0 0 0 3.2rem;
+        line-height: 2rem;
+        color: #999;
+    }
+    #relocation{
+        display:inline;
+    }
+    .compare .gather {
+        display: inline-block;
+        width: 49%;
+        border: 0;
+    }
+    .compare .gather:first-child {
+        border-right: 1px solid #e0e0e0;
+    }
+    .compare .gather p,.compare .gather span {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+    #orderAvg {
+      width: 100%;
+      height: 14rem;
+    }
+
+    .map-wrapper {
+        width: 100%;
+        height: 20rem;
+    }
+    
+    .maps {
+        width: 100%;
+        height: 100%;
+    }
+    
+    header {
+        background: #f9f9f9;
+    }
+    
+    .title {
+        display: inline;
+        margin-left: 35%;
+        background: none;
+    }
+    .more-dealer {
+        display: inline;
+	    clear: both;
+	    line-height: 2rem;
+	    width: 2rem;
+	    text-align: center;
+	    cursor: pointer;
+    }
+
+</#macro>
+
+<#macro script_import>
+    <script type='text/javascript' src="${CTPATH}/js/countUp.js"></script>
+    <!-- <script type="text/javascript" src="${CTPATH}/js/city-data.js"></script>
+    <script type="text/javascript" src="${CTPATH}/js/city-picker.js"></script> -->
+    <script type="text/javascript" src="${CTPATH}/json/china-city-map.js"></script>
+    <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
+    <script type="text/javascript" src="${CTPATH}/js/index_map.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+</#macro>
+<#macro script>
+    
+    var $city = $("#city-name");
+    
+    var provName = $.cookie(Utils.provCacheName);
+    var cityName = $.cookie(Utils.cityCacheName);
+    var countryName = $.cookie(Utils.countryCacheName);
+    var curProvName = '';
+    var dateType = '0';
+    
+    var strKit = new StrKit();
+    
+    $(function() { 
+        Utils.loading();
+        //initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
+
+        //wxReadyGetLocation(
+        //    function(lng, lat, addComp, address) {
+        //        $("#lng").val(lng.toFixed(6));
+        //        $("#lat").val(lat.toFixed(6));
+        //    }
+        //);
+        
+        initDealerInChinaMap(); 
+        
+        // 时间切换选择, 如近一天，近一周等
+	    $(".date").click(function(e) {
+	        var $a = $(e.currentTarget);
+	        $a.parent().find(".date").removeClass("active-date");
+	        $a.addClass("active-date");
+	    });
+        
+        $(document).on('click', '#combin-filter', function() {
+        
+        }).off("click", "#combin-filter");
+        
+    });
+
+    function initDealerInChinaMap() {
+        var dealerMapId = document.getElementById("dealer_in_china_map");
+        var chinaMapCharts = echarts.init(dealerMapId);
+        $(dealerMapId).height(400);
+        chinaMapCharts.clear();
+        chinaMapCharts.resize();
+        $.getJSON(getMapDataUrl(), function(data) {
+            echarts.registerMap('china', data);
+            chinaMapCharts.setOption(option);
+            Utils.close();
+        });
+        
+        //chinaMapCharts.showLoading({
+        //    text: '加载中...',
+        //    effect: 'whirling'
+        //});
+        
+        
+        //chinaMapCharts.hideLoading();
+    }
+    
+    function getMapDataUrl() {
+
+        if(cityMap[curProvName] == undefined){
+            return '${CTPATH}/json/china.json';
+        }
+
+        return '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
+    }
+
+</#macro>
+
+<@layout>
+<section>
+
+    <div class="bi-body">
+        <#include "_inc/_bi_search_box.html"/>
+        <#include "_inc/_location_box.html"/>
+
+        <div class="compare">
+            <div class="gather">
+                <p>
+                    经销商总数(个):<br/><span id="all-customer"></span>
+                </p>
+            </div>
+            <div class="gather">
+                <p>
+                    总下单客户数(个):<br/><span id="all-order-customer"></span>
+                </p>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        
+        <div class="divide-line"></div>
+        <header>
+            <div class="title">经销商分布图</div>
+            <div id="combin-filter-btn" class="more-dealer fr font-20"><i class="icon-list"></i></div>
+        </header>
+        
+        <div id="map-wrapper" class="map-wrapper">
+            <div id="dealer_in_china_map" class="maps"></div>
+        </div>
+        <!-- <div class="divide-line"></div> -->
+        
+        <header>
+            <div class="title">经销商汇总信息</div>
+        </header>
+        <div class="sales-gather">
+            <div class="gather">
+                <img src="${CTPATH}/images/bi_money.png">
+                <p>
+                    销售总额(元):<br/><span id="order-sales"></span>
+                </p>
+                <div class="clearfix"></div>
+            </div>
+            <div class="gather">
+                <img src="${CTPATH}/images/bi_order.png">
+                <p>
+                    订单总数(笔):<br/><span id="order-total"></span>
+                </p>
+                <div class="clearfix"></div>
+            </div>
+            <div class="gather">
+                <img src="${CTPATH}/images/bi_customer.png">
+                <p>
+                    客户总数(个):<br/><span id="order-customer"></span>
+                </p>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        
+        <div class="divide-line"></div>
+        <!-- <div id="orderAvg"></div> -->
+        
+    </div>
+</section>
+<article id="combin-filter" >
+    <div id="customer">
+        <header>
+            <div class="weui-search-bar" id="searchBar">
+                <form class="weui-search-bar__form">
+                    <div class="weui-search-bar__box">
+                        <i class="weui-icon-search"></i>
+                        <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                        <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+                    </div>
+                    <label class="weui-search-bar__label" id="searchText">
+                        <i class="weui-icon-search"></i>
+                        <span>请输入经销商名称</span>
+                    </label>
+                </form>
+                <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+            </div>
+        </header>
+        <article class="customer">
+            <article id="infinite">
+                <div id="customerList">
+                    <div class="weui-panel weui-panel_access customerSelect" style="display: none">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item customer-info" id="customerInfo">
+                                <p class="ft14" id="customerName"></p>
+                                <p class="gray" id="contactP"></p>
+                                <input type="hidden" id="sellerCustomerId" value="">
+                                <input type="hidden" id="contact" value="">
+                                <input type="hidden" id="mobile" value="">
+                                <input type="hidden" id="address" value="">
+                            </div>
+                        </div>
+                        <p class="gray">
+                            <span class="icon-map-marker ft16 green"></span>
+                            <span id="addressSpan"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="weui-loadmore" id="loading" style="display: none;">
+                    <i class="weui-loading"></i>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                </div>
+                <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+                    <span class="weui-loadmore__tips">暂无数据</span>
+                </div>
+            </article>
+        </article>
+    </div>
+</article>
+<#include "_inc/_nav_box.html"/>
+</@layout>

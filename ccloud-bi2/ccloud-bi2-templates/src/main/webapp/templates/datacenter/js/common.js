@@ -72,6 +72,65 @@ function Map() {
 	this.isEmpty = isEmpty;
 }
 
+function initWxConfig(appId, timestamp, nonceStr, signature) {
+    wx.config({
+        debug: false,
+        appId: appId,
+        timestamp: timestamp,
+        nonceStr: nonceStr,
+        signature: signature,
+        jsApiList: [
+            'checkJsApi',
+            'getLocation',
+            'chooseImage',
+            'uploadImage',
+            'downloadImage'
+        ]
+    });
+}
+
+function wxReadyGetLocation(callback) {
+    wx.ready(function() {
+        wxGetLocation(callback);
+    });
+}
+
+function wxGetLocation(callback) {
+    wx.getLocation({
+        type: 'wgs84',
+        success: function (res) {
+            var latitude = res.latitude;                      // 纬度，浮点数，范围为90 ~ -90
+            var longitude = res.longitude;                    // 经度，浮点数，范围为180 ~ -180。
+            var speed = res.speed;                            // 速度，以米/每秒计
+            var accuracy = res.accuracy;                      // 位置精度
+
+            var point = new BMap.Point(longitude, latitude);  // 将经纬度转化为百度经纬度
+            var geoc = new BMap.Geocoder();                   // 获取百度地址解析器
+
+            translateCallback = function (point) {            // 回调函数
+                var lng = parseFloat(point.lng);
+                var lat = parseFloat(point.lat);
+                geoc.getLocation(point, function(rs) {
+                    var addComp = rs.addressComponents;
+                    var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
+
+                    callback(lng, lat, addComp, address);
+
+                });
+            };
+            setTimeout(function() {
+                BMap.Convertor.translate(point, 0, translateCallback);//真实经纬度转成百度坐标
+            }, 100);
+        },
+        cancel: function (res) {
+            console.log('用户拒绝授权获取地理位置');
+        },
+        fail: function (res) {
+            console.log(JSON.stringify(res));
+        }
+    });
+}
+
 function wxLocation() {
     var df = $.Deferred();
     wx.ready(function() {
@@ -244,16 +303,3 @@ var MapSet = {
 		},{enableHighAccuracy: true})
 	}
 };
-
-$(function() {
-/*	var goback = new Headroom($(".left-back")[0], {
-		tolerance: 5,
-		offset: 200,
-		classes: {
-			initial: "animated",
-			pinned: "slideInLeft",
-			unpinned: "slideOutLeft"
-		}
-	});
-	goback.init();*/
-})
