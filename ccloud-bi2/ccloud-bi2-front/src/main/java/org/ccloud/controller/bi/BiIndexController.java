@@ -68,7 +68,7 @@ public class BiIndexController extends BaseFrontController {
 		setSessionAttr(Consts.SESSION_BRAND_ID_ARRAY, brandArray);
 		setSessionAttr(Consts.SESSION_PRODUCT_ID_ARRAY, productArray);
 
-		render("bi_index.html");
+		render("index.html");
 	}
 
 	// 顶部统计
