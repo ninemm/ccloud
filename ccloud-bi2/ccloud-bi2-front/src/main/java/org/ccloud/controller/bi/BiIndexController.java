@@ -75,6 +75,10 @@ public class BiIndexController extends BaseFrontController {
 	public void topTotal() {
 
 		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+		String[] dataAreaLike = new String[dataArea.length];
+		for (int i = 0 ;i<dataArea.length;i++){
+			dataAreaLike[i] = dataArea[i] + "%";
+		}
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -82,9 +86,9 @@ public class BiIndexController extends BaseFrontController {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("totalAllCustomerCount",
-				Bi2SalesQuery.me().findAllCustomerCount(dataArea, provName, cityName, countryName));
+				Bi2SalesQuery.me().findAllCustomerCount(dataAreaLike, provName, cityName, countryName));
 		result.put("totalCustomerCount",
-				Bi2SalesQuery.me().findCustomerCount(dataArea, provName, cityName, countryName, null, null));
+				Bi2SalesQuery.me().findCustomerCount(dataAreaLike, provName, cityName, countryName, null, null));
 
 		renderJson(result);
 
@@ -93,6 +97,10 @@ public class BiIndexController extends BaseFrontController {
 	public void total() {
 
 		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+		String[] dataAreaLike = new String[dataArea.length];
+		for (int i = 0 ;i<dataArea.length;i++){
+			dataAreaLike[i] = dataArea[i] + "%";
+		}
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
@@ -107,7 +115,7 @@ public class BiIndexController extends BaseFrontController {
 				DateUtils.plusDays(startDate, -2), endDate));
 
 		result.put("totalCustomerCount",
-				Bi2SalesQuery.me().findCustomerCount(dataArea, provName, cityName, countryName, startDate, endDate));
+				Bi2SalesQuery.me().findCustomerCount(dataAreaLike, provName, cityName, countryName, startDate, endDate));
 		result.put("totalOrderCount",
 				Bi2SalesQuery.me().findOrderCount(dataArea, provName, cityName, countryName, startDate, endDate));
 		result.put("totalOrderAmount",

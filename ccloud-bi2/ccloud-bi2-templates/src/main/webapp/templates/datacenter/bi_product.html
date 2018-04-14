@@ -69,10 +69,10 @@
     }
     
     //产品选择
-    function setProduct(Code, Name){
+    function setProduct(Code, obj){
         Utils.loading();
         cInvCode = Code;
-        cInvName = Name;
+        cInvName = $(obj).text();
         area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
         customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
     }
@@ -102,8 +102,8 @@
             $tbody.empty();
             $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
             for(var i = 0; i < data.length; i++){
-                var fun = "setProduct('" + data[i].id + "'" + "," + "'" + data[i].custom_name + "')";
-                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].custom_name + "</a></td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+                var fun = "setProduct('" + data[i].id + "',this" + ")";
+                $tbody.append("<tr ><td><a onclick=" + fun +">" + data[i].custom_name + "</a></td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
 
             var dataCInvCode = (data[0] != undefined ? data[0].id : '');

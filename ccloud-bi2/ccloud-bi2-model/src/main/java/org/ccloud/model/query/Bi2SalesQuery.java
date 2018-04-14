@@ -117,7 +117,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 		sqlBuilder.append(" and cso.biz_date is not null ");
 
-		appendIfNotEmpty(sqlBuilder, "cso.dealer_data_area", dataArea, params, false);
+		appendIfNotEmptyWithLike(sqlBuilder, "cso.dealer_data_area", dataArea, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
@@ -147,7 +147,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		sqlBuilder.append(" and csc.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		appendIfNotEmptyWithLike(sqlBuilder, "csc.data_area", dataArea + "%", params, false);
+		appendIfNotEmptyWithLike(sqlBuilder, "csc.data_area", dataArea, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cc.country_name", countryName, params, false);
@@ -291,7 +291,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		sqlBuilder.append(" group by o.customer_type_id");
+		sqlBuilder.append(" group by ct.`name`");
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
@@ -336,7 +336,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		sqlBuilder.append(" GROUP BY so.customer_type_id");
+		sqlBuilder.append(" GROUP BY ct.`name`");
 		sqlBuilder.append(" order by totalAmount desc");
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
@@ -465,7 +465,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		if (isDealer) {
 			sqlBuilder.append(" s.id, d.data_area, TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, s.seller_name dealerName,s.id dealerCode ");
 		} else {
-			sqlBuilder.append(" so.seller_id, d.data_area, TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, se.seller_name sellerName,se.id dealerCode ");
+			sqlBuilder.append(" TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, se.seller_name sellerName,se.id dealerCode ");
 		}
 		sqlBuilder.append(" FROM cc_sales_outstock so ");
 		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
@@ -514,7 +514,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	//经销商产品销售排行
-	public List<Record> findProductListByDealer(String provName, String cityName, String countryName, String dataArea,
+	public List<Record> findProductListByDealer(boolean isDealer,String provName, String cityName, String countryName, String dataArea,
 	                                            String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -542,7 +542,11 @@ public class Bi2SalesQuery extends JBaseQuery {
 		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
-		appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
+		if(isDealer) {
+			appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
+		}else {
+			appendIfNotEmpty(sqlBuilder, "so.seller_id", dataArea, params, false);
+		}
 
 		if (startDate != null) {
 			sqlBuilder.append(" and so.biz_date >= ?");
@@ -565,8 +569,8 @@ public class Bi2SalesQuery extends JBaseQuery {
 	                                    String startDate, String endDate) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT cc.id,cu.customer_name,cu.country_name,cu.city_name,cu.prov_name,o.customer_type_id,ct.`name`,IFNULL(SUM(o.total_amount),0) as totalAmount, ");
-		sqlBuilder.append("IFNULL(SUM(t1.refundAmount),0) as refundAmount, TRUNCATE((IFNULL(SUM(o.total_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as realAmount ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT ct.`name`, ");
+		sqlBuilder.append("TRUNCATE((IFNULL(SUM(o.total_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as realAmount ");
 		sqlBuilder.append("FROM cc_sales_outstock o JOIN cc_seller_customer cc ON o.customer_id = cc.id ");
 		sqlBuilder.append("JOIN cc_customer cu on cc.customer_id = cu.id ");
 		sqlBuilder.append("JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
@@ -591,7 +595,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		sqlBuilder.append(" group by o.customer_type_id");
+		sqlBuilder.append(" group by ct.`name`");
 		sqlBuilder.append(" order by realAmount desc");
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
@@ -656,7 +660,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	                                            String startDate, String endDate, String customerTypeName) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT cc.id,cu.customer_name,o.customer_type_id,ct.`name`,IFNULL(SUM(o.total_amount),0) as totalAmount, ");
+		StringBuilder sqlBuilder = new StringBuilder(" SELECT ct.`name`, ");
 
 		if (StrKit.notBlank(cityName)) {
 			sqlBuilder.append(" cu.country_name,");
@@ -665,7 +669,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		} else {
 			sqlBuilder.append(" cu.prov_name,");
 		}
-		sqlBuilder.append("IFNULL(SUM(t1.refundAmount),0) as refundAmount, TRUNCATE((IFNULL(SUM(o.total_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as realAmount ");
+		sqlBuilder.append("TRUNCATE((IFNULL(SUM(o.total_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as realAmount ");
 		sqlBuilder.append("FROM cc_sales_outstock o LEFT JOIN cc_seller_customer cc ON o.customer_id = cc.id ");
 		sqlBuilder.append("LEFT JOIN cc_customer cu on cc.customer_id = cu.id ");
 		sqlBuilder.append("LEFT JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
