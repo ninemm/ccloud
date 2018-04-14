@@ -269,7 +269,7 @@ function saveGroup() {
 							</th>
 							<th>用户名</th>
 							<th>真实姓名</th>
-							<th>昵称</th>
+							<th>企业微信ID</th>
 							<th>手机</th>							
 							<th>是否停用</th>
 							<th>所属部门</th>
@@ -292,7 +292,7 @@ function saveGroup() {
 								<a href="${CPATH}/admin/user/edit?id=${bean.id}&c=${c!}&p=${p!}">${bean.username!}</a>
 							</td>
 							<td>${bean.realname!}</td>
-							<td>${bean.nickname!}</td>
+							<td>${bean.wechat_userid!}</td>
 							<td>${bean.mobile!}</td>
 							<td><#if bean.status == 0>是<#else>否</#if></td>
 							<td>${bean.department_name!}</td>

@@ -118,6 +118,10 @@ public class UserQuery extends JBaseQuery {
 //		return DAO.doFindByCache(User.CACHE_NAME, openid, "wechat_open_id = ? AND status = 1", openid);
 	}
 	
+	public User findByWechatUserId(String userId) {
+		return DAO.doFindFirstByCache(User.CACHE_NAME, userId, "wechat_userid = ? AND status = 1", userId);
+	}
+	
 	public List<User> findByMobile(String mobile) {
 		StringBuilder sqlBuilder = new StringBuilder("select * ");
 		sqlBuilder.append("from `user` ");

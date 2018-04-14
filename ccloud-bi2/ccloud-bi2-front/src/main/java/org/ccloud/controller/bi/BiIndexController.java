@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import com.alibaba.fastjson.JSON;
 import org.ccloud.Consts;
@@ -25,28 +24,28 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.User;
 import org.ccloud.model.query.Bi2SalesQuery;
 import org.ccloud.model.query.BiManagerQuery;
-import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
+import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
 import org.joda.time.DateTime;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.jfinal.kit.HashKit;
+import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
-import com.jfinal.plugin.ehcache.CacheKit;
-import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
-import com.jfinal.qyweixin.sdk.api.JsTicket;
-import com.jfinal.qyweixin.sdk.api.JsTicketApi;
 
 @RouterMapping(url = "/")
 public class BiIndexController extends BaseFrontController {
 
+	@Before(WorkWechatJSSDKInterceptor.class)
 	public void index() {
-		initWechatConfig();
-//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		User user = UserQuery.me().findById("7aee55cb56534e92a346467b9f3a262a");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+//		User user = UserQuery.me().findById("7aee55cb56534e92a346467b9f3a262a");
+		if (user == null) {
+			renderNull();
+			return ;
+		}
 		List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
 		String sellerArray[] = new String[sellerByUser.size()];
 		for (int i = 0; i < sellerByUser.size(); i++) {
@@ -96,7 +95,7 @@ public class BiIndexController extends BaseFrontController {
 
 		String dataArea = getPara("dataArea");
 		if("all".equals(dataArea)){
-			User user = UserQuery.me().findById("7aee55cb56534e92a346467b9f3a262a");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
 			String sellerArray[] = new String[sellerByUser.size()];
 			for (int i = 0; i < sellerByUser.size(); i++) {
@@ -189,8 +188,9 @@ public class BiIndexController extends BaseFrontController {
 		render("bi_area.html");
 	}
 
+	@Before(WorkWechatJSSDKInterceptor.class)
 	public void customer() {
-		initWechatConfig();
+		//initWechatConfig();
 		setAttr("cur_nav", "customer");
 		render("bi_customer.html");
 	}
@@ -205,7 +205,8 @@ public class BiIndexController extends BaseFrontController {
 		render("bi_dealer.html");
 	}
 
-	public void initWechatConfig() {
+
+	/*public void initWechatConfig() {
 
 		String jsapi_ticket = CacheKit.get("ccloud", "jsapi_ticket");
 		if (StrKit.isBlank(jsapi_ticket)) {
@@ -255,6 +256,6 @@ public class BiIndexController extends BaseFrontController {
 
 	private static String create_nonce_str() {
 		return UUID.randomUUID().toString();
-	}
+	}*/
 
 }
