@@ -17,7 +17,6 @@ public class WorkWechatApi {
 		config.setAgentId(OptionQuery.me().findValue("qywechat_agentId"));
 		
 		// 企业号只支持加密且必须配置
-//		config.setEncryptMessage(OptionQuery.me().findValueAsBool("qywechat_encryptMessage"));
 		config.setEncryptMessage(true);
 		config.setEncodingAesKey(OptionQuery.me().findValue("qywechat_encodingAesKey"));
 		

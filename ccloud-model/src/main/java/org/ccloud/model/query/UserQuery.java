@@ -119,7 +119,7 @@ public class UserQuery extends JBaseQuery {
 	}
 	
 	public User findByWechatUserId(String userId) {
-		return DAO.doFindFirstByCache(User.CACHE_KEY, userId, "wechat_userid = ? AND status = 1", userId);
+		return DAO.doFindFirstByCache(User.CACHE_NAME, userId, "wechat_userid = ? AND status = 1", userId);
 	}
 	
 	public List<User> findByMobile(String mobile) {
