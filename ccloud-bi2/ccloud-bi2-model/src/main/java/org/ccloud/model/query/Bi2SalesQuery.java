@@ -196,7 +196,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 	//产品区域分布
 	public List<Record> findAreaListByProduct(String[] dataArea, String provName, String cityName, String countryName,
-	                                          String startDate, String endDate, String cInvCode) {
+	                                          String startDate, String endDate, String cInvCode, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -217,6 +217,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		sqlBuilder.append(" JOIN cc_customer c ON sc.customer_id = c.id ");
 		sqlBuilder.append(" JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" JOIN cc_goods cg on p.goods_id = cg.id ");
 
 		sqlBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 
@@ -229,6 +230,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
 		appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
@@ -298,7 +300,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 	//产品客户分布
 	public List<Record> findCustomerTypeListByProduct(String[] dataArea, String provName, String cityName,
-	                                                  String countryName, String startDate, String endDate, String cInvCode) {
+	                                                  String countryName, String startDate, String endDate, String cInvCode, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -311,6 +313,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		sqlBuilder.append(" JOIN cc_customer c ON sc.customer_id = c.id ");
 		sqlBuilder.append(" JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" JOIN cc_goods cg on p.goods_id = cg.id ");
 		sqlBuilder.append(" JOIN cc_customer_type ct on so.customer_type_id = ct.id");
 		sqlBuilder.append(" LEFT JOIN (SELECT srd.outstock_detail_id, srd.product_count, srd.product_amount ");
 		sqlBuilder.append(" FROM cc_sales_refund_instock_detail srd ");
@@ -321,6 +324,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
 		appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
@@ -345,7 +349,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 	//产品销售排行
 	public List<Record> findProductList(String[] dataArea, String provName, String cityName, String countryName,
-	                                    String startDate, String endDate) {
+	                                    String startDate, String endDate, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -358,6 +362,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		sqlBuilder.append(" JOIN cc_customer c ON sc.customer_id = c.id ");
 		sqlBuilder.append(" JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" JOIN cc_goods cg on p.goods_id = cg.id ");
 
 		sqlBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 
@@ -370,6 +375,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
 		appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
@@ -457,55 +463,67 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 	//经销商销售排行和销售情况
 	public List<Record> findsalesList(boolean isDealer, String provName, String cityName, String countryName,
-	                                  String[] dataArea, String startDate, String endDate) {
+	                                  String[] dataArea, String startDate, String endDate, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT s.id, d.data_area, TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT ");
 		if (isDealer) {
-			sqlBuilder.append(" s.id, d.data_area, TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, s.seller_name dealerName,s.id dealerCode ");
+			sqlBuilder.append(" d.data_area, s.seller_name dealerName,s.id dealerCode ");
 		} else {
-			sqlBuilder.append(" TRUNCATE( (ifnull(sum(so.total_amount),0) - ifnull(sum(t.totalAmount),0)) / 10000 , 2) totalAmount, se.seller_name sellerName,se.id dealerCode ");
+			sqlBuilder.append(" se.seller_name sellerName,se.id dealerCode ");
 		}
-		sqlBuilder.append(" FROM cc_sales_outstock so ");
-		sqlBuilder.append(" JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
-		sqlBuilder.append(" JOIN cc_customer c ON c.id=sc.customer_id ");
-		sqlBuilder.append(" JOIN cc_department d ON so.dealer_data_area = d.data_area");
-		sqlBuilder.append(" JOIN cc_seller s ON d.id=s.dept_id ");
+
+		sqlBuilder.append(" , TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as totalAmount  ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer cu ON cu.id = csu.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer_type ct ON ct.id = o.customer_type_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
+
+		sqlBuilder.append(" JOIN cc_department d ON o.dealer_data_area = d.data_area");
+		sqlBuilder.append(" JOIN cc_seller s ON d.id = s.dept_id ");
 
 		if (!isDealer) {
-			sqlBuilder.append(" JOIN cc_seller se ON so.seller_id = se.id ");
+			sqlBuilder.append(" JOIN cc_seller se ON o.seller_id = se.id ");
 		}
-		sqlBuilder.append(" LEFT JOIN ");
-		sqlBuilder.append(" (SELECT csri.outstock_id, ifnull(SUM(csri.total_reject_amount),0) AS totalAmount ");
-		sqlBuilder.append(" FROM cc_sales_refund_instock csri ");
-		sqlBuilder.append(" WHERE csri.biz_date IS NOT NULL ");
-		sqlBuilder.append(" GROUP BY csri.outstock_id)t ON so.id = t.outstock_id ");
+
+		sqlBuilder.append(" LEFT JOIN (SELECT cd.outstock_detail_id, SUM(cd.product_amount) as refundAmount, SUM(cd.product_count/pr.convert_relate) as refundCount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock_detail cd ");
+		sqlBuilder.append(" JOIN cc_sales_refund_instock cr on cr.id = cd.refund_instock_id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp on cd.sell_product_id = sp.id ");
+		sqlBuilder.append(" JOIN cc_product pr on pr.id = sp.product_id ");
+		sqlBuilder.append(" WHERE cr.`biz_date` is not null ");
+		sqlBuilder.append(" GROUP BY cd.outstock_detail_id) t1 on t1.outstock_detail_id = cc.id ");
 
 		sqlBuilder.append(" where d.data_area > '001001' ");
 
-		sqlBuilder.append(" and sc.customer_kind = ?");
+		sqlBuilder.append(" and csu.customer_kind = ?");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
-		appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
-		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
-		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
-		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
+		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
+		appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, false);
 
 		if (startDate != null) {
-			sqlBuilder.append(" and so.biz_date >= ?");
+			sqlBuilder.append(" and o.biz_date >= ?");
 			params.add(startDate);
 		}
 
 		if (endDate != null) {
-			sqlBuilder.append(" and so.biz_date <= ?");
+			sqlBuilder.append(" and o.biz_date <= ?");
 			params.add(endDate);
 		}
 
 		if (isDealer) {
 			sqlBuilder.append(" GROUP BY s.id");
 		} else {
-			sqlBuilder.append(" GROUP BY so.seller_id");
+			sqlBuilder.append(" GROUP BY o.seller_id");
 		}
 		sqlBuilder.append(" order by totalAmount desc");
 
@@ -515,7 +533,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 	//经销商产品销售排行
 	public List<Record> findProductListByDealer(boolean isDealer,String provName, String cityName, String countryName, String dataArea,
-	                                            String startDate, String endDate) {
+	                                            String startDate, String endDate, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -528,6 +546,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		sqlBuilder.append(" JOIN cc_customer c ON sc.customer_id = c.id ");
 		sqlBuilder.append(" JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" JOIN cc_product p ON sp.product_id = p.id ");
+		sqlBuilder.append(" JOIN cc_goods cg on p.goods_id = cg.id ");
 
 		sqlBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 
@@ -542,6 +561,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		appendIfNotEmpty(sqlBuilder, "c.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "c.country_name", countryName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		if(isDealer) {
 			appendIfNotEmpty(sqlBuilder, "so.dealer_data_area", dataArea, params, false);
 		}else {
@@ -566,21 +586,33 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	public List<Record> findByCusTypeId(String[] dataArea, String provName, String cityName, String countryName,
-	                                    String startDate, String endDate) {
+	                                    String startDate, String endDate, String[] brandId) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
-		StringBuilder sqlBuilder = new StringBuilder("SELECT ct.`name`, ");
-		sqlBuilder.append("TRUNCATE((IFNULL(SUM(o.total_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as realAmount ");
-		sqlBuilder.append("FROM cc_sales_outstock o JOIN cc_seller_customer cc ON o.customer_id = cc.id ");
-		sqlBuilder.append("JOIN cc_customer cu on cc.customer_id = cu.id ");
-		sqlBuilder.append("JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
-		sqlBuilder.append("LEFT JOIN (SELECT cr.outstock_id,SUM(cr.total_reject_amount) as refundAmount FROM cc_sales_refund_instock cr ");
-		sqlBuilder.append("WHERE cr.`biz_date` is not null GROUP BY cr.outstock_id) t1 ON t1.outstock_id = o.id ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT ct.`name` ");
+		sqlBuilder.append(" , TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as realAmount  ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer cu ON cu.id = csu.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer_type ct ON ct.id = o.customer_type_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
 
-		sqlBuilder.append(" WHERE cc.customer_kind = ? ");
+		sqlBuilder.append(" LEFT JOIN (SELECT cd.outstock_detail_id, SUM(cd.product_amount) as refundAmount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock_detail cd ");
+		sqlBuilder.append(" JOIN cc_sales_refund_instock cr on cr.id = cd.refund_instock_id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp on cd.sell_product_id = sp.id ");
+		sqlBuilder.append(" JOIN cc_product pr on pr.id = sp.product_id ");
+		sqlBuilder.append(" WHERE cr.`biz_date` is not null ");
+		sqlBuilder.append(" GROUP BY cd.outstock_detail_id) t1 on t1.outstock_detail_id = cc.id ");
+
+		sqlBuilder.append(" WHERE csu.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
 		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, false);
@@ -602,7 +634,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	public List<Record> findProductListByCusType(String[] dataArea, String provName, String cityName, String countryName,
-	                                             String startDate, String endDate, String customerTypeName) {
+	                                             String startDate, String endDate, String customerTypeName, String[] brandId) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sqlBuilder = new StringBuilder("SELECT ct.`name` , concat(cp.name,' ',temp.valueName) as custom_name, TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as totalAmount ");
@@ -620,6 +652,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 		sqlBuilder.append(" JOIN cc_customer_type ct ON ct.id = o.customer_type_id ");
 		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
 		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
 
 		sqlBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) temp ON temp.product_set_id = cp.id ");
 
@@ -636,6 +669,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 		appendIfNotEmpty(sqlBuilder, "ct.name", customerTypeName, params, false);
 		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, false);
@@ -657,7 +691,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	public List<Record> findAreaListByCusTypeId(String[] dataArea, String provName, String cityName, String countryName,
-	                                            String startDate, String endDate, String customerTypeName) {
+	                                            String startDate, String endDate, String customerTypeName, String[] brandId) {
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sqlBuilder = new StringBuilder(" SELECT ct.`name`, ");
@@ -669,18 +703,31 @@ public class Bi2SalesQuery extends JBaseQuery {
 		} else {
 			sqlBuilder.append(" cu.prov_name,");
 		}
-		sqlBuilder.append("TRUNCATE((IFNULL(SUM(o.total_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as realAmount ");
-		sqlBuilder.append("FROM cc_sales_outstock o LEFT JOIN cc_seller_customer cc ON o.customer_id = cc.id ");
-		sqlBuilder.append("LEFT JOIN cc_customer cu on cc.customer_id = cu.id ");
-		sqlBuilder.append("LEFT JOIN cc_customer_type ct on ct.id = o.customer_type_id ");
-		sqlBuilder.append("LEFT JOIN (SELECT cr.outstock_id,SUM(cr.total_reject_amount) as refundAmount FROM cc_sales_refund_instock cr ");
-		sqlBuilder.append("WHERE cr.`biz_date` is not null GROUP BY cr.outstock_id) t1 ON t1.outstock_id = o.id ");
 
-		sqlBuilder.append(" WHERE cc.customer_kind = ? ");
+		sqlBuilder.append(" TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as realAmount  ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer cu ON cu.id = csu.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer_type ct ON ct.id = o.customer_type_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
+
+		sqlBuilder.append(" LEFT JOIN (SELECT cd.outstock_detail_id, SUM(cd.product_amount) as refundAmount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock_detail cd ");
+		sqlBuilder.append(" JOIN cc_sales_refund_instock cr on cr.id = cd.refund_instock_id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp on cd.sell_product_id = sp.id ");
+		sqlBuilder.append(" JOIN cc_product pr on pr.id = sp.product_id ");
+		sqlBuilder.append(" WHERE cr.`biz_date` is not null ");
+		sqlBuilder.append(" GROUP BY cd.outstock_detail_id) t1 on t1.outstock_detail_id = cc.id ");
+
+		sqlBuilder.append(" WHERE csu.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
 		appendIfNotEmpty(sqlBuilder, "ct.name", customerTypeName, params, false);
 		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, false);
@@ -709,7 +756,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	public List<Map<String, Object>> findAreaArray(String[] dataArea, String provName, String cityName,
-	                                               String countryName, String startDate, String endDate) {
+	                                               String countryName, String startDate, String endDate,String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
@@ -723,20 +770,30 @@ public class Bi2SalesQuery extends JBaseQuery {
 			sqlBuilder.append(" cu.prov_name");
 		}
 
-		sqlBuilder.append(" ,TRUNCATE((IFNULL(SUM(o.total_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as totalAmount ");
-		sqlBuilder.append(" FROM cc_sales_outstock o ");
+		sqlBuilder.append(" , TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as totalAmount  ");
+		sqlBuilder.append(" , TRUNCATE(IFNULL(SUM(cc.product_count/cp.convert_relate),0) - IFNULL(SUM(t1.refundCount),0),2) as productCount  ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
 		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
 		sqlBuilder.append(" JOIN cc_customer cu ON cu.id = csu.customer_id ");
 		sqlBuilder.append(" JOIN cc_customer_type ct ON ct.id = o.customer_type_id ");
-		sqlBuilder.append(" LEFT JOIN (SELECT cr.outstock_id, SUM(cr.total_reject_amount) as refundAmount ");
-		sqlBuilder.append(" FROM cc_sales_refund_instock cr");
-		sqlBuilder.append(" where cr.biz_date is not null");
-		sqlBuilder.append(" GROUP BY cr.outstock_id) t1 on o.id = t1.outstock_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
+
+		sqlBuilder.append(" LEFT JOIN (SELECT cd.outstock_detail_id, SUM(cd.product_amount) as refundAmount, SUM(cd.product_count/pr.convert_relate) as refundCount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock_detail cd ");
+		sqlBuilder.append(" JOIN cc_sales_refund_instock cr on cr.id = cd.refund_instock_id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp on cd.sell_product_id = sp.id ");
+		sqlBuilder.append(" JOIN cc_product pr on pr.id = sp.product_id ");
+		sqlBuilder.append(" WHERE cr.`biz_date` is not null ");
+		sqlBuilder.append(" GROUP BY cd.outstock_detail_id) t1 on t1.outstock_detail_id = cc.id ");
 
 		sqlBuilder.append(" WHERE csu.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
 		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, false);
@@ -823,25 +880,35 @@ public class Bi2SalesQuery extends JBaseQuery {
 	}
 
 	public List<Record> findAreaSales(String[] dataArea, String provName, String cityName,
-	                                  String countryName, String startDate, String endDate) {
+	                                  String countryName, String startDate, String endDate, String[] brandId) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sqlBuilder = new StringBuilder("select csu.lng, csu.lat ");
 
-		sqlBuilder.append(" ,TRUNCATE((IFNULL(SUM(o.total_amount),0) - IFNULL(SUM(t1.refundAmount),0))/2,2) as count ");
-		sqlBuilder.append(" FROM cc_sales_outstock o ");
+		sqlBuilder.append(" , TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as count  ");
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
 		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
 		sqlBuilder.append(" JOIN cc_customer cu ON cu.id = csu.customer_id ");
-		sqlBuilder.append(" LEFT JOIN (SELECT cr.outstock_id, SUM(cr.total_reject_amount) as refundAmount ");
-		sqlBuilder.append(" FROM cc_sales_refund_instock cr");
-		sqlBuilder.append(" where cr.biz_date is not null");
-		sqlBuilder.append(" GROUP BY cr.outstock_id) t1 on o.id = t1.outstock_id ");
+		sqlBuilder.append(" JOIN cc_customer_type ct ON ct.id = o.customer_type_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
+
+		sqlBuilder.append(" LEFT JOIN (SELECT cd.outstock_detail_id, SUM(cd.product_amount) as refundAmount ");
+		sqlBuilder.append(" FROM cc_sales_refund_instock_detail cd ");
+		sqlBuilder.append(" JOIN cc_sales_refund_instock cr on cr.id = cd.refund_instock_id ");
+		sqlBuilder.append(" JOIN cc_seller_product sp on cd.sell_product_id = sp.id ");
+		sqlBuilder.append(" JOIN cc_product pr on pr.id = sp.product_id ");
+		sqlBuilder.append(" WHERE cr.`biz_date` is not null ");
+		sqlBuilder.append(" GROUP BY cd.outstock_detail_id) t1 on t1.outstock_detail_id = cc.id ");
 
 		sqlBuilder.append(" WHERE csu.customer_kind = ? ");
 		params.add(Consts.CUSTOMER_KIND_COMMON);
 
 		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, false);
 		appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, false);
