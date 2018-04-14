@@ -114,6 +114,13 @@ function wxGetLocation(callback) {
                     var addComp = rs.addressComponents;
                     var address = addComp.province + addComp.city + addComp.district + addComp.street + addComp.streetNumber;
 
+	                $.cookie(Utils.longitudeCache, rs.point.lng, { expires: 7 });
+	                $.cookie(Utils.latitudeCache, rs.point.lat, { expires: 7 });
+
+	                $.cookie(Utils.provCacheName, addComp.province, { expires: 7 });
+	                $.cookie(Utils.cityCacheName, addComp.city, { expires: 7 });
+	                $.cookie(Utils.countryCacheName, addComp.district, { expires: 7 });
+
                     callback(lng, lat, addComp, address);
 
                 });

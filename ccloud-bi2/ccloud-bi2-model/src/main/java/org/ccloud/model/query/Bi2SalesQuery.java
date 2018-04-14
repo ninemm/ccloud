@@ -887,7 +887,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 		StringBuilder sqlBuilder = new StringBuilder("select csu.lng, csu.lat ");
 
-		sqlBuilder.append(" , TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as count  ");
+		sqlBuilder.append(" , TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/2,2) as count  ");
 		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
 		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
 		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
@@ -959,6 +959,10 @@ public class Bi2SalesQuery extends JBaseQuery {
 		}
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
+	}
+
+	public Record findSellerByDataArea(String dataArea) {
+		return Db.findFirst(" select s.prov_name, s.city_name, s.country_name from cc_seller s join cc_department d on s.dept_id = d.id where d.data_area = ? ", dataArea);
 	}
 
 }

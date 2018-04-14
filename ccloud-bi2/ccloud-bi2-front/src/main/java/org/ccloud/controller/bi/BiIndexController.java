@@ -94,6 +94,9 @@ public class BiIndexController extends BaseFrontController {
 	public void selectDealer() {
 
 		String dataArea = getPara("dataArea");
+
+		Map<String, Object> result = new HashMap<String, Object>();
+
 		if("all".equals(dataArea)){
 			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 			List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
@@ -102,13 +105,22 @@ public class BiIndexController extends BaseFrontController {
 				sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
 			}
 			setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
+
+			result.put("provName", "");
+			result.put("cityName", "");
+			result.put("countryName", "");
+
 		}else{
 			String dataAreaArray[] = new String[]{dataArea};
 			setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, dataAreaArray);
+
+			Record seller = Bi2SalesQuery.me().findSellerByDataArea(dataArea);
+			result.put("provName", seller.getStr("prov_name"));
+			result.put("cityName", seller.getStr("city_name"));
+			result.put("countryName", seller.getStr("country_name"));
 		}
 
-
-		renderAjaxResultForSuccess();
+		renderJson(result);
 	}
 
 

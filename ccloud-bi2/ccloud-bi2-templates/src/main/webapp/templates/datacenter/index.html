@@ -246,6 +246,11 @@
             data:{dataArea: dataArea},
             dataType:"json"
         }).done(function(data){
+            
+            $.cookie(Utils.provCacheName, data.provName, { expires: 7 });
+            $.cookie(Utils.cityCacheName, data.cityName, { expires: 7 });
+            $.cookie(Utils.countryCacheName, data.countryName, { expires: 7 });
+
             total();
             closeCombinSearch();
         });
