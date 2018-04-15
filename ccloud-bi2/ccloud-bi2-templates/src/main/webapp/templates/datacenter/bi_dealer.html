@@ -123,12 +123,12 @@
             dataType:"json"
         }).done(function(data){
             //直营商
-            var sellerTitle = dealerName + '销售情况';
-            var $p = $("#p_seller_rank");
-            $p.empty();
-            $p.text(sellerTitle);
+            //var sellerTitle = dealerName + '销售情况';
+            //var $p = $("#p_seller_rank");
+            //$p.empty();
+            //$p.text(sellerTitle);
             
-            seller_rank(data.sellerList);
+            //seller_rank(data.sellerList);
             
             var prTitle = dealerName + '产品销售排行';
             var $p = $("#p_product_rank");
@@ -140,7 +140,7 @@
        });
     }
     
-    var sellerOption;
+    /*var sellerOption;
     function seller_rank(sellerList){
         var sellerIdData = [];
         var sellerYData = [];
@@ -207,7 +207,7 @@
             var sellerId = sellerOption.series.sellerIdData[param.dataIndex];
             seller_product(provName, cityName, '', dateType, sellerName, sellerId);
         }
-    }
+    }*/
     
     //产品
     function product_rank(productList){
@@ -223,7 +223,7 @@
     }
     
     //直营商产品
-    function seller_product(provName, cityName, countryName, dateType, sellerName, sellerId){
+    /*function seller_product(provName, cityName, countryName, dateType, sellerName, sellerId){
       Utils.loading();
       $.ajax({
             url:"${CPATH}/biSales/productBySeller",
@@ -240,7 +240,7 @@
             //产品
             product_rank(data);
        });
-    }
+    }*/
 
 </#macro>
 <@layout>
@@ -267,9 +267,9 @@
                 </table>
             </div>
         </div>
-        <p class="title" id="p_seller_rank"></p>
+<!--        <p class="title" id="p_seller_rank"></p>
         <div id="seller_rank">
-        </div>
+        </div>-->
         <p class="title" id="p_product_rank"></p>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell" style="padding: 0">

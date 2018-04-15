@@ -49,17 +49,14 @@
     }
     
     .title {
-        display: inline;
-        margin-left: 35%;
         background: none;
     }
     .more-dealer {
-        display: inline;
-	    clear: both;
 	    line-height: 2rem;
 	    width: 2rem;
 	    text-align: center;
-	    cursor: pointer;
+        position: relative;
+        top: -2rem;
     }
 
 </#macro>
@@ -78,6 +75,10 @@
     
     var $city = $("#city-name");
     
+    if($.cookie(Utils.provCacheName) == null)$.cookie(Utils.provCacheName, '', { expires: 7 });
+    if($.cookie(Utils.cityCacheName) == null)$.cookie(Utils.cityCacheName, '', { expires: 7 });
+    if($.cookie(Utils.countryCacheName) == null)$.cookie(Utils.countryCacheName, '', { expires: 7 });
+
     var provName = $.cookie(Utils.provCacheName);
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
@@ -208,11 +209,11 @@
             var dataValue = [];
             var $dealerList = $("#dealerList");
             $dealerList.empty();
-            $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + "all" + "')\"><div class='weui-cell__hd'>" + "全部" + "</div></div>");
+            $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + "all" + "',this)\"><div class='weui-cell__hd'>" + "全部" + "</div></div>");
             $.each(data,function(index,el){
                 var cityName = el.city_name.replace('市','');
                 dataValue.push({'name': cityName, 'value': el.totalAmount});
-                $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + el.data_area + "')\"><div class='weui-cell__hd'>" + el.dealerName + "</div></div>");
+                $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + el.data_area + "',this)\"><div class='weui-cell__hd'>" + el.dealerName + "</div></div>");
             });
             var option = initOption(dataValue);
             var dealerMapId = document.getElementById("dealer_in_china_map");
@@ -238,8 +239,9 @@
         return '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
     }
 
-    function selectDealer(dataArea) {
+    function selectDealer(dataArea,obj) {
         Utils.loading();
+        $("#dealerName").text($(obj).find(".weui-cell__hd").eq(0).text() + '汇总信息');
         $.ajax({
             url:"${CPATH}/selectDealer",
             type:"post",
@@ -331,7 +333,7 @@
         <!-- <div class="divide-line"></div> -->
         
         <header>
-            <div class="title">经销商汇总信息</div>
+            <div class="title" id="dealerName">全部经销商汇总信息</div>
         </header>
         <div class="sales-gather">
             <div class="gather">
