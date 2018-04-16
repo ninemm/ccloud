@@ -183,9 +183,9 @@ function queryPrintDetail(financePrint) {
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
                     if(financePrint == 0){
-                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', item.salesAmount, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone,);
+                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', item.salesAmount, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone);
                     }else{
-                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', saleMoney, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone,);
+                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', saleMoney, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone);
                     }
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
