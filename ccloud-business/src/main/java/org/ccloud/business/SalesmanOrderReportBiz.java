@@ -7,8 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.ccloud.model.Customer;
+import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.SalesmanOrderReportQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 
 import com.jfinal.plugin.activerecord.Record;
 
@@ -41,17 +43,26 @@ public class SalesmanOrderReportBiz {
 		List<Record> records = SalesmanOrderReportQuery.me().getSalesmanOrder(startDate, endDate, dayTag, userId, orderTag, print, receiveType);
 		if (records != null && records.size() > 0) {
 			Record record = null;
+			SellerCustomer sellerCustomer = null;
+			String customerName = null;
 			Customer customer = null;
 			for (Iterator<Record> iterator = records.iterator(); iterator.hasNext();) {
 				record = (Record) iterator.next();
-				customer = CustomerQuery.me().findById(String.valueOf(record.getColumns().get("customerId")));
-				if(customer != null) {
-					record.getColumns().put("customer_name", customer.getCustomerName());
-				}
+				sellerCustomer = SellerCustomerQuery.me().findById( String.valueOf(record.getColumns().get("customerId")));
+				customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
+				customerName = sellerCustomer != null ? customer.getCustomerName() : "";
+				record.getColumns().put("customer_name", customerName);
 				record = null;
 				customer = null;
+				customerName = null;
 			}
 		}
 		return records;
+	}
+	
+	
+	public List<Record> getOrderRankOfMyDepartment() {
+		
+		return null;
 	}
 }
