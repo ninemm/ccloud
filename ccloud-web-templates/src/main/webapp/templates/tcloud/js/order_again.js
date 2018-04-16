@@ -146,6 +146,7 @@
 		return product = {
 			productName : $el.custom_name,
 			valueName : $el.valueName,
+			categoryId : $el.categoryId,
 			
 			bigPriceSpan : '￥' + $el.price,
 			smallPriceSpan : '￥' + ($el.price/$el.convert_relate).toFixed(2),
