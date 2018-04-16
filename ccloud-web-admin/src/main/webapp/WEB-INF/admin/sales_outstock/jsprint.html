@@ -99,13 +99,14 @@ var headerStr =
 				'<td colspan="8" style="text-align:left;">备注:{3}</td>' +
 			'</tr>'+
 			'<tr>' +
-				'<td colspan="8" style="text-align:left;">公司名称：{5}</td>' +
+				'<td colspan="4" style="text-align:left;">公司名称：{5}</td>' +
+				'<td colspan="4" style="text-align:left;">公司电话：{7}</td>' +
 			'</tr>'+
 			'<tr>' +
-				'<td colspan="8" style="text-align:left;">公司电话：{7}</td>' +
+				'<td colspan="8" style="text-align:left;">业务员:{8} 电话:{9} 开单人:{0} </td>' +
 			'</tr>'+
 			'<tr>' +
-				'<td colspan="8" style="text-align:left;">客户签名： 仓管 业务员 {8} 开单人 系统管理员</td>' +
+				'<td colspan="8" style="text-align:left;">客户签名:</td>' +
 			'</tr>'+
 			'</tbody></table>'
 			;
@@ -182,11 +183,9 @@ function queryPrintDetail(financePrint) {
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
                     if(financePrint == 0){
-                    var salesAmount = jQuery.mm.digitUppercase(item.salesAmount);
-                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone,);
+                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', item.salesAmount, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone,);
                     }else{
-                    var salesAmount = jQuery.mm.digitUppercase(saleMoney);
-                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone,);
+                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', saleMoney, warehousePhone, remark,printFootContext,item.sellerName,item.totalCount,item.sellerPhone,placeOrderMan, placeOrderPhone,);
                     }
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
