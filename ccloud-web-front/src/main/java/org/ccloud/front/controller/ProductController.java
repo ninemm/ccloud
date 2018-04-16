@@ -44,46 +44,30 @@ public class ProductController extends BaseFrontController {
 
 		List<Map<String, Object>> productList = new ArrayList<Map<String, Object>>();
 		List<Map<String, Object>> compositionList = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> goodsCategory=new ArrayList<Map<String, Object>>();
 		
-		Set<String> tagSet = new LinkedHashSet<String>();
+		Set<String> tagSet = SellerProductQuery.me().findTagsBySellerId(sellerId);
 		
-		List<Record> find=GoodsCategoryQuery.me().findBySellerId(sellerId,"");
+		List<Record> goodsCategoryList=GoodsCategoryQuery.me().findBySellerId(sellerId,"");
 		List<Record> productRecords = new ArrayList<>();
-		if (find.size()!=0) {
+		if (goodsCategoryList.size()>0) {
 			if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
-				productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),find.get(0).getStr("categoryId"));
+				productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),goodsCategoryList.get(0).getStr("categoryId"));
 			} else {
-				productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",find.get(0).getStr("categoryId"));
+				productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",goodsCategoryList.get(0).getStr("categoryId"));
 			}
 		}
-		List<Map<String, Object>> goodsCategory=new ArrayList<Map<String, Object>>();
-		for (Record record : find) {
-			Map<String, Object> map=new HashMap<>();
-			map.put("categoryId", record.getStr("categoryId"));
-			map.put("categoryName", record.getStr("categoryName"));
-			goodsCategory.add(map);
+		
+		for (Record record : goodsCategoryList) {
+			goodsCategory.add(record.getColumns());
 		}
 		
 		for (Record record : productRecords) {
 			productList.add(record.getColumns());
-			String tags = record.getStr("tags");
-			if (StrKit.notBlank(tags)) {
-				String[] tagArray = tags.split(",", -1);
-				for (String tag : tagArray) {
-					tagSet.add(tag);
-				}
-			}
 		}
 		
 		for (Record record : compositionRecords) {
 			compositionList.add(record.getColumns());
-			String tags = record.getStr("tags");
-			if (StrKit.notBlank(tags)) {
-				String[] tagArray = tags.split(",", -1);
-				for (String tag : tagArray) {
-					tagSet.add(tag);
-				}
-			}
 		}
 		
 		setAttr("refund", refund);

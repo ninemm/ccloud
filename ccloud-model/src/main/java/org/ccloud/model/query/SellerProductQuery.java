@@ -17,8 +17,10 @@ package org.ccloud.model.query;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -292,5 +294,15 @@ public class SellerProductQuery extends JBaseQuery {
 				"LEFT JOIN cc_goods_specification css on css.id = cgs.goods_specification_id " + 
 				"GROUP BY csp.id) t1 where t1.custom_name = '"+customName+"' and t1.seller_id = '"+sellerId+"' and  t1.cps_name ='"+cpsName+"'";
 		return DAO.find(sql);
+	}
+
+	public Set<String> findTagsBySellerId(String sellerId) {
+		Set<String> tagSet = new LinkedHashSet<String>();
+		String sql ="SELECT sp.tags tags FROM cc_seller_product sp WHERE sp.seller_id = ? AND sp.tags != '' GROUP BY sp.tags";
+		List<Record> recordList = Db.find(sql,sellerId);
+		for (Record record : recordList) {
+			tagSet.add(record.getStr("tags"));
+		}
+		return tagSet;
 	}
 }

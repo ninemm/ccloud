@@ -76,7 +76,7 @@ $(function() {
         }
     }).on("click", "#sidebar li", function () {
         $(this).addClass("active").siblings().removeClass("active");
-        var index = $(this).index()-1;
+        var index = $(this).index();
      	$('.type').eq(index).show().siblings('.type').hide();
 
     }).on("click", ".product-content .swiper-slide", function () {
@@ -87,8 +87,10 @@ $(function() {
 			tag = '';
 		}
 		changeInit();
-    }).on("click", "#category", function () {
-    		categoryId = $(this).attr("value");
+		
+    }).on("click", "[name='category']", function () {
+		$(this).addClass("active").siblings().removeClass("active");
+    		categoryId = $(this).attr("id");
     		changeInit();
     }).on("click", "#searchCancel", function () {
     	keyword = $(this).val();
@@ -208,6 +210,7 @@ var $tags = $("#tags");
 var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
 var categoryId = '';
+var map = {};
 function firstInit(){
 	var tags = ${tags!};
 	initTags(tags);
@@ -254,28 +257,29 @@ function initTags(tags) {
 
 function initProduct(productList,goodsCategory){
 	$.each(goodsCategory, function(index, el) {
+		map[el.categoryId] = 0;
 		if(categoryId==''){
-			$sidebar.append("<li id='category' class='active' value='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+			$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
 			$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
 			categoryId=el.categoryId;
 		}else{
 			if(categoryId != el.categoryId){
-				$sidebar.append("<li id='category' value='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-				$menuRight.append("<div class='type1' id='" + el.categoryId + "' style='display:none'> </div>")
+				$sidebar.append("<li name='category' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
 			}else{
-				$sidebar.append("<li id='category' class='active' value='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+				$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
 				$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
 			}
 		}
 	});
 	
+	var $type = $menuRight.find("#"+categoryId);
 	$.each(productList, function(index, el) {
-		var $type = $menuRight.find(".type:last");
 		$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
 		var $newProductDetail = $type.find(".common:last");
 		$newProductDetail.find("#productName").text(el.custom_name);
 		$newProductDetail.find("#valueName").text(el.valueName);
-		
+		$newProductDetail.find("#categoryId").val(categoryId);
 		var bigPrice = el.price;
 		var convert = el.convert_relate;
 		var smallPrice = (bigPrice / convert).toFixed(2);
@@ -324,6 +328,7 @@ function productNum(){
 
 var compositionHtml = $(".composition").eq(0).html();
 function initComposition(compositionList){
+	map['composition']=0;
 	if(compositionList.length > 0) {
 		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'></span> </li>");
 		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
@@ -462,29 +467,35 @@ $gallery.on("click", function() {
 });
 
 function calTotal() {
- 	var types = $(".type");
-  
-	$.each(types, function(typeIndex, typeEl) {
+	$.each(map,function(key,values){ 
+		map[key]=0;
+	});
+	var productList = getItemBykey("productList");
+	$.each(productList, function(Index, product) {
 		var total = 0;
-		var $typeEl = $(typeEl);
-		var id = $typeEl.attr('id');
-		var products = $typeEl.find('.product_detail');
-		$.each(products, function(index, el) {
-			var $el = $(el);
-			if(id == 'composition'){
-				total += Number($el.find("#compositionNum").val());
-			}else{
-				total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
-			}
-		});
-
-		var $total = $sidebar.find("#" + id + " .goods-num");
+		var id =product.categoryId;
+		total += Number(product.bigNum)+ Number(product.smallNum);
+		var value = map[id];
+		map[id] = Number(total)+Number(value);
+	});
+	
+	var compositionList = getItemBykey("compositionList")
+	$.each(compositionList, function(Index, composition) {
+		var total = 0;
+		total += Number(composition.compositionNum);
+		var value = map['composition'];
+		map['composition'] = Number(total)+Number(value);
+	});
+	
+	$.each(map,function(key,values){ 
+		var $total = $sidebar.find("#" + key + " .goods-num");
+		var total=values;
 		if (total > 0) {
 		    $total.show().text(total);
 		} else {
 		    $total.hide().text(total);
 		}
-	});
+	});    
 }
 
 function productChange(obj){
@@ -507,13 +518,13 @@ function getProduct($el){
 	return product = {
 		productName : $el.find("#productName").text(),
 		valueName : $el.find("#valueName").text(),
-		
 		bigPriceSpan : $el.find("#bigPriceSpan").text(),
 		smallPriceSpan : $el.find("#smallPriceSpan").text(),
 		bigUnitSpan : $el.find("#bigUnitSpan").text(),
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
 		stock : $el.find("#stock").text(),
-
+		categoryId : $el.find("#categoryId").val(),
+		
 		bigCost : $el.find("#bigCost").val(),
 		smallCost : $el.find("#smallCost").val(),
 		bigAccountPrice : $el.find("#bigAccountPrice").val(),
@@ -667,6 +678,7 @@ function order(){
 									<input type="hidden" id="description" value="0">
 									<input type="hidden" id="product_image_list_store" value="">
 									<input type="hidden" id="product_sn" value="">
+									<input type="hidden" id="categoryId" value="">
 									<div class="product-top">
 										<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 										<div class="weui-cell_access product-top-right">

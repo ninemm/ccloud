@@ -30,7 +30,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 public class PlansController extends BaseFrontController {
 	public void index() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "","");
 		List<Map<String, Object>> productItems = new ArrayList<>();
 		for(Record record : productRecords) {
 			
@@ -48,7 +48,7 @@ public class PlansController extends BaseFrontController {
 
 	public void getProduct() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		List<Record> productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "","");
 		Map<String, Object> map = new HashMap<>();
 		map.put("productList", productRecords);
 		renderJson(map);
