@@ -157,7 +157,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 		needwhere = appendIfNotEmpty(sql, "ccv.status", status, params, needwhere);
 		needwhere = appendIfNotEmpty(sql, "ccv.user_id", user, params, needwhere);
-		sql.append("ORDER BY  ccv.create_date desc, ccv.`status` ");
+		sql.append("GROUP BY ccv.id ORDER BY  ccv.create_date desc, ccv.`status` ");
 		return Db.paginate(pageNumber, pageSize,select ,sql.toString(), params.toArray());
 	}
 
