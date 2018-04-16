@@ -68,7 +68,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	public List<Record> orderAgainDetail(String orderId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
-				" SELECT sod.*, sp.custom_name,sp.tax_price,sp.account_price, sp.price,sp.bar_code, sp.cost, ");
+				" SELECT sod.*,g.goods_category_id as categoryId, sp.custom_name,sp.tax_price,sp.account_price, sp.price,sp.bar_code, sp.cost, ");
 		sqlBuilder.append(" p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, ");
 		sqlBuilder.append(" w.code as warehouseCode, t1.valueName,w.name as warehouseName, IFNULL(cpc1.seller_product_id,cpc.seller_product_id) as sub_id, IFNULL(cpc.name,cpc1.name) as comName, ");
 		sqlBuilder.append(" IFNULL(cpc.main_product_count,cpc1.sub_product_count) as comCount, IFNULL(cpc.price,cpc1.price) as comPrice ");

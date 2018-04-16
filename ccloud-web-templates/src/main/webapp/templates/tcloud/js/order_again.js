@@ -77,7 +77,7 @@
 							if (sub_smallCount != 0) {
 								sub_smallCountHtml = "" + sub_smallCount + item.small_unit + "";
 							}
-							var html = $newProductDetail.find("#subProduct").html();
+							var html = $newProductDetail.find("#subProduct").html().trim();
 							if (item.is_gift == 0) { 
 								$newProductDetail.find("#compositionValueName").append('<div>'+item.custom_name + ' ' + sub_bigCountHtml + sub_smallCountHtml+'</div>');
 							} else {
@@ -146,6 +146,7 @@
 		return product = {
 			productName : $el.custom_name,
 			valueName : $el.valueName,
+			categoryId : $el.categoryId,
 			
 			bigPriceSpan : '￥' + $el.price,
 			smallPriceSpan : '￥' + ($el.price/$el.convert_relate).toFixed(2),
