@@ -65,7 +65,7 @@
     	var salesIndent = document.getElementById('userCount');
        	var salesIndentChart = echarts.init(salesIndent);
 		salesIndentChart.showLoading();    	
-		Utils.ajax('${CPATH}/report/getUserRankMenu', params, 
+		Utils.ajax('${CPATH}/report/getSalesmenOrderOrStockOutReportOfSupervisor', params, 
 			function(data){
 				var high = 40 * data.length + 100;
 		        if (high < 300) {

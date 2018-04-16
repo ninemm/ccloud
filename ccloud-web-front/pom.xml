@@ -44,7 +44,15 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
-        </dependency> 
+        </dependency>
+        
+        <dependency>
+		  	<groupId>org.ccloud</groupId>
+		  	<artifactId>ccloud-business</artifactId>
+		  	<version>${project.version}</version>
+		  	<type>jar</type>
+		  	<scope>compile</scope>
+		</dependency>
     
         <dependency>
             <groupId>org.ccloud</groupId>

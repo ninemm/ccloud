@@ -23,11 +23,22 @@ import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
+import org.ccloud.business.SalesmanOrderReportBiz;
+import org.ccloud.business.SupervisorOrderReportBiz;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
-import org.ccloud.model.query.*;
+import org.ccloud.model.query.CustomerTypeQuery;
+import org.ccloud.model.query.CustomerVisitQuery;
+import org.ccloud.model.query.OrderDetailInfoQuery;
+import org.ccloud.model.query.OrderInfoQuery;
+import org.ccloud.model.query.ReceivablesQuery;
+import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DataAreaUtil;
 
@@ -155,7 +166,7 @@ public class ReportController extends BaseFrontController {
 		if (typeTag.equals("outStock")) {
 			customerCountByOutStock();
 		} else {
-			customerCount();
+			getSalesmanOrderReport();
 		}
 	}
 	
@@ -164,7 +175,7 @@ public class ReportController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");	
 		String dayTag = getPara("dayTag");
-//		String sellerId = getSessionAttr("sellerId");
+//			String sellerId = getSessionAttr("sellerId");
 		String customerType = getPara("customerType");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String userId = getPara("userId");
@@ -766,6 +777,56 @@ public class ReportController extends BaseFrontController {
 			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 			List<Record> lists = ReceivablesQuery.me().findByDataArea(dataArea);
 			renderJson(lists);
+		}
+		
+		/**
+		 * 查询登录业务员的客户订单报表(订单与打印)
+		 */
+		public void getSalesmanOrderReport() {
+			String startDate = getPara("startDate");
+			String endDate = getPara("endDate");	
+			String dayTag = getPara("dayTag");
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			String orderTag = getPara("orderTag");
+			String print = getPara("print");
+			String typeTag = getPara("typeTag");
+			String receiveType = getPara("receiveType");
+			if (typeTag != null && typeTag.equals("print")) {
+				print = "true";
+			}		
+			List<Record> records = SalesmanOrderReportBiz.me().getMyOrderReport(startDate, endDate, dayTag, user.getId(), orderTag, print, receiveType);
+			renderJson(records);
+		}
+		
+		/**
+		 * 查询主管下的业务员订单或者出库信息报表
+		 */
+		public void getSalesmenOrderOrStockOutReportOfSupervisor() {
+			String typeTag = getPara("typeTag");
+			if (typeTag.equals("outStock")) {
+				getUserRankByOutStock();
+			} else {
+				getSalesmenOrderReportOfSupervisor();
+			}
+		}
+		
+		/**
+		 * 查询主管下的业务员订单报表
+		 */
+		public void getSalesmenOrderReportOfSupervisor() {
+			String startDate = getPara("startDate");
+			String endDate = getPara("endDate");
+			String dayTag = getPara("dayTag");
+			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+			String orderTag = getPara("orderTag");
+			String print = getPara("print");
+			String typeTag = getPara("typeTag");
+			if (typeTag != null && typeTag.equals("print")) {
+				print = "true";
+			}		
+			String receiveType = getPara("receiveType");
+			List<Record> record = SupervisorOrderReportBiz.me().getMySalesmenOrderReport(startDate, endDate, dayTag, orderTag, dataArea, print, receiveType);
+			renderJson(record);
 		}
 }
 
