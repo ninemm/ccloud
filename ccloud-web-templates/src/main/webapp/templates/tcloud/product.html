@@ -76,17 +76,20 @@ $(function() {
         }
     }).on("click", "#sidebar li", function () {
         $(this).addClass("active").siblings().removeClass("active");
-        var index = $(this).index();
+        var index = $(this).index()-1;
      	$('.type').eq(index).show().siblings('.type').hide();
 
     }).on("click", ".product-content .swiper-slide", function () {
         $(this).addClass("active").siblings().removeClass("active");
 		tag = $(this).text();
+		categoryId='';
 		if(tag == '全部') {
 			tag = '';
 		}
 		changeInit();
-
+    }).on("click", "#category", function () {
+    		categoryId = $(this).attr("value");
+    		changeInit();
     }).on("click", "#searchCancel", function () {
     	keyword = $(this).val();
 		changeInit();
@@ -204,13 +207,14 @@ var newHtml = $(".common").eq(0).html();
 var $tags = $("#tags");
 var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
-
+var categoryId = '';
 function firstInit(){
 	var tags = ${tags!};
 	initTags(tags);
 	var productList = ${productList!};
 	var compositionList = ${compositionList!};
-	combo(productList, compositionList);
+	var goodsCategory = ${goodsCategory!};
+	combo(productList, compositionList,goodsCategory);
 }
 
 function changeInit(){
@@ -221,16 +225,16 @@ function changeInit(){
 
 	$sidebar.empty();
 	$menuRight.empty();
-	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword}, 
+	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword,'categoryId':categoryId}, 
 		function(data){
 			layer.closeAll();
-			combo(data.productList, data.compositionList);
+			combo(data.productList, data.compositionList, data.goodsCategory);
 		}
 	);
 }
 
-function combo(productList, compositionList){
-	initProduct(productList);
+function combo(productList, compositionList,goodsCategory){
+	initProduct(productList,goodsCategory);
 	initComposition(compositionList);
 	productNum();
 	compositionNum();
@@ -243,27 +247,29 @@ function initTags(tags) {
 	$.each(tags, function (index, el) {
 		$tags.append("<div class='swiper-slide'>" + el + "</div>");
 	});
-
 	var mySwiper = new Swiper('.product-content .swiper-container', {
 		width: $('#sidebar').width(),
 	})
 }
 
-function initProduct(productList){
-	var categoryId = '';
-
-	$.each(productList, function(index, el) {
-		if(categoryId != el.categoryId) {
-			if(categoryId == '') {
-				$sidebar.append("<li id='" + el.categoryId + "' class='active'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+function initProduct(productList,goodsCategory){
+	$.each(goodsCategory, function(index, el) {
+		if(categoryId==''){
+			$sidebar.append("<li id='category' class='active' value='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+			$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
+			categoryId=el.categoryId;
+		}else{
+			if(categoryId != el.categoryId){
+				$sidebar.append("<li id='category' value='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+				$menuRight.append("<div class='type1' id='" + el.categoryId + "' style='display:none'> </div>")
+			}else{
+				$sidebar.append("<li id='category' class='active' value='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
 				$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
-			} else {
-				$sidebar.append("<li id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
-				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
 			}
-			categoryId = el.categoryId;
 		}
-
+	});
+	
+	$.each(productList, function(index, el) {
 		var $type = $menuRight.find(".type:last");
 		$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
 		var $newProductDetail = $type.find(".common:last");
@@ -319,7 +325,7 @@ function productNum(){
 var compositionHtml = $(".composition").eq(0).html();
 function initComposition(compositionList){
 	if(compositionList.length > 0) {
-		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'>8</span> </li>");
+		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'></span> </li>");
 		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
 	}
 	

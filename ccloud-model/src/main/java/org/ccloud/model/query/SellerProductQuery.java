@@ -150,7 +150,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
-	public List<Record> findProductListForApp(String sellerId, String keyword, String tag) {
+	public List<Record> findProductListForApp(String sellerId, String keyword, String tag, String categoryId) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, sp.cost, sp.account_price, sp.tags,"
 				+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
@@ -163,7 +163,7 @@ public class SellerProductQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, false);
-		
+		appendIfNotEmpty(fromBuilder, "gc.id", categoryId, params, false);
 		if (StrKit.notBlank(tag)) {
 			fromBuilder.append(" AND FIND_IN_SET(?, sp.tags)");
 			params.add(tag);
@@ -256,7 +256,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return DAO.findFirst(sql, sellerProductId,sellerId);
 	}
 
-	public List<Record> findProductListForAppByCar(String sellerId, String keyword, String tag, String wareHouseId) {
+	public List<Record> findProductListForAppByCar(String sellerId, String keyword, String tag, String wareHouseId, String categoryId) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.price, sp.cost, sp.account_price, sp.tags,"
 				+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
@@ -271,7 +271,7 @@ public class SellerProductQuery extends JBaseQuery {
 		params.add(wareHouseId);
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, false);
-		
+		appendIfNotEmpty(fromBuilder, "gc.id", categoryId, params, false);
 		if (StrKit.notBlank(tag)) {
 			fromBuilder.append(" AND FIND_IN_SET(?, sp.tags)");
 			params.add(tag);

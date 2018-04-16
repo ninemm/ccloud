@@ -271,4 +271,19 @@ public class GoodsCategoryQuery extends JBaseQuery {
 		fromBuilder.append("where cc.seller_id = ? GROUP BY cgc.id ");
 		return DAO.find(fromBuilder.toString(), sellerId);
 	}
+
+	public List<Record> findBySellerId(String sellerId, String tag) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT gc.id categoryId, gc.`name` categoryName FROM cc_seller_product sp ");
+		fromBuilder.append(" JOIN cc_product p ON sp.product_id = p.id JOIN cc_goods g ON p.goods_id = g.id ");
+		fromBuilder.append(" JOIN cc_goods_category gc ON g.goods_category_id = gc.id ");
+		fromBuilder.append(" WHERE sp.is_enable = 1 AND sp.is_gift = 0 ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
+		if (StrKit.notBlank(tag)) {
+			fromBuilder.append(" AND FIND_IN_SET(?, sp.tags)");
+			params.add(tag);
+		}
+		fromBuilder.append("  GROUP BY gc.`id` ORDER BY gc.`parent_id`");
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
 }
