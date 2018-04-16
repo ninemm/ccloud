@@ -46,10 +46,14 @@ public class BiIndexController extends BaseFrontController {
 			renderNull();
 			return ;
 		}
+
+		//=================================本地开发需要放开这一段注释===================================================
 		List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
 		String sellerArray[] = new String[sellerByUser.size()];
+		String sellerNameArray[] = new String[sellerByUser.size()];
 		for (int i = 0; i < sellerByUser.size(); i++) {
 			sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
+			sellerNameArray[i] = sellerByUser.get(i).getStr("seller_name");
 		}
 
 		List<Record> brandByUser = BiManagerQuery.me().findBrandByUser(user.getId());
@@ -65,30 +69,23 @@ public class BiIndexController extends BaseFrontController {
 		}
 
 		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
+		setSessionAttr(Consts.SESSION_SELLER_NAME, sellerNameArray);
 		setSessionAttr(Consts.SESSION_BRAND_ID_ARRAY, brandArray);
 		setSessionAttr(Consts.SESSION_PRODUCT_ID_ARRAY, productArray);
-
+		//==============================================================================================================
 
 		//从session取
 		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+		String[] sellerName = getSessionAttr(Consts.SESSION_SELLER_NAME);
 		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
 
 		setAttr("dealerCount", dataArea.length);
 		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(dataArea,null, null, brandId));
 
+		setAttr("dataArea", JSON.toJSON(dataArea));
+		setAttr("sellerName", JSON.toJSON(sellerName));
 
 		render("index.html");
-	}
-
-	public void dealerList(){
-
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
-
-		String startDate = DateUtils.getDateByType("2");
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
-
-		renderJson(Bi2SalesQuery.me().findsalesList(true,null,null,null,dataArea, startDate, endDate, brandId));
 	}
 
 	public void selectDealer() {

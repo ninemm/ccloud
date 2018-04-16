@@ -3,9 +3,7 @@
     section {
         background: #fff;
     }
-    .location-wrapper {
-        margin-top: 2.4rem;
-    }
+
     .wy-header-title{
         display:inline;
         margin: 0 0 0 3.2rem;
@@ -29,21 +27,11 @@
         width: 100%;
         text-align: center;
     }
-    #orderAvg {
+    #dealer_in_china_map {
       width: 100%;
-      height: 14rem;
+      height: 16rem;
     }
 
-    .map-wrapper {
-        width: 100%;
-        height: 20rem;
-    }
-    
-    .maps {
-        width: 100%;
-        height: 100%;
-    }
-    
     header {
         background: #f9f9f9;
     }
@@ -52,11 +40,12 @@
         background: none;
     }
     .more-dealer {
-	    line-height: 2rem;
-	    width: 2rem;
-	    text-align: center;
-        position: relative;
-        top: -2rem;
+        line-height: 2rem;
+        width: 2rem;
+        text-align: center;
+        position: absolute;
+        bottom: 4.9rem;
+        right: 0;
     }
 
 </#macro>
@@ -67,7 +56,7 @@
     <script type="text/javascript" src="${CTPATH}/js/city-picker.js"></script> -->
     <script type="text/javascript" src="${CTPATH}/json/china-city-map.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
-    <script type="text/javascript" src="${CTPATH}/js/index_map.js"></script>
+    <!--<script type="text/javascript" src="${CTPATH}/js/index_map.js"></script>-->
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="${CTPATH}/js/headroom.min.js"></script>    
 </#macro>
@@ -101,7 +90,8 @@
 
         dealerSelect.init();
         topTotal();
-        initDealerInChinaMap();
+        initDealerList();
+        renderChinaMap();
         total();
 
     });
@@ -191,52 +181,104 @@
         }, 2000);
     }
 
-    var dealerMapId = document.getElementById("dealer_in_china_map");
-    var chinaMapCharts = echarts.init(dealerMapId);
-    function initDealerInChinaMap() {
 
-        chinaMapCharts.showLoading({
-            text: '加载中...',
-            effect: 'whirling'
-        });
-        dataValue = [];
-        $.ajax({
-            url:"${CPATH}/dealerList",
-            type:"post",
-            data:{},
-            dataType:"json"
-        }).done(function(data){
-            var dataValue = [];
+    function initDealerList() {
+
+            var dataArea = ${dataArea};
+            var sellerName = ${sellerName};
             var $dealerList = $("#dealerList");
             $dealerList.empty();
             $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + "all" + "',this)\"><div class='weui-cell__hd'>" + "全部" + "</div></div>");
-            $.each(data,function(index,el){
-                var cityName = el.city_name.replace('市','');
-                dataValue.push({'name': cityName, 'value': el.totalAmount});
-                $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + el.data_area + "',this)\"><div class='weui-cell__hd'>" + el.dealerName + "</div></div>");
+            $.each(dataArea,function(index,el){
+                $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + el + "',this)\"><div class='weui-cell__hd'>" + sellerName[index] + "</div></div>");
             });
-            var option = initOption(dataValue);
-            var dealerMapId = document.getElementById("dealer_in_china_map");
-            var chinaMapCharts = echarts.init(dealerMapId);
-            $(dealerMapId).height(400);
-            chinaMapCharts.clear();
-            chinaMapCharts.resize();
-            $.getJSON(getMapDataUrl(), function(data) {
-                echarts.registerMap('china', data);
-                chinaMapCharts.setOption(option);
-                chinaMapCharts.hideLoading();
-                Utils.close();
-            });
-        });
     }
+
+    var dealerMapId = document.getElementById("dealer_in_china_map");
+    var chinaMapCharts = echarts.init(dealerMapId);
     
-    function getMapDataUrl() {
+    //中国地图渲染
+    function renderChinaMap() {
 
-        if(cityMap[curProvName] == undefined){
-            return '${CTPATH}/json/china.json';
-        }
-
-        return '${CTPATH}/json/'+cityMap[curProvName]+'/'+ (cityMap[cityName] != undefined ? cityMap[cityName] : cityMap[curProvName]) +'.json';
+            chinaMapCharts.showLoading({
+                text: '加载中...',
+                effect: 'whirling'
+            });
+            
+            var maxData = 0;
+            
+            $.ajax({
+                url: "${CPATH}/biSales/queryMapData",
+                type: "post",
+                data: {dateType: '3'},
+                dataType:"json"
+            }).done(function(data) {
+                prov_data = [];
+                for(var i = 0; i < data.length; i++) {
+                    prov_data.push({
+                        "name": data[i].prov_name.substring(0, data[i].prov_name.length -1),
+                        "value": data[i].realAmount
+                    });
+            
+                if (data[i].realAmount > maxData)
+                    maxData = data[i].realAmount;
+                }
+            
+                $.get('${CTPATH}/json/china.json', function (mapJson) {
+                
+                    echarts.registerMap('china', mapJson);
+                    chinaMapCharts.hideLoading();
+                    chinaMapCharts.resize();
+    
+                    chinaMapCharts.setOption({
+                        tooltip: {
+                            trigger: 'item',
+                            textStyle: {fontSize: 9},
+                            formatter: function (result){
+                                if(isNaN(result.value))
+                                    return result.name + '<br />总金额: 0';
+                                else
+                                    return result.name + '<br />总金额:' + result.value + '万元';
+                            }
+                        },
+                        visualMap: {
+                            min: 0,
+                            max: maxData + 1,
+                            splitNumber: 0,
+                            text: ['高','低'],
+                            realtime: false,
+                            selectedMode: false,
+                            realtime: false,
+                            show: true,
+                            itemWidth: 20,
+                            itemHeight: 120
+                        },
+                        series: [{
+                            type: 'map',
+                            map: 'china',                   // 要和echarts.registerMap（）中第一个参数一致
+                            roam: true,
+                            scaleLimit: { min: 1, max: 4},  // 缩放
+                            mapLocation:{
+                            y:60
+                        },
+                        itemSytle: {
+                            emphasis: {label: {show: false}}
+                        },
+                        label: {
+                            normal: {
+                                show: true,
+                                textStyle: {fontSize: 9},
+                            },
+                            emphasis: {
+                                show: true,
+                                textStyle: {fontSize: 9},
+                            }
+                        },
+                        data: prov_data.reverse()
+                        }]
+                    });
+                });
+            });
     }
 
     function selectDealer(dataArea,obj) {
@@ -324,16 +366,15 @@
         <div class="divide-line"></div>
         <header>
             <div class="title">经销商分布图</div>
-            <div id="combin-filter-btn" class="more-dealer fr font-20"><i class="icon-list"></i></div>
         </header>
         
         <div id="map-wrapper" class="map-wrapper">
             <div id="dealer_in_china_map" class="maps"></div>
         </div>
-        <!-- <div class="divide-line"></div> -->
-        
+        <div class="divide-line"></div>
         <header>
             <div class="title" id="dealerName">全部经销商汇总信息</div>
+            <div id="combin-filter-btn" class="more-dealer font-20"><i class="icon-list"></i></div>
         </header>
         <div class="sales-gather">
             <div class="gather">
@@ -359,7 +400,6 @@
             </div>
         </div>
         
-        <div class="divide-line"></div>
         <!-- <div id="orderAvg"></div> -->
         
     </div>

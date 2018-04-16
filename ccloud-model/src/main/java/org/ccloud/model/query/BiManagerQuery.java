@@ -50,9 +50,11 @@ public class BiManagerQuery extends JBaseQuery {
 	public List<Record> findSellerByUser(String id) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder(" select dealer_data_area ");
-		sqlBuilder.append(" from bi_user_join_seller ");
-		appendIfNotEmpty(sqlBuilder, "user_id", id, params, true);
+		StringBuilder sqlBuilder = new StringBuilder(" select b.dealer_data_area, s.seller_name ");
+		sqlBuilder.append(" from bi_user_join_seller b ");
+		sqlBuilder.append(" left join cc_department d on b.dealer_data_area = d.data_area ");
+		sqlBuilder.append(" left join cc_seller s on d.id = s.dept_id ");
+		appendIfNotEmpty(sqlBuilder, "b.user_id", id, params, true);
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}

@@ -38,6 +38,7 @@ public class Consts {
 	public static final String SESSION_SELLER_HAS_STORE = "hasStore";
 
 	public static final String SESSION_DEALER_DATA_AREA_ARRAY = "_dealer_data_area_array";//经销商ID
+	public static final String SESSION_SELLER_NAME_ARRAY = "_dealer_seller_name_array";//经销商ID
 	public static final String SESSION_BRAND_ID_ARRAY = "_brand_id_array";//商品ID
 	public static final String SESSION_PRODUCT_ID_ARRAY = "_product_id_array";//商品ID
 
