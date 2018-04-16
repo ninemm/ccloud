@@ -78,13 +78,14 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String sortOrder = getPara("sortOrder");
 		Map<String, String[]> paraMap = getParaMap();
 		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
+		String keyword1 = StringUtils.getArrayFirst(paraMap.get("k1"));
 		String customerType = getPara("customerType");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		Page<Record> page = SellerCustomerQuery.me()._paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType);
+		Page<Record> page = SellerCustomerQuery.me()._paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType,keyword1);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -408,7 +409,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		Page<Record> page = SellerCustomerQuery.me()._paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
+		Page<Record> page = SellerCustomerQuery.me()._paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "","");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
