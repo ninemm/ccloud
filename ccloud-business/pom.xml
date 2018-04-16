@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.ccloud</groupId>
+    <artifactId>ccloud</artifactId>
+    <version>0.0.1</version>
+  </parent>
+  <artifactId>ccloud-business</artifactId>
+  <name>ccloud-business</name>
+  <packaging>jar</packaging>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+	  <groupId>com.jfinal</groupId>
+	  <artifactId>jfinal</artifactId>
+	</dependency>
+	
+	<dependency>
+	  <groupId>org.ccloud</groupId>
+	  <artifactId>ccloud-model</artifactId>
+	  <version>${project.version}</version>
+	  <type>jar</type>
+	  <scope>compile</scope>
+	</dependency>
+    
+  </dependencies>
+</project>
