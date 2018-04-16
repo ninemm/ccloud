@@ -308,7 +308,7 @@
 		    content: '${CPATH}/admin/attachment/_choose_layer',
 		    end:function(){
 		    	if(''!=data.url && null != data.url){
-		    		$("#imageDiv").append("<li><div class='imgDiv'><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"><div class='delete'></div></div></li>");
+		    		$("#imageDiv").append("<li style='display:inline;margin-right:15px;'><div class='imgDiv' style='width: 30%; height: 200px;max-width:300px'><img src="+ data.url +" path=${CPATH}"+ data.url +" class='jp-grids-photos img-responsive' ><input type='hidden' name='imageUrl[]' value="+ data.url +"><input type='hidden' name='title[]' value="+ data.alt +"><div class='delete'></div></div></li>");
 		    		data.url = "";
 	    		}
 		    }
@@ -712,13 +712,13 @@
 									<span class="btn btn-default" id="chooseImg" onClick="imgChoose()">选择图片</span>
 								</div>
 							</div>
-							<div class="col-sm-5 validata-box" style="margin-left:-20%;">
+							<div class="col-sm-12 validata-box">
 								<label class="control-label col-sm-4"></label>
-								<div class="input-group col-md-10 col-sm-10">
-									<ul class="list-inline list-unstyled" id="imageDiv">
+								<div class="input-group col-md-12 col-sm-12">
+									<ul id="imageDiv">
 										<#list (imageList)! as img>
-											<li>
-												<div class="imgDiv">
+											<li style="display:inline;margin-right:15px;">
+												<div class="imgDiv"  style="width: 20%; height: 200px;margin-right:15px;">
 													<img src="${img}" class='jp-grids-photos img-responsive' >
 													<input type='hidden' name='imageUrl[]' value="${img}">
 													<div class="delete"></div>
@@ -819,7 +819,7 @@
 							<th width="5%">行号</th>
 							<th width="10%">步骤</th>
 							<th width="50%">执行说明</th>
-							<th width="30%">模板配置</th>
+							<!-- <th width="30%">模板配置</th> -->
 						</tr>
 					</thead>
 					<tbody>
@@ -843,11 +843,11 @@
 									<input type="text" id="remark" name="remark"  style="width: 50%;"value=""/>
 								</div>
 							</td>
-							<td>
+							<!-- <td>
 								<div class = "validata-box">
 									<a class="btn btn-danger btn-xs" onclick = "editTemplate(this)">编辑</a>
 								</div>
-							</td>
+							</td> -->
 						</tr>
 					</tbody>
 					<tfoot>
