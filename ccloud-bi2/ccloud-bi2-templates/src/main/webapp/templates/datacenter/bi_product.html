@@ -53,7 +53,9 @@
     var provName = $.cookie(Utils.provCacheName);
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
-    var dateType = 0;
+    var dateType = $.cookie(Utils.dateTypeCache) == null ? 0 : $.cookie(Utils.dateTypeCache);
+    $("#date-div").find(".date").eq(dateType).addClass("active-date");
+
     var cInvCode = '';
     var cInvName = '';
 
@@ -64,6 +66,7 @@
         $a.addClass("active-date");
     });
     function setDateType(type){
+        $.cookie(Utils.dateTypeCache, type, { expires: 1 });
         dateType = type;
         product(provName, cityName, '', dateType);
     }

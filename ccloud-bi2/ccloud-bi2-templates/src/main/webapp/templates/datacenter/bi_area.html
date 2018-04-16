@@ -85,7 +85,9 @@
     var countryName = $.cookie(Utils.countryCacheName);
     var curProvTitle = null;
     
-    var dateType = 0;// 日期搜索按钮类型
+    var dateType = $.cookie(Utils.dateTypeCache) == null ? 0 : $.cookie(Utils.dateTypeCache);// 日期搜索按钮类型
+    $("#date-div").find(".date").eq(dateType).addClass("active-date");
+
     var hotMapType = 0 ;
     var prov_data = [];
     var city_data = [];
@@ -196,7 +198,7 @@
 
     //做时间的切换选择
     function setDateType(type) {
-    
+        $.cookie(Utils.dateTypeCache, type, { expires: 1 });
         dateType = type;
         //initData(provName, cityName, countryName, dateType);
         //refreshStockData(provName, cityName, countryName);

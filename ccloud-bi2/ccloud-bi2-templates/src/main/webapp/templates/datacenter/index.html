@@ -3,9 +3,15 @@
     section {
         background: #fff;
     }
-
-    #relocation{
-        display:inline;
+    #selectDealer {
+        display: inline-flex;
+        margin-top: 0.3rem;
+    }
+    #searchBar {
+        margin-left: 0.3rem;
+    }
+    .relocation{
+        margin-left: 9rem;
     }
     .compare .gather {
         display: inline-block;
@@ -63,7 +69,8 @@
     var cityName = $.cookie(Utils.cityCacheName);
     var countryName = $.cookie(Utils.countryCacheName);
     var curProvName = '';
-    var dateType = '0';
+    var dateType = $.cookie(Utils.dateTypeCache) == null ? 0 : $.cookie(Utils.dateTypeCache);
+    $("#date-div").find(".date").eq(dateType).addClass("active-date");
     
     var strKit = new StrKit();
     
@@ -95,6 +102,7 @@
         $a.addClass("active-date");
     });
     function setDateType(type){
+        $.cookie(Utils.dateTypeCache, type, { expires: 1 });
         dateType = type;
         total();
     }
@@ -113,7 +121,18 @@
         openCombinSearch();
     }).on('click', '#combin-filter .cancel-search-btn', function () { //关闭组合筛选
         closeCombinSearch();
+    }).on("click", ".relocation", function () { //定位
+        initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
+        
+        wxReadyGetLocation(
+            function(lng, lat, addComp, address) {
+                //$("#lng").val(lng.toFixed(6));
+                //$("#lat").val(lat.toFixed(6));
+            }
+        );
     })
+
+
 
     /*var dealerSelect = new Headroom($("#dealer-select")[0], {
         tolerance: 5,
@@ -339,7 +358,6 @@
 
     <div class="bi-body">
         <#include "_inc/_bi_search_box.html"/>
-
         <div class="compare">
             <div class="gather">
                 <p>
@@ -399,8 +417,8 @@
 <div class="layer"></div>
 <article id="combin-filter" class="animated slideOutRight">
     <div id="customer">
-        <header>
-            <div class="weui-search-bar" style="text-align: center" id="searchBar"> <p>选择经销商</p>
+        <header id="selectDealer" >
+            <div id="searchBar"> <p>选择经销商</p>
 <!--                <form class="weui-search-bar__form">
                     <div class="weui-search-bar__box">
                         <i class="weui-icon-search"></i>
@@ -414,6 +432,7 @@
                 </form>
                 <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>-->
             </div>
+            <div id="relocation" class="relocation fr"><i class="icon-map-marker txt-color-blue"></i> 定位</div>
         </header>
         <article id="infinite">
             <div class="weui-cells" id="dealerList">

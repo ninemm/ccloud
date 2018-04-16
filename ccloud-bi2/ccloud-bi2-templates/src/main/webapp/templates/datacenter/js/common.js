@@ -7,6 +7,7 @@ Utils = {
 	countryCacheName: 'COUNTRY_CACHE_NAME',
 	longitudeCache: 'LONGITUDE_CACHE',
 	latitudeCache: 'LATITUDE_CACHE',
+	dateTypeCache: 'DATE_TYPE',
 	rootName: '大冶市',
 	cp: [114.974842,30.098804],
 	loading: function() {
