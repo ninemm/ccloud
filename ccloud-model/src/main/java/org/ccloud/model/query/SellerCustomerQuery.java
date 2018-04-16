@@ -587,7 +587,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 	}
 
 	public Page<Record> _findImportCustomer(int pageNumber, int pageSize, String userDataArea, String searchKey, String corpSellerId, String dealerDataArea) {
-		boolean needwhere = false;
+//		boolean needwhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		String select = "SELECT cc.*, GROUP_CONCAT(u.realname) AS getted ";

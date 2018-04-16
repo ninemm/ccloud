@@ -228,4 +228,9 @@ public class CustomerTypeQuery extends JBaseQuery {
 		return DAO.find(sql.toString());
 		
 	}
+	
+	public List<CustomerType> findByID(String customerTypeIds){
+		String sql = "select * from cc_customer_type where id in ("+customerTypeIds+") ORDER BY create_date ";
+		return DAO.find(sql);
+	}
 }

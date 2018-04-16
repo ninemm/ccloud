@@ -32,7 +32,6 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
-import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 
 /**
@@ -148,20 +147,23 @@ public class ActivityController extends BaseFrontController {
 
 		//客户类型限制
 		String customer_type = activity.getStr("customer_type");
+		customerTypes.add(all);
+		List<CustomerType> customerTypeList = new ArrayList<CustomerType>();
 		if(StrKit.isBlank(customer_type)) {
-			customerTypes.add(all);
-			List<CustomerType> customerTypeList = CustomerTypeQuery.me()
-					                                      .findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
-			for (CustomerType customerType : customerTypeList) {
-				Map<String, Object> item = new HashMap<>();
-				item.put("title", customerType.getName());
-				item.put("value", customerType.getId());
-				customerTypes.add(item);
-			}
+			customerTypeList = CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
 		}else {
+			int index = customer_type.indexOf(",");
+			if(index != -1) {
+				customer_type = "'"+customer_type.replace(",", "','")+"'";
+			}else {
+				customer_type = "'"+customer_type+"'";
+			}
+			customerTypeList = CustomerTypeQuery.me().findByID(customer_type);
+		}
+		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("title", activity.getStr("customerTypeName"));
-			item.put("value", customer_type);
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
 		List<ExpenseDetail> expenseDetails = ExpenseDetailQuery.me().findByActivityId(activity_id);
@@ -679,28 +681,31 @@ public class ActivityController extends BaseFrontController {
 	
 	public void customerList(){
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String activity_id = getPara("activityId");
+		Record activity = ActivityQuery.me().findMoreById(activity_id);
 		String keyword = getPara("keyword");
 		String userId = getPara("userId");
-		List<CustomerType> customerTypes = new ArrayList<CustomerType>();
-		String customerType = "'";
+//		List<CustomerType> customerTypes = new ArrayList<CustomerType>();
+//		String customerType = "'";
 		String customerTypeId = "";
-		if(getPara("customerTypeId")!=null) {
-			String[] customerTypeIds= getPara("customerTypeId").split(",");
-			for(int i = 0;i<customerTypeIds.length;i++){
-				customerType += customerTypeIds[i]+"','";
-			}
-			if(customerTypeIds!=null){
-				customerTypeId = customerType.substring(0, customerType.length()-2);
+		if(StrKit.isBlank(getPara("customerTypeId")) || StrKit.isBlank(getPara("customerType"))) {
+			if(StrKit.notBlank(activity.getStr("customer_type"))) {
+				int index = activity.getStr("customer_type").indexOf(",");
+				if(index != -1) {
+					customerTypeId = "'"+activity.getStr("customer_type").replace(",", "','")+"'";
+				}else {
+					customerTypeId = "'" + activity.getStr("customer_type") + "'";
+				}
+			}else {
+				List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+				for(CustomerType ct : customerTypeList) {
+					customerTypeId += "'" + ct.getId() + "',";//customerTypeIDs.add(ct.getId());
+				}
+				customerTypeId = customerTypeId.substring(0,customerTypeId.length()-1);
 			}
 		}else {
-			customerTypes=CustomerTypeQuery.me().findByDept(user.getDepartmentId());
-			for(int i = 0;i<customerTypes.size();i++){
-				customerType += customerTypes.get(i).getId()+"','";
-			}
-			if(customerTypes!=null){
-				customerTypeId = customerType.substring(0, customerType.length()-2);
-			}
+			customerTypeId = "'" + getPara("customerType") + "'";
 		}
 		
 		String isOrdered = getPara("isOrdered");
