@@ -1108,13 +1108,13 @@ public class CustomerController extends BaseFrontController {
 
 	public void  getImportCustomerList(){
 		User user = (User) getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String dataArea = user.getDataArea();
 		String customerName = getPara("keyword");
 
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
-
+		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area");
+		
 		Page<Record> customerList = SellerCustomerQuery.me()._findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
