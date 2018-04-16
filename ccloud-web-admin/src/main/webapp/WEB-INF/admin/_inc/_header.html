@@ -11,28 +11,28 @@
 			<span class="sr-only">开关</span> 
 			<span class="icon-bar"></span>
 		</a>
-        <a href="#" class="navbar-brand">${(session.sellerName)!'协同云平台'}</a>
+        <a href="#" class="navbar-brand">协同云平台</a>
 		<div class="navbar-custom-menu" style="padding-right: 2rem">
 			<ul class="nav navbar-nav">
                 <!-- Messages: style can be found in dropdown.less-->
 				<li class="dropdown notifications-menu">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					    <i class="fa fa-envelope-o"></i><span class="label label-success">${(session.allList)!}</span>
+					    <i class="fa fa-envelope-o"></i><span class="label label-success"></span>
 					</a>
 					<ul class="dropdown-menu">
-						<li class="header">你有${(session.allList)!}条待审核信息</li>
+						<li class="header">你有0条待审核信息</li>
 						<li>
 							<!-- inner menu: contains the actual data -->
 							<ul class="menu">
 								
 									<!-- start message --> 
-									<#if (session.sellerCustomerList??) && (session.sellerCustomerList >0)>
+<!--									<#if (session.sellerCustomerList??) && (session.sellerCustomerList >0)>
 									<li><a href="${CPATH}/admin">
 										<i class="fa fa-user-plus text-aqua"></i>你有${(session.sellerCustomerList)!}个待审核客户
 								    </a></li>
 								    </#if>
 								
-								<!-- end message -->
+								&lt;!&ndash; end message &ndash;&gt;
 								<#if (session.orderList??) && (session.orderList > 0)>
 								<li><a href="${CPATH}/admin">
 										<i class="fa fa-file-text-o text-yellow"></i> 你有${(session.orderList)!}个待审核订单
@@ -40,7 +40,7 @@
 								<#if (session.sellerCustomerVisitList??) && (session.sellerCustomerVisitList > 0)>
 								<li><a href="${CPATH}/admin">
 										<i class="fa fa-users text-red"></i>你有${(session.sellerCustomerVisitList)!}个待审核客户拜访
-								</a></li></#if>
+								</a></li></#if>-->
 							</ul>
 						</li>
 						<li class="footer"><a href="${CPATH}/admin">查看所有</a></li>
@@ -78,7 +78,7 @@
 						<!-- User image -->
 						<li class="user-header">
 							<img src="${CPATH}${(USER.avatar)!'/static/ccloud/admin/image/avatar.jpg'}" style="border-radius: 50%;" >
-							<p>${USER.nickname!USER.username} - ${(session['sellerName'])!}</p>
+							<p>${USER.nickname!USER.username} - </p>
 							</li>
 						<li class="user-footer">
 							<div class="pull-left">

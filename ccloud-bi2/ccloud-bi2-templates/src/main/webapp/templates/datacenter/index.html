@@ -4,12 +4,6 @@
         background: #fff;
     }
 
-    .wy-header-title{
-        display:inline;
-        margin: 0 0 0 3.2rem;
-        line-height: 2rem;
-        color: #999;
-    }
     #relocation{
         display:inline;
     }
@@ -35,16 +29,13 @@
     header {
         background: #f9f9f9;
     }
-    
-    .title {
-        background: none;
-    }
+
     .more-dealer {
         line-height: 2rem;
         width: 2rem;
         text-align: center;
         position: absolute;
-        bottom: 4.9rem;
+        bottom: 4.7rem;
         right: 0;
     }
 
@@ -58,7 +49,7 @@
     <script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
     <!--<script type="text/javascript" src="${CTPATH}/js/index_map.js"></script>-->
     <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    <script type="text/javascript" src="${CTPATH}/js/headroom.min.js"></script>    
+ <!--   <script type="text/javascript" src="${CTPATH}/js/headroom.min.js"></script>   -->
 </#macro>
 <#macro script>
     
@@ -78,17 +69,17 @@
     
     $(function() { 
         Utils.loading();
-        //initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
+        initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
-        //wxReadyGetLocation(
-        //    function(lng, lat, addComp, address) {
-        //        $("#lng").val(lng.toFixed(6));
-        //        $("#lat").val(lat.toFixed(6));
-        //    }
-        //);
+        wxReadyGetLocation(
+            function(lng, lat, addComp, address) {
+                //$("#lng").val(lng.toFixed(6));
+                //$("#lat").val(lat.toFixed(6));
+            }
+        );
 
 
-        dealerSelect.init();
+        //dealerSelect.init();
         topTotal();
         initDealerList();
         renderChinaMap();
@@ -124,7 +115,7 @@
         closeCombinSearch();
     })
 
-    var dealerSelect = new Headroom($("#dealer-select")[0], {
+    /*var dealerSelect = new Headroom($("#dealer-select")[0], {
         tolerance: 5,
         offset: 200,
         classes: {
@@ -132,7 +123,7 @@
             pinned: "slideInRight",
             unpinned: "slideOutRight"
         }
-    });
+    });*/
     
     //打开组合搜索
     function openCombinSearch() {
@@ -404,7 +395,7 @@
         
     </div>
 </section>
-<img src="${CTPATH}/images/dealer-select.svg" alt="" id="dealer-select">
+<!--<img src="${CTPATH}/images/dealer-select.svg" alt="" id="dealer-select">-->
 <div class="layer"></div>
 <article id="combin-filter" class="animated slideOutRight">
     <div id="customer">
