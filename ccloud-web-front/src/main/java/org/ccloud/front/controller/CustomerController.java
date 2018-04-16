@@ -101,9 +101,9 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refresh() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
-		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
+//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+//		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+//		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		boolean visitAdd = SecurityUtils.getSubject().isPermitted("/admin/customerVisit/add");
