@@ -283,7 +283,7 @@ public class GoodsCategoryQuery extends JBaseQuery {
 			fromBuilder.append(" AND FIND_IN_SET(?, sp.tags)");
 			params.add(tag);
 		}
-		fromBuilder.append("  GROUP BY gc.`id` ORDER BY gc.`parent_id`");
+		fromBuilder.append("  GROUP BY gc.`id` ORDER BY gc.`parent_id`,gc.`order_list`");
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 }
