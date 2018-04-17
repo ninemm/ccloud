@@ -360,6 +360,8 @@
 				"typeTag":  $("#typeTag").val(),
 				"deptId": deptObj[param.name]
 			}
+			$(".productName").html(param.name+"部门产品统计");
+			$(".workerName").html(param.name+"部门业务员统计");
 	    	productCount(params);
 	    	userCount(params);
 	    }
@@ -717,7 +719,7 @@
 				</div>
 			</div>
 			<div class="weui-panel weui-panel_access">
-				<div class="weui-panel__hd pro t-c ft16">
+				<div class="weui-panel__hd pro t-c ft16 productName">
 					部门产品统计
 				</div>
 				<div class="weui-cells weui-cells_form mg-0">
@@ -731,7 +733,7 @@
 				</div>
 			</div>
 			<div class="weui-panel weui-panel_access">
-				<div class="weui-panel__hd ft16 t-c">
+				<div class="weui-panel__hd ft16 t-c workerName">
 					部门业务员统计
 				</div>
 				<div class="weui-panel__bd report-area border-top-1px relative">
