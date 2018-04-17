@@ -71,21 +71,8 @@
         dateType = type;
         total();
     }
-    
-    $(document).on('click', '#combin-filter', function() {
-    
-    }).off("click", "#combin-filter");
 
-    var $combinSearch = $('#combin-filter');
-    var $layer = $(".layer");
-
-    $(document).on("click", ".layer", function () { //点击遮罩关闭菜单、组合筛选
-        closeCombinSearch();
-    }).on('click', '#combin-filter-btn, #dealer-select', function () { //打开组合筛选
-        openCombinSearch();
-    }).on('click', '#combin-filter .cancel-search-btn', function () { //关闭组合筛选
-        closeCombinSearch();
-    }).on("click", ".relocation", function () { //定位
+    /*$(document).on("click", ".relocation", function () { //定位
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
         
         wxReadyGetLocation(
@@ -93,9 +80,7 @@
 
             }
         );
-    })
-
-
+    })*/
 
     /*var dealerSelect = new Headroom($("#dealer-select")[0], {
         tolerance: 5,
@@ -106,37 +91,7 @@
             unpinned: "slideOutRight"
         }
     });*/ 
-    
-    //打开组合搜索
-    function openCombinSearch() {
-        ModalHelper.afterOpen();
-        $layer.addClass("layer-show");
-        $combinSearch.show().removeClass("slideOutRight").addClass("slideInRight");
-    }
 
-    //关闭组合搜索
-    function closeCombinSearch() {
-        ModalHelper.beforeClose();
-        $combinSearch.removeClass("slideInRight").addClass("slideOutRight");
-        setTimeout(function() {
-            $layer.removeClass("layer-show");
-        }, 300);
-    }
-
-    var ModalHelper = (function (bodyCls) {
-        var scrollTop;
-        return {
-          afterOpen: function () {
-            scrollTop = document.scrollingElement.scrollTop;
-            document.body.classList.add(bodyCls);
-            document.body.style.top = -scrollTop + "px";
-          },
-          beforeClose: function () {
-            document.body.classList.remove(bodyCls);
-            document.scrollingElement.scrollTop = scrollTop;
-          }
-        };
-      })("modal-open");
 
     //顶部统计
     function topTotal(){
@@ -391,9 +346,9 @@
         
     </div>
 </section>
-<img src="${CTPATH}/images/dealer-select.svg" alt="" id="dealer-select">
-<div class="layer"></div>
-<article id="combin-filter" class="animated slideOutRight">
+<img src="${CTPATH}/images/dealer-select.svg" alt="" id="dealer-select" data-target="dealer-filter">
+
+<article id="dealer-filter" class="combin-filter animated slideOutRight">
     <div id="customer">
         <header>
             <div class="weui-search-bar" id="searchBar">
@@ -423,8 +378,11 @@
                 <span class="weui-loadmore__tips">暂无数据</span>
             </div>
         </article>
-        <button class="cancel-search-btn">取消</button>
+        <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+            <button class="red-button cancel-search-btn weui-flex__item">取消</button>
+        </footer>
     </div>
 </article>
+<#include "_inc/_combin_filter.html"/>
 <#include "_inc/_nav_box.html"/>
 </@layout>

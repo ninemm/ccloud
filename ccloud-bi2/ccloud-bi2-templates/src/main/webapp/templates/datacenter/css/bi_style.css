@@ -516,8 +516,9 @@ header {
 }
 
 .weui-footer {
-	height: 1.5rem;
-	line-height: 1.5rem;
+	height: 2rem;
+	line-height: 2rem;
+	bottom: 0;
 }
 
 .weui-search-bar__label {
@@ -783,7 +784,7 @@ img {
 
 /* 侧边筛选 */
 
-#combin-filter {
+.combin-filter {
   position: fixed;
   top: 0;
   bottom: 0;
@@ -795,7 +796,7 @@ img {
 	
 }
 
-#combin-filter #infinite {
+.combin-filter #infinite {
 	position: absolute;
 	top: 44px;
 	bottom: 2rem;
@@ -806,11 +807,11 @@ img {
 	margin-top: 0;
 }
 
-#combin-filter .weui-cells {
+.combin-filter .weui-cells {
 	margin-top: 0;
 }
 
-#combin-filter .weui-cell {
+.combin-filter .weui-cell {
 	font-size: .7rem;
 }
 
@@ -845,12 +846,55 @@ body.modal-open {
 	right: .5rem;
 }
 
-.cancel-search-btn {
-	height: 2rem;
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	background: #ea6f5a;
-	color: #fff;
-	width: 100%;
+.filter-item {
+	padding: 0 0.5rem;
+}
+
+.filter-item h4 {
+	padding: 1rem 0 0.5rem;
+}
+
+.filter-item .weui-flex {
+	-webkit-box-pack: justify;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
+.filter-item span {
+	display: block;
+	text-align: center;
+	width: 30%;
+	background: #f2f2f2;
+	margin-bottom: 0.5rem;
+	height: 1.2rem;
+	line-height: 1.2rem;
+	margin-right: 3%;
+	float: left;
+	border-radius: 2px;
+}
+
+.filter-item input {
+	border: 1px solid #e5e5e5;
+	border-radius: 4px;
+	text-align: center;
+	background: #efefef;
+}
+
+.white-button-no-border {
+	background: #fff;
+	color: #666;
+	border: 0;
+	width: 50%;
+	height: 100%;
+}
+
+.red-button {
+	background: #ea6f5a !important;
+	color: #fff !important;
+	height: 100%;
+}
+
+.border-top-1px {
+	border-top: 1px solid #e5e5e5 !important;
 }
