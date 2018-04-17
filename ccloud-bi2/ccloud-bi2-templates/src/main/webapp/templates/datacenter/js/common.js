@@ -311,3 +311,13 @@ var MapSet = {
 		},{enableHighAccuracy: true})
 	}
 };
+
+$(".trOpen").click(function() {
+	$(this).hide().siblings().show();
+	$(this).parents('table').find('tbody tr:gt(5)').show();
+});
+
+$(".trClose").click(function() {
+	$(this).hide().siblings().show();
+	$(this).parents('table').find('tbody tr:gt(5)').hide();
+});
