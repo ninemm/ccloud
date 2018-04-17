@@ -777,7 +777,6 @@
         //post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
     }
     
-    var $prTR;
     //产品
     function product_rank(provName, cityName, countryName, dateType){
         countryName = '';
@@ -804,22 +803,27 @@
             for(var i = 0; i < data.length; i++){
                 $tbody.append('<tr><td>' + data[i].custom_name + '</td><td class="t-r">' + Math.round(data[i].productCount*100)/100 + '</td><td class="t-r">' + data[i].totalAmount + '</td></tr>');
             }
-            $prTR = $("#product_rank tbody tr:gt(5)");
-            if($prTR.length > 0){
-                $prTR.hide();
-                $("#prTrOpen").show();
-                $("#prTrClose").hide();
+            var $tr = $("#product_rank tbody tr:gt(5)");
+            if($tr.length > 0){
+                $tr.hide();
+                $(".trOpen").show();
+                $(".trClose").hide();
                 $("#product_rank tfoot").show();
             }else {
-                $("#prTrOpen").hide();
-                $("#prTrClose").hide();
                 $("#product_rank tfoot").hide();
             }
             $(".weui-tab__bd").height($("#tab1").height());
        });
     }
+
+    $(".trOpen").click(function() {
+        $(".weui-tab__bd").height($("#tab1").height())
+    });
+    $(".trClose").click(function() {
+        $(".weui-tab__bd").height($("#tab1").height())
+    });
     
-    $("#prTrOpen").click(function() {
+/*    $("#prTrOpen").click(function() {
         $prTR.show();
         $("#prTrOpen").hide();
         $("#prTrClose").show();
@@ -831,7 +835,7 @@
         $("#prTrOpen").show();
         $("#prTrClose").hide();
         $(".weui-tab__bd").height($("#tab1").height());
-    });
+    });*/
 
     var $sTR;
     //库存
@@ -1081,8 +1085,8 @@
                             <tfoot>
                               <tr>
                                 <th colspan="3">
-                                  <span id="prTrOpen" class="fr txt-color-red"><i class="icon-arrow-down2"></i> 查看更多</span>
-                                  <span id="prTrClose" class="fr txt-color-red"><i class="icon-arrow-up2"></i> 收起</span>
+                                  <span id="prTrOpen" class="fr txt-color-red trOpen"><i class="icon-arrow-down2"></i> 查看更多</span>
+                                  <span id="prTrClose" class="fr txt-color-red trClose" style="display: none"><i class="icon-arrow-up2"></i> 收起</span>
                                 </th>
                               </tr>
                             </tfoot>

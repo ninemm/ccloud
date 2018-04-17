@@ -502,7 +502,16 @@
             for(var i = 0; i < data.length; i++){
                 $tbody.append("<tr><td>" + data[i].custom_name + "</td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
-            
+
+            var $tr = $("#product_rank tbody tr:gt(5)");
+            if($tr.length > 0){
+                $tr.hide();
+                $(".trOpen").show();
+                $(".trClose").hide();
+                $("#product_rank tfoot").show();
+            }else {
+                $("#product_rank tfoot").hide();
+            }
             
        });
     }
@@ -652,6 +661,14 @@
                             </th>
                         </tr>
                     </tbody>
+                     <tfoot>
+                      <tr>
+                        <th colspan="3">
+                          <span class="fr txt-color-red trOpen"><i class="icon-arrow-down2"></i> 查看更多</span>
+                          <span class="fr txt-color-red trClose" style="display: none"><i class="icon-arrow-up2"></i> 收起</span>
+                        </th>
+                      </tr>
+                     </tfoot>
                 </table>
             </div>
         </div>
