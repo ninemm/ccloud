@@ -58,7 +58,7 @@
 						$("#orderCount").html(data[i].orderCount);
 						$("#totalAmount").html("￥ "+formatNumber(data[i].totalAmount));	            		
 	            	}
-	            if(data[i].avatar==null||data[i].avatar==""){
+	            if(data[i].avatar == null || data[i].avatar == ""){
     		            rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'>/"+data[i].orderCount+"笔("+formatNumber(data[i].productCount)+")件</span></div></div></div></div>");
 	            	}else{
 		            	rank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+j+"</span><img src='"+data[i].avatar+"' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'> / "+data[i].orderCount+"笔 / "+formatNumber(data[i].productCount)+"件</span></div></div></div></div>");
@@ -66,7 +66,7 @@
 	            }
 	            var index = 1;
 	            for(var i = totalLength-1; i >= descLength; i--){
-	            	if(data[i].avatar==""){
+	            	if(data[i].avatar == null || data[i].avatar == ""){
 	            		descRank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+index+"</span><img src='${CTPATH}/images/avatar.png' style='border-radius:50%;'><div class='rank-box'><div class='good-name'>"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'> / "+data[i].orderCount+"笔 / "+formatNumber(data[i].productCount)+"件</span></div></div></div></div>");
 	            	}else{
 		            	descRank.append("<div class='weui-media-box ft14'><div class='rank-detail'><span class='sequence'>"+index+"</span><img src='"+data[i].avatar+"' style='border-radius:50%;'><div class='rank-box'><div class='good-name' >"+data[i].realname+"</div><div class='good-total'><span class='orange'>￥"+formatNumber(data[i].totalAmount)+"</span><span class='gray ft14'> / "+data[i].orderCount+"笔 / "+formatNumber(data[i].productCount)+"件</span></div></div></div></div>");
