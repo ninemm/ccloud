@@ -20,6 +20,7 @@ import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -142,7 +143,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
-
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 		if(isDealerAdmin || isSuperAdmin) {
 			if(StrKit.notBlank(id)){
 				SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
@@ -153,16 +154,22 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			return;
 		}
 
-		if(StrKit.notBlank(id)) {
-
-			String updated = startProcess(id, new HashMap<String, Object>(), 1);
-
-			if (StrKit.isBlank(updated)) {
-				renderAjaxResultForSuccess("操作成功");
-			} else {
-				renderAjaxResultForError(updated);
+		if(StrKit.notBlank(id) ) {
+			if(isChecked == null || !isChecked) {
+				SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+				sellerCustomer.setIsEnabled(isEnabled);
+				if (sellerCustomer.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
+			}else {
+				String updated = startProcess(id, new HashMap<String, Object>(), 1);
+				if (StrKit.isBlank(updated)) {
+					renderAjaxResultForSuccess("操作成功");
+				} else {
+					renderAjaxResultForError(updated);
+				}
 			}
-		}else {
+		} 
+		
+		else {
 			renderAjaxResultForError("该客户不存在");
 		}
 	}
@@ -982,7 +989,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				message.setSellerId(sellerId);
 				message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
 				message.setTitle(sellerCustomer.getCustomer().getCustomerName());
-
+				
 				Object customerVO = param.get("customerVO");
 				if (customerVO == null && isEnable == 0) {
 					message.setContent("新增待审核");
@@ -1006,7 +1013,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerId, defKey, param);
-
+			sellerCustomer.setIsChecked(0);
 			sellerCustomer.setProcDefKey(defKey);
 			sellerCustomer.setProcInstId(procInstId);
 			sellerCustomer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
@@ -1019,5 +1026,87 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		return "";
 	}
-
+	
+	//批量启用
+	public void upIsenable() {
+		String ds = getPara("sellerCustomerItems");
+		boolean flang = true;
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerCustomer> imageList = jsonArray.toJavaList(SellerCustomer.class);
+		for (SellerCustomer sellerCustomer : imageList) {
+			if(isDealerAdmin || isSuperAdmin) {
+				if(StrKit.notBlank(sellerCustomer.getId())){
+					SellerCustomer sC = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+					sC.setIsEnabled(1);
+					if (sC.saveOrUpdate()) flang = true;
+					else {flang = false;break;}
+				} 
+			}
+			if(StrKit.notBlank(sellerCustomer.getId()) ) {
+				SellerCustomer sellerCustomers = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+				if(isChecked == null || !isChecked) {
+					sellerCustomers.setIsEnabled(1);
+					if (sellerCustomers.saveOrUpdate()) flang = true;
+				}else {
+					if(sellerCustomers.getIsEnabled() !=1) {
+						String updated = startProcess(sellerCustomer.getId(), new HashMap<String, Object>(), 1);
+						if (StrKit.isBlank(updated)) {
+							flang = true;
+						} else {
+							flang = false ;
+							break;
+						}
+					}
+				}
+			}else {
+				flang = false ;
+				break;
+			}
+		}
+		renderJson(flang);
+	}
+	//批量停用
+	public void downIsenable() {
+		String ds = getPara("sellerCustomerItems");
+		boolean flang = true;
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerCustomer> imageList = jsonArray.toJavaList(SellerCustomer.class);
+		for (SellerCustomer sellerCustomer : imageList) {
+			if(isDealerAdmin || isSuperAdmin) {
+				if(StrKit.notBlank(sellerCustomer.getId())){
+					SellerCustomer sC = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+					sC.setIsEnabled(0);
+					if (sC.saveOrUpdate()) flang = true;
+					else {flang = false;break;}
+				} 
+			}
+			if(StrKit.notBlank(sellerCustomer.getId()) ) {
+				SellerCustomer sellerCustomers = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+				if(isChecked == null || !isChecked) {
+					sellerCustomers.setIsEnabled(0);
+					if (sellerCustomers.saveOrUpdate()) flang = true;
+				}else {
+					if(sellerCustomers.getIsEnabled() !=0) {
+						String updated = startProcess(sellerCustomer.getId(), new HashMap<String, Object>(), 1);
+						if (StrKit.isBlank(updated)) {
+							flang = true;
+						} else {
+							flang = false ;
+							break;
+						}
+					}
+				}
+			}else {
+				flang = false ;
+				break;
+			}
+		}
+		renderJson(flang);
+	}
 }
