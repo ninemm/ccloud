@@ -44,7 +44,7 @@
 			setItemBykey("startDate", $.today());
 			setItemBykey("endDate", $.today() + ' 23:59:59');    			
 		</#if>
-		
+		showBizUser(${bizUsers!});
 		$(document).on("submit", ".weui-search-bar__form", function() {
 			setItemBykey("keyword", $("#searchInput").val());
 			combo();
@@ -141,7 +141,6 @@
 				},{title: "最近30天", value: "3"
 			}]
 		})
-		showBizUser(${bizUsers!});
 	});
   function showBizUser(obj){
 		$("#bizUserId").select("update",{
@@ -166,20 +165,11 @@
 		
 		$loading.show();
 		$noMore.hide();
-		$.showLoading();
 		var params = getParam();
-		//业务员随着时间刷新
-		
-		Utils.ajax('${CPATH}/order/getBizUser', params, 
-			function(data) {
-				showBizUser(data);
-			}
-		);
 		
 		Utils.ajax('${CPATH}/order/orderList', params, 
 			function(data) {
 				$loading.hide();
-				$.hideLoading();
 				$("#orderCount").html(data.orderCount+" 单");
 				$("#orderAmount").html(data.orderAmount+" 元");				
 				if(data.orderList.length == 0) {
@@ -634,6 +624,6 @@
 				</div>
 			</div>
 		</section>
-	</div>	
+	</div>
 	<#include "_inc/_footer_nav.html" />
 </@layout>

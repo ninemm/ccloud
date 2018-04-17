@@ -1,7 +1,7 @@
 <#include "../_inc/_layer_layout.html"/>
 
 <#macro script_import>
-	<script src="${CPATH}/static/plugins/jquery/jquery-1.9.1.min.js"></script>
+	<!-- <script src="${CPATH}/static/plugins/jquery/jquery-1.9.1.min.js"></script> -->
 	<script src="${CPATH}/static/plugins/jquery/jquery-ui.js"></script>
 	<script src="${CPATH}/static/layer/layer.min.js"></script>
 	<script src="${CPATH}/static/plugins/jquery/jquery.all.print.table.js"></script>
@@ -159,10 +159,10 @@ function queryPrintDetail(financePrint) {
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
                     if(financePrint == 0){
-                    var salesAmount = DX(item.salesAmount);
+                    var salesAmount = jQuery.mm.digitUppercase(item.salesAmount);
                     footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext);
                     }else{
-                    var salesAmount = DX(saleMoney);
+                    var salesAmount = jQuery.mm.digitUppercase(saleMoney);
                     footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
                     }
 

@@ -114,9 +114,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 							SalesOutstockQuery.me().updateTotalAmount(outstockId, outTotalAmount.toString());
 							outTotalAmount = new BigDecimal(0);
 						}
-						if (orderDetail.getInt("is_composite") == 1) {
-							composite = true;
-						}
 						outstockId = StrKit.getRandomUUID();
 						warehouseId = orderDetail.getStr("warehouse_id");
 						String OrderSO = SalesOutstockQuery.me().getNewSn(sellerId);
@@ -126,7 +123,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 						SalesOutstockQuery.me().insert(outstockId, outstockSn, warehouseId, sellerId, order, date);
 						SalesOrderJoinOutstockQuery.me().insert(orderId, outstockId);
 					}
-
+					if (orderDetail.getInt("is_composite") == 1) {
+						composite = true;
+					}
 					outTotalAmount = outTotalAmount
 							.add(SalesOutstockDetailQuery.me().insert(outstockId, orderDetail, date, order));
 					if (i == orderDetailList.size()) {
@@ -331,7 +330,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.id", customerTypeId, params, needWhere);
 		// needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id",
 		// customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
@@ -667,7 +666,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", bizUserId, params, needWhere);

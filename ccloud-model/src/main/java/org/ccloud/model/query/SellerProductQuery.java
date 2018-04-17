@@ -17,8 +17,10 @@ package org.ccloud.model.query;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -150,7 +152,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
-	public List<Record> findProductListForApp(String sellerId, String keyword, String tag) {
+	public List<Record> findProductListForApp(String sellerId, String keyword, String tag, String categoryId) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, sp.cost, sp.account_price, sp.tags,"
 				+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
@@ -163,7 +165,7 @@ public class SellerProductQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, false);
-		
+		appendIfNotEmpty(fromBuilder, "gc.id", categoryId, params, false);
 		if (StrKit.notBlank(tag)) {
 			fromBuilder.append(" AND FIND_IN_SET(?, sp.tags)");
 			params.add(tag);
@@ -256,7 +258,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return DAO.findFirst(sql, sellerProductId,sellerId);
 	}
 
-	public List<Record> findProductListForAppByCar(String sellerId, String keyword, String tag, String wareHouseId) {
+	public List<Record> findProductListForAppByCar(String sellerId, String keyword, String tag, String wareHouseId, String categoryId) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.price, sp.cost, sp.account_price, sp.tags,"
 				+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
@@ -271,7 +273,7 @@ public class SellerProductQuery extends JBaseQuery {
 		params.add(wareHouseId);
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, false);
-		
+		appendIfNotEmpty(fromBuilder, "gc.id", categoryId, params, false);
 		if (StrKit.notBlank(tag)) {
 			fromBuilder.append(" AND FIND_IN_SET(?, sp.tags)");
 			params.add(tag);
@@ -292,5 +294,15 @@ public class SellerProductQuery extends JBaseQuery {
 				"LEFT JOIN cc_goods_specification css on css.id = cgs.goods_specification_id " + 
 				"GROUP BY csp.id) t1 where t1.custom_name = '"+customName+"' and t1.seller_id = '"+sellerId+"' and  t1.cps_name ='"+cpsName+"'";
 		return DAO.find(sql);
+	}
+
+	public Set<String> findTagsBySellerId(String sellerId) {
+		Set<String> tagSet = new LinkedHashSet<String>();
+		String sql ="SELECT sp.tags tags FROM cc_seller_product sp WHERE sp.seller_id = ? AND sp.tags != '' GROUP BY sp.tags";
+		List<Record> recordList = Db.find(sql,sellerId);
+		for (Record record : recordList) {
+			tagSet.add(record.getStr("tags"));
+		}
+		return tagSet;
 	}
 }

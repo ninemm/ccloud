@@ -331,7 +331,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
 					if (StrKit.notBlank(sellProductId)) {
 						if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, date, deptId, dataArea, index,
-								user.getId(), outStockSN, wareHouseId, sellProductId, sellerCustomerId, order_user, order_date)) {
+								user.getId(),
+								outStockSN, wareHouseId, sellProductId, sellerCustomerId, order_user, order_date)) {
 							return false;
 						}
 						count++;

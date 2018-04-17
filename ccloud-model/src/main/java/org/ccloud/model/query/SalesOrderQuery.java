@@ -66,7 +66,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,
-			String sellerId, String dataArea, String activityId) {
+			String sellerId, String dataArea, String activityId, String status) {
 		String select = "";
 		if(StrKit.notBlank(activityId)) {
 			select = "select o.*, c.customer_name,t1.title, c.prov_name,c.city_name,c.country_name,c.address,c.contact as ccontact, c.mobile as cmobile,ct.`name` as customerTypeName,u.realname ";
@@ -95,6 +95,10 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
+		
+		if (StrKit.notBlank(status) && !status.equals("-1")) {
+			needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
+		}		
 
 		if (StrKit.notBlank(activityId)) {
 			fromBuilder.append(" and (t1.activity_id = '" + activityId + "' or t2.activity_id = '" + activityId + "')");
@@ -461,6 +465,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_) ");
 		sb.append(" order by o.create_date DESC");
 		return DAO.find(sb.toString(), username);
+	}
+	
+	public Long findToDoOrderReviewCount(String username) {
+		StringBuilder sb = new StringBuilder("SELECT count(*)");
+		sb.append(" FROM cc_sales_order o ");
+		sb.append(" JOIN act_ru_task a on o.proc_inst_id = a.PROC_INST_ID_ ");
+		sb.append(" where o.status = 0 AND FIND_IN_SET(?, a.ASSIGNEE_) ");
+		return Db.queryLong(sb.toString(), username);
 	}
 	
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username) {
@@ -853,7 +865,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			}
 			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
-		fromBuilder.append("u.realname '业务员名称'");
+		fromBuilder.append("u.realname '业务员名称',u.id userId");
 		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok ON sok.id=sojo.outstock_id ");
@@ -877,6 +889,29 @@ public class SalesOrderQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString());
 	}
 
+	public Record findTotalAmountByUserId(String startDate, String endDate, String keyword, String userId) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		StringBuilder fromBuilder = new StringBuilder();
+			if (keyword.equals("sok.biz_date")) {
+				fromBuilder.append("SELECT SUM(sok.total_amount) totalAmount  FROM cc_sales_outstock sok ");
+				needWhere = appendIfNotEmpty(fromBuilder, "sok.biz_user_id", userId, params, needWhere);
+			}else {
+				fromBuilder.append("SELECT SUM(so.total_amount) totalAmount  FROM cc_sales_order so ");
+				needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", userId, params, needWhere);
+			}
+			if (StrKit.notBlank(startDate)) {
+				fromBuilder.append(" and "+keyword+" >= ? ");
+				params.add(startDate);
+			}
+			if (StrKit.notBlank(endDate)) {
+				fromBuilder.append(" and "+keyword+" <= ? ");
+				params.add(endDate);
+			}
+		
+		return Db.findFirst(fromBuilder.toString(), params.toArray());
+	}
+	
 	//我客户的详情
 	public List<Record> findByCustomerDetail(String startDate, String endDate, String keyword, String userId,
 			String sellerId, boolean ifGift) {
@@ -2020,11 +2055,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " cs.customer_kind", Consts.CUSTOMER_KIND_SELLER, params, needWhere);
-		if (needWhere) {
-			fromBuilder.append(" where cc.status not in (1001,1002) ");
-		} else {
-			fromBuilder.append(" and cc.status not in (1001,1002) ");
-		}
+		fromBuilder.append(" AND EXISTS(SELECT os.`status` FROM cc_sales_order_status os ");
+		fromBuilder.append("WHERE os.`status` = cc.`status` AND os.`status` != 1001 ");
+		fromBuilder.append("AND os.`status` != 1002) ");
 
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cc.create_date >= ? ");
@@ -2229,7 +2262,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", selectDataArea, params, needWhere);
 //		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 
@@ -2317,7 +2350,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.id", customerTypeId, params, needWhere);
 //		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 //		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);

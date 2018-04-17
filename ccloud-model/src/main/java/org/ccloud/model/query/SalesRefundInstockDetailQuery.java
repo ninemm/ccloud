@@ -81,7 +81,7 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productPrice = StringUtils.getArrayFirst(paraMap.get("bigPrice" + index));
 		String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
-		String isGift = StringUtils.getArrayFirst(paraMap.get("isGift" + index));
+		String isGift = StringUtils.getArrayFirst(paraMap.get("_isGift" + index));
 		
 		detail.setProductCount(productCount);
 		detail.setProductPrice(new BigDecimal(productPrice));
@@ -240,13 +240,15 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 				if (!sellerProduct.update()) {
 					return false;
 				}
-
-				//更新计划
-				BigDecimal bigProductCount = new BigDecimal(record.getInt("bigCount")).add(new BigDecimal(record.getInt("smallCount")).divide(new BigDecimal(record.getInt("convert_relate")), 2, BigDecimal.ROUND_HALF_UP));
-				if (StrKit.notBlank(order_user)) {
-					if (!updatePlans(order_user, record.getStr("sell_product_id"), order_date, bigProductCount)) {
-						return false;
-					}					
+				
+				if(record.getStr("is_gift").equals("0")) {
+					//更新计划
+					BigDecimal bigProductCount = new BigDecimal(record.getInt("bigCount")).add(new BigDecimal(record.getInt("smallCount")).divide(new BigDecimal(record.getInt("convert_relate")), 2, BigDecimal.ROUND_HALF_UP));
+					if (StrKit.notBlank(order_user)) {
+						if (!updatePlans(order_user, record.getStr("sell_product_id"), order_date, bigProductCount)) {
+							return false;
+						}					
+					}
 				}
 			}
 			return true;

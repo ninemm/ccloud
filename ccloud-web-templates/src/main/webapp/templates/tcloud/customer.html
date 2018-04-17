@@ -42,11 +42,9 @@
         <#if history??>
   			var region = getItemBykey("region");
   			var customerType = getItemBykey("customerType");
-  			var ifOrder = getItemBykey("ifOrder");
   			var keywordName = getItemBykey("keyword");
   			$("#region").val(region);
   			$("#customer-type").val(customerType);
-  			$("#if-order").val(ifOrder);
             if(keywordName !=null && keywordName.length!=0) {
                 $('.weui-search-bar').addClass('weui-search-bar_focusing');
   			    $("#searchInput").val(keywordName);
@@ -57,6 +55,7 @@
         refresh();
         
         $(document).on("submit", ".weui-search-bar__form", function() {
+            layer.open({type: 2,content: '加载中'});
             setItemBykey("keyword", $("#searchInput").val());
             refresh();			
             return false;
@@ -68,10 +67,6 @@
 			setItemBykey("customerTypeId", $("#customer-type").data('values'));
 			setItemBykey("customerType", $("#customer-type").val());
 			refresh();
-		}).on("change", "#if-order", function() {
-			setItemBykey("ifOrderId", $("#if-order").data('values'));
-			setItemBykey("ifOrder", $("#if-order").val());
-			refresh();
 		});
 
         $("#region").select({
@@ -82,25 +77,6 @@
         $("#customer-type").select({
             title: "选择客户类型",
             items: ${customerType!}
-        });
-
-        $("#if-order").select({
-            title: "是否下单",
-            items: [{
-                title: "全部客户", value: ""
-            },{
-                title: "已下单", value: "0"
-            },{
-                title: "未下单", value: "1"
-            },{
-                title: "近一周未下单", value: "2"
-            },{
-                title: "近一月未下单", value: "3"
-            },{
-                title: "近三月未下单", value: "4"
-            },{
-                title: "近六月未下单", value: "5"
-            }]
         });
 
         var str = '';
@@ -119,21 +95,18 @@
 			    "pageNumber": pageNumber,
 			    "pageSize": pageSize,
 			    "region": $("#region")[0].dataset.values,
-			    "customerType": $("#customer-type")[0].dataset.values,
-			    "isOrdered": $("#if-order")[0].dataset.values
+			    "customerType": $("#customer-type")[0].dataset.values
 			};
 		<#else>
 			var region = getItemBykey("regionId");
   			var customerType = getItemBykey("customerTypeId");
-  			var ifOrder = getItemBykey("ifOrderId");
   			var keywordName = getItemBykey("keyword");
 			return  {
 			    "searchKey": keywordName,
 			    "pageNumber": pageNumber,
 			    "pageSize": pageSize,
 			    "region": region,
-			    "customerType": customerType,
-			    "isOrdered": ifOrder
+			    "customerType": customerType
 			};
        </#if>
     }
@@ -169,7 +142,6 @@
 
     function refresh() {
         pageNumber = 1;
-        $.showLoading();
         $.ajax({
             url:"${CPATH}/customer/refresh",
             type:"post",
@@ -190,7 +162,7 @@
                 if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#customerList").html(data.html);
                 pageNumber = 2;
-                $.hideLoading();
+                layer.closeAll();
             }
         });
     }
@@ -207,10 +179,8 @@
         $("#searchInput")[0].value = '';
         $("#customer-type")[0].dataset.values = '';
         $("#region")[0].dataset.values = '';
-        $("#if-order")[0].dataset.values = '';
         $("#customer-type").val("客户类型");
         $("#region").val("业务员");
-        $("#if-order").val("是否下单");
     }
 
     function getAreaCustomer(){
@@ -247,6 +217,7 @@
 
     //搜索框叉掉和取消时，先清input值，再调用接口
     function searchCancel() {
+        layer.open({type: 2,content: '加载中'});
         $("#searchInput")[0].value = "";
         setItemBykey("keyword", $("#searchInput").val());
         refresh();
@@ -280,7 +251,7 @@
 				Utils.openLoadingWin('启用中...');
 				$.get('${CPATH}/customer/memberOrderOpen?member_id=' + member_id,
 					function(result) {
-							if (result.errorCode > 0) {
+						if (result.errorCode > 0) {
 							$.toptip(result.message, 'error');
 						} else {
 							$.toptip(result.message, 'success');
@@ -330,10 +301,9 @@
                     <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" onclick="searchCancel()">取消</a>
                 </div>
             </header>
-            <article class="customer" style="top:44px;">
-                <header class="has-th-list weui-flex">
+            <article class="customer" style="top:44px;width: 100%;">
+                <header class="weui-flex">
                     <div class="head-search select-area weui-flex__item">
-                        <div class="weui-flex">
                             <div class="weui-flex__item">
                                 <input type="text" id="region" placeholder="业务员" class="weui-input" readonly>
                                 <i class="icon-sort-desc"></i>
@@ -342,13 +312,8 @@
                                 <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
                                 <i class="icon-sort-desc"></i>
                             </div>
-                            <div class="weui-flex__item">
-                                <input type="text" id="if-order" placeholder="是否下单" class="weui-input" readonly>
-                                <i class="icon-sort-desc"></i>
-                            </div>
                             <input type="hidden" name="lng" id="lng">
                             <input type="hidden" name="lat" id="lat">
-                        </div>
                     </div>
                     <div id="combin-filter-btn">
                         <i class="icon-th-list"></i>

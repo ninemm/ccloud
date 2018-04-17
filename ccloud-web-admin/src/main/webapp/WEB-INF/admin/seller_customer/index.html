@@ -40,6 +40,7 @@
 	var initParams = function(params) {
 
 		var keyword = $('#search').val();
+		var keyword1 = $('#search1').val();
 		var customerType = $('#customer_type').val();
 		if(customerType!=null){
 			var date = new Date();
@@ -52,6 +53,7 @@
 			page: params.offset/params.limit + 1,
 			customerType: customerType,
 			k: keyword,
+			k1:keyword1,
 			sort: params.sort,      //排序列名  
             sortOrder: params.order //排位命令（desc,asc）
 		};
@@ -158,13 +160,81 @@
 				strHtml = '<option selected="selected" value="">客户类型</option>';
 				for(index in customerType){
 					var row = customerType[index].columns;
-					strHtml +='<option value="'+row.name+'">'+row.name+'</option>';
+					strHtml +='<option value="'+row.id+'">'+row.name+'</option>';
 				}
 				$("#customer_type").html(strHtml);
 				var aa = $.cookie('customerType');
 				$("#customer_type").val(aa);
 			}
 		});
+	}
+	
+	var upSellerCustomer = function(){
+		var sellerCustomerItems = new Array();
+		 var flang = true;
+		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
+		 if(checklist.length == 0){
+			toastr.error("未选中任何数据!");
+			flang=false;
+			return;		 
+		 }
+		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+		  	var obj = {
+								"id": $(this).find('td').eq(0).find("input").val(),
+							};
+							sellerCustomerItems.push(obj);
+						})
+			if(flang==true){			
+				$.ajax({
+					url:"${CPATH}/admin/sellerCustomer/upIsenable",
+					type:"post",
+					dataType:"json",
+					data : {sellerCustomerItems : JSON.stringify(sellerCustomerItems)},
+					success:function(data){
+						if (data == false) {
+							toastr.error(data.message, '操作失败');
+						} else {
+							toastr.success(data.message, '操作成功');
+							$table.bootstrapTable('refresh');
+						}
+					}
+				});
+			}
+		
+	}
+	
+	var downSellerCustomer = function(){
+		var sellerCustomerItems = new Array();
+		 var flang = true;
+		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
+		 if(checklist.length == 0){
+			toastr.error("未选中任何数据!");
+			flang=false;
+			return;		 
+		 }
+		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+		  	var obj = {
+								"id": $(this).find('td').eq(0).find("input").val(),
+							};
+							sellerCustomerItems.push(obj);
+						})
+			if(flang==true){			
+				$.ajax({
+					url:"${CPATH}/admin/sellerCustomer/downIsenable",
+					type:"post",
+					dataType:"json",
+					data : {sellerCustomerItems : JSON.stringify(sellerCustomerItems)},
+					success:function(data){
+						if (data == false) {
+							toastr.error(data.message, '操作失败');
+						} else {
+							toastr.success(data.message, '操作成功');
+							$table.bootstrapTable('refresh');
+						}
+					}
+				});
+			}
+		
 	}
 	
 </#macro>
@@ -188,7 +258,31 @@
 			</div>
 
 			 <div class="form-group">
-                <div class="col-sm-4">
+				<div class="col-sm-3">
+					<label class="control-label col-sm-5">客户类型:</label>
+                    <div class="col-sm-7 input-group input-group-sm">
+                    	<select  class="form-control" name="customer_type" id="customer_type">
+						</select>
+                    </div>
+				</div>
+				<div class="col-sm-4">
+					<label class="control-label col-sm-4">业务员:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+						<input id="search1" class="form-control" type="search" value="${k1!}" name="k1" placeholder="搜索业务员名称">
+                    </div>
+				</div>
+				<div class="col-sm-4">
+					<label class="control-label col-sm-4">客户名称:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+						<input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索客户名称">
+                    </div>
+				</div>
+				<div class="col-sm-1">
+					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+				</div>
+			</div>
+			 <div class="form-group">
+			  <div class="col-sm-8">
 					<@shiro.hasPermission name="/admin/sellerCustomer/batchSetUser, /admin/dealer/all, /admin/all">
 						<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
 					</@shiro.hasPermission>
@@ -199,22 +293,10 @@
 					<@shiro.hasPermission name="/admin/sellerCustomer/downloading, /admin/dealer/all, /admin/all">
 						<a href="${CPATH}/admin/sellerCustomer/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
 					</@shiro.hasPermission>
+						<a href="#" onclick = "upSellerCustomer()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-arrow-up"></i> 批量启用</a>
+						<a href="#" onclick = "downSellerCustomer()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-arrow-down"></i> 批量停用</a>
 				</div>
-				<div class="col-sm-3">
-					<label class="control-label col-sm-5">客户类型:</label>
-                    <div class="col-sm-7 input-group input-group-sm">
-                    	<select  class="form-control" name="customer_type" id="customer_type">
-						</select>
-                    </div>
-				</div>
-				<div class="col-sm-4">
-					<label class="control-label col-sm-4">客户/负责人:</label>
-                    <div class="col-sm-8 input-group input-group-sm">
-						<input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索客户/负责人">
-                    </div>
-				</div>
-				<div class="col-sm-1">
-					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+				 <div class="col-sm-4">
 				</div>
 			</div>
 		<div class="box">

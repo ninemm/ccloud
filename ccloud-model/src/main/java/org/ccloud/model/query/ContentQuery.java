@@ -405,8 +405,12 @@ public class ContentQuery extends JBaseQuery {
 
 		sql.append(" where c.status = 'normal' ");
 		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(sellerId)) {
+			sql.append(" and (c.seller_id = ? or c.seller_id is null) ");
+			params.add(sellerId);
+		}
 		appendIfNotEmpty(sql, "m.taxonomy_id", typeIds, params, false);
-		appendIfNotEmpty(sql, "c.seller_id", sellerId, params, false);
+//		appendIfNotEmpty(sql, "c.seller_id", sellerId, params, false);
 		appendIfNotEmpty(sql, "c.module", modules, params, false);
 		appendIfNotEmpty(sql, "c.style", styles, params, false);
 		appendIfNotEmpty(sql, "c.slug", slugs, params, false);

@@ -104,9 +104,7 @@ $(function() {
 	        $(this).text("展开");
 	        $(this).prev().find('#subsubProduct').hide();
         }
-    }).on("click", ".choose-customer", function () {
-		window.location.href = '${CPATH}/product/customerChoose';
-  }).on("click", "#placeOrder", function () {
+    }).on("click", "#placeOrder", function () {
 	if (!flg) {
 		return;
 	}
@@ -116,17 +114,29 @@ $(function() {
 	}
 	<#if !isMix>
 		var productList = getItemBykey("productList");
+		var compositionList = getItemBykey("compositionList");
 		var mix = false;
-		var isGift = productList[0].isGift;
-		$.each(productList, function(index, el){
-			if(isGift != el.isGift || (isGift == 0 && el.subProduct[0].sellProductId != "")){
+		if (productList && productList.length > 0) {
+			var isGift = productList[0].isGift;
+			$.each(productList, function(index, el){
+				if(isGift != el.isGift || (isGift == 0 && el.subProduct[0].sellProductId != "")){
+					mix = true;
+					return;
+				}
+			});
+			if (compositionList && compositionList.length > 0) {
 				mix = true;
+			}
+			if (mix) {
+			  	$.toptip("该帐套未开启赠品混下功能，请单独下赠品", 'warning');
 				return;
 			}
-		});
-		if (mix) {
-		  	$.toptip("该帐套未开启赠品混下功能，请单独下赠品", 'warning');
-			return;
+		}
+		if (compositionList && compositionList.length > 0) {
+			if (productList && productList.length > 0) {
+			  	$.toptip("该帐套未开启赠品混下功能，请联系管理员", 'warning');
+				return;			
+			}
 		}
 	</#if>
 	
@@ -586,7 +596,7 @@ $(function() {
 
 		$loading.show();
 		$noMore.hide();
-		$.showLoading();
+		layer.open({type: 2,content: '加载中'});
 
 	    var params = {
 		    "page": page,
@@ -600,7 +610,7 @@ $(function() {
 		Utils.ajax('${CPATH}/product/customerList', params, 
 			function(data){
 				$loading.hide();
-				$.hideLoading();
+				layer.closeAll();
 				if(data.customerList.length == 0){
 					if($('.customerSelect').length == 0) $noMore.show();
 					loading = true;
@@ -613,7 +623,7 @@ $(function() {
 					$newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
 					$newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
 
-					$newCustomer.find("#sellerCustomerId").val(el.id);
+					$newCustomer.find("#sellerCustomerId").val(el.sellerCustomerId);
 					$newCustomer.find("#contact").val(el.contact);
 					$newCustomer.find("#mobile").val(el.mobile);
 					$newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
@@ -647,7 +657,7 @@ $(function() {
 	<div id="order">
 		<form action="${CPATH}/order/salesOrder" method="post" id="form">
 			<div class="weui-flex order-top-btns t-c ft14">
-				<div class="weui-flex__item border-right-1px choose-customer">
+				<div class="weui-flex__item border-right-1px choose-customer select-customer">
 					<span><i class="icon-user"></i></span>
 					选择客户
 				</div>
@@ -660,15 +670,14 @@ $(function() {
 					<input type="hidden" id="lng" name="lng" value="">
 					<input type="hidden" id="lat" name="lat" value="">
 					<input type="hidden" id="location" name="location" value="">
-					<div class="weui-cell weui-cell_access">
+					<div class="weui-cell">
 						<div class="weui-cell__bd">
 							<!-- <div class="order-customer-info-title">
 								客户名称
 								<span class="require">*</span>
 							</div> -->
 							<input type="hidden" id="sellerCustomerId" name="customerId" value="" >
-							<input type="text" class="weui-input select-customer" id="customerName" name="customerName" value="" readonly>
-							<span class="weui-cell__ft"></span>
+							<input type="text" class="weui-input" id="customerName" name="customerName" value="" readonly>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">

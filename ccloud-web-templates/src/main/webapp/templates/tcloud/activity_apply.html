@@ -278,7 +278,7 @@ function doChange(key){
      items: ${customerTypes!}
     });
 
-	var customerTypeId = '${customerTypeId!}';
+	//var customerTypeId = '${customerTypeId!}';
 	if(customerTypeId != ""){
 		$("#customerTypeId").attr('data-values',customerTypeId);
 	}
@@ -314,8 +314,10 @@ function doChange(key){
             "size": size,
             "keyword": $("#searchInput").val(),
             "userId": $("#userId").data('values'),
-            "customerTypeId": $("#customerTypeId").data('values'),
+            "customerTypeId": $("#customerTypeId").val(),
+            "customerType": $("#customerTypeId").data('values'),
             "isOrdered": $("#isOrdered").data('values'),
+            "activityId":$("#activityId").val(),
             "provName": provName,
             "cityName": cityName,
             "countryName": countryName

@@ -47,6 +47,7 @@
 	var initParams = function(params) {
 		var actId = $("#activityId").find("option:selected").val();
 		var ssId = $("#sellerId").find("option:selected").val();
+		var status = $("#status").find("option:selected").val();
 		var keyword = $('#search').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
@@ -56,7 +57,8 @@
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
 			activity: actId,
-			sellerId: ssId
+			sellerId: ssId,
+			status: status
 		};
 		return param;
 	};
@@ -336,10 +338,20 @@
 		                </select>
 	                </div>
                 </div>
-                <div class="col-sm-4" style="text-align:center;">
-                    <input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
-                </div>
-			</div>
+                <div class="col-sm-4">
+                    <label class="control-label col-sm-4">状态:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+		                <select class="form-control" id="status">
+							${DICT_BOX('order_status', 'select')}
+		                </select>
+	                </div>
+                </div> 
+            </div>               
+			<div class="form-group">
+			    <div class="col-sm-12" style="text-align:center;">
+			    	<a id="search-submit" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-search"></i> 搜索</a>
+			    </div>
+            </div>
 		</form>
 	</div>
 	<div class="row content-row">

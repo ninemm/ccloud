@@ -27,8 +27,6 @@
             combo();
         }).on("change", "#customerTypeId", function() {
             combo();
-        }).on("change", "#isOrdered", function() {
-            combo();
         }).on("click", "#customerInfo", function() {
             var el = $(this);
             var customerInfo = {
@@ -57,25 +55,6 @@
             items: ${customerTypes!}
         });
 
-    $("#isOrdered").select({
-        title: "是否下单",
-        items: [{
-            title: "全部客户", value: ""
-            },{
-            title: "已下单", value: "0"
-            },{
-            title: "未下单", value: "1"
-            },{
-            title: "近一周未下单", value: "2"
-            },{
-            title: "近一月未下单", value: "3"
-            },{
-            title: "近三月未下单", value: "4"
-            },{
-            title: "近六月未下单", value: "5"
-        }]
-    });
-
     var newHtml = $(".weui-panel").eq(0).html();
     var $loading = $("#loading");
     var $noMore = $("#noMore");
@@ -93,20 +72,19 @@
 
         $loading.show();
         $noMore.hide();
-        $.showLoading();
+        layer.open({type: 2,content: '加载中'});
 
         var params = {
             "page": page,
             "size": size,
             "keyword": $("#searchInput").val(),
             "userId": $("#userId").data('values'),
-            "customerTypeId": $("#customerTypeId").data('values'),
-            "isOrdered": $("#isOrdered").data('values')
+            "customerTypeId": $("#customerTypeId").data('values')
         }
         Utils.ajax('${CPATH}/product/customerList', params,
         function(data){
             $loading.hide();
-            $.hideLoading();
+            layer.closeAll();
             if(data.customerList.length == 0){
                 if($('.weui-panel').length == 0) $noMore.show();
                 loading = true;
@@ -119,7 +97,7 @@
                 $newCustomer.find("#contactP").text(el.contact + "/" + el.mobile);
                 $newCustomer.find("#addressSpan").text(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
 
-                $newCustomer.find("#sellerCustomerId").val(el.id);
+                $newCustomer.find("#sellerCustomerId").val(el.sellerCustomerId);
                 $newCustomer.find("#contact").val(el.contact);
                 $newCustomer.find("#mobile").val(el.mobile);
                 $newCustomer.find("#address").val(el.prov_name + " " + el.city_name + " " + el.country_name + " " + el.address);
@@ -162,16 +140,15 @@
 	                </div>
 	                <label class="weui-search-bar__label" id="searchText">
 	                    <i class="weui-icon-search"></i>
-	                    <span>请输入客户名或联系人</span>
+	                    <span>请输入客户名</span>
 	                </label>
 	            </form>
 	            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" >取消</a>
 	        </div>
 	    </header>
-	    <article class="customer">
+        <article class="customer" style="top:44px;width: 100%;">
 	        <header class="has-th-list weui-flex">
 	            <div class="head-search select-area weui-flex__item">
-	                <div class="weui-flex">
 	                    <div class="weui-flex__item">
 	                        <input type="text" id="userId" class="weui-input" placeholder="业务员" readonly>
 	                        <i class="icon-sort-desc"></i>
@@ -180,17 +157,12 @@
 	                        <input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型"  readonly>
 	                        <i class="icon-sort-desc"></i>
 	                    </div>
-	                    <div class="weui-flex__item">
-	                        <input type="text" id="isOrdered" class="weui-input" placeholder="是否下单" readonly>
-	                        <i class="icon-sort-desc"></i>
-	                    </div>
-	                </div>
 	            </div>
 	            <div id="combin-filter-btn">
 	                <i class="icon-th-list"></i>
 	            </div>
             </header>
-            <div id="infinite"> 
+            <div id="infinite">
                 <div id="customerList">
                     <div class="weui-panel weui-panel_access" style="display: none">
                         <div class="weui-flex">

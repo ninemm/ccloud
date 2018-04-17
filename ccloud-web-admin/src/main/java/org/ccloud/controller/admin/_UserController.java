@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -94,9 +96,30 @@ public class _UserController extends JBaseCRUDController<User> {
 
 		Page<User> page = UserQuery.me().paginateUser(getPageNumber(), getPageSize(), keyword, dataArea, "u.create_date",
 				userId);
+		List<User> list = page.getList();
+		for (User user : list) {
+			try {
+				if (StrKit.notBlank(user.getNickname())) {
+					String nickname = URLDecoder.decode(user.getNickname(), "utf-8");
+					user.setNickname(nickname);
+				}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
 		if (page != null) {
 			setAttr("page", page);
 		}
+//		String nickname = get("nickname");
+//		try {
+//			if (StrKit.notBlank(nickname)) {
+//				nickname = URLDecoder.decode((String) get("nickname"), "utf-8");
+//			}
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return nickname;
 
 	}
 
@@ -104,6 +127,15 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 		final User user = getModel(User.class);
+		try {
+			if (StrKit.notBlank(user.getNickname())) {
+				String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
+				user.setNickname(nickname);
+			}
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");

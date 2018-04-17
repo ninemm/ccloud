@@ -141,6 +141,14 @@ public class ActivityApplyQuery extends JBaseQuery {
 		sb.append(" order by o.create_date DESC");
 		return Db.find(sb.toString(), dealerDataArea, username);
 	}
+	
+	public Long findToDoActivityReviewCount(String username) {
+		StringBuilder sb = new StringBuilder("SELECT count(*)");
+		sb.append(" FROM cc_activity_apply o ");
+		sb.append(" JOIN act_ru_task a ON o.proc_inst_id = a.PROC_INST_ID_");
+		sb.append(" where FIND_IN_SET(?, a.ASSIGNEE_)");
+		return Db.queryLong(sb.toString(), username);
+	}
 
 	public Page<Record> getHisProcessList(int pageNumber, int pageSize, String procKey, String username, String dealerDataArea) {
 

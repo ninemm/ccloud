@@ -1,5 +1,6 @@
 package org.ccloud.front.controller;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,8 +11,10 @@ import java.util.Map;
 
 import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
@@ -58,8 +61,8 @@ public class OrderController extends BaseFrontController {
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
 		all.put("value", "");
@@ -72,23 +75,28 @@ public class OrderController extends BaseFrontController {
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
 
 		List<Map<String, Object>> bizUsers = new ArrayList<>();
 		bizUsers.add(all);
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String startDate = sdf.format(date);
-		String endDate = sdf.format(date)+" 23:59:59";
-		List<SalesOrder> orders = SalesOrderQuery.me().findBySellerIdAndDataArea(sellerId,dataArea,startDate,endDate);
-		for (SalesOrder order : orders) {
+		List<User> users = new ArrayList<User>();
+		
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+			users = UserQuery.me().findByDeptDataArea(dataArea);
+		} else {
+			users.add(user);
+		}
+		
+		for (User u : users) {
 			Map<String, Object> items = new HashMap<>();
-			items.put("title", order.getStr("realname"));
-			items.put("value", order.getBizUserId());
+			items.put("title", u.getRealname());
+			items.put("value", u.getId());
 			bizUsers.add(items);
 		}
+		
 		String history = getPara("history");
 		setAttr("history", history);
 		setAttr("bizUsers",JSON.toJSON(bizUsers));
@@ -197,7 +205,7 @@ public class OrderController extends BaseFrontController {
 		setAttr("images", images);
 		setAttr("orderDetailList", orderDetailList);
 
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","");
 
 		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
@@ -243,10 +251,112 @@ public class OrderController extends BaseFrontController {
 
 		String outstockInfo = buildOutstockInfo(id);
 		setAttr("outstockInfo", outstockInfo);
-
+		if (comments.size()==0) {
+			String modifyPrice = modifyPrice(id);
+			setAttr("modifyPrice", modifyPrice);
+		}
 		render("operate_history.html");
 	}
-
+	
+	private String modifyPrice(String ordedId) {
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
+			if (!record.getInt("price").equals(record.getInt("product_price"))) {
+				double conver_relate = Double.parseDouble(record.getStr("convert_relate"));
+				double price = Double.parseDouble(record.getStr("price"));
+				double product_price = Double.parseDouble(record.getStr("product_price"));
+				double smallproductPrice=product_price/conver_relate;
+				double smallprice=price/conver_relate;
+				smallproductPrice=new BigDecimal(smallproductPrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
+				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ product_price+ "(" + price+ ")<br>");
+				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallproductPrice+ "(" +  smallprice + ")<br>");
+			}
+		}
+		
+		return stringBuilder.toString();
+	}
+	
+	private String modifyPrice1(String orderId) {
+		String[] productNames = getParaValues("productName");
+		String[] bigUnits = getParaValues("bigUnit");
+		String[] smallUnits = getParaValues("smallUnit");
+		String[] bigPriceSpans = getParaValues("bigPriceSpan");
+		String[] smallPriceSpans = getParaValues("smallPriceSpan");
+		Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
+		String salesOrderName="";
+		if (null==salesOrder.getStr("customer_name")){
+			salesOrderName=salesOrder.getStr("salesName");
+		}else {
+			salesOrderName=salesOrder.getStr("customer_name");
+		}
+		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" + 
+				"	        <div></div>\n" + 
+				"	        <p>\n" + 
+				"	          价格修改\n" + 
+				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" + 
+				"	        </p>\n" + 
+				"	        <p>操作人："+salesOrderName+"</p>\n" + 
+				"	         <p>");
+		
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		for (int i = 0; i < productNames.length; i++) {
+			if (!orderDetails.get(i).getInt("price").equals(orderDetails.get(i).getInt("product_price"))) {
+				double conver_relate = Double.parseDouble(orderDetails.get(i).getStr("convert_relate"));
+				double price = Double.parseDouble(orderDetails.get(i).getStr("price"));
+				double smallprice=price/conver_relate;
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+				stringBuilder.append("●" + productNames[i] + "<br>");
+				stringBuilder.append("-每" + bigUnits[i] + "价格修改为"+ bigPriceSpans[i]+ "(" + price+ ")<br>");
+				stringBuilder.append("-每" + smallUnits[i] + "价格修改为"+ smallPriceSpans[i]+ "(" +  smallprice+ ")<br>");
+			}
+		}
+		stringBuilder.append("</p>\n" + 
+				"	      </div>");
+		
+		return stringBuilder.toString();
+	}
+	
+	private String modifyPrice2(String orderId) {
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
+		String salesOrderName="";
+		if (null==salesOrder.getStr("customer_name")){
+			salesOrderName=salesOrder.getStr("salesName");
+		}else {
+			salesOrderName=salesOrder.getStr("customer_name");
+		}
+		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" + 
+				"	        <div></div>\n" + 
+				"	        <p>\n" + 
+				"	          价格修改\n" + 
+				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" + 
+				"	        </p>\n" + 
+				"	        <p>操作人："+salesOrderName+"</p>\n" + 
+				"	         <p>");
+		
+		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
+			if (!record.getInt("price").equals(record.getInt("product_price"))) {
+				double conver_relate = Double.parseDouble(record.getStr("convert_relate"));
+				double price = Double.parseDouble(record.getStr("price"));
+				double product_price = Double.parseDouble(record.getStr("product_price"));
+				double smallproductPrice=product_price/conver_relate;
+				double smallprice=price/conver_relate;
+				smallproductPrice=new BigDecimal(smallproductPrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
+				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ product_price+ "(" + price+ ")<br>");
+				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallproductPrice+ "(" +  smallprice + ")<br>");
+			}
+		}
+		stringBuilder.append("</p>\n" + 
+				"	      </div>");
+		return stringBuilder.toString();
+	}
+	
+	
 	private String buildOutstockInfo(String ordedId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
 
@@ -483,12 +593,19 @@ public class OrderController extends BaseFrontController {
 				Integer pass = getParaToInt("pass", 1);
 				Integer edit = getParaToInt("edit", 0);
 
+				Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
+				if (Integer.parseInt(salesOrder.getStr("status"))!=Consts.SALES_ORDER_STATUS_DEFAULT) {
+					renderAjaxResultForError("订单已审核");
+					return false;
+				}
+				
 				Map<String, Object> var = Maps.newHashMap();
 				var.put("pass", pass);
 				var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
-
+				StringBuilder stringBuilder = new StringBuilder();
 				//是否改价格
 				if (pass == 1 && edit == 1) {
+					
 					Map<String, String[]> paraMap = getParaMap();
 					String result = editOrder(paraMap, user);
 					if (StrKit.notBlank(result)) {
@@ -497,18 +614,18 @@ public class OrderController extends BaseFrontController {
 					}
 					String editInfo = buildEditInfo();
 					String addInfo = buildAddInfo();
-
 					comment = "通过" + " 修改订单<br>" + editInfo + addInfo;
+					stringBuilder.append( modifyPrice1(orderId));
 				} else {
 					comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
 							          + (refuseReson == "undefined" ? "" : refuseReson);
 					var.put("comment", comment);
+					stringBuilder.append( modifyPrice2(orderId));
 				}
-
 				String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
-
+				stringBuilder.append(comments);
 				WorkFlowService workflowService = new WorkFlowService();
-				workflowService.completeTask(taskId, comments, var);
+				workflowService.completeTask(taskId, stringBuilder.toString(), var);
 
 				//审核订单后将message中是否阅读改为是
 				Message message = MessageQuery.me().findByObjectIdAndToUserId(orderId, user.getId());
@@ -554,7 +671,6 @@ public class OrderController extends BaseFrontController {
 					}
 
 				}
-
 			}
 		}
 

@@ -159,7 +159,7 @@
     
     function refresh() {
         pageNumber = 1;
-        $.showLoading();
+        layer.open({type: 2,content: '加载中'});
         $.ajax({
             url:"${CPATH}/customerVisit/refresh",
             type:"post",
@@ -179,7 +179,7 @@
                 if(data.html.length ==0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#visitList").html(data.html);
                 pageNumber = 2;
-                $.hideLoading();
+                layer.closeAll();
             }
         });
     }
@@ -203,7 +203,7 @@
             </div>
             <label class="weui-search-bar__label" id="searchText">
                 <i class="weui-icon-search"></i>
-                <span>请输入客户名或联系人</span>
+                <span>请输入客户名</span>
             </label>
         </form>
         <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel" onclick="searchCancel()">取消</a>

@@ -95,7 +95,7 @@
 
 		$loading.show();
 		$noMore.hide();
-		$.showLoading();
+		layer.open({type: 2,content: '加载中'});
 		var dd = $("#datetime-picker").val();
 		var params = {
 			"page": page,
@@ -112,7 +112,7 @@
 		Utils.ajax('${CPATH}/plans/myPlanList', params,
 			function(data) {
 				$loading.hide();
-				$.hideLoading();
+				layer.closeAll();
 				$("#planAmount").html("");
 				$("#completeAmount").html("");
 				if(data.planList.length == 0) {
