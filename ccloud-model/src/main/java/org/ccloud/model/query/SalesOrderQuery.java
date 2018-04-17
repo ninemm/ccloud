@@ -2055,11 +2055,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " cc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, " cs.customer_kind", Consts.CUSTOMER_KIND_SELLER, params, needWhere);
-		if (needWhere) {
-			fromBuilder.append(" where cc.status not in (1001,1002) ");
-		} else {
-			fromBuilder.append(" and cc.status not in (1001,1002) ");
-		}
+		fromBuilder.append(" AND EXISTS(SELECT os.`status` FROM cc_sales_order_status os ");
+		fromBuilder.append("WHERE os.`status` = cc.`status` AND os.`status` != 1001 ");
+		fromBuilder.append("AND os.`status` != 1002) ");
 
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and cc.create_date >= ? ");

@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.ccloud.model.Customer;
 import org.ccloud.model.SellerCustomer;
+import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.SalesmanOrderReportQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.UserQuery;
 
 import com.jfinal.plugin.activerecord.Record;
 
@@ -61,8 +63,37 @@ public class SalesmanOrderReportBiz {
 	}
 	
 	
-	public List<Record> getOrderRankOfMyDepartment() {
-		
-		return null;
+	/**
+	 * 查询登录业务员所在部门的订单销售排行
+	 * @param startDate：开始时间
+	 * @param endDate：结束时间
+	 * @param dayTag：天数标识
+	 * @param orderTag：订单标识
+	 * @param deptId：登录业务员所在部门ID
+	 * @param receiveType：收款类型
+	 * @return
+	 */
+	public List<Record> getOrderRankOfMyDepartment(String startDate, String endDate, String dayTag,
+			String orderTag, String deptId, String receiveType) {
+		List<Record> records = SalesmanOrderReportQuery.me().getOrderRankOfMyDepartment(startDate, endDate, dayTag, orderTag, deptId, receiveType);
+		if(records != null && records.size() > 0) {
+			Record record = null;
+			User user = null;
+			String realname = null;
+			String avatar = null;
+			for (Iterator<Record> iterator = records.iterator(); iterator.hasNext();) {
+				record = (Record) iterator.next();
+				user = UserQuery.me().findById(String.valueOf(record.getColumns().get("id")));
+				realname = user != null ? user.getRealname() : "";
+				avatar = user != null ? user.getAvatar() : "";
+				record.getColumns().put("realname", realname);
+				record.getColumns().put("avatar", avatar);
+				record = null;
+				user = null;
+				realname = null;
+				avatar = null;
+			}
+		}
+		return records;
 	}
 }

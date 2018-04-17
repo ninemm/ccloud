@@ -46,6 +46,7 @@ import org.ccloud.model.compare.BeanCompareUtils;
 import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerExcel;
 import org.ccloud.model.vo.CustomerVO;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -725,6 +726,20 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			src.setAreaCode(areaCode);
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
+			for (int i = 0; i < diffAttrList.size(); i++) {
+				if (diffAttrList.get(i).startsWith("店招图")) {
+					String imageListStore=diffAttrList.get(i).substring(4);
+					String domain = OptionQuery.me().findValue("cdn_domain");
+					List<ImageJson> listI = JSON.parseArray(imageListStore, ImageJson.class);
+					for (ImageJson image : listI) {
+						image.setSavePath(domain + "/" + image.getSavePath());
+						image.setOriginalPath(domain + "/" +image.getOriginalPath());
+					}
+					setAttr("diffAttrImage", listI);
+					diffAttrList.remove(i);
+					break;
+				}
+			}
 		} else if(isEnable.equals("0")) {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("新增客户");

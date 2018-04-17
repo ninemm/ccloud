@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.ccloud.Consts;
+import org.ccloud.business.BusinessManagerOrderReportBiz;
 import org.ccloud.business.SalesmanOrderReportBiz;
 import org.ccloud.business.SupervisorOrderReportBiz;
 import org.ccloud.core.BaseFrontController;
@@ -448,7 +449,7 @@ public class ReportController extends BaseFrontController {
 		String dataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		
 		String receiveType = getPara("receiveType");
-		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea+"%",receiveType);
+		List<Record> record = SalesmanOrderReportBiz.me().getOrderRankOfMyDepartment(startDate, endDate, dayTag, orderTag, user.getDepartmentId(), receiveType);
 		renderJson(record);
 	}
 	
@@ -468,7 +469,7 @@ public class ReportController extends BaseFrontController {
 		renderJson(record);
 	}
 	
-	//经销商下或部门下业务员排行榜(包含没下单用户)
+	// 查询业务主管、业务经理或品牌经理下的业务员排行榜(包含没下单用户)
 	public void getUserRankZero() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -480,7 +481,7 @@ public class ReportController extends BaseFrontController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String orderTag = getPara("orderTag");
 		String receiveType = getPara("receiveType");
-		List<Record> record = SalesOrderQuery.me().getUserRankZero(startDate, endDate, dayTag, sellerId, orderTag, dataArea,receiveType);
+		List<Record> record = SupervisorOrderReportBiz.me().getOrderRankOfMySalesmen(startDate, endDate, dayTag, orderTag, dataArea, receiveType);
 		renderJson(record);
 	}	
 	
@@ -697,7 +698,7 @@ public class ReportController extends BaseFrontController {
 			print = "true";
 		}	
 		String receiveType = getPara("receiveType");
-		List<Record> record = SalesOrderQuery.me().getDepartmentCount(startDate, endDate, dayTag, null, dataArea, orderTag,receiveType,print);
+		List<Record> record = BusinessManagerOrderReportBiz.me().getMyDepartmentsOrderReport(startDate, endDate, dayTag, orderTag, dataArea, print, receiveType);
 		renderJson(record);		
 	}
 	

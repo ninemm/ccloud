@@ -86,4 +86,55 @@ public class SalesmanOrderReportQuery extends JBaseQuery {
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
+	
+	/**
+	 * 查询登录业务员所在部门的订单销售排行
+	 * @param startDate：开始时间
+	 * @param endDate：结束时间
+	 * @param dayTag：天数标识
+	 * @param orderTag：订单标识
+	 * @param deptId：登录业务员所在部门ID
+	 * @param receiveType：收款类型
+	 * @return
+	 */
+	public List<Record> getOrderRankOfMyDepartment(String startDate, String endDate, String dayTag,
+			String orderTag, String deptId, String receiveType) {
+		if (StrKit.notBlank(dayTag)) {
+			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
+			startDate = date[0];
+			endDate = date[1];
+		}
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("SELECT IFNULL(SUM(t1.totalAmount), 0) AS totalAmount,");
+		sqlBuilder.append("IFNULL(SUM(t1.productCount), 0) AS productCount,");
+		sqlBuilder.append("IFNULL(t1.orderCount, 0) AS orderCount, u.id ");
+		sqlBuilder.append("FROM `user` u LEFT JOIN (");
+		sqlBuilder.append("SELECT SUM(cc.total_amount) AS totalAmount,");
+		sqlBuilder.append("SUM(cc.total_count) AS productCount,");
+		sqlBuilder.append("COUNT(1) AS orderCount,cc.biz_user_id ");
+		sqlBuilder.append("FROM cc_sales_order cc WHERE cc.dept_id = ? ");
+		params.add(deptId);
+		sqlBuilder.append("AND EXISTS(SELECT os.`status` FROM cc_sales_order_status os ");
+		sqlBuilder.append("WHERE os.status = cc.status and os.status != 1001 and os.status != 1002) ");
+		if (StrKit.notBlank(receiveType) && !receiveType.equals("all")) {
+			appendIfNotEmpty(sqlBuilder, "cc.receive_type", receiveType, params, Boolean.FALSE.booleanValue());
+		}
+		sqlBuilder.append("AND cc.create_date >= ? AND cc.create_date <= ? ");
+		sqlBuilder.append("GROUP BY cc.biz_user_id)  t1 ON u.id = t1.biz_user_id ");
+		sqlBuilder.append("WHERE u.department_id = ? GROUP BY u.id ");
+		params.add(startDate);
+		params.add(endDate);
+		params.add(deptId);
+		if (StrKit.notBlank(orderTag)) {
+			sqlBuilder.append("ORDER BY "+ orderTag + " desc ");
+		} else {
+			sqlBuilder.append("ORDER BY totalAmount desc ");
+		}
+		
+		if (params.isEmpty())
+			return Db.find(sqlBuilder.toString());
+
+		return Db.find(sqlBuilder.toString(), params.toArray());
+	}
 }
