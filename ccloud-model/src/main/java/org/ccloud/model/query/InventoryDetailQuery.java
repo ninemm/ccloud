@@ -165,15 +165,18 @@ public class InventoryDetailQuery extends JBaseQuery {
 
 	//库存明细报表
 	public Page<InventoryDetail> findByDataArea(int pageNumber, int pageSize, String dataArea, String warehouseId, String sort, String order, String startDate, String endDate, String user_id, boolean admin) {
-		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , IFNULL(t1.out_count,0) out_count, IFNULL(t1.in_count,0) in_count, IFNULL(t2.balance_count,0) balance_count ";
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid");
+		LinkedList<Object> params = new LinkedList<Object>();
+		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , IFNULL(t1.out_count , 0) out_count , IFNULL(t1.in_count , 0) in_count , IFNULL(t2.balance_count , 0) balance_count ";
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid ");
 		fromBuilder.append(" LEFT JOIN cc_warehouse w ON w.id = cid.warehouse_id  ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
 		
-		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(c.out_count) , 0) out_count , IFNULL(SUM(c.in_count) , 0) in_count , c.sell_product_id ,c.warehouse_id FROM cc_inventory_detail c WHERE");
-		fromBuilder.append(" c.create_date >= '"+startDate+"' AND c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id,c.warehouse_id) t1 ON t1.sell_product_id = sp.id AND t1.warehouse_id=cid.warehouse_id");
-		
+		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(c.out_count) , 0) out_count , IFNULL(SUM(c.in_count) , 0) in_count , c.sell_product_id ,c.warehouse_id FROM cc_inventory_detail c ");
+		appendIfNotEmptyWithLike(fromBuilder, "c.data_area", dataArea, params, true);
+		fromBuilder.append(" and c.create_date >= ? AND c.create_date <= ? GROUP BY c.sell_product_id,c.warehouse_id) t1 ON t1.sell_product_id = sp.id AND t1.warehouse_id=cid.warehouse_id");
+		params.add(startDate);
+		params.add(endDate);
 		fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id ,c.warehouse_id FROM cc_inventory_detail c WHERE ");
 		fromBuilder.append(" c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id,c.warehouse_id) t2 ON t2.sell_product_id = sp.id AND t2.warehouse_id=cid.warehouse_id");
 		
@@ -184,10 +187,9 @@ public class InventoryDetailQuery extends JBaseQuery {
 			fromBuilder.append(" where cid.warehouse_id IN(select w.id from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id='"+user_id+"' and w.is_enabled=1)");
 		}
 		
-		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = false;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "w.id", warehouseId, params, needWhere);
+		
+		appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, false);
+		appendIfNotEmpty(fromBuilder, "w.id", warehouseId, params, false);
 		fromBuilder.append("GROUP BY cid.warehouse_id , cid.sell_product_id ");
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"cid.create_date");
