@@ -1,7 +1,7 @@
 
 Utils = {
 	context: '',	
-	devMode: true,	
+	devMode: false,	
 	provCacheName: 'PROV_CACHE_NAME',
 	cityCacheName: 'CITY_CACHE_NAME',
 	countryCacheName: 'COUNTRY_CACHE_NAME',
@@ -75,7 +75,7 @@ function Map() {
 
 function initWxConfig(appId, timestamp, nonceStr, signature) {
     wx.config({
-        debug: true,
+        debug: false,
         appId: appId,
         timestamp: timestamp,
         nonceStr: nonceStr,
@@ -243,3 +243,13 @@ var MapSet = {
 		},{enableHighAccuracy: true})
 	}
 };
+
+$(".trOpen").click(function() {
+	$(this).hide().siblings().show();
+	$(this).parents('table').find('tbody tr:gt(5)').show();
+});
+
+$(".trClose").click(function() {
+	$(this).hide().siblings().show();
+	$(this).parents('table').find('tbody tr:gt(5)').hide();
+});
