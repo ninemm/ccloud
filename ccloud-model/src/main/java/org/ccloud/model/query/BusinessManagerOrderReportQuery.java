@@ -35,7 +35,7 @@ public class BusinessManagerOrderReportQuery extends JBaseQuery {
 	 * @return
 	 */
 	public List<Record> getMyDepartmentsOrderReport(String startDate, String endDate, String dayTag,
-			String orderTag, String dataArea, String receiveType, String print) {
+			String orderTag, String dataArea, String print, String receiveType) {
 		if (StrKit.notBlank(dayTag)) {
 			String[] date = DateUtils.getStartDateAndEndDateByType(dayTag);
 			startDate = date[0];
