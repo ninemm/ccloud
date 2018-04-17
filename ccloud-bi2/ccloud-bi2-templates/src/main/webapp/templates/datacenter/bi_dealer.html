@@ -44,27 +44,14 @@
     $(function() {
         dealer(provName, cityName, '', dateType);
         
-        initTopHoverTree("gotop", 100, 10, 50);
-        
         $('#goback').on('click', function() {
             historyUtils.back();
         });
     });
-    var provName = $.cookie(Utils.provCacheName);
-    var cityName = $.cookie(Utils.cityCacheName);
-    var countryName = $.cookie(Utils.countryCacheName);
-    var dateType = $.cookie(Utils.dateTypeCache) == null ? 0 : $.cookie(Utils.dateTypeCache);
-    $("#date-div").find(".date").eq(dateType).addClass("active-date");
 
     var dealerCode = '';
     var dealerName = '';
-    
-    //做时间的切换选择
-    $(".date").click(function(e) {
-        var $a = $(e.currentTarget);
-        $a.parent().find(".date").removeClass("active-date");
-        $a.addClass("active-date");
-    });
+
     function setDateType(type){
         $.cookie(Utils.dateTypeCache, type, { expires: 1 });
         dateType = type;
@@ -314,5 +301,4 @@
     </div>
 </section>
 <#include "_inc/_nav_box.html"/>
-<span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>
 </@layout>

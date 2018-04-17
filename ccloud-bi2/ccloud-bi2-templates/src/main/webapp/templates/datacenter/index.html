@@ -49,34 +49,15 @@
  <!--   <script type="text/javascript" src="${CTPATH}/js/headroom.min.js"></script>   -->
 </#macro>
 <#macro script>
-    
-    var $city = $("#city-name");
-    
-    if($.cookie(Utils.provCacheName) == null)$.cookie(Utils.provCacheName, '', { expires: 7 });
-    if($.cookie(Utils.cityCacheName) == null)$.cookie(Utils.cityCacheName, '', { expires: 7 });
-    if($.cookie(Utils.countryCacheName) == null)$.cookie(Utils.countryCacheName, '', { expires: 7 });
 
-    var provName = $.cookie(Utils.provCacheName);
-    var cityName = $.cookie(Utils.cityCacheName);
-    var countryName = $.cookie(Utils.countryCacheName);
-    var curProvName = '';
-    var dateType = $.cookie(Utils.dateTypeCache) == null ? 0 : $.cookie(Utils.dateTypeCache);
-    $("#date-div").find(".date").eq(dateType).addClass("active-date");
-    
-    var strKit = new StrKit();
-    
     $(function() { 
-        Utils.loading();
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
         wxReadyGetLocation(
             function(lng, lat, addComp, address) {
-                //$("#lng").val(lng.toFixed(6));
-                //$("#lat").val(lat.toFixed(6));
+                console.log('定位成功');
             }
         );
-
-
         //dealerSelect.init();
         topTotal();
         initDealerList();
@@ -85,13 +66,6 @@
 
     });
 
-
-    // 时间切换选择, 如近一天，近一周等
-    $(".date").click(function(e) {
-        var $a = $(e.currentTarget);
-        $a.parent().find(".date").removeClass("active-date");
-        $a.addClass("active-date");
-    });
     function setDateType(type){
         $.cookie(Utils.dateTypeCache, type, { expires: 1 });
         dateType = type;
@@ -105,7 +79,6 @@
     var $combinSearch = $('#combin-filter');
     var $layer = $(".layer");
 
-
     $(document).on("click", ".layer", function () { //点击遮罩关闭菜单、组合筛选
         closeCombinSearch();
     }).on('click', '#combin-filter-btn, #dealer-select', function () { //打开组合筛选
@@ -117,8 +90,7 @@
         
         wxReadyGetLocation(
             function(lng, lat, addComp, address) {
-                //$("#lng").val(lng.toFixed(6));
-                //$("#lat").val(lat.toFixed(6));
+
             }
         );
     })
@@ -181,7 +153,6 @@
             }, 1000);
         }, 2000);
     }
-
 
     function initDealerList() {
 
@@ -298,7 +269,6 @@
         $(".weui-cell").show();
     });
 
-
     function selectDealer(dataArea,obj) {
         Utils.loading();
         $("#dealerName").text($(obj).find(".weui-cell__hd").eq(0).text() + '汇总信息');
@@ -391,7 +361,7 @@
         <div class="divide-line"></div>
         <header>
             <div class="title" id="dealerName">全部经销商汇总信息</div>
-            <div id="combin-filter-btn" class="more-dealer font-20"><i class="icon-list"></i></div>
+            <!--<div id="combin-filter-btn" class="more-dealer font-20"><i class="icon-list"></i></div>-->
         </header>
         <div class="sales-gather">
             <div class="gather">
@@ -421,7 +391,7 @@
         
     </div>
 </section>
-<!--<img src="${CTPATH}/images/dealer-select.svg" alt="" id="dealer-select">-->
+<img src="${CTPATH}/images/dealer-select.svg" alt="" id="dealer-select">
 <div class="layer"></div>
 <article id="combin-filter" class="animated slideOutRight">
     <div id="customer">

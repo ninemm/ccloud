@@ -87,10 +87,11 @@
 	<@script_import />
 	<script type="text/javascript" src="${CTPATH}/js/convertor.js"></script>
 	<script type='text/javascript' src="${CTPATH}/js/common.js"></script>
-    <script type='text/javascript' src="${CTPATH}/js/vconsole.min.js"></script> 
+	<!--<script type='text/javascript' src="${CTPATH}/js/comm.js"></script>
+    <script type='text/javascript' src="${CTPATH}/js/vconsole.min.js"></script>-->
 	<!-- <script type='text/javascript' src="${CTPATH}/js/headroom.min.js"></script> -->
 	<script type="text/javascript">
-		//Utils.loading();
+		Utils.loading();
 		$(function() {
 			FastClick.attach(document.body);
 			Utils.context = '${CTPATH}';
@@ -103,5 +104,6 @@
 	</script>
 	</#if>
 </body>
+<span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>
 </html>
 </#macro>

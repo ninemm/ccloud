@@ -77,16 +77,8 @@
      
 </#macro>
 <#macro script>
-    var strKit = new StrKit();
 
     var $dateTitle = $('#date-title');
-    var provName = $.cookie(Utils.provCacheName);
-    var cityName = $.cookie(Utils.cityCacheName);
-    var countryName = $.cookie(Utils.countryCacheName);
-    var curProvTitle = null;
-    
-    var dateType = $.cookie(Utils.dateTypeCache) == null ? 0 : $.cookie(Utils.dateTypeCache);// 日期搜索按钮类型
-    $("#date-div").find(".date").eq(dateType).addClass("active-date");
 
     var hotMapType = 0 ;
     var prov_data = [];
@@ -96,23 +88,15 @@
     var color = ['#a6c84c', '#ffa022', '#46bee9'];
     
     $(function() {
-        curProvTitle = strKit.convertProvName(provName);
 
         if(countryName.length != 0) {
-            renderCityMap({"name": cityName}, curProvTitle);
+            renderCityMap({"name": cityName}, curProvName);
             //provName = provName + "省";
         } else if(cityName.length != 0){
-            renderProvMap({"name": curProvTitle}, true);
+            renderProvMap({"name": curProvName}, true);
         } else {
             renderChinaMap(true);
         }
-
-        //做时间的切换选择
-        $(".date").click(function(e) {
-            var $a = $(e.currentTarget);
-            $a.parent().find(".date").removeClass("active-date");
-            $a.addClass("active-date");
-        });
         
         //做地图类型的切换选择
         $(".mapType").click(function(e) {
@@ -157,8 +141,6 @@
         });
         
         $dateTitle.text('近一天销售统计');
-        
-        initTopHoverTree("gotop", 100, 10, 50);
         
         $('#goback').on('click', function() {
             historyUtils.back();
@@ -1131,5 +1113,4 @@
     </div>
 </section>
 <#include "_inc/_nav_box.html"/>
-<span id="gotop" title="返回顶部"><i class="icon-arrow-up2"></i></div>
 </@layout>
