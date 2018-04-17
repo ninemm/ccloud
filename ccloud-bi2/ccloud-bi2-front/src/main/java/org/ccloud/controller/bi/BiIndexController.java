@@ -47,43 +47,43 @@ public class BiIndexController extends BaseFrontController {
 			return ;
 		}
 
-		//=================================本地开发需要放开这一段注释===================================================
-//		List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
-//		String sellerArray[] = new String[sellerByUser.size()];
-//		String sellerNameArray[] = new String[sellerByUser.size()];
-//		for (int i = 0; i < sellerByUser.size(); i++) {
-//			sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
-//			sellerNameArray[i] = sellerByUser.get(i).getStr("seller_name");
-//		}
-//
-//		List<Record> brandByUser = BiManagerQuery.me().findBrandByUser(user.getId());
-//		String brandArray[] = new String[brandByUser.size()];
-//		for (int i = 0; i < brandByUser.size(); i++) {
-//			brandArray[i] = brandByUser.get(i).getStr("brand_id");
-//		}
-//
-//		List<Record> productByUser = BiManagerQuery.me().findProductByUser(user.getId());
-//		String productArray[] = new String[productByUser.size()];
-//		for (int i = 0; i < productByUser.size(); i++) {
-//			productArray[i] = productByUser.get(i).getStr("product_id");
-//		}
-//
-//		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
-//		setSessionAttr(Consts.SESSION_SELLER_NAME, sellerNameArray);
-//		setSessionAttr(Consts.SESSION_BRAND_ID_ARRAY, brandArray);
-//		setSessionAttr(Consts.SESSION_PRODUCT_ID_ARRAY, productArray);
+		//====================================================================================
+		List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
+		String sellerArray[] = new String[sellerByUser.size()];
+		String sellerNameArray[] = new String[sellerByUser.size()];
+		for (int i = 0; i < sellerByUser.size(); i++) {
+			sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
+			sellerNameArray[i] = sellerByUser.get(i).getStr("seller_name");
+		}
+
+		List<Record> brandByUser = BiManagerQuery.me().findBrandByUser(user.getId());
+		String brandArray[] = new String[brandByUser.size()];
+		for (int i = 0; i < brandByUser.size(); i++) {
+			brandArray[i] = brandByUser.get(i).getStr("brand_id");
+		}
+
+		List<Record> productByUser = BiManagerQuery.me().findProductByUser(user.getId());
+		String productArray[] = new String[productByUser.size()];
+		for (int i = 0; i < productByUser.size(); i++) {
+			productArray[i] = productByUser.get(i).getStr("product_id");
+		}
+
+		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
+		setSessionAttr(Consts.SESSION_SELLER_NAME, sellerNameArray);
+		setSessionAttr(Consts.SESSION_BRAND_ID_ARRAY, brandArray);
+		setSessionAttr(Consts.SESSION_PRODUCT_ID_ARRAY, productArray);
 		//==============================================================================================================
 
-		//从session取
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] sellerName = getSessionAttr(Consts.SESSION_SELLER_NAME);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+//		//从session取
+//		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+//		String[] sellerName = getSessionAttr(Consts.SESSION_SELLER_NAME);
+//		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
 
-		setAttr("dealerCount", dataArea.length);
-		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(dataArea,null, null, brandId));
+		setAttr("dealerCount", sellerArray.length);
+		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(sellerArray,null, null, brandArray));
 
-		setAttr("dataArea", JSON.toJSON(dataArea));
-		setAttr("sellerName", JSON.toJSON(sellerName));
+		setAttr("dataArea", JSON.toJSON(sellerArray));
+		setAttr("sellerName", JSON.toJSON(sellerNameArray));
 
 		render("index.html");
 	}
