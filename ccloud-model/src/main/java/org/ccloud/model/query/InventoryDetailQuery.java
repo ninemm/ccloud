@@ -159,11 +159,10 @@ public class InventoryDetailQuery extends JBaseQuery {
 		}
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
-
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	//库存明细报表
+	//库存详情报表
 	public Page<InventoryDetail> findByDataArea(int pageNumber, int pageSize, String dataArea, String warehouseId, String sort, String order, String startDate, String endDate, String user_id, boolean admin) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name , w.`name` , sp.custom_name , IFNULL(t1.out_count , 0) out_count , IFNULL(t1.in_count , 0) in_count , IFNULL(t2.balance_count , 0) balance_count ";
@@ -186,8 +185,8 @@ public class InventoryDetailQuery extends JBaseQuery {
 			params.add(user_id);
 			params.add(dataArea);
 		}else {
-			fromBuilder.append(" where cid.warehouse_id IN(select w.id from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and w.is_enabled=1 )");
-			appendIfNotEmpty(fromBuilder, "uw.user_id", user_id, params, false);
+			fromBuilder.append(" where cid.warehouse_id IN(select w.id from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and w.is_enabled=1 and uw.user_id=? )");
+			params.add(user_id);
 		}
 		appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, false);
 		appendIfNotEmpty(fromBuilder, "w.id", warehouseId, params, false);
@@ -202,30 +201,35 @@ public class InventoryDetailQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	//库存详细报表 产品总计
+	//产品总计报表
 	public Page<InventoryDetail> findByInventoryDetailListTotal(int pageNumber, int pageSize,
 			String dataArea, String sort, String order, String sellerId, String startDate, String endDate, String user_id, boolean admin) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		String select = "SELECT cid.warehouse_id , cid.sell_product_id , cs.seller_name ,  sp.custom_name , IFNULL(t1.out_count,0) out_count, IFNULL(t1.in_count,0) in_count, IFNULL(t2.balance_count,0) balance_count ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_inventory_detail cid");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id = cid.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = sp.seller_id ");
 		
-		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(c.out_count) , 0) out_count , IFNULL(SUM(c.in_count) , 0) in_count , c.sell_product_id FROM cc_inventory_detail c WHERE");
-		fromBuilder.append(" c.create_date >= '"+startDate+"' AND c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t1 ON t1.sell_product_id = cid.sell_product_id ");
-		
-		fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE ");
-		fromBuilder.append(" c.create_date <= '"+endDate+"' GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = cid.sell_product_id ");
-		
+		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(c.out_count) , 0) out_count , IFNULL(SUM(c.in_count) , 0) in_count , c.sell_product_id ,c.warehouse_id FROM cc_inventory_detail c ");
+		appendIfNotEmptyWithLike(fromBuilder, "c.data_area", dataArea, params, true);
+		fromBuilder.append(" and c.create_date >= ? AND c.create_date <= ? GROUP BY c.sell_product_id,c.warehouse_id) t1 ON t1.sell_product_id = sp.id AND t1.warehouse_id=cid.warehouse_id");
+		params.add(startDate);
+		params.add(endDate);
+		fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id ,c.warehouse_id FROM cc_inventory_detail c  ");
+		appendIfNotEmptyWithLike(fromBuilder, "c.data_area", dataArea, params, true);
+		fromBuilder.append(" AND c.create_date <= ? GROUP BY c.sell_product_id,c.warehouse_id) t2 ON t2.sell_product_id = sp.id AND t2.warehouse_id=cid.warehouse_id");
+		params.add(endDate);
 		if (admin) {
-			fromBuilder.append(" where cid.warehouse_id IN(SELECT c.id FROM `cc_warehouse` c LEFT JOIN department d ON c.dept_id = d.id WHERE c.id IN");
-			fromBuilder.append("( SELECT uw.warehouse_id FROM cc_user_join_warehouse uw WHERE uw.user_id ='"+user_id+"') OR d.data_area LIKE '"+dataArea+"')");
+			fromBuilder.append(" WHERE EXISTS( SELECT c.id FROM cc_warehouse c LEFT JOIN `department` d ON c.dept_id = d.id WHERE c.id = cid.warehouse_id AND( EXISTS( SELECT uw.warehouse_id FROM ");
+			fromBuilder.append(" cc_user_join_warehouse uw WHERE uw.warehouse_id = c.id AND uw.user_id = ?) OR d.data_area LIKE ?)) ");
+			params.add(user_id);
+			params.add(dataArea);
 		}else {
-			fromBuilder.append(" where cid.warehouse_id IN(select w.id from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id='"+user_id+"' and w.is_enabled=1)");
+			fromBuilder.append(" where cid.warehouse_id IN(select w.id from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and w.is_enabled=1 and uw.user_id=? )");
+			params.add(user_id);
 		}
-		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = false;
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, needWhere);
+		appendIfNotEmptyWithLike(fromBuilder, "cid.data_area", dataArea, params, false);
+		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
 		fromBuilder.append("GROUP BY cid.sell_product_id ");
 		if (sort==""||null==sort) {
 			fromBuilder.append("order by "+"cid.create_date");

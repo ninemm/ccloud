@@ -160,12 +160,9 @@ function queryPrintDetail(financePrint) {
                     if (!printFootContext) printFootContext = '';
                     if(financePrint == 0){
                     var salesAmount = jQuery.mm.digitUppercase(item.salesAmount);
-                    console.log(salesAmount)
-                    alert()
                     footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext);
                     }else{
                     var salesAmount = jQuery.mm.digitUppercase(saleMoney);
-                    console.log(salesAmount)
                     footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
                     }
 
