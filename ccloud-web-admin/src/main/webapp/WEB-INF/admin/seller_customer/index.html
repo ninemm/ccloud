@@ -293,8 +293,12 @@
 					<@shiro.hasPermission name="/admin/sellerCustomer/downloading, /admin/dealer/all, /admin/all">
 						<a href="${CPATH}/admin/sellerCustomer/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
 					</@shiro.hasPermission>
+					<@shiro.hasPermission name="/admin/sellerCustomer/upIsenable, /admin/dealer/all, /admin/all">
 						<a href="#" onclick = "upSellerCustomer()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-arrow-up"></i> 批量启用</a>
+					</@shiro.hasPermission>
+					<@shiro.hasPermission name="/admin/sellerCustomer/downIsenable, /admin/dealer/all, /admin/all">
 						<a href="#" onclick = "downSellerCustomer()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-arrow-down"></i> 批量停用</a>
+					</@shiro.hasPermission>
 				</div>
 				 <div class="col-sm-4">
 				</div>
