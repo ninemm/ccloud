@@ -43,7 +43,7 @@ public class BiIndexController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (user == null) {
 			renderNull();
-			return ;
+			return;
 		}
 
 		//====================================本地开发放开此段注释================================================
@@ -82,7 +82,7 @@ public class BiIndexController extends BaseFrontController {
 		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
 
-		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(dataArea,null, null, brandId));
+		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(dataArea, null, null, brandId));
 
 		render("index.html");
 	}
@@ -93,11 +93,11 @@ public class BiIndexController extends BaseFrontController {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
-		if(StrKit.isBlank(dataArea)){
+		if (StrKit.isBlank(dataArea)) {
 			result.put("provName", "");
 			result.put("cityName", "");
 			result.put("countryName", "");
-		}else{
+		} else {
 			Record seller = Bi2SalesQuery.me().findSellerByDataArea(dataArea);
 			result.put("provName", seller.getStr("prov_name"));
 			result.put("cityName", seller.getStr("city_name"));
@@ -123,7 +123,7 @@ public class BiIndexController extends BaseFrontController {
 		result.put("totalOrderCount",
 				Bi2SalesQuery.me().findOrderCount(dataArea, startDate, endDate, brandId));
 		result.put("totalOrderAmount",
-				Bi2SalesQuery.me().findTotalAmount(dataArea,startDate, endDate, brandId));
+				Bi2SalesQuery.me().findTotalAmount(dataArea, startDate, endDate, brandId));
 
 		renderJson(result);
 

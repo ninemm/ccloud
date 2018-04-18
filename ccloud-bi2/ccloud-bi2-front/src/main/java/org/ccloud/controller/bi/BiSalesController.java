@@ -329,6 +329,11 @@ public class BiSalesController extends BaseFrontController {
 		for (int i = 1; i < dataArea.length; i++) {
 			dataAreaIn += "," + dataArea[i];
 		}
+		String[] brandId = this.getBrandId(getPara("brandId"));
+		String brandIdIn = brandId[0];
+		for (int i = 1; i < brandId.length; i++) {
+			brandIdIn += "," + brandId[i];
+		}
 
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
@@ -344,6 +349,7 @@ public class BiSalesController extends BaseFrontController {
 		salesCallback.setEndDate(endDate);
 		salesCallback.setDataArea(dataAreaIn);
 		salesCallback.setCustomerKind(Consts.CUSTOMER_KIND_COMMON);
+		salesCallback.setBrandId(brandIdIn);
 
 		AroundCustomerBiVisitCallback visitCallback = new AroundCustomerBiVisitCallback();
 		visitCallback.setLongitude(longitude);
@@ -394,13 +400,14 @@ public class BiSalesController extends BaseFrontController {
 	}
 
 	public void productByCustomerId() {
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String customerId = getPara("customerId", "").trim();
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findProductList(customerId, startDate,
-				endDate);
+				endDate, brandId);
 
 		renderJson(result);
 

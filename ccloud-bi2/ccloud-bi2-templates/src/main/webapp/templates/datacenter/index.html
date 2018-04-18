@@ -59,6 +59,9 @@
             }
         );
         //dealerSelect.init();
+        if(dataArea != ''){
+            $("#dealerName").text($("#" + dataArea).text());
+        }
         topTotal();
         renderChinaMap();
         total();
@@ -300,7 +303,7 @@
         
         <div class="divide-line"></div>
         <header>
-            <div class="title">经销商分布图</div>
+            <div class="title">全国销售分布图</div>
         </header>
         
         <div id="map-wrapper" class="map-wrapper">
@@ -363,7 +366,7 @@
             <div class="weui-cells" id="dealerList">
                 <div class='weui-cell'onclick="selectDealer('',this)"><div class='weui-cell__hd'>全部经销商</div></div>
                 <#list session['dealer_data_area_array'] as dealerDataArea>
-                    <div class='weui-cell'onclick="selectDealer('${dealerDataArea!}',this)"><div class='weui-cell__hd'>${session['dealer_name_array'][dealerDataArea_index]!}</div></div>
+                    <div class='weui-cell'onclick="selectDealer('${dealerDataArea!}',this)"><div class='weui-cell__hd' id="${dealerDataArea!}">${session['dealer_name_array'][dealerDataArea_index]!}</div></div>
                 </#list>
             </div>
             <div class="weui-loadmore" id="loading" style="display: none;">

@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2015-2016, Eric Huang 黄鑫 (hx50859042@gmail.com).
- *
+ * <p>
  * Licensed under the GNU Lesser General Public License (LGPL) ,Version 3.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.gnu.org/licenses/lgpl-3.0.txt
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -35,6 +35,7 @@ public class AroundCustomerBiSalesCallback implements ICallback {
 	private String endDate;
 	private String dataArea;
 	private String customerKind;
+	private String brandId;
 
 	@Override
 	public Object call(Connection conn) {
@@ -43,7 +44,7 @@ public class AroundCustomerBiSalesCallback implements ICallback {
 		List<Map<String, Object>> result = Lists.newArrayList();
 
 		try {
-			proc = conn.prepareCall("{ call around_customer_bi_sales(?, ?, ?, ?, ?, ?, ?) }");
+			proc = conn.prepareCall("{ call around_customer_bi_sales(?, ?, ?, ?, ?, ?, ?, ?) }");
 
 			proc.setDouble(1, getLongitude());
 			proc.setDouble(2, getLatitude());
@@ -52,6 +53,7 @@ public class AroundCustomerBiSalesCallback implements ICallback {
 			proc.setString(5, getEndDate());
 			proc.setString(6, getDataArea());
 			proc.setString(7, getCustomerKind());
+			proc.setString(8, getBrandId());
 
 			proc.execute();
 
@@ -79,7 +81,7 @@ public class AroundCustomerBiSalesCallback implements ICallback {
 
 		return result;
 	}
-	
+
 	public String getStartDate() {
 		return startDate;
 	}
@@ -142,5 +144,13 @@ public class AroundCustomerBiSalesCallback implements ICallback {
 
 	public void setCustomerKind(String customerKind) {
 		this.customerKind = customerKind;
+	}
+
+	public String getBrandId() {
+		return brandId;
+	}
+
+	public void setBrandId(String brandId) {
+		this.brandId = brandId;
 	}
 }
