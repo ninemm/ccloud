@@ -18,7 +18,7 @@
 	td {
 		width:14%;
 		border: none;
-		white-space: nowrap;
+		
 	} 
 	table {
 		width: 100%;
@@ -66,7 +66,7 @@ var headerStr =
 			'<td style="visibility: hidden; ">&nbsp;</td>'+
 		'</tr>' +
 		'<tr>' +
-			'<td colspan="2" style="text-align:left;">货品名称</td>' +
+			'<td colspan="2" style="text-align:left;width: 28%;">货品名称</td>' +
 			'<td>规格</td>' +
 			'<td>单位</td>' +
 			'<td>数量</td>' +
@@ -77,7 +77,7 @@ var headerStr =
 	'</thead>';
 
 		var contentStr = '<tr>' +
-			'<td colspan="2" style="text-align:left;">{1}</td>' +
+			'<td colspan="2" style="text-align:left;width: 28%;">{1}</td>' +
 			'<td >{7}</td>' +
 			'<td >{9}</td>' +
 			'<td >{2}</td>' +
@@ -90,8 +90,8 @@ var headerStr =
 		'<div class="signatureArea clearfooter" >'+
 			'<div class="stat" style="text-align: center;">' + 
 				'<span style="float: left;">合计:</span>'+
-				'<span>{6}</span>'+
-				'<span style="float: right;">{1}</span>' + 
+				'<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{6}</span>'+
+				'<span style="float: right;">{1}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + 
 			'</div>' + 
 			'<div class="stat">' +
 				'<div><span>友情提示:支付宝账号2229893130@qq.com请备注客户名称</span></div>' +
@@ -100,7 +100,7 @@ var headerStr =
 				'<span >备注:{3}</span>' +
 			'</div>' +
 			'<div class="stat">' +
-				'<span class="width200">公司名称：{5}</span><span style="float: right;">公司电话：{7}</span>' +
+				'<span class="width200">公司名称：{5}</span><span style="float: right;">公司电话：{7}&nbsp;&nbsp;&nbsp;&nbsp;</span>' +
 			'</div>' +
 			'<div class="stat">' +
 				'<span >业务员:{8} 电话:{9} </span>' +
@@ -154,10 +154,10 @@ function queryPrintDetail(financePrint) {
                             if(subitem.convertRelate!=null){
                             		convertRelate="1*"+	subitem.convertRelate;
                             }
-                            if(financePrint == 0){
+                            if(isGift == 0){
                             content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,productAmout,subitem.bigUnit)
                             }else{
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,totalMoney,subitem.bigUnit,subitem.convertRelate)
+                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, 0, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,totalMoney,subitem.bigUnit,subitem.convertRelate)
                             }
                         });
 
