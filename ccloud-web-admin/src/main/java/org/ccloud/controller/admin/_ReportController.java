@@ -235,7 +235,7 @@ public class _ReportController extends JBaseController {
 		renderJson(map);
 	}
 	
-	//我部门的产品明细
+	//我部门的产品详细
 	public void departProduct() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		setAttr("startDate", date);
@@ -243,7 +243,7 @@ public class _ReportController extends JBaseController {
 		render("departmentProductReport.html");
 	}
 	
-	//我部门的产品明细list
+	//我部门的产品详细list
 	public void departmentProductReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -266,7 +266,7 @@ public class _ReportController extends JBaseController {
 		renderJson(map);
 	}
 	
-	//我部门的产品明细赠品list
+	//我部门的产品详细赠品list
 	public void departmentProductGiftReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
