@@ -466,7 +466,8 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-				String waterFont3 = sellerCustomer.getLocation();
+//				String waterFont3 = sellerCustomer.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
@@ -664,16 +665,21 @@ public class CustomerController extends BaseFrontController {
 	public void enable() {
 
 		String id = getPara("id");
-		//int isEnabled = getParaToInt("isEnabled");
-		if(StrKit.notBlank(id)) {
-
-			String updated = startProcess(id, new HashMap<String, Object>(), 1);
-
-			if (StrKit.isBlank(updated)) {
-				renderAjaxResultForSuccess("操作成功");
-			} else {
-				renderAjaxResultForError(updated);
+		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		if(StrKit.notBlank(id) ) {
+			if(isCustomerAudit == null || !isCustomerAudit) {
+				SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+				sellerCustomer.setIsEnabled(0);
+				if (sellerCustomer.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
+			}else {
+				String updated = startProcess(id, new HashMap<String, Object>(), 1);
+				if (StrKit.isBlank(updated)) {
+					renderAjaxResultForSuccess("操作成功");
+				} else {
+					renderAjaxResultForError(updated);
+				}
 			}
+		
 		}else {
 			renderAjaxResultForError("该客户不存在");
 		}
@@ -943,6 +949,7 @@ public class CustomerController extends BaseFrontController {
 
 			sellerCustomer.setProcDefKey(defKey);
 			sellerCustomer.setProcInstId(procInstId);
+			sellerCustomer.setIsChecked(0);
 			sellerCustomer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
 		}
 		
