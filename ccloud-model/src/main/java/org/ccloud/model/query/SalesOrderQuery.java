@@ -599,6 +599,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我部门的产品
 	public Page<SalesOrder> findByDepartmentProduct(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift, String sort, String order) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		String product_count="sd.product_count";
 		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
@@ -614,9 +615,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id=sp.seller_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sum(srid.product_count) count , srid.sell_product_id , sri.outstock_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON srid.refund_instock_id=sri.id ");
-		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
+		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
 		fromBuilder.append(" GROUP BY srid.sell_product_id , srid.refund_instock_id) t1 ON t1.outstock_id = sok.id AND t1.sell_product_id = sd.sell_product_id ");
-		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+//		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" where EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = so.status and os.status != ? and os.status != ?) and sc.customer_kind = ? ");
+		params.add(dataArea);
+		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
+		params.add(Consts.SALES_ORDER_STATUS_REJECT);
+		params.add(Consts.CUSTOMER_KIND_COMMON);		
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -625,7 +631,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
-		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
 		if (StrKit.notBlank(startDate)) {
@@ -648,6 +653,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我部门的业务员
 	public Page<SalesOrder> findByDepartSalesman(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		String product_count="sd.product_count";
 		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
@@ -663,9 +669,14 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sum(srid.product_count) count , srid.sell_product_id , sri.outstock_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON srid.refund_instock_id=sri.id ");
-		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
+		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
 		fromBuilder.append(" GROUP BY srid.sell_product_id , srid.refund_instock_id) t1 ON t1.outstock_id = sok.id AND t1.sell_product_id = sd.sell_product_id ");
-		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+//		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+		fromBuilder.append(" where EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = so.status and os.status != ? and os.status != ?) and sc.customer_kind = ? ");
+		params.add(dataArea);
+		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
+		params.add(Consts.SALES_ORDER_STATUS_REJECT);
+		params.add(Consts.CUSTOMER_KIND_COMMON);		
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -674,7 +685,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
-		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, needWhere);
 		if (StrKit.notBlank(startDate)) {
@@ -745,6 +755,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	//经销商的直营商的采购
 	public Page<SalesOrder> findBypurSeller(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String dataArea, boolean ifGift) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		String product_count="sd.product_count";
 		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
@@ -762,10 +773,15 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sum(srid.product_count) count , srid.sell_product_id , sri.outstock_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON srid.refund_instock_id=sri.id ");
-		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
+		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
 		fromBuilder.append(" GROUP BY srid.sell_product_id , srid.refund_instock_id) t1 ON t1.outstock_id = sok.id AND t1.sell_product_id = sd.sell_product_id ");
-		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
-		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		fromBuilder.append(" where EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = so.status and os.status != ? and os.status != ?) and sc.customer_kind = ? ");
+//		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
+//		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
+		params.add(dataArea);
+		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
+		params.add(Consts.SALES_ORDER_STATUS_REJECT);
+		params.add(Consts.CUSTOMER_KIND_COMMON);		
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -774,7 +790,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
-		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = false;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, " so.data_area", dataArea, params, needWhere);
 		if (StrKit.notBlank(startDate)) {
