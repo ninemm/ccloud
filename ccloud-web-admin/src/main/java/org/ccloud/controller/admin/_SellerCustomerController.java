@@ -766,7 +766,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("diffAttrList", diffAttrList);
 		}
 	}
-
+	@Before(Tx.class)
 	@RequiresPermissions(value = { "/admin/sellerCustomer/audit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void complete() {
 		
@@ -946,7 +946,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		else
 			renderAjaxResultForError("操作失败");
 	}
-
+	@Before(Tx.class)
 	private String startProcess(String customerId, Map<String, Object> param, int isEnable) {
 
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
