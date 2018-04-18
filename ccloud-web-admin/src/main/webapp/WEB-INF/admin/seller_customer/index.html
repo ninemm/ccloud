@@ -7,6 +7,9 @@
 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
 	<!-- bootstrapValidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	
+	<!-- select2 -->
+	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
 
 </#macro>
 
@@ -16,6 +19,9 @@
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
 	<!-- bootstrapValidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	
+	<!-- select2 -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
 
 </#macro>
 
@@ -23,7 +29,7 @@
 
 	var $table = $("#_customer_table");
 	var url = '${CPATH}/admin/sellerCustomer/list';
-	
+	$("#customerTypes").select2({width:'100%'});
 	var batchFlg = true;
 
 	$(function() {
@@ -182,8 +188,8 @@
 		  	var obj = {
 								"id": $(this).find('td').eq(0).find("input").val(),
 							};
-							sellerCustomerItems.push(obj);
-						})
+			sellerCustomerItems.push(obj);
+		})
 			if(flang==true){			
 				$.ajax({
 					url:"${CPATH}/admin/sellerCustomer/upIsenable",
@@ -216,8 +222,8 @@
 		  	var obj = {
 								"id": $(this).find('td').eq(0).find("input").val(),
 							};
-							sellerCustomerItems.push(obj);
-						})
+			sellerCustomerItems.push(obj);
+			})
 			if(flang==true){			
 				$.ajax({
 					url:"${CPATH}/admin/sellerCustomer/downIsenable",
@@ -236,6 +242,57 @@
 			}
 		
 	}
+	
+	var updateSellerCustomerType = function(){
+		 var sellerCustomerItems = new Array();
+		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
+		 if(checklist.length == 0){
+			toastr.error("未选中任何客户!");
+			return;		 
+		 }
+		 var list = $("#customerTypes").select2("val");
+		 var ids = "";
+		 if (list != null && list.length > 0) {
+		 	ids = list.toString();
+		 }
+		 console.log(ids);
+		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+		 	var obj = {
+								"id": $(this).find('td').eq(0).find("input").val(),
+							};
+			sellerCustomerItems.push(obj);
+		 })
+		 $.ajax({
+				url:"${CPATH}/admin/sellerCustomer/saveCustomerTypes",
+				type:"post",
+				dataType:"json",
+				data : {"customerTypes":ids,sellerCustomerItems : JSON.stringify(sellerCustomerItems)},
+				success:function(data)
+				{
+						if (data == false) {
+							toastr.error(data.message, '操作失败');
+						} else {
+							toastr.success(data.message, '操作成功');
+							$table.bootstrapTable('refresh');
+						}
+				}
+			});
+	}
+	
+		$('#exampleModal').on('show.bs.modal', function (event) {
+			$("#customerType_table").bootstrapTable('destroy');
+			$.ajax({
+				url:"${CPATH}/admin/sellerCustomer/getCustomerType",
+				type:"post",
+				dataType:"json",
+				success:function(data)
+				{
+					for (var i = 0; i < data.length; i++) {
+							$("#customerTypes").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+					}
+				}
+			});
+		})
 	
 </#macro>
 
@@ -293,8 +350,15 @@
 					<@shiro.hasPermission name="/admin/sellerCustomer/downloading, /admin/dealer/all, /admin/all">
 						<a href="${CPATH}/admin/sellerCustomer/download?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-download"></i> 导出</a>
 					</@shiro.hasPermission>
+					<@shiro.hasPermission name="/admin/sellerCustomer/upIsenable, /admin/dealer/all, /admin/all">
 						<a href="#" onclick = "upSellerCustomer()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-arrow-up"></i> 批量启用</a>
+					</@shiro.hasPermission>
+					<@shiro.hasPermission name="/admin/sellerCustomer/downIsenable, /admin/dealer/all, /admin/all">
 						<a href="#" onclick = "downSellerCustomer()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-arrow-down"></i> 批量停用</a>
+					</@shiro.hasPermission>
+					<@shiro.hasPermission name="/admin/sellerCustomer/updateSellerCustomerType, /admin/dealer/all, /admin/all">	
+						<button type="button"  class="btn btn-sm btn-primary btn-flat" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo"><i class="fa fa-list"></i> 批量设置客户类型</button>
+					</@shiro.hasPermission>
 				</div>
 				 <div class="col-sm-4">
 				</div>
@@ -306,5 +370,29 @@
 </div>
 	<!-- /.box -->
 </section>
-
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:200px;">
+  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="exampleModalLabel">选择客户类型</h4>
+	      </div>
+	      <div class="modal-body" id = "modal-body">
+		      <div class="form-group">
+		       <div class="col-sm-12 validata-box">
+	                 <label class="control-label col-sm-4">客户类型:</label>
+	                 <div class="input-group col-sm-8" >
+	                     <select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
+	                  </select>
+	                 </div>
+	             </div>
+	          </div>
+		  	</div>
+	      <div class="modal-footer">
+	        <button type="button" onclick="updateSellerCustomerType()" class="btn btn-sm btn-primary btn-flat">确认</button>
+	        <button type="button" class="btn btn-sm btn-primary btn-flat btn-flat" data-dismiss="modal">关闭</button>
+	      </div>
+	      </div>
+	 </div>
+</div>
 </@layout>
