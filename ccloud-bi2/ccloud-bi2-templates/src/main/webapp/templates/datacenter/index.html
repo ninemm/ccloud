@@ -50,14 +50,16 @@
 </#macro>
 <#macro script>
 
-    $(function() { 
-        initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
-
-        wxReadyGetLocation(
-            function(lng, lat, addComp, address) {
-                console.log('定位成功');
-            }
-        );
+    $(function() {
+        if($.cookie(Utils.longitudeCache) == null || $.cookie(Utils.latitudeCache) == null) {
+            initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
+    
+            wxReadyGetLocation(
+                function(lng, lat, addComp, address) {
+                    console.log('定位成功');
+                }
+            );
+        }
         //dealerSelect.init();
         if(dataArea != ''){
             $("#dealerName").text($("#" + dataArea).text());
