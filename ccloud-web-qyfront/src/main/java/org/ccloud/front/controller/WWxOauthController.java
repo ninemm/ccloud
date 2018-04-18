@@ -32,6 +32,8 @@ import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.StrKit;
+import com.jfinal.qyweixin.sdk.api.AccessTokenApi;
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.qyweixin.sdk.api.ApiResult;
 import com.jfinal.qyweixin.sdk.api.ConUserApi;
 import com.jfinal.qyweixin.sdk.api.OAuthApi;
@@ -43,24 +45,34 @@ public class WWxOauthController extends BaseFrontController {
 	@Clear(SessionInterceptor.class)
 	@Before(WorkWechatApiConfigInterceptor.class)
 	public void index() {
+		
 		String gotoUrl = getPara("goto", Consts.INDEX_URL);
 		String wechatUserJson = getSessionAttr(Consts.SESSION_WECHAT_USER);
 		String code = getPara("code");
-		
+		wechatUserJson  = null;
 		if (StrKit.isBlank(wechatUserJson)) {
-			ApiResult userResult = OAuthApi.getUserInfoByCode(code);
-			if (userResult != null) {
-				setSessionAttr(Consts.SESSION_WECHAT_USER, userResult.getJson());
-				wechatUserJson = userResult.getJson();
+			String userJsonText = getUserInfoByCode(code);
+			if (StrKit.notBlank(userJsonText)) {
+				setSessionAttr(Consts.SESSION_WECHAT_USER, userJsonText);
+				wechatUserJson = userJsonText;
 			}
 		}
 		
 		JSONObject userJson = JSON.parseObject(wechatUserJson);
+		String errorCode = userJson.getString("errcode");
+		if (!StrKit.equals(errorCode, "0")) {
+			String userJsonText = getUserInfoByCode(code);
+			if (StrKit.notBlank(userJsonText)) {
+				setSessionAttr(Consts.SESSION_WECHAT_USER, userJsonText);
+				userJson = JSON.parseObject(userJsonText);
+			}
+		}
+		
 		String wechatUserId = userJson.getString("UserId");
 		if (StrKit.isBlank(wechatUserId)) {
-			renderError(500);
+			renderText("配置错误，请联系管理员！");
 			return ;
-		} else {
+		} else { 
 			CookieUtils.put(this, Consts.SESSION_WECHAT_OPEN_ID, wechatUserId);
 			setSessionAttr(Consts.SESSION_WECHAT_OPEN_ID, wechatUserId);
 		}
@@ -87,7 +99,7 @@ public class WWxOauthController extends BaseFrontController {
 				if (wxUserResult.isSucceed()) {
 					user.setAvatar(wxUserResult.getStr("avatar"));
 					user.setNickname(wxUserResult.getStr("name"));
-					user.setWechatUserId(wechatUserId);
+					user.setWechatUseriId(wechatUserId);
 					
 					if (!user.saveOrUpdate()) {
 						renderError(500);
@@ -174,5 +186,15 @@ public class WWxOauthController extends BaseFrontController {
 		setSessionAttr(Consts.SESSION_SELLER_ID, sellerId);
 		setSessionAttr(Consts.SESSION_SELLER_NAME, sellerName);
 		setSessionAttr(Consts.SESSION_SELLER_CODE, sellerCode);
+	}
+	
+	private String getUserInfoByCode(String code) {
+		AccessTokenApi.refreshAccessToken(ApiConfigKit.getApiConfig());
+		ApiResult result = OAuthApi.getUserInfoByCode(code);
+//		System.out.println(result.toString());
+		if (result != null) {
+			return result.getJson();
+		}
+		return null;
 	}
 }

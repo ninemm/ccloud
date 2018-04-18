@@ -175,17 +175,11 @@ public class UserController extends BaseFrontController {
 		keepPara();
 		String action = getPara(0, "index");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		
-		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
-		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
-		setAttr("totalOrderCount", totalOrderCount.intValue());
-		setAttr("totalCustomerCount", totalCustomerCount.intValue());
-		setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());
-		setAttr("customerVisitTotal",CustomerVisitQuery.me().getToDo(user.getUsername()).size());
-		setAttr("customerTotal",SellerCustomerQuery.me().getToDo(user.getUsername()).size());
-		setAttr("activityApplyTotal", ActivityApplyQuery.me().getToDo(user.getUsername(), dealerDataArea).size());
+		setAttr("orderTotal", SalesOrderQuery.me().findToDoOrderReviewCount(user.getUsername()));
+		setAttr("customerVisitTotal", CustomerVisitQuery.me().findToDoCustomerVisitReviewCount(user.getUsername()));
+		setAttr("customerTotal", SellerCustomerQuery.me().findToDoCustomerReviewCount(user.getUsername()));
+		setAttr("activityApplyTotal", ActivityApplyQuery.me().findToDoActivityReviewCount(user.getUsername()));
 		
 		render(String.format("user_center_%s.html", action));
 	}
@@ -313,7 +307,7 @@ public class UserController extends BaseFrontController {
 					User user = userList.get(0);
 					user.setAvatar(wxUserResult.getStr("avatar"));
 					user.setNickname(wxUserResult.getStr("name"));
-					user.setWechatUserId(wechatUserId);
+					user.setWechatUseriId(wechatUserId);
 					if (!user.saveOrUpdate()) {
 						ret.set("message", "手机号绑定失败，请联系管理员");
 						return false;

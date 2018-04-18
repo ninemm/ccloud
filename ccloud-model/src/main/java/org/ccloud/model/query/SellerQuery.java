@@ -181,7 +181,8 @@ public class SellerQuery extends JBaseQuery {
 		StringBuilder sql = new StringBuilder("SELECT CONCAT(d.data_area, '%') AS id, cs.seller_name AS text ");
 		sql.append("FROM department d ");
 		sql.append("JOIN cc_seller cs ON d.id = cs.dept_id ");
-		sql.append("WHERE (d.dept_level = '1' OR d.dept_level = '2') AND cs.jpwx_open_id is not null ");
+		sql.append("WHERE (d.dept_level = '1' OR d.dept_level = '2') AND cs.jpwx_open_id is not null AND cs.jpwx_open_id != ''");
 		return Db.find(sql.toString());
 	}
+	
 }

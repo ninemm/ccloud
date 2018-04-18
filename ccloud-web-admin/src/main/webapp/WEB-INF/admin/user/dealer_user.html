@@ -81,7 +81,7 @@
 
             {field: "action", title: "操作", align: "center", width: '20%',
                 formatter: function(value, row, rowIndex) {
-                    var strHtml = '<a href="' + # + '" class="btn btn-xs bg-olive btn-flat">同步</a> ';
+                    var strHtml = '<a href="javascript:void(0);" class="btn btn-xs bg-olive btn-flat" onclick="syn(\'' + row.id + '\'' + ')">同步</a> ';
                     return strHtml;
                 },
                 edit:false
@@ -89,6 +89,51 @@
         ];
         return fields;
     }
+    
+    function syn(id) {
+        $.get('${CPATH}/admin/user/synUser?userId=' + id ,
+            function(result){
+                if (result.errorCode > 0) {
+                    toastr.error(result.message, '操作失败');
+                } else {
+                    toastr.success(result.message, '操作成功');
+                    $table.bootstrapTable('refresh');
+                }
+            }
+        );
+    }
+    
+    function batchAction(action) {
+        var userIds = new Array();
+        if ($(":input[name='dataItem']:checked").length == 0) {
+            toastr.warning('请选择客户','操作失败');
+            return ;
+        }else {
+
+            $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
+                userIds.push($(this).find('td').eq(0).find("input").val());
+            })
+
+            $.ajax({
+                url:"${CPATH}/admin/user/batchSynUser",
+                type:"post",
+                dataType:"json",
+                data : {userIds : JSON.stringify(userIds)},
+                success:function(data){
+                    if (data.errorCode > 0) {
+                        toastr.error(data.message, '操作失败');
+                    } else {
+                        toastr.success(data.message, '操作成功');
+                        $table.bootstrapTable('refresh');
+                    }
+                    setTimeout( function(){
+                        location.reload();
+                    }, 2 * 1000 );
+                }
+            });
+        }
+    }
+    
 
 </#macro>
 

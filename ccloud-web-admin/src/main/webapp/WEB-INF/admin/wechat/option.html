@@ -82,7 +82,7 @@ wechat_search_${module.name}_enable,
 		
 		<div class="row">
             <div class="col-xs-12">
-                <h4 class="jp-set-title">常规选项</h4>
+                <h4 class="jp-set-title">企业微信配置选项</h4>
                 <ul class="list-unstyled">
                     <li class="jp-set-pad">
                         <div class="col-sm-3 ">
@@ -98,11 +98,23 @@ wechat_search_${module.name}_enable,
 
                     <li class="jp-set-pad">
                         <div class="col-sm-3 ">
-                            <div class="  jp-set-info ">企业微信Secret</div>
+                            <div class="  jp-set-info ">企业微信应用Secret</div>
                         </div>
                         <div class="col-sm-9  jp-set-title-line">
                             <div class="col-sm-6 jp-table-distance-top ">
                                 <input class="form-control input-md" type="text" name="qywechat_secret" value="${OPTION('qywechat_secret')!}">
+                            </div>
+                        </div>
+                        <div class="clr"></div>
+                    </li>
+                    
+                    <li class="jp-set-pad">
+                        <div class="col-sm-3 ">
+                            <div class="  jp-set-info ">企业微信通讯录Secret</div>
+                        </div>
+                        <div class="col-sm-9  jp-set-title-line">
+                            <div class="col-sm-6 jp-table-distance-top ">
+                                <input class="form-control input-md" type="text" name="qywechat_contact_secret" value="${OPTION('qywechat_contact_secret')!}">
                             </div>
                         </div>
                         <div class="clr"></div>
@@ -127,6 +139,17 @@ wechat_search_${module.name}_enable,
                         <div class="col-sm-9  jp-set-title-line">
                             <div class="col-sm-6 jp-table-distance-top ">
                                 <input class="form-control input-md" type="text" name="qywechat_encodingAesKey" value="${OPTION('qywechat_encodingAesKey')!}">
+                            </div>
+                        </div>
+                        <div class="clr"></div>
+                    </li>
+                    <li class="jp-set-pad">
+                        <div class="col-sm-3 ">
+                            <div class="  jp-set-info ">默认父ID</div>
+                        </div>
+                        <div class="col-sm-9  jp-set-title-line">
+                            <div class="col-sm-6 jp-table-distance-top ">
+                                <input class="form-control input-md" type="text" name="qywechat_default_deptid" value="${OPTION('qywechat_default_deptid')!}">
                             </div>
                         </div>
                         <div class="clr"></div>

@@ -114,6 +114,11 @@ public class UserQuery extends JBaseQuery {
 		});
 	}
 	
+	public List<User> findByWechatUserId(String wechatUserId) {
+		return DAO.doFind("wechat_userid = ? and status = 1", wechatUserId);
+//		return DAO.doFindByCache(User.CACHE_NAME, wechatUserId, "wechat_userid = ? and status = 1", wechatUserId);
+	}
+	
 	public List<User> findByWechatOpenid(final String openid) {
 		return DAO.doFind("wechat_open_id = ? AND status = 1", openid);
 //		return DAO.doFindByCache(User.CACHE_NAME, openid, "wechat_open_id = ? AND status = 1", openid);

@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.alibaba.fastjson.JSON;
-import com.google.common.collect.ImmutableMap;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
@@ -41,11 +39,18 @@ import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.menu.MenuManager;
 import org.ccloud.model.Department;
 import org.ccloud.model.Group;
+import org.ccloud.model.Seller;
 import org.ccloud.model.Station;
 import org.ccloud.model.User;
 import org.ccloud.model.UserGroupRel;
 import org.ccloud.model.UserHistory;
-import org.ccloud.model.query.*;
+import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.GroupQuery;
+import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.StationQuery;
+import org.ccloud.model.query.UserGroupRelQuery;
+import org.ccloud.model.query.UserHistoryQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.UserExecel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -54,6 +59,9 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -61,6 +69,8 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.qyweixin.sdk.api.ApiResult;
+import com.jfinal.qyweixin.sdk.api.ConUserApi;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
@@ -758,5 +768,141 @@ public class _UserController extends JBaseCRUDController<User> {
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
+	}
+	
+//	@Before(WorkWechatContactApiConfigInterceptor.class)
+	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
+	public void synUser(){
+		String userId = getPara("userId");
+		User user = UserQuery.me().findById(userId);
+		Seller seller = SellerQuery.me().findByDeptId(user.getDepartmentId());
+		//获取部门下成员信息
+		ApiResult apiResult = ConUserApi.getDepartmentUserList(seller.getJpwxOpenId(), "1", "");
+		boolean isExist = false;
+
+		if(!apiResult.getErrorCode().equals(0)) {
+			renderAjaxResultForError();
+			return;
+		}
+		List<Map<String, Object>> userList = apiResult.getList("userlist");
+		for(Map<String, Object> item : userList){
+
+			//判断是否存在该用户
+			if(item.get("mobile").equals(user.getMobile())) {
+				isExist = true;
+				user.setWechatUseriId(item.get("userid").toString());
+
+				if (!user.saveOrUpdate()) {
+					renderAjaxResultForError();
+					return;
+				}
+
+				String json = "{\"userid\": \"" + item.get("userid").toString() +
+						"\", \"name\": \"" + user.getRealname().toLowerCase() +
+						"\", \"mobile\": \"" + item .get("mobile").toString() +
+						"\", \"department\": " + item.get("department").toString() +
+						"\",position\": \"" + item.get("position").toString() +
+						"\", \"enable\":1, \"to_invite\": false," + "}";
+				ApiResult apiResult1 = ConUserApi.updateUser(json);
+
+				if(!apiResult1.getErrorCode().equals(0)) {
+					renderAjaxResultForError();
+					return;
+				}
+			}
+		}
+		if(!isExist){
+
+			String json = "{\"userid\": \"" + user.getId() +
+					"\", \"name\": \"" + user.getRealname() +
+					"\", \"mobile\": \"" + user.getMobile();
+
+			if(user.getAvatar() != null && user.getAvatar().length() != 0) json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
+
+			json = json + "\", \"department\": [" + seller.getJpwxOpenId() + "]," +
+					"\"position\": \"" + user.getStationId() +
+					"\", \"enable\":1, \"to_invite\": false," + "}";
+			ApiResult apiResult1 = ConUserApi.createUser(json);
+
+			if(apiResult1.getErrorCode().equals(0)){
+
+				user.setWechatUseriId(user.getId());
+				if(!user.saveOrUpdate()){
+					renderAjaxResultForError();
+					return;
+				}
+
+			}
+		}
+		renderAjaxResultForSuccess();
+	}
+
+	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
+	public void batchSynUser(){
+		String userIds = getPara("userIds");
+		JSONArray userIdArray = JSONArray.parseArray(userIds);
+
+		Seller seller = SellerQuery.me().findByDeptId(UserQuery.me().findById(userIdArray.get(0).toString()).getDepartmentId());
+		//获取部门下成员信息
+		ApiResult apiResult = ConUserApi.getDepartmentUserList(seller.getJpwxOpenId(), "1", "");
+
+		for(int i = 0; i < userIdArray.size(); i++) {
+			String userId = userIdArray.get(i).toString();
+			User user = UserQuery.me().findById(userId);
+			boolean isExist = false;
+
+			if (!apiResult.getErrorCode().equals(0)) {
+				renderAjaxResultForError();
+				return;
+			}
+			List<Map<String, Object>> userList = apiResult.getList("userlist");
+			for(Map<String, Object> item : userList){
+
+				//判断是否存在该用户
+				if(item.get("mobile").equals(user.getMobile())) {
+					isExist = true;
+					user.setWechatUseriId(item.get("userid").toString());
+
+					if (!user.saveOrUpdate()) {
+						renderAjaxResultForError();
+						return;
+					}
+
+					String json = "{\"userid\": \"" + user.getId() +
+							"\", \"name\": \"" + user.getRealname() +
+							"\", \"mobile\": \"" + user.getMobile();
+
+					if(user.getAvatar() != null && user.getAvatar().length() != 0) json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
+
+					json = json + "\", \"department\": [" + seller.getJpwxOpenId() + "]," +
+							"\"position\": \"" + user.getStationId() +
+							"\", \"enable\":1, \"to_invite\": false," + "}";
+
+					ApiResult apiResult1 = ConUserApi.updateUser(json);
+
+					if(!apiResult1.getErrorCode().equals(0)) {
+						renderAjaxResultForError();
+						return;
+					}
+				}
+			}
+			if(!isExist){
+
+				String json = "{\"userid\": \"" + user.getId() + "\", \"name\": \"" + user.getRealname() + "\", \"mobile\": \"" + user.getMobile() + "\", \"department\": [" + seller.getJpwxOpenId() + "],"
+						+ "\"position\": \"" + user.getStationId() + "\", \"enable\":1, \"to_invite\": false," + "}";
+				ApiResult apiResult1 = ConUserApi.createUser(json);
+
+				if(apiResult1.getErrorCode().equals(0)){
+
+					user.setWechatUseriId(user.getId());
+					if(!user.saveOrUpdate()){
+						renderAjaxResultForError();
+						return;
+					}
+
+				}
+			}
+		}
+		renderAjaxResultForSuccess();
 	}
 }

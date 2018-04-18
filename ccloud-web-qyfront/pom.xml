@@ -63,14 +63,6 @@
             <scope>compile</scope>
         </dependency>
 
-<!--         <dependency>
-            <groupId>org.ccloud</groupId>
-            <artifactId>ccloud-oauth2</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency> -->
-        
         <dependency>
             <groupId>org.ccloud</groupId>
             <artifactId>ccloud-web-front</artifactId>
