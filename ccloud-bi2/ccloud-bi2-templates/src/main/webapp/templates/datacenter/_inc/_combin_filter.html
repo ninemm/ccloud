@@ -10,8 +10,10 @@
         <div class="filter-item">
 			<h4>品牌</h4>
 			<div class="relative ft12" id="getBrand">
-                <span>123</span>
-                <span>123</span>
+				<span  class="red-button" data-id="">全部</span>
+                <#list session['brand_id_array'] as brandId>
+                    <span data-id='${brandId!}'">${session['brand_name_array'][brandId_index]!}</span>
+                </#list>
 			</div>
 		</div>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">

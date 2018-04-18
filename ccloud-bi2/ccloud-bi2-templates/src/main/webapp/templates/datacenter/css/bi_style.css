@@ -898,3 +898,21 @@ body.modal-open {
 .border-top-1px {
 	border-top: 1px solid #e5e5e5 !important;
 }
+
+i.icon.icon-prev {
+	background-image: url(../images/left.svg)
+}
+
+i.icon.icon-next {
+	background-image: url(../images/right.svg)
+}
+
+.weui-picker-container {
+	z-index: 2002;
+}
+
+.weui-badge,
+.picker-calendar-day.picker-calendar-day-selected span
+{
+	background: #ea6f5a;
+}

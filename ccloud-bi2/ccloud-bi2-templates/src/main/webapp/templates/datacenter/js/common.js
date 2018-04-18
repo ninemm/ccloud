@@ -8,6 +8,10 @@ Utils = {
 	longitudeCache: 'LONGITUDE_CACHE',
 	latitudeCache: 'LATITUDE_CACHE',
 	dateTypeCache: 'DATE_TYPE',
+	startDateCache: 'START_DATE',
+	endDateCache: 'END_DATE',
+	dataAreaCache: 'DATA_AREA',
+	brandIdCache: 'BRAND_ID',
 	rootName: '大冶市',
 	cp: [114.974842,30.098804],
 	loading: function() {

@@ -37,10 +37,11 @@ public class Consts {
 	public static final String SESSION_SELLER_NAME = "sellerName";
 	public static final String SESSION_SELLER_HAS_STORE = "hasStore";
 
-	public static final String SESSION_DEALER_DATA_AREA_ARRAY = "_dealer_data_area_array";//经销商ID
-	public static final String SESSION_SELLER_NAME_ARRAY = "_dealer_seller_name_array";//经销商ID
-	public static final String SESSION_BRAND_ID_ARRAY = "_brand_id_array";//商品ID
-	public static final String SESSION_PRODUCT_ID_ARRAY = "_product_id_array";//商品ID
+	public static final String SESSION_DEALER_DATA_AREA_ARRAY = "dealer_data_area_array";//经销商ID
+	public static final String SESSION_DEALER_NAME_ARRAY = "dealer_name_array";//经销商
+	public static final String SESSION_BRAND_ID_ARRAY = "brand_id_array";//商品ID
+	public static final String SESSION_BRAND_NAME_ARRAY = "brand_name_array";//商品ID
+	public static final String SESSION_PRODUCT_ID_ARRAY = "product_id_array";//商品ID
 
 	public static final String WORKFLOW_APPLY_USER = "applyUser";
 	public static final String WORKFLOW_APPLY_COMFIRM = "applyComfirm";

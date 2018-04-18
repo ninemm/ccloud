@@ -60,17 +60,20 @@
         );
         //dealerSelect.init();
         topTotal();
-        initDealerList();
         renderChinaMap();
         total();
 
     });
 
     function setDateType(type){
-        $.cookie(Utils.dateTypeCache, type, { expires: 1 });
-        dateType = type;
+        setFilter(type);
         total();
     }
+    $(document).on("click", ".confirm-search-btn", function () { //点击确定按钮
+        setFilter(3);
+        total();
+        closeCombinSearch();
+    })
 
     /*$(document).on("click", ".relocation", function () { //定位
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
@@ -96,7 +99,7 @@
     //顶部统计
     function topTotal(){
         
-        var dealerCount = new CountUp("dealerCount",0, parseInt(${dealerCount!}));
+        var dealerCount = new CountUp("dealerCount",0, parseInt(${session['dealer_data_area_array']?size}));
         dealerCount.start();
         var orderCustomerCount = new CountUp("orderCustomerCount",0, parseInt(${orderCustomerCount!}));
         orderCustomerCount.start();
@@ -107,18 +110,6 @@
                 $("#orderCustomerCount").addClass('animated pulse');
             }, 1000);
         }, 2000);
-    }
-
-    function initDealerList() {
-
-        var dataArea = ${dataArea};
-        var sellerName = ${sellerName};
-        var $dealerList = $("#dealerList");
-        $dealerList.empty();
-        $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + "all" + "',this)\"><div class='weui-cell__hd'>" + "全部经销商" + "</div></div>");
-        $.each(dataArea,function(index,el){
-            $dealerList.append("<div class='weui-cell'onclick=\"selectDealer('" + el + "',this)\"><div class='weui-cell__hd'>" + sellerName[index] + "</div></div>");
-        });
     }
 
     var dealerMapId = document.getElementById("dealer_in_china_map");
@@ -137,7 +128,7 @@
             $.ajax({
                 url: "${CPATH}/biSales/queryMapData",
                 type: "post",
-                data: {dateType: '3'},
+                data: {startDate: '2018-01-01 00:00:00', endDate: moment().format('YYYY-MM-DD HH:mm:ss')},
                 dataType:"json"
             }).done(function(data) {
                 prov_data = [];
@@ -224,8 +215,10 @@
         $(".weui-cell").show();
     });
 
-    function selectDealer(dataArea,obj) {
+    function selectDealer(selectDataArea,obj) {
         Utils.loading();
+        dataArea = selectDataArea;
+        $.cookie(Utils.dataAreaCache, dataArea, { expires: 1 });
         $("#dealerName").text($(obj).find(".weui-cell__hd").eq(0).text() + '汇总信息');
         $.ajax({
             url:"${CPATH}/selectDealer",
@@ -261,7 +254,7 @@
         $.ajax({
             url:"${CPATH}/total",
             type:"post",
-            data:{dateType: dateType},
+            data:{startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -368,7 +361,10 @@
         </header>
         <article id="infinite">
             <div class="weui-cells" id="dealerList">
-                <div class="weui-cell"><div class="weui-cell__hd">加载中。。</div></div>
+                <div class='weui-cell'onclick="selectDealer('',this)"><div class='weui-cell__hd'>全部经销商</div></div>
+                <#list session['dealer_data_area_array'] as dealerDataArea>
+                    <div class='weui-cell'onclick="selectDealer('${dealerDataArea!}',this)"><div class='weui-cell__hd'>${session['dealer_name_array'][dealerDataArea_index]!}</div></div>
+                </#list>
             </div>
             <div class="weui-loadmore" id="loading" style="display: none;">
                 <i class="weui-loading"></i>

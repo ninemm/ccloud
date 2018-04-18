@@ -56,8 +56,8 @@
 </#macro>
 <#macro script>
     $(function() {
-        lMap(dateType);
-        customer(provName, cityName, '', dateType);
+        lMap();
+        customer();
         
         $('#goback').on('click', function() {
             historyUtils.back();
@@ -68,11 +68,17 @@
     var customerTypeName = '';
 
     function setDateType(type){
-        $.cookie(Utils.dateTypeCache, type, { expires: 1 });
-        dateType = type;
-        lMap(dateType);
-        customer(provName, cityName, '', dateType);
+        setFilter(type)
+        lMap();
+        customer();
     }
+
+    $(document).on("click", ".confirm-search-btn", function () { //点击确定按钮
+        setFilter(3);
+        lMap();
+        customer();
+        closeCombinSearch();
+    })
 
     //做地图类型的切换选择
     $(".mapType").click(function(e) {
@@ -83,7 +89,7 @@
 
     function setMapType(type){
         mapType = type;
-        lMap(dateType);
+        lMap();
     }
 
     //定位
@@ -95,8 +101,8 @@
                 provName = $.cookie(Utils.provCacheName);
                 cityName = $.cookie(Utils.cityCacheName);
                 countryName = $.cookie(Utils.countryCacheName);
-                lMap(dateType)
-                customer(provName, cityName, '', dateType);
+                lMap()
+                customer();
             }
         );
     });
@@ -108,7 +114,7 @@
     var grayIcon = new BMap.Icon("${CTPATH}/images/marker_gray.png", new BMap.Size(20, 20));
 
     //地图
-    function lMap(dateType){
+    function lMap(){
         Utils.loading();
 
         var longitude = $.cookie(Utils.longitudeCache);
@@ -122,20 +128,20 @@
         map.addOverlay(position);              // 将标注添加到地图中
         
         if(mapType == 0){
-            salesMap(dateType,longitude,latitude);
+            salesMap(longitude,latitude);
         } else {
-            positionMap(dateType,longitude,latitude);
+            positionMap(longitude,latitude);
             undevelopedMap(longitude,latitude);
         }
     
     }
 
-    function salesMap(dateType,longitude,latitude){
+    function salesMap(longitude,latitude){
         
         $.ajax({
             url:"${CPATH}/biSales/aroundCustomer",
             type:"post",
-            data:{dateType: dateType, longitude: longitude, latitude: latitude, dist: 10},
+            data:{ startDate: startDate, endDate: endDate, longitude: longitude, latitude: latitude, dist: 10, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -197,12 +203,12 @@
         });
     }
 
-    function positionMap(dateType,longitude,latitude){
+    function positionMap(longitude,latitude){
     
         $.ajax({
             url:"${CPATH}/biSales/aroundCustomerPosition",
             type:"post",
-            data:{dateType: dateType, longitude: longitude, latitude: latitude, dist: 5},
+            data:{ startDate: startDate, endDate: endDate, longitude: longitude, latitude: latitude, dist: 5, dataArea: dataArea},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -233,7 +239,7 @@
         $.ajax({
             url:"${CPATH}/biSales/aroundCustomerUndeveloped",
             type:"post",
-            data:{longitude: longitude, latitude: latitude, dist: 1},
+            data:{longitude: longitude, latitude: latitude, dist: 1, dataArea: dataArea},
             dataType:"json"
         }).done(function(data){
             
@@ -269,12 +275,12 @@
             $("#visit_customerId").hide();
 			if(mapType == 0){
 				if(flg == 0){
-					product_customerId(dateType,opts.customerId,opts.customerName);
-					visit_customerId(dateType,opts.customerId,opts.customerName);
+					product_customerId(opts.customerId,opts.customerName);
+					visit_customerId(opts.customerId,opts.customerName);
 				}else if(flg == 1){
-					product_customerId(dateType,opts.customerId,opts.customerName);
+					product_customerId(opts.customerId,opts.customerName);
 				}else if(flg == 2){
-					visit_customerId(dateType,opts.customerId,opts.customerName);
+					visit_customerId(opts.customerId,opts.customerName);
 				}
 			}
 
@@ -282,12 +288,12 @@
     }
     
     //终端产品详细
-    function product_customerId(dateType, customerId, customerName){
+    function product_customerId(customerId, customerName){
       Utils.loading();
       $.ajax({
             url:"${CPATH}/biSales/productByCustomerId",
             type:"post",
-            data:{dateType: dateType, customerId: customerId},
+            data:{ startDate: startDate, endDate: endDate, customerId: customerId, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -315,12 +321,12 @@
     }
 
     //终端拜访详细
-    function visit_customerId(dateType, customerId, customerName){
+    function visit_customerId(customerId, customerName){
         Utils.loading();
         $.ajax({
             url:"${CPATH}/biSales/visitByCustomerId",
             type:"post",
-            data:{dateType: dateType, customerId: customerId},
+            data:{ startDate: startDate, endDate: endDate, customerId: customerId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -350,12 +356,12 @@
     var $customer_rank = $(customer_rank);
     var customerRankChart = echarts.init(customer_rank);
     
-    function customer(provName, cityName, countryName, dateType){
+    function customer(){
         Utils.loading();
         $.ajax({
             url:"${CPATH}/biSales/customerType",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             
@@ -423,10 +429,10 @@
             customerRankChart.setOption(crOption,true);
             customerRankChart.on('legendselectchanged', customerClick);
 
-            var dataCustomerTypeName = (data[0] != undefined ? data[0].name : '');
+            customerTypeName = (data[0] != undefined ? data[0].name : '');
             //调用其他纬度
-            product_rank(provName, cityName, '', dateType, dataCustomerTypeName);
-            area_rank(provName, cityName, '', dateType, dataCustomerTypeName);
+            product_rank();
+            area_rank();
         });
     }
     
@@ -455,17 +461,17 @@
         }
         customerTypeName = typeName.slice(0, typeName.lastIndexOf('('));
         
-        product_rank(provName, cityName, '', dateType, customerTypeName);
-        area_rank(provName, cityName, '', dateType, customerTypeName);
+        product_rank();
+        area_rank();
     }
     
     
     //产品
-    function product_rank(provName, cityName, countryName, dateType, customerTypeName){
+    function product_rank(){
       $.ajax({
             url:"${CPATH}/biSales/productByCustomerType",
             type:"post",
-            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, customerTypeName: customerTypeName},
+            data:{provName: provName, cityName: cityName, countryName: '',  startDate: startDate, endDate: endDate, customerTypeName: customerTypeName, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -501,11 +507,11 @@
     }
     
     //区域
-    function area_rank(provName, cityName, countryName, dateType, customerTypeName){
+    function area_rank(){
       $.ajax({
             url:"${CPATH}/biSales/areaByCustomerType",
             type:"post",
-            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, customerTypeName: customerTypeName},
+            data:{provName: provName, cityName: cityName, countryName: '', startDate: startDate, endDate: endDate, customerTypeName: customerTypeName, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -662,5 +668,6 @@
 
     </div>
 </section>
+<#include "_inc/_combin_filter.html"/>
 <#include "_inc/_nav_box.html"/>
 </@layout>

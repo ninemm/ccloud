@@ -42,16 +42,14 @@ public class BiSalesController extends BaseFrontController {
 
 	public void area() {
 
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();// 0: 近一天， 1: 近一周， 2: 近一月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Map<String, Object>> result = Bi2SalesQuery.me().findAreaArray(dataArea, provName, cityName,
 				countryName, startDate, endDate, brandId);
@@ -61,19 +59,16 @@ public class BiSalesController extends BaseFrontController {
 	}
 
 	public void areaByCustomerType() {
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 		String customerTypeName = getPara("customerTypeName", "").trim();
 
-		String dateType = getPara("dateType", "0").trim();
-		;// 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findAreaListByCusTypeId(dataArea, provName, cityName,
 				countryName, startDate, endDate, customerTypeName, brandId);
@@ -84,16 +79,14 @@ public class BiSalesController extends BaseFrontController {
 
 	public void customerType() {
 
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();// 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findByCusTypeId(dataArea, provName, cityName,
 				countryName, startDate, endDate, brandId);
@@ -105,17 +98,14 @@ public class BiSalesController extends BaseFrontController {
 	//产品销售排行
 	public void product() {
 
-		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();
-		;// 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findProductList(dataArea, provName, cityName, countryName,
 				startDate, endDate, brandId);
@@ -127,18 +117,16 @@ public class BiSalesController extends BaseFrontController {
 	//产品客户分布
 	public void customerTypeByProduct() {
 
-		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 		String cInvCode = getPara("cInvCode", "").trim();
 
-		String dateType = getPara("dateType", "0").trim();// 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findCustomerTypeListByProduct(dataArea, provName, cityName,
 				countryName, startDate, endDate, cInvCode, brandId);
@@ -150,19 +138,16 @@ public class BiSalesController extends BaseFrontController {
 	//产品区域分布
 	public void areaByProduct() {
 
-		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 
 		String cInvCode = getPara("cInvCode", "").trim();
-		String dateType = getPara("dateType", "0").trim();
-		// 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findAreaListByProduct(dataArea, provName, cityName, countryName,
 				startDate, endDate, cInvCode, brandId);
@@ -171,18 +156,16 @@ public class BiSalesController extends BaseFrontController {
 
 	}
 
-	public void productByAreaList() {
+/*	public void productByAreaList() {
 
-		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();// 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<List<Record>> rows = new ArrayList<List<Record>>();
 		List<Record> countryResult = Bi2SalesQuery.me().findAreaListByCusTypeId(dataArea, provName, cityName,
@@ -207,20 +190,18 @@ public class BiSalesController extends BaseFrontController {
 		setAttr("dateType", dateType);
 		render("bi_product_area.html");
 
-	}
+	}*/
 
-	public void productByCustomerTypeList() {
+/*	public void productByCustomerTypeList() {
 
-		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<List<Record>> rows = new ArrayList<List<Record>>();
 		List<Record> typeResult = Bi2SalesQuery.me().findCustomerTypeList(dataArea, provName, cityName, countryName,
@@ -235,21 +216,19 @@ public class BiSalesController extends BaseFrontController {
 		setAttr("rows", rows);
 		render("bi_product_customer_type.html");
 
-	}
+	}*/
 
 	public void productByCustomerType() {
 
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 		String customerTypeName = getPara("customerTypeName", "").trim();
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findProductListByCusType(dataArea, provName, cityName,
 				countryName, startDate, endDate, customerTypeName, brandId);
@@ -261,17 +240,15 @@ public class BiSalesController extends BaseFrontController {
 	//经销商销售排行
 	public void dealer() {
 
-		String dataArea[] = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findsalesList(true, provName, cityName, countryName, dataArea
 				, startDate, endDate, brandId);
@@ -284,28 +261,26 @@ public class BiSalesController extends BaseFrontController {
 	public void dealerDetail() {
 
 		String dataArea = getPara("dataArea", "").trim();
-		String dataAreaArray[] = new String[]{dataArea};
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+//		String dataAreaArray[] = new String[]{dataArea};
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
 
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
 		//直营商销售情况
-		List<Record> sellerList = Bi2SalesQuery.me().findsalesList(false, provName, cityName, countryName, dataAreaArray
-				, startDate, endDate, brandId);
+//		List<Record> sellerList = Bi2SalesQuery.me().findsalesList(false, provName, cityName, countryName, dataAreaArray
+//				, startDate, endDate, brandId);
 		//经销商产品销售排行
 		List<Record> productList = Bi2SalesQuery.me().findProductListByDealer(true, provName, cityName, countryName,
 				dataArea, startDate, endDate, brandId);
 
-		result.put("sellerList", sellerList);
+//		result.put("sellerList", sellerList);
 		result.put("productList", productList);
 
 		renderJson(result);
@@ -314,17 +289,14 @@ public class BiSalesController extends BaseFrontController {
 
 	public void productBySeller() {
 
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-
 		String dataArea = getPara("sellerId").trim();
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findProductListByDealer(false, provName, cityName, countryName, dataArea, startDate, endDate, brandId);
 
@@ -334,16 +306,14 @@ public class BiSalesController extends BaseFrontController {
 
 	public void queryMapData() {
 
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> salesFactList = Bi2SalesQuery.me().findAreaListByCusTypeId(dataArea, provName, cityName,
 				countryName, startDate, endDate, null, brandId);
@@ -354,19 +324,17 @@ public class BiSalesController extends BaseFrontController {
 	@SuppressWarnings("unchecked")
 	public void aroundCustomer() throws SQLException {
 
-		String[] dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String dataAreaIn = dealerDataArea[0];
-		for (int i = 1 ;i<dealerDataArea.length;i++){
-			dataAreaIn += "," + dealerDataArea[i];
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String dataAreaIn = dataArea[0];
+		for (int i = 1; i < dataArea.length; i++) {
+			dataAreaIn += "," + dataArea[i];
 		}
 
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
 		double dist = Double.parseDouble(getPara("dist"));
-		String dateType = getPara("dateType", "0").trim();
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		AroundCustomerBiSalesCallback salesCallback = new AroundCustomerBiSalesCallback();
 		salesCallback.setLongitude(longitude);
@@ -428,10 +396,8 @@ public class BiSalesController extends BaseFrontController {
 	public void productByCustomerId() {
 
 		String customerId = getPara("customerId", "").trim();
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findProductList(customerId, startDate,
 				endDate);
@@ -443,10 +409,8 @@ public class BiSalesController extends BaseFrontController {
 	public void visitByCustomerId() {
 
 		String customerId = getPara("customerId", "").trim();
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findVistList(customerId, startDate,
 				endDate);
@@ -458,19 +422,17 @@ public class BiSalesController extends BaseFrontController {
 	@SuppressWarnings("unchecked")
 	public void aroundCustomerPosition() throws SQLException {
 
-		String[] dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String dataAreaIn = dealerDataArea[0];
-		for (int i = 1 ;i<dealerDataArea.length;i++){
-			dataAreaIn += "," + dealerDataArea[i];
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String dataAreaIn = dataArea[0];
+		for (int i = 1; i < dataArea.length; i++) {
+			dataAreaIn += "," + dataArea[i];
 		}
 
 		double longitude = Double.parseDouble(getPara("longitude"));
 		double latitude = Double.parseDouble(getPara("latitude"));
 		double dist = Double.parseDouble(getPara("dist"));
-		String dateType = getPara("dateType", "0").trim();
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		AroundCustomerBiPositionCallback callback = new AroundCustomerBiPositionCallback();
 		callback.setLongitude(longitude);
@@ -501,10 +463,10 @@ public class BiSalesController extends BaseFrontController {
 	@SuppressWarnings("unchecked")
 	public void aroundCustomerUndeveloped() throws SQLException {
 
-		String[] dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String dataAreaIn = dealerDataArea[0];
-		for (int i = 1 ;i<dealerDataArea.length;i++){
-			dataAreaIn += "," + dealerDataArea[i];
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String dataAreaIn = dataArea[0];
+		for (int i = 1; i < dataArea.length; i++) {
+			dataAreaIn += "," + dataArea[i];
 		}
 
 		BigDecimal longitude = new BigDecimal(getPara("longitude"));
@@ -537,16 +499,14 @@ public class BiSalesController extends BaseFrontController {
 
 	public void salesHotMap() {
 
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();// 0: 近一天， 1: 近一周， 2: 近一月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findAreaSales(dataArea, provName, cityName,
 				countryName, startDate, endDate, brandId);
@@ -557,21 +517,33 @@ public class BiSalesController extends BaseFrontController {
 
 	public void customerHotMap() {
 
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
 
 		String provName = getPara("provName", "").trim();
 		String cityName = getPara("cityName", "").trim();
 		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim();// 0: 近一天， 1: 近一周， 2: 近一月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		List<Record> result = Bi2SalesQuery.me().findAreaCustomer(dataArea, provName, cityName,
 				countryName, startDate, endDate);
 
 		renderJson(result);
 
+	}
+
+	private String[] getDataArea(String dataArea) {
+		if (StrKit.notBlank(dataArea)) {
+			return new String[]{dataArea};
+		}
+		return getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+	}
+
+	private String[] getBrandId(String brandId) {
+		if (StrKit.notBlank(brandId)) {
+			return new String[]{brandId};
+		}
+		return getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
 	}
 
 }

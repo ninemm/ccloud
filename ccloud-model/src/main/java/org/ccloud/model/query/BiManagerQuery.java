@@ -75,8 +75,9 @@ public class BiManagerQuery extends JBaseQuery {
 	public List<Record> findBrandByUser(String id) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder(" select brand_id ");
-		sqlBuilder.append(" from bi_user_join_brand ");
+		StringBuilder sqlBuilder = new StringBuilder(" select ujb.brand_id, b.name ");
+		sqlBuilder.append(" from bi_user_join_brand ujb ");
+		sqlBuilder.append(" left join cc_brand b on ujb.brand_id = b.id ");
 		appendIfNotEmpty(sqlBuilder, "user_id", id, params, true);
 
 		return Db.find(sqlBuilder.toString(), params.toArray());

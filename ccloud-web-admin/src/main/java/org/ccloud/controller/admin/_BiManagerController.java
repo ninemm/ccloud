@@ -142,7 +142,7 @@ public class _BiManagerController extends JBaseController {
 		String id = getPara("userId");
 		String[] ids = getParaValues("array[]");
 
-		BiManagerQuery.me().delUProductByUserId(id);
+		BiManagerQuery.me().delUBrandBByUserId(id);
 		for (String s : ids) {
 			BiUserJoinBrand biUserJoinBrand = new BiUserJoinBrand();
 			biUserJoinBrand.setUserId(id);

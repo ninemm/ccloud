@@ -41,49 +41,48 @@ public class BiIndexController extends BaseFrontController {
 	@Before(WorkWechatJSSDKInterceptor.class)
 	public void index() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-//		User user = UserQuery.me().findById("7aee55cb56534e92a346467b9f3a262a");
 		if (user == null) {
 			renderNull();
 			return ;
 		}
 
-		//====================================================================================
-		List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
-		String sellerArray[] = new String[sellerByUser.size()];
-		String sellerNameArray[] = new String[sellerByUser.size()];
-		for (int i = 0; i < sellerByUser.size(); i++) {
-			sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
-			sellerNameArray[i] = sellerByUser.get(i).getStr("seller_name");
-		}
+		//====================================本地开发放开此段注释================================================
+//		User user = UserQuery.me().findById("7aee55cb56534e92a346467b9f3a262a");
+//		List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
+//		String sellerArray[] = new String[sellerByUser.size()];
+//		String sellerNameArray[] = new String[sellerByUser.size()];
+//		for (int i = 0; i < sellerByUser.size(); i++) {
+//			sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
+//			sellerNameArray[i] = sellerByUser.get(i).getStr("seller_name");
+//		}
+//
+//		List<Record> brandByUser = BiManagerQuery.me().findBrandByUser(user.getId());
+//		String brandArray[] = new String[brandByUser.size()];
+//		String brandNameArray[] = new String[brandByUser.size()];
+//		for (int i = 0; i < brandByUser.size(); i++) {
+//			brandArray[i] = brandByUser.get(i).getStr("brand_id");
+//			brandNameArray[i] = brandByUser.get(i).getStr("name");
+//		}
+//
+//		List<Record> productByUser = BiManagerQuery.me().findProductByUser(user.getId());
+//		String productArray[] = new String[productByUser.size()];
+//		for (int i = 0; i < productByUser.size(); i++) {
+//			productArray[i] = productByUser.get(i).getStr("product_id");
+//		}
+//
+//		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
+//		setSessionAttr(Consts.SESSION_DEALER_NAME_ARRAY, sellerNameArray);
+//		setSessionAttr(Consts.SESSION_BRAND_ID_ARRAY, brandArray);
+//		setSessionAttr(Consts.SESSION_BRAND_NAME_ARRAY, brandNameArray);
+//		setSessionAttr(Consts.SESSION_PRODUCT_ID_ARRAY, productArray);
 
-		List<Record> brandByUser = BiManagerQuery.me().findBrandByUser(user.getId());
-		String brandArray[] = new String[brandByUser.size()];
-		for (int i = 0; i < brandByUser.size(); i++) {
-			brandArray[i] = brandByUser.get(i).getStr("brand_id");
-		}
-
-		List<Record> productByUser = BiManagerQuery.me().findProductByUser(user.getId());
-		String productArray[] = new String[productByUser.size()];
-		for (int i = 0; i < productByUser.size(); i++) {
-			productArray[i] = productByUser.get(i).getStr("product_id");
-		}
-
-		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
-		setSessionAttr(Consts.SESSION_SELLER_NAME, sellerNameArray);
-		setSessionAttr(Consts.SESSION_BRAND_ID_ARRAY, brandArray);
-		setSessionAttr(Consts.SESSION_PRODUCT_ID_ARRAY, productArray);
 		//==============================================================================================================
 
 //		//从session取
-//		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-//		String[] sellerName = getSessionAttr(Consts.SESSION_SELLER_NAME);
-//		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
+		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
 
-		setAttr("dealerCount", sellerArray.length);
-		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(sellerArray,null, null, brandArray));
-
-		setAttr("dataArea", JSON.toJSON(sellerArray));
-		setAttr("sellerName", JSON.toJSON(sellerNameArray));
+		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(dataArea,null, null, brandId));
 
 		render("index.html");
 	}
@@ -94,23 +93,11 @@ public class BiIndexController extends BaseFrontController {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
-		if("all".equals(dataArea)){
-			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-			List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
-			String sellerArray[] = new String[sellerByUser.size()];
-			for (int i = 0; i < sellerByUser.size(); i++) {
-				sellerArray[i] = sellerByUser.get(i).getStr("dealer_data_area");
-			}
-			setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
-
+		if(StrKit.isBlank(dataArea)){
 			result.put("provName", "");
 			result.put("cityName", "");
 			result.put("countryName", "");
-
 		}else{
-			String dataAreaArray[] = new String[]{dataArea};
-			setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, dataAreaArray);
-
 			Record seller = Bi2SalesQuery.me().findSellerByDataArea(dataArea);
 			result.put("provName", seller.getStr("prov_name"));
 			result.put("cityName", seller.getStr("city_name"));
@@ -123,16 +110,11 @@ public class BiIndexController extends BaseFrontController {
 
 	public void total() {
 
-		String[] dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
-		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
+		String[] dataArea = this.getDataArea(getPara("dataArea"));
+		String[] brandId = this.getBrandId(getPara("brandId"));
 
-//		String provName = getPara("provName", "").trim();
-//		String cityName = getPara("cityName", "").trim();
-//		String countryName = getPara("countryName", "").trim();
-		String dateType = getPara("dateType", "0").trim(); // 0: 昨天， 1: 最近1周， 2: 最近1月
-
-		String startDate = DateUtils.getDateByType(dateType);
-		String endDate = DateTime.now().toString(DateUtils.DEFAULT_FORMATTER);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
@@ -214,57 +196,18 @@ public class BiIndexController extends BaseFrontController {
 		render("bi_dealer.html");
 	}
 
-
-	/*public void initWechatConfig() {
-
-		String jsapi_ticket = CacheKit.get("ccloud", "jsapi_ticket");
-		if (StrKit.isBlank(jsapi_ticket)) {
-			JsTicket jsApiTicket = JsTicketApi.getTicket(JsTicketApi.JsApiType.jsapi);
-			jsapi_ticket = jsApiTicket.getTicket();
-			CacheKit.put("ccloud", "jsapi_ticket", jsapi_ticket);
+	private String[] getDataArea(String dataArea) {
+		if (StrKit.notBlank(dataArea)) {
+			return new String[]{dataArea};
 		}
-
-		String nonce_str = create_nonce_str();
-		// 注意 URL 一定要动态获取，不能 hardcode.
-		String url = "http://" + getRequest().getServerName() // 服务器地址
-				             // + ":"
-				             // + getRequest().getServerPort() //端口号
-				             + getRequest().getContextPath() // 项目名称
-				             + getRequest().getServletPath();// 请求页面或其他地址
-		String qs = getRequest().getQueryString(); // 参数
-		if (qs != null) {
-			url = url + "?" + (getRequest().getQueryString());
-		}
-		// url="http://javen.tunnel.mobi/my_weixin/_front/share.jsp";
-		// System.out.println("url>>>>" + url);
-		String timestamp = create_timestamp();
-		// 这里参数的顺序要按照 key 值 ASCII 码升序排序
-		// 注意这里参数名必须全部小写，且必须有序
-		String str = "jsapi_ticket=" + jsapi_ticket + "&noncestr=" + nonce_str + "&timestamp=" + timestamp + "&url="
-				             + url;
-
-		String signature = HashKit.sha1(str);
-
-		// System.out.println("corpId " + ApiConfigKit.getApiConfig().getCorpId()
-		// + " nonceStr " + nonce_str + " timestamp " + timestamp);
-		// System.out.println("url " + url + " signature " + signature);
-		// System.out.println("nonceStr " + nonce_str + " timestamp " + timestamp);
-		// System.out.println(" jsapi_ticket " + jsapi_ticket);
-		// System.out.println("nonce_str " + nonce_str);
-		setAttr("appId", ApiConfigKit.getApiConfig().getCorpId());
-		setAttr("nonceStr", nonce_str);
-		setAttr("timestamp", timestamp);
-		setAttr("url", url);
-		setAttr("signature", signature);
-		setAttr("jsapi_ticket", jsapi_ticket);
+		return getSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY);
 	}
 
-	private static String create_timestamp() {
-		return Long.toString(System.currentTimeMillis() / 1000);
+	private String[] getBrandId(String brandId) {
+		if (StrKit.notBlank(brandId)) {
+			return new String[]{brandId};
+		}
+		return getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
 	}
-
-	private static String create_nonce_str() {
-		return UUID.randomUUID().toString();
-	}*/
 
 }

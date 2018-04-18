@@ -42,7 +42,7 @@
 </#macro>
 <#macro script>
     $(function() {
-        product(provName, cityName, '', dateType);
+        product();
 
         $('#goback').on('click', function() {
             historyUtils.back();
@@ -53,27 +53,32 @@
     var cInvName = '';
 
     function setDateType(type){
-        $.cookie(Utils.dateTypeCache, type, { expires: 1 });
-        dateType = type;
-        product(provName, cityName, '', dateType);
+        setFilter(type)
+        product();
     }
+
+    $(document).on("click", ".confirm-search-btn", function () { //点击确定按钮
+        setFilter(3);
+        product();
+        closeCombinSearch();
+    })
     
     //产品选择
     function setProduct(Code, obj){
         Utils.loading();
         cInvCode = Code;
         cInvName = $(obj).text();
-        area_rank(provName, cityName, '', dateType, cInvCode, cInvName);
-        customer_rank(provName, cityName, '', dateType, cInvCode, cInvName);
+        area_rank(cInvCode, cInvName);
+        customer_rank(cInvCode, cInvName);
     }
     
     //产品
-    function product(provName, cityName, countryName, dateType){
+    function product(){
         Utils.loading();
         $.ajax({
             url:"${CPATH}/biSales/product",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -93,7 +98,7 @@
             $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
             for(var i = 0; i < data.length; i++){
                 var fun = "setProduct('" + data[i].id + "',this" + ")";
-                $tbody.append("<tr ><td><a onclick=" + fun +">" + data[i].custom_name + "</a></td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+                $tbody.append("<tr ><td><a href='javascript:void();' onclick=" + fun +">" + data[i].custom_name + "</a></td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
 
             var $tr = $("#product_rank tbody tr:gt(5)");
@@ -110,17 +115,17 @@
             var dataCInvName = (data[0] != undefined ? data[0].custom_name : '');
 
             //调用其他纬度
-            area_rank(provName, cityName, '', dateType, dataCInvCode, dataCInvName);
-            customer_rank(provName, cityName, '', dateType, dataCInvCode, dataCInvName);
+            area_rank(dataCInvCode, dataCInvName);
+            customer_rank(dataCInvCode, dataCInvName);
        });
     }
     
     //区域
-    function area_rank(provName, cityName, countryName, dateType, cInvCode, cInvName){
+    function area_rank(cInvCode, cInvName){
       $.ajax({
             url:"${CPATH}/biSales/areaByProduct",
             type:"post",
-            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
+            data:{provName: provName, cityName: cityName, countryName: '', startDate: startDate, endDate: endDate, cInvCode: cInvCode, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -201,11 +206,11 @@
     }
     
     //客户
-    function customer_rank(provName, cityName, countryName, dateType, cInvCode, cInvName){
+    function customer_rank(cInvCode, cInvName){
         $.ajax({
             url:"${CPATH}/biSales/customerTypeByProduct",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType, cInvCode: cInvCode},
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, cInvCode: cInvCode, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -301,5 +306,6 @@
         </div>
     </div>
 </section>
+<#include "_inc/_combin_filter.html"/>
 <#include "_inc/_nav_box.html"/>
 </@layout>

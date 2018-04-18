@@ -78,8 +78,6 @@
 </#macro>
 <#macro script>
 
-    var $dateTitle = $('#date-title');
-
     var hotMapType = 0 ;
     var prov_data = [];
     var city_data = [];
@@ -140,8 +138,6 @@
             showTab($a);
         });
         
-        $dateTitle.text('近一天销售统计');
-        
         $('#goback').on('click', function() {
             historyUtils.back();
         });
@@ -160,8 +156,8 @@
         cityName = '';
         countryName = '';
         
-        initData(provName, cityName, countryName, dateType);
-        refreshStockData(provName, cityName, countryName);
+        initData();
+        refreshStockData();
     }
 
     //回到省界面
@@ -174,16 +170,13 @@
         renderProvMap({"name": provName}, true);
         $('#city').css('visibility','hidden');
       
-        initData(provName, cityName, countryName, dateType);
-        refreshStockData(provName, cityName, countryName);
+        initData();
+        refreshStockData();
     }
 
     //做时间的切换选择
     function setDateType(type) {
-        $.cookie(Utils.dateTypeCache, type, { expires: 1 });
-        dateType = type;
-        //initData(provName, cityName, countryName, dateType);
-        //refreshStockData(provName, cityName, countryName);
+        setFilter(type);
         
         if (document.getElementById('china_map').style.display == 'block') 
             renderChinaMap(false);
@@ -191,21 +184,24 @@
             renderProvMap({"name": strKit.convertProvName(provName)}, false);
         if (document.getElementById('city_map').style.display == 'block') 
             renderCityMap({"name": cityName}, provName.substring(0, provName.length - 1));
-        
-        if (dateType == 0) {
-            $dateTitle.text('近一天销售统计');
-        } else if (dateType == 1) {
-            $dateTitle.text('近一周销售统计');
-        } else if (dateType == 2) {
-            $dateTitle.text('近一月销售统计');
-        } else {
-            $dateTitle.text('近一年销售统计');
-        }
+
     }
+
+    $(document).on("click", ".confirm-search-btn", function () { //点击确定按钮
+        setFilter(3);
+        if (document.getElementById('china_map').style.display == 'block')
+            renderChinaMap(false);
+        if (document.getElementById('prov_map').style.display == 'block')
+            renderProvMap({"name": strKit.convertProvName(provName)}, false);
+        if (document.getElementById('city_map').style.display == 'block')
+            renderCityMap({"name": cityName}, provName.substring(0, provName.length - 1));
+
+        closeCombinSearch();
+    })
 
     function setHotMapType(type){
         hotMapType = type;
-        hMap(dateType);
+        hMap();
     }
 
     //点击地图上的省
@@ -223,7 +219,7 @@
         $.ajax({
             url:"${CPATH}/biSales/queryMapData",
             type:"post",
-            data:{"provName": provName, "cityName": '', countryName: '', dateType: dateType},
+            data:{"provName": provName, "cityName": '', countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data) {
             city_data = [];
@@ -311,8 +307,8 @@
             });
         });
         
-        initData(provName, cityName, countryName, dateType);
-        refreshStockData(provName, cityName, countryName);
+        initData();
+        refreshStockData();
     }
 
     //点击地图上的市
@@ -322,7 +318,7 @@
         $.ajax({
             url:"${CPATH}/biSales/queryMapData",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: '', dateType: dateType},
+            data:{"provName": provName, "cityName": cityName, "countryName": '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data) {
             country_data = [];
@@ -370,8 +366,8 @@
             countryMapRender(selectProv, selectCity, maxData);
         });
       
-        initData(provName, cityName, countryName, dateType);
-        refreshStockData(provName, cityName, countryName);
+        initData();
+        refreshStockData();
     }
 
     // 城市地图(市)
@@ -450,7 +446,7 @@
         $.ajax({
             url: "${CPATH}/biSales/queryMapData",
             type: "post",
-            data: {dateType: dateType},
+            data: {startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data) {
             prov_data = [];
@@ -538,8 +534,8 @@
                     renderProvMap(result, true);
                 });
             });
-            initData(provName, cityName, countryName, dateType);
-            refreshStockData(provName, cityName, countryName);
+            initData();
+            refreshStockData();
         });
     }
 
@@ -549,7 +545,7 @@
     var redIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20));
     var orangeIcon = new BMap.Icon("${CTPATH}/images/marker_orange.png", new BMap.Size(20, 20));
     var grayIcon = new BMap.Icon("${CTPATH}/images/marker_gray.png", new BMap.Size(20, 20));
-    function hMap(dateType){
+    function hMap(){
         Utils.loading();
         
         var hmTitle = '热力图';
@@ -576,19 +572,19 @@
         hotMap.enableScrollWheelZoom(true);
         hotMap.clearOverlays();
         if(hotMapType == 0){
-            hotMapData(dateType,"${CPATH}/biSales/salesHotMap");
+            hotMapData("${CPATH}/biSales/salesHotMap");
         } else {
-            hotMapData(dateType,"${CPATH}/biSales/customerHotMap");
+            hotMapData("${CPATH}/biSales/customerHotMap");
         }
         
     }
     
-    function hotMapData(dateType, url){
+    function hotMapData(url){
     
         $.ajax({
             url:url,
             type:"post",
-            data:{provName: provName, cityName: cityName, countryName: '', dateType: dateType},
+            data:{provName: provName, cityName: cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -611,12 +607,12 @@
     }
 
     // 客户
-    function customer_rank(provName, cityName, countryName, dateType) {
+    function customer_rank() {
         countryName = '';
         $.ajax({
             url:"${CPATH}/biSales/customerType",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -675,16 +671,16 @@
     }
     function customerClick(param) {
         countryName = '';
-        //post('${CPATH}/biSales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
+        //post('${CPATH}/biSales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, startDate: startDate, endDate: endDate});
     }
 
     //区域
-    function area_rank(provName, cityName, countryName, dateType){
+    function area_rank(){
         countryName = '';
         $.ajax({
             url:"${CPATH}/biSales/area",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             var areaYData = [];
@@ -756,16 +752,16 @@
     
     function areaClick(param) {
         countryName = '';
-        //post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, "dateType" : dateType});
+        //post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, startDate: startDate, endDate: endDate});
     }
     
     //产品
-    function product_rank(provName, cityName, countryName, dateType){
+    function product_rank(){
         countryName = '';
         $.ajax({
             url:"${CPATH}/biSales/product",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, dateType: dateType},
+            data:{"provName": provName, "cityName": cityName, countryName: countryName, startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
 
@@ -991,16 +987,16 @@
         
     }
     
-    function initData(provName, cityName, countryName, dateType) {
+    function initData() {
         Utils.loading();
         //热力图
-        hMap(dateType);
+        hMap();
         // 客户类型
-        customer_rank(provName, cityName, countryName, dateType);
+        customer_rank();
         // 客户区域
-        area_rank(provName, cityName, countryName, dateType);
+        area_rank();
         // 产品
-        product_rank(provName, cityName, countryName, dateType);
+        product_rank();
     }
     
 </#macro>
@@ -1014,7 +1010,7 @@
         <div class="map">
             <header class="wy-header">
                 <div id="goback" class="wy-header-icon-back"><span></span></div>
-                <div id="date-title" class="wy-header-title"></div>
+                <div id="date-title" class="wy-header-title">销售统计</div>
             </header>
             <div class="map-nav">
                 <span id="china" style="visibility:visible;"> <a href="javascript:void(0);" onclick="goBackChinaMap()"> 全国</a></span>
@@ -1112,5 +1108,6 @@
         </div>
     </div>
 </section>
+<#include "_inc/_combin_filter.html"/>
 <#include "_inc/_nav_box.html"/>
 </@layout>
