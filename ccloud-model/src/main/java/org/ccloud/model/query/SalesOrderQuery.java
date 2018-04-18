@@ -508,6 +508,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我的客户类型
 	public Page<SalesOrder> findByCustomerType(int pageNumber, int pageSize, String startDate, String endDate,
 			String keyword, String userId, boolean ifGift) {
+		LinkedList<Object> params = new LinkedList<Object>();
 		String product_count="sd.product_count";
 		if (keyword.equals("sok.biz_date")) {
 			product_count="sd.out_count";
@@ -535,7 +536,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (keyword.equals("sok.biz_date")) {
 			fromBuilder.append(" AND sd.out_count != 0");
 		}
-		LinkedList<Object> params = new LinkedList<Object>();
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and "+keyword+" >= ?");
 			params.add(startDate);
