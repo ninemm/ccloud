@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -111,10 +112,6 @@ public class UserQuery extends JBaseQuery {
 				return DAO.doFindFirst("mobile = ? AND status = 1", mobile);
 			}
 		});
-	}
-	
-	public List<User> findByWechatUserId(String wechatUserId) {
-		return DAO.doFindByCache(User.CACHE_NAME, wechatUserId, "wechat_userid = ? and status = 1", wechatUserId);
 	}
 	
 	public List<User> findByWechatOpenid(final String openid) {
@@ -379,5 +376,29 @@ public class UserQuery extends JBaseQuery {
 	
 	public User findDataArea (String dataArea) {
 		return DAO.doFindFirst("data_area = ?",dataArea);
+	}
+	
+	public Page<Record> paginateByDeptAndKey(int pageNumber, int pageSize, String keyword, String departmentType, String sort, String sortOrder) {
+
+		boolean needWhere = true;
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		String select = "SELECT u.* ";
+		StringBuilder fromBuilder = new StringBuilder("FROM user u ");
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.data_area" , departmentType, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword, params, needWhere);
+
+		if(StrKit.notBlank(sort)) {
+			fromBuilder.append(" order by "+sort);
+			if(!sortOrder.equals("")) {
+				fromBuilder.append(" "+ sortOrder);
+			}
+		}
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 }
