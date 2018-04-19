@@ -28,11 +28,9 @@ import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Department;
-import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -226,13 +224,9 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		
 	public void findByDataArea() {
 		String dataArea = getPara("dataArea");
-		List<Record>list=new ArrayList<Record>();
-		if (!StrKit.notBlank(dataArea)) {
-			renderJson(list);	
-			return;
-		}
-		list=DepartmentQuery.me().findByDataAreaSeller(dataArea);
-		renderJson(list);	
+		Page<Department> page = DepartmentQuery.me().paginateByDataAreaSeller(getPageNumber(), getPageSize(),dataArea);
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+	    renderJson(map);	
 	}
 	
 	//@Before(WorkWechatContactApiConfigInterceptor.class)

@@ -704,5 +704,13 @@ public class DepartmentQuery extends JBaseQuery {
 		return Db.findFirst(sql,id).getStr("qywx_deptid");
 	}
 
+	public Page<Department> paginateByDataAreaSeller(int pageNumber, int pageSize, String dataArea) {
+		String select = "SELECT d.id , d.dept_name , d.data_area,d.qywx_deptid ";
+		StringBuilder fromBuilder = new StringBuilder("FROM department d WHERE d.dept_level IN(1 , 2) and  ");
+		fromBuilder.append("d.data_area LIKE '"+dataArea+"%' ORDER BY d.dept_level ");
+
+		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+	}
 
 }

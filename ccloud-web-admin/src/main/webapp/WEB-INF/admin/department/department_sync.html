@@ -1,17 +1,27 @@
-<#include "../_inc/_layout.html"/> 
+<#include "../_inc/_layout.html"/>
 
 <#macro script_import>
-    <script src="${CPATH}/static/ladda/spin.min.js"></script>
-    <script src="${CPATH}/static/ladda/ladda.min.js"></script>
+
+	<!-- bootstrap-table -->
+ 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
+ 	<!-- <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-edit.js"></script> -->
+ 	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+
 </#macro>
 
 <#macro css_import>
-   <link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
-</#macro> 
+
+	<!-- bootstrap-table-->
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
+
+</#macro>
 
 <#macro script>
-    
+	var $departmentTable = $("#department_table");
     $(function() {
+    	var num = 1;
+    	url = "${CPATH}/admin/department/findByDataArea"
+    	jQuery.mm.initEditTable('#department_table', url, initParams, initFields(), null);
         $(document).on('change', '#all', function(){
             var $this = this;
             $('input[name=checkItem]').each(function(){
@@ -28,31 +38,46 @@
         })
         
         $("#dataArea").change(function() {
-            change();
+            $departmentTable.bootstrapTable('refresh');
         });
-        
-        function change(){
-            var dataArea = $("#dataArea").find("option:selected").val(); 
-            $.ajax({
-                url:"${CPATH}/admin/department/findByDataArea",
-                type:"post",
-                data:{"dataArea":dataArea},
-                dataType:"json",
-                success:function(data) {
-                    $("#dataTbody").empty();
-                    $.each(data,function(index,el){
-                        if(el.qywx_deptid){ 
-                            $("#dataTbody").append("<tr data-id='"+el.id+"'><td align='center'></td><td align='center'>"+(index+1)+"</td><td align='center'>"+el.dept_name+"</td><td align='center'>已同步</td></tr>");
-                        }else{
-                            $("#dataTbody").append("<tr data-id='"+el.id+"'><td align='center'><input type='checkbox' name='checkItem' value='"+el.id+"'/></td><td align='center'>"+(index+1)+"</td><td align='center'>"+el.dept_name+"</td><td align='center'>未同步</td></tr>");
-                        }
-                    })
-                }
-            });
-        }
-        
-        
-        $("#synchronous").click(function(){
+    })
+    
+    
+ 	var initParams = function(params) {
+		var dataArea = $("#dataArea").find("option:selected").val();
+		var keyword = $('#search').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
+		var param = {
+			size: params.limit,
+			page: params.offset/params.limit + 1,
+			dataArea: dataArea
+		};
+		return param;
+	};
+    
+    var initFields = function() {
+		var fields =
+			[
+				{field: "", title: "<input type='checkbox' onclick='checkA(this)' name='data1' value=''/>", align: "center", width: '5%',
+				formatter: function(value, row, rowIndex) {
+					var strHtml = '<input type="checkbox" name="data" id="data" value="'+row.id+'"/>';
+					return strHtml;
+				},
+				edit:false
+				},
+				{field: "", title: "序号", align: "center", width: '10%', edit:false},
+				{field: "dept_name", title: "部门名称", align: "center", width: '10%', edit:false},
+				{field: "", title: "是否同步", align: "center", width: '10%',
+				formatter: function(value, row, rowIndex) {
+					if(row.qywx_deptid) {return "同步";}
+					else {return "未同步";}
+				},
+				 edit:false},
+			];
+		return fields;
+	}
+	
+	  $("#synchronous").click(function(){
             var l = Ladda.create( document.querySelector( '.ladda-button' ) );  
             var departmentIds="";
             $.each($('input:checkbox'),function(){
@@ -85,8 +110,7 @@
                 });
             }
         });
-    })
-    
+	
 </#macro>
 <@layout active_id=p child_active_id=c>
 <section class="content-header">
@@ -118,7 +142,10 @@
                     <button id="synchronous" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">同步</button>
                 </div>
         </div>
-        <table class="table table-striped table-bordered" width="100%">
+        <div class="box">
+			<table class="table table-striped table-hover table-condensed" id="department_table" ></table>
+		</div>
+        <!-- <table class="table table-striped table-bordered" width="100%">
             <thead>
                 <tr>
                     <th class="col-sm-2 center" style="text-align: center;"><input type='checkbox' id="all"/></th>
@@ -130,7 +157,7 @@
             <tbody id="dataTbody">
                 
             </tbody>
-        </table>
+        </table> -->
     </div>
 </section>
 
