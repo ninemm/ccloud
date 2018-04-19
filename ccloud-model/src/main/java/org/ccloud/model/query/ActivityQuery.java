@@ -223,7 +223,7 @@ public class ActivityQuery extends JBaseQuery {
 
 	public Page<Record> visitDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate,
 			String endDate, String activityApplyId) {
-		String select = "SELECT ccv.id customerVisitId,u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
+		String select = "SELECT ccv.id customerVisitId,ccv.templete_remark,u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
 		select = select+",caa.create_date putDate ,ccv.photo,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit ccv ");
 		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.id=ccv.active_apply_id ");

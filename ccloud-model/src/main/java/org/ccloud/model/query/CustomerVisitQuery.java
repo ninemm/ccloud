@@ -487,4 +487,11 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.find(sql);
 	}
 	
+	public CustomerVisit fingByApplyIdAndOrderList(String applyId , String orderList) {
+		String sql = "SELECT ccv.* from cc_customer_visit ccv "
+				+ "LEFT JOIN cc_activity_apply caa on caa.id = ccv.active_apply_id "
+				+ "LEFT JOIN cc_activity_execute cae on cae.activity_id = caa.activity_id and cae.id = ccv.activity_execute_id "
+				+ "where ccv.active_apply_id ='"+applyId+"' and cae.order_list = '"+orderList+"'";
+		return DAO.findFirst(sql);
+	}
 }

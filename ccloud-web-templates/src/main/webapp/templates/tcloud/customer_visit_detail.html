@@ -122,7 +122,7 @@
 		            <div class="weui-cell__bd">
 		            <!-- <div class="order-customer-info-title">问题类型
 		                        </div> -->
-		                <textarea class="weui-textarea" placeholder="备注说明（70字以内）">${(visit.question_desc)!}</textarea>
+		                <textarea class="weui-textarea" placeholder="备注说明（70字以内）"><#if visit.templete_remark??>${(visit.templete_remark)!}<#else>${(visit.question_desc)!}</#if></textarea>
 		            </div>
 		        </div>
 		    </section>

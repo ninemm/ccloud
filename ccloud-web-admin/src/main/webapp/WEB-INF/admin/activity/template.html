@@ -139,8 +139,10 @@
 	}
 	function doSubmit(){
 		$.each(templateList,function(index,item){
-			if(item.activityExecteId ==  $("#activityExecteId").val()){
-				templateList.splice(index,1);
+			if(item != null){
+				if(item.activityExecteId ==  $("#activityExecteId").val()){
+					templateList.splice(index,1);
+				}
 			}
 		})
 		for(var i = 1 ; i <= num ; i++){
@@ -196,7 +198,7 @@
 					</td>
 					<td>
 						<div class = "validata-box">
-							<input type="text" id="templateValueTypeValue" name="templateValueTypeValue" value="" placeholder="多个选项值用逗号表示"/>
+							<input type="text" id="templateValueTypeValue" name="templateValueTypeValue" value="" placeholder="多个选项值用英文逗号隔开"/>
 						</div>
 					</td>
 				</tr>

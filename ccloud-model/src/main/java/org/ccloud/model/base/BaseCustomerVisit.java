@@ -303,6 +303,14 @@ public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends 
 		set("active_apply_id", activityApplyId);
 	}
 
+	public java.lang.String getTempleteRemark() {
+		return getStr("templete_remark");
+	}
+	
+	public void setTempleteRemark(java.lang.String templeteRemark) {
+		set("templete_remark", templeteRemark);
+	}
+
 	public java.lang.String getActiveApplyId() {
 		return getStr("active_apply_id");
 	}

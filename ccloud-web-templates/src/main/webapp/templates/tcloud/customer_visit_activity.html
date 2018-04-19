@@ -43,7 +43,6 @@
         var imgeList = ${(list)!'1'};
         var domain = "${(domain)!}";
         var flang = false;
-        
         var _orderList = "${(orderList)!}";//点击的是第几执行步骤
     	$("#customer_id").val("${(record.seller_customer_id)!}");
    	    $("#customer_name").val("${(record.customer_name)!}");
@@ -96,7 +95,12 @@
 	                        }
 	                        if(imgeList[j].orderList == _orderList){
 	                        	$("#question_type").val("${(customerVisit.typeName)!}");
-						        $("#question_desc").val("${(customerVisit.question_desc)!}")
+	                        	var cv = "${(cv.templete_remark)!}";
+	                        	if(cv == ""){
+							        $("#question_desc").val("${(customerVisit.question_desc)!}");
+	                        	}else{
+	                        		$("#question_desc").val(cv);
+	                        	}
 						        //$("#location").val("${(customerVisit.location)!}");
 						        $("#problem_id").val("${(customerVisit.question_type)!}");
 	        					$('._submit_btn').hide();
@@ -118,9 +122,64 @@
 						            }
 						        }
 						    });
+						    
+						    $.ajax({
+						        url: "${CPATH}/customerVisit/getActivityTemplete",
+						        data: {
+						            "activityExecuteId": activityExecutesList[i].id
+						        },
+						        multi: false,
+						        dataType: "json",
+						        success: function(data) {
+						        	if(data.length>0){
+						        		$("#question_desc").hide();
+						        		$("#length").hide();
+						        		$(".remarkTemplete").html("");
+						        		$("#completeNum").val(data.length);
+						        		for(var m = 0 ; m < data.length ; m++){
+							        		var Html = "";
+						        			console.log(data);
+						        			//输入框
+						        			if(data[m].template_value_type == "103016"){
+						        				Html += '<div class="weui-cell weui-cell_access select-area"><span>'+data[m].template_value+'<span class="require"></span></span><div class="weui-cell__bd"><input type="tel" class="weui-input fr" id="activityTemplete'+m+'" name="activityTemplete'+m+'" value="0" placeholder="请填写规格" required><input type="hidden" id="activityTempleteName'+m+'" name="activityTempleteName'+m+'" value="'+data[m].template_value+'"></div></div>'
+								        		$(".remarkTemplete").append(Html);
+						        			} 
+						        			//单选
+						        			if(data[m].template_value_type == "103017"){
+						        				Html += '<div class="weui-cell weui-cell_access select-area"><span>'+data[m].template_value+'<span class="require"></span></span><div class="weui-cell__bd"><input id="activityTemplete'+m+'" class="weui-input" name="activityTemplete'+m+'" style="width:100%;" type="text"><input type="hidden" id="activityTempleteName'+m+'" name="activityTempleteName'+m+'" value="'+data[m].template_value+'"></div><span class="weui-cell__ft"></span></div>'
+						        				var arr = data[m].template_value_opt.split(",");
+						        				$(".remarkTemplete").append(Html);
+						        				var selectId = "#activityTemplete"+m;
+						        				$(selectId).select({
+											   		title: "选择",
+													multi: false,
+													items: arr
+											    });
+						        			}
+						        			//多选
+						        			if(data[m].template_value_type == "103018"){
+						        				Html += '<div class="weui-cell weui-cell_access select-area"><span>'+data[m].template_value+'<span class="require"></span></span><div class="weui-cell__bd"><input id="activityTemplete'+m+'" class="weui-input" name="activityTemplete'+m+'" style="width:100%;" type="text"><input type="hidden" id="activityTempleteName'+m+'" name="activityTempleteName'+m+'" value="'+data[m].template_value+'"></div><span class="weui-cell__ft"></span></div>'
+						        				var arr = data[m].template_value_opt.split(",")
+						        				$(".remarkTemplete").append(Html);
+						        				var selectId = "#activityTemplete"+m;
+						        				$(selectId).select({
+											   		title: "选择",
+													multi: true,
+													items: arr
+											    });
+						        			}
+						        		}
+						        	}else{
+						        		$("#question_desc").show();
+						        		$("#length").show();
+						        	}
+						        }	
+				        	});
+						    
 	                     }else{
 	                     	html +='</ul></div>'
 	                          	 +'</div>';
+	                        
 	                     }
 	        $(".imgeActivity").html("");
 			$(".imgeActivity").append(html);
@@ -158,12 +217,12 @@
             return false;
         }
 
-        if($("#question_desc").val().length==0) {
+        /*if($("#question_desc").val().length==0) {
             $.toptip('备注描述不能为空', 3000, 'error'); 
             return false;
         }
         
-        /*if($("#location").val().length==0) {
+        if($("#location").val().length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
         }*/
@@ -364,15 +423,9 @@
 						<input id="activity_title" class="weui-input" name="activity_title" type="text" placeholder="请选择" readonly>
                     </div>
                 </div>
-                <!-- <div class="weui-cell weui-cell_access">
-                    <div class="weui-cell__bd">
-                        <div class="order-customer-info-title">活动名称 <span class="require">*</span></div>
-                        <input class="weui-input" placeholder="请选择">
-                    </div>
-                    <span class="weui-cell__ft"></span>
-		        </div> -->
-                <div class="weui-cell weui-cell_access">
-                    <div class="weui-cell__bd">
+                <div class="weui-cell weui-cell_access ">
+                    <input type = "hidden" name = "completeNum" id = "completeNum" value = "0"/>
+                    <div class="weui-cell__bd remarkTemplete">
                         <textarea class="weui-textarea" rows="3" name="customerVisit.question_desc" id="question_desc" placeholder="备注说明"></textarea>
                         <div class="weui-textarea-counter" id="length"></div>
                     </div>

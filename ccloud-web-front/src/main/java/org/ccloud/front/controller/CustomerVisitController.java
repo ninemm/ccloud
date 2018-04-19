@@ -16,6 +16,7 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.ActivityApply;
 import org.ccloud.model.ActivityExecute;
+import org.ccloud.model.ActivityExecuteTemplate;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
@@ -27,6 +28,7 @@ import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
+import org.ccloud.model.query.ActivityExecuteTemplateQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -921,10 +923,14 @@ public class CustomerVisitController extends BaseFrontController {
 	public void addActivityApplyVisit() {
 		String activityApplyId = getPara("applyId");
 		String orderList = getPara("orderList");
+		CustomerVisit cv = CustomerVisitQuery.me().findByActivityApplyIdAndOrderList(activityApplyId, orderList);
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		if(customerVisits.size()>0) {
 			setAttr("imgeLists",JSON.toJSON(JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class)));
 			setAttr("customerVisit",CustomerVisitQuery.me().findMoreById(customerVisits.get(0).getId()));
+		}
+		if(cv != null) {
+			setAttr("cv",cv);
 		}
 		Record record = ActivityQuery.me().findByApplyId(activityApplyId);
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityIdAndOrderList(record.getStr("activity_id"),orderList);
@@ -946,6 +952,16 @@ public class CustomerVisitController extends BaseFrontController {
 		String activityApplyId = getPara("activity_apply_id");
 		String activityExecuteId = getPara("activity_execute_id");
 		Boolean isChecked = OptionQuery.me().findValueAsBool("web_proc_customer_visit_" + getSessionAttr("sellerCode"));
+		int completeNum = Integer.parseInt(getPara("completeNum"));
+		if(completeNum>0) {
+			String completeRemark = "";
+			for(int i = 0 ; i < completeNum ; i++) {
+				String activityTempleteName = "activityTempleteName"+i;
+				String activityTemplete = "activityTemplete"+i;
+				completeRemark += getPara(activityTempleteName)+" : "+getPara(activityTemplete)+";";
+			}
+			customerVisit.setTempleteRemark(completeRemark);
+		}
 		
 		List<ImageJson> list = Lists.newArrayList();
 		String picJson = getPara("pic");
@@ -978,8 +994,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-					String waterFont3 =  customerVisit.getLocation();
-//					String waterFont3 = "湖北省-武汉市-洪山区";
+//					String waterFont3 =  customerVisit.getLocation();
+					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -1042,6 +1058,12 @@ public class CustomerVisitController extends BaseFrontController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("message", message);
 		renderJson(map);
+	}
+	//根据活动执行步骤查找活动执行步骤对应的模板
+	public void getActivityTemplete() {
+		String activityExecuteId = getPara("activityExecuteId");
+		List<ActivityExecuteTemplate> list = ActivityExecuteTemplateQuery.me().findActivityExecuteId(activityExecuteId);
+		renderJson(list);
 	}
 	
 }
