@@ -60,12 +60,17 @@
 			[
 				{field: "", title: "<input type='checkbox' onclick='checkA(this)' name='data1' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="checkbox" name="data" id="data" value="'+row.id+'"/>';
+					var strHtml = '';
+					if(!row.qywx_deptid) {strHtml = '<input type="checkbox" name="data" id="data" value="'+row.id+'"/>';}
 					return strHtml;
 				},
 				edit:false
 				},
-				{field: "", title: "序号", align: "center", width: '10%', edit:false},
+				{field: "", title: "序号", align: "center", width: '10%',
+				formatter: function (value, row, index) {  
+                            return index+1;  
+                        }
+				, edit:false},
 				{field: "dept_name", title: "部门名称", align: "center", width: '10%', edit:false},
 				{field: "", title: "是否同步", align: "center", width: '10%',
 				formatter: function(value, row, rowIndex) {
