@@ -408,7 +408,8 @@ public class CustomerVisitController extends BaseFrontController {
 		String activityExceuteId = getPara("activity_execute_id");
 		if(!activityApplyId.equals("")) {
 			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
-			if(customerVisits.size()>0) {
+			List<ActivityExecute> executeList = ActivityExecuteQuery.me().findbyActivityApplyId(activityApplyId);
+			if(customerVisits.size() > 0 && executeList.size() > 0) {
 				for(CustomerVisit visit:customerVisits) {
 					if(!visit.getStatus() .equals(Consts.CUSTOMER_VISIT_STATUS_PASS)) {
 						renderAjaxResultForError("您的拜访未审核通过！");
@@ -548,7 +549,7 @@ public class CustomerVisitController extends BaseFrontController {
 				List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(customerVisit.getActiveApplyId());
 				ActivityApply activityApply = ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId());
 				List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
-				if(customerVisits.size() == activityExecutes.size()) {
+				if(customerVisits.size() == activityExecutes.size() || activityExecutes.size() == 0) {
 					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_VERIFICATION);
 					activityApply.update();
 				}

@@ -32,7 +32,6 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
-import org.ccloud.workflow.listener.order.OrderReviewUtil;
 import org.ccloud.workflow.service.WorkFlowService;
 
 /**
@@ -207,6 +206,7 @@ public class ActivityController extends BaseFrontController {
 		String[] activity_ids = getParaValues("activity_id");
  		String[] applyNum = getParaValues("apply_num");
 		String[] applyAmount = getParaValues("apply_amount");
+		String[] applyArea = getParaValues("apply_area");
 		if(expenseDetailIds!=null) {
 			expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
 			for (String sellerCustomerId : sellerCustomerIdArray) {
@@ -228,6 +228,7 @@ public class ActivityController extends BaseFrontController {
 						activityApply.setBizUserId(user.getId());
 						activityApply.setApplyNum(new BigDecimal(applyNum[j]));
 						activityApply.setApplyAmount(new BigDecimal(applyAmount[j]));
+						activityApply.setApplyArea(applyArea[j]);
 						activityApply.setNum(0);
 						activityApply.setContent(content);
 						
@@ -272,6 +273,7 @@ public class ActivityController extends BaseFrontController {
 					activityApply.setContent(content);
 					activityApply.setApplyNum(new BigDecimal(applyNum[0]));
 					activityApply.setApplyAmount(new BigDecimal(applyAmount[0]));
+					activityApply.setApplyArea(applyArea[0]);
 					
 					if (startProc != null && startProc) {
 						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);
@@ -746,6 +748,9 @@ public class ActivityController extends BaseFrontController {
 				map.put("num", null);
 				BigDecimal surplusMoney = new BigDecimal(detail.getItem2()).subtract(new BigDecimal(detail.get("amount").toString()));
 				map.put("amount", surplusMoney.toString());
+				if (detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
+					map.put("area", "1");
+				}
 			} else if(detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY) || detail.getFlowDictType().equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL)) {
 				BigDecimal surplusMoney = new BigDecimal(detail.getItem4()).subtract(new BigDecimal(detail.get("amount").toString()));
 				BigDecimal surplusNum = new BigDecimal(detail.getItem3()).subtract(new BigDecimal(detail.get("num").toString()));

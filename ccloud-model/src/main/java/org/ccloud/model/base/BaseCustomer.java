@@ -97,6 +97,14 @@ public abstract class BaseCustomer<M extends BaseCustomer<M>> extends JModel<M> 
 	public java.lang.String getId() {
 		return getStr("id");
 	}
+	
+	public void setCheckSize(java.lang.String checkSize) {
+		set("check_size", checkSize);
+	}
+
+	public java.lang.String getCheckSize() {
+		return getStr("check_size");
+	}	
 
 	public void setCustomerCode(java.lang.String customerCode) {
 		set("customer_code", customerCode);

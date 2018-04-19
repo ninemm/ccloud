@@ -98,6 +98,14 @@ public abstract class BaseActivityApply<M extends BaseActivityApply<M>> extends 
 		return getStr("id");
 	}
 	
+	public void setApplyArea(String applyArea) {
+		set("apply_area", applyArea);
+	}
+
+	public String getApplyArea() {
+		return getStr("apply_area");
+	}	
+	
 	public void setApplyNum(java.math.BigDecimal applyNum) {
 		set("apply_num", applyNum);
 	}
