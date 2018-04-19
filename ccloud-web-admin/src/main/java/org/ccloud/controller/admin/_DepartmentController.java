@@ -237,7 +237,6 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	
 	//@Before(WorkWechatContactApiConfigInterceptor.class)
 	public void synchronous() {
-		
 		String sellerIds = getPara("sellerIds");
 		String[] sellerId = sellerIds.split(",");
 		for (String seller_id : sellerId) {
