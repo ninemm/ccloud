@@ -62,7 +62,7 @@ public class WWxOauthController extends BaseFrontController {
 		
 		User user = UserQuery.me().findByWechatUserId(wechatUserId);
 		if (user == null) {
-			renderError(500);
+			renderText("你没有权限查看此应用，请联系管理员！");
 			return ;
 		}
 		
@@ -88,6 +88,12 @@ public class WWxOauthController extends BaseFrontController {
 		String productArray[] = new String[productByUser.size()];
 		for (int i = 0; i < productByUser.size(); i++) {
 			productArray[i] = productByUser.get(i).getStr("product_id");
+		}
+
+
+		if (sellerByUser == null || sellerByUser.size() == 0 || brandByUser == null || brandByUser.size() == 0) {
+			renderText("你没有配置对应的经销商或品牌，请联系管理员！");
+			return ;
 		}
 
 		setSessionAttr(Consts.SESSION_DEALER_DATA_AREA_ARRAY, sellerArray);
