@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.ccloud.Consts;
 import org.ccloud.cache.JCachePlugin;
+import org.ccloud.cache.impl.J2Cache;
+import org.ccloud.cache.plugins.J2CachePlugin;
 import org.ccloud.core.cache.ActionCacheHandler;
 import org.ccloud.core.interceptor.HookInterceptor;
 import org.ccloud.core.interceptor.JI18nInterceptor;
@@ -68,7 +70,6 @@ import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.ViewType;
 import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 
-import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
@@ -120,11 +121,13 @@ public abstract class CCloudConfig extends JFinalConfig {
 
 	public void configPlugin(Plugins plugins) {
 		
-		plugins.add(createEhCachePlugin());
+//		plugins.add(createEhCachePlugin());
 
 		if (CCloud.isInstalled()) {
-
-			JCachePlugin leCachePlugin = new JCachePlugin();
+			
+			plugins.add(new J2CachePlugin());
+			
+			JCachePlugin leCachePlugin = new JCachePlugin(J2Cache.class);
 			plugins.add(leCachePlugin);
 
 			DruidPlugin druidPlugin = createDruidPlugin();
@@ -229,7 +232,7 @@ public abstract class CCloudConfig extends JFinalConfig {
 		interceptors.add(new JI18nInterceptor());
 		interceptors.add(new GlobelInterceptor());
 		interceptors.add(new AdminInterceptor());
-		interceptors.add(new HookInterceptor());
+//		interceptors.add(new HookInterceptor());
 		interceptors.add(new ShiroInterceptor());
 		interceptors.add(new PublicInterceptor());
 		interceptors.add(new SessionInterceptor());
@@ -280,7 +283,8 @@ public abstract class CCloudConfig extends JFinalConfig {
 			e.printStackTrace();
 		}
 		
-		 CacheManager.getInstance().shutdown();
+		 //CacheManager.getInstance().shutdown();
+//		org.ccloud.cache.CacheManager.me().
 	}
 
 	public void onCCloudStarted() {

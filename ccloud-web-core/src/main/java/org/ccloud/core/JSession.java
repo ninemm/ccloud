@@ -22,9 +22,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 
+import org.ccloud.cache.CacheManager;
+
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
-import com.jfinal.plugin.ehcache.CacheKit;
 
 @SuppressWarnings("deprecation")
 public class JSession implements HttpSession {
@@ -36,15 +37,16 @@ public class JSession implements HttpSession {
 	}
 
 	private void doPut(String key, Object value) {
-		CacheKit.put("session", key + tryToGetJsessionId(), value);
+		//CacheManager.me().getCache().
+		CacheManager.me().getCache().put("session", key + tryToGetJsessionId(), value);
 	}
 
 	private void doRemove(String key) {
-		CacheKit.remove("session", key + tryToGetJsessionId());
+		CacheManager.me().getCache().remove("session", key + tryToGetJsessionId());
 	}
 
 	private Object doGet(String key) {
-		return CacheKit.get("session", key + tryToGetJsessionId());
+		return CacheManager.me().getCache().get("session", key + tryToGetJsessionId());
 	}
 
 	private String tryToGetJsessionId() {
