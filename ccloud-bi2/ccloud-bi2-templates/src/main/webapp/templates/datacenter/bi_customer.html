@@ -94,6 +94,7 @@
 
     //定位
     $("#relocation").on('click', function() {
+        Utils.loading();
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
         
         wxReadyGetLocation(
