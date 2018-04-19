@@ -92,7 +92,7 @@
     
     function syn(id) {
      	var departmentType = $('#department_type').val();
-        $.get('${CPATH}/admin/user/synUser?userId=' + id +'&departmentType='+departmentType,
+        $.get('${CPATH}/admin/user/synUser?userIds=' + id +'&departmentType='+departmentType,
             function(result){
                 if (result.errorCode > 0) {
                     toastr.error(result.message, '操作失败');
@@ -103,6 +103,28 @@
             }
         );
     }
+    
+	$("#synchronous").click(function(){
+		var userIds="";
+		$.each($('input:checkbox'),function(){
+			if(this.checked){
+				if($(this).val()!='on'){
+					userIds=userIds+$(this).val()+",";
+				}
+			}
+		});
+		var departmentType = $('#department_type').val();
+        $.get('${CPATH}/admin/user/synUser?userIds=' + userIds +'&departmentType='+departmentType,
+            function(result){
+                if (result.errorCode > 0) {
+                    toastr.error(result.message, '操作失败');
+                } else {
+                    toastr.success(result.message, '操作成功');
+                    $table.bootstrapTable('refresh');
+                }
+            }
+        );
+	});
     
     function batchAction(action) {
         var userIds = new Array();
@@ -154,14 +176,16 @@
     <div class="row content-row">
         <form id="form" class="form-horizontal" >
             <div class="form-group">
-                <div class="col-sm-4">
-                    <a href="#" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-refresh"></i> 同步</a>
+                <div class="col-sm-1">
+                    <a href="#" class="btn btn-sm btn-primary btn-flat" id="synchronous"><i class="fa fa-refresh"></i> 同步</a>
                 </div>
-                <div class="col-sm-3">
-                    <label class="control-label col-sm-5">组织机构:</label>
-                    <div class="col-sm-7 input-group input-group-sm">
+                <div class="col-sm-6">
+                    <label class="control-label col-sm-4">组织机构:</label>
+                    <div class="col-sm-4 input-group input-group-sm">
                         <select  class="form-control" name="department_type" id="department_type">
                         </select>
+                    </div>
+                    <div class="col-sm-4 input-group input-group-sm">
                     </div>
                 </div>
                 <div class="col-sm-4">
