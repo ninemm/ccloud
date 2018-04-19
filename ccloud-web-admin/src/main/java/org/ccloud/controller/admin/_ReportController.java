@@ -235,7 +235,7 @@ public class _ReportController extends JBaseController {
 		renderJson(map);
 	}
 	
-	//我部门下的产品明细
+	//我部门的产品详细
 	public void departProduct() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		setAttr("startDate", date);
@@ -243,7 +243,7 @@ public class _ReportController extends JBaseController {
 		render("departmentProductReport.html");
 	}
 	
-	//我部门下的产品明细list
+	//我部门的产品详细list
 	public void departmentProductReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -266,7 +266,7 @@ public class _ReportController extends JBaseController {
 		renderJson(map);
 	}
 	
-	//我部门下的产品明细赠品list
+	//我部门的产品详细赠品list
 	public void departmentProductGiftReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -447,7 +447,7 @@ public class _ReportController extends JBaseController {
 		renderJson(map);
 	}
 	
-	//我部门的业务员详情
+	//我部门的业务员详细
 	public void mSalesmanDetail() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		setAttr("startDate", date);
@@ -466,7 +466,7 @@ public class _ReportController extends JBaseController {
 		render("mSalesmanDetail.html");
 	}
 	
-	//我部门的业务员详情
+	//我部门的业务员详细
 	public void mSalesmanDetailReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -486,7 +486,7 @@ public class _ReportController extends JBaseController {
 		renderJson(list);
 	}
 	
-	//我部门的业务员赠品详情
+	//我部门的业务员赠品详细
 	public void mSalesmanDetailGiftReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -501,7 +501,7 @@ public class _ReportController extends JBaseController {
 		renderJson(list);
 	}
 	
-	//我部门的直营商详情
+	//我部门的直营商详细
 	public void mSellerDetail() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		setAttr("startDate", date);
@@ -519,7 +519,7 @@ public class _ReportController extends JBaseController {
 		render("mSellerDetail.html");
 	}
 	
-	//我部门的直营商详情
+	//我部门的直营商详细
 	public void mSellerDetailReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -534,7 +534,7 @@ public class _ReportController extends JBaseController {
 		renderJson(list);
 	}
 	
-	//我部门的直营商赠品详情
+	//我部门的直营商赠品详细
 	public void mSellerDetailGiftReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
@@ -550,7 +550,7 @@ public class _ReportController extends JBaseController {
 	}
 	
 	
-	//我的客户详情
+	//我的客户详细
 	public void customerDetails() {
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/manager");
 		if (isSuperAdmin) {
@@ -576,7 +576,7 @@ public class _ReportController extends JBaseController {
 		render("customerDetails.html");
 	}
 	
-	//我的客户详情
+	//我的客户详细
 	public void customerDetailsReportList() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
@@ -594,7 +594,7 @@ public class _ReportController extends JBaseController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		//我的客户卖出商品详情
+		//我的客户卖出商品详细
 		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId,false);
 		List<Record> list1=SalesOrderQuery.me().findMoney(startDate,endDate,keyword, userId);
 		for (Record record : list) {
@@ -610,7 +610,7 @@ public class _ReportController extends JBaseController {
 		renderJson(list);
 	}
 	
-	//我的客户详情
+	//我的客户详细
 	public void customerDetailsGiftReportList() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String userId = user.getId();
