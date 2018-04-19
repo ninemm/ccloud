@@ -384,8 +384,8 @@
                 });
             }
             var crTitle = '客户分布';
-            if((provName + cityName + countryName).trim() != '' ){
-                crTitle = provName + cityName + countryName + crTitle;
+            if((provName + cityName).trim() != '' ){
+                crTitle = provName + cityName + crTitle;
             } else {
                 crTitle = '全国' + crTitle;
             }
@@ -477,8 +477,8 @@
             Utils.close();
 
             var prTitle = customerTypeName + '产品销售排行';
-            if((provName + cityName + countryName).trim() != '' ){
-                prTitle = provName + cityName + countryName + prTitle;
+            if((provName + cityName).trim() != '' ){
+                prTitle = provName + cityName + prTitle;
             } else {
                 prTitle = '全国' + prTitle;
             }
@@ -537,8 +537,8 @@
             }
 
             var areaTitle = customerTypeName + '销售分布';
-            if((provName + cityName + countryName).trim() != '' ){
-                areaTitle = provName + cityName + countryName + areaTitle;
+            if((provName + cityName).trim() != '' ){
+                areaTitle = provName + cityName + areaTitle;
             } else {
                 areaTitle = '全国' + areaTitle;
             }

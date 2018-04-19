@@ -549,7 +549,7 @@
         Utils.loading();
         
         var hmTitle = '热力图';
-        if((provName + cityName + countryName).trim() != '' ){
+        if((provName + cityName).trim() != '' ){
             hmTitle = provName + cityName  + hmTitle;
         } else {
             hmTitle = '全国' + hmTitle;
@@ -608,11 +608,10 @@
 
     // 客户
     function customer_rank() {
-        countryName = '';
         $.ajax({
             url:"${CPATH}/biSales/customerType",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             Utils.close();
@@ -627,8 +626,8 @@
                 });
             }
             var crTitle = '客户销售统计排行Top5(金额/万元)';
-            if((provName + cityName + countryName).trim() != '' ){
-                crTitle = provName + cityName + countryName + crTitle;
+            if((provName + cityName).trim() != '' ){
+                crTitle = provName + cityName + crTitle;
             } else {
                 crTitle = '全国' + crTitle
             }
@@ -670,17 +669,15 @@
         });
     }
     function customerClick(param) {
-        countryName = '';
-        //post('${CPATH}/biSales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, startDate: startDate, endDate: endDate});
+        //post('${CPATH}/biSales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : '', startDate: startDate, endDate: endDate});
     }
 
     //区域
     function area_rank(){
-        countryName = '';
         $.ajax({
             url:"${CPATH}/biSales/area",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
             var areaYData = [];
@@ -693,8 +690,8 @@
             }
 
             var areaTitle = '区域销售统计Top5(金额/万元)';
-            if((provName + cityName + countryName).trim() != '' ){
-                areaTitle = provName + cityName + countryName + areaTitle;
+            if((provName + cityName).trim() != '' ){
+                areaTitle = provName + cityName + areaTitle;
             } else {
                 areaTitle = '全国' + areaTitle
             }
@@ -750,23 +747,21 @@
     }
     
     function areaClick(param) {
-        countryName = '';
-        //post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : countryName, startDate: startDate, endDate: endDate});
+        //post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : '', startDate: startDate, endDate: endDate});
     }
     
     //产品
     function product_rank(){
-        countryName = '';
         $.ajax({
             url:"${CPATH}/biSales/product",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
 
             var prTitle = '产品销售排行Top5';
-            if((provName + cityName + countryName).trim() != '' ){
-                prTitle = provName + cityName + countryName + prTitle;
+            if((provName + cityName).trim() != '' ){
+                prTitle = provName + cityName + prTitle;
             } else {
                 prTitle = '全国' + prTitle
             }
@@ -816,17 +811,16 @@
 
     var $sTR;
     //库存
-    function stock_rank(provName, cityName, countryName){
-        countryName = '';
+    function stock_rank(){
         $.ajax({
             url:"${CPATH}/stock/area",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName},
+            data:{"provName": provName, "cityName": cityName, countryName: ''},
             dataType:"json"
         }).done(function(data){
             var srTitle = '库存情况';
-            if((provName + cityName + countryName).trim() != '' ){
-                srTitle = provName + cityName + countryName + srTitle;
+            if((provName + cityName).trim() != '' ){
+                srTitle = provName + cityName + srTitle;
             } else {
                 srTitle = '全国' + srTitle
             }
@@ -870,18 +864,17 @@
     });
 
     //库存趋势
-    function stock(name, tn, provName, cityName, countryName, color){
-        countryName = '';
+    function stock(name, tn, color){
         $.ajax({
             url:"${CPATH}/stock/date",
             type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: countryName, custom_name: tn},
+            data:{"provName": provName, "cityName": cityName, countryName: '', custom_name: tn},
             dataType:"json"
         }).done(function(data){
 
             var sTitle = '库存趋势';
-            if((provName + cityName + countryName).trim() != '' ){
-                sTitle = provName + cityName + countryName + sTitle;
+            if((provName + cityName).trim() != '' ){
+                sTitle = provName + cityName + sTitle;
             } else {
                 sTitle = '全国' + sTitle
             }
@@ -977,12 +970,12 @@
     }
     
     // 更新库存数据
-    function refreshStockData(provName, cityName, countryName) {
+    function refreshStockData() {
     
-        //stock_rank(provName, cityName, countryName);
-        //stock(125, "125ml35度中国劲酒", provName, cityName, countryName, color[0]);
-        //stock(258, "258ml35度中国劲酒", provName, cityName, countryName, color[1]);
-        //stock(520, "520ml35度中国劲酒", provName, cityName, countryName, color[2]);
+        //stock_rank();
+        //stock(125, "125ml35度中国劲酒", color[0]);
+        //stock(258, "258ml35度中国劲酒", color[1]);
+        //stock(520, "520ml35度中国劲酒", color[2]);
         
     }
     

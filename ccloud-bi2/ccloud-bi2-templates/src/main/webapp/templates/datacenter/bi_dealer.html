@@ -81,8 +81,8 @@
         }).done(function(data){
 
             var drTitle = '经销商销售排行';
-            if((provName + cityName + countryName).trim() != '' ){
-                drTitle = provName + cityName + countryName + drTitle;
+            if((provName + cityName).trim() != '' ){
+                drTitle = provName + cityName + drTitle;
             } else {
                 drTitle = '全国' + drTitle;
             }
@@ -199,7 +199,7 @@
         if (typeof param.seriesIndex != 'undefined') {
             var sellerName = param.name;
             var sellerId = sellerOption.series.sellerIdData[param.dataIndex];
-            seller_product(provName, cityName, '', dateType, sellerName, sellerId);
+            seller_product(dateType, sellerName, sellerId);
         }
     }*/
     
@@ -227,12 +227,12 @@
     }
     
     //直营商产品
-    /*function seller_product(provName, cityName, countryName, dateType, sellerName, sellerId){
+    /*function seller_product(dateType, sellerName, sellerId){
       Utils.loading();
       $.ajax({
             url:"${CPATH}/biSales/productBySeller",
             type:"post",
-            data:{provName: provName, cityName: cityName, countryName: countryName, dateType: dateType, sellerId: sellerId},
+            data:{provName: provName, cityName: cityName, countryName: '', dateType: dateType, sellerId: sellerId},
             dataType:"json"
         }).done(function(data){
 
