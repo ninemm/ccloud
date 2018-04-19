@@ -774,10 +774,11 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
 	public void synUser(){
 		String userId = getPara("userId");
+		String departmentType = getPara("departmentType");
 		User user = UserQuery.me().findById(userId);
-		Seller seller = SellerQuery.me().findByDeptId(user.getDepartmentId());
+		Department department = DepartmentQuery.me().findByDataArea(departmentType);
 		//获取部门下成员信息
-		ApiResult apiResult = ConUserApi.getDepartmentUserList(seller.getJpwxOpenId(), "1", "");
+		ApiResult apiResult = ConUserApi.getDepartmentUserList(department.getQywxDeptid(), "1", "");
 		boolean isExist = false;
 
 		if(!apiResult.getErrorCode().equals(0)) {
@@ -819,7 +820,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 			if(user.getAvatar() != null && user.getAvatar().length() != 0) json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
 
-			json = json + "\", \"department\": [" + seller.getJpwxOpenId() + "]," +
+			json = json + "\", \"department\": [" + department.getQywxDeptid() + "]," +
 					"\"position\": \"" + user.getStationId() +
 					"\", \"enable\":1, \"to_invite\": false," + "}";
 			ApiResult apiResult1 = ConUserApi.createUser(json);
