@@ -98,31 +98,15 @@
     }
 
     //搜索框监听
-
-    var cpLock = true;
-    var time;
-
-    $(document).on("compositionstart", "#searchInput", function() {
-        cpLock = false;
-    }).on("compositionend", "#searchInput", function() {
-        cpLock = true;
-        if(cpLock) {
-            clearTimeout(time);
-            time = setTimeout(function(){ 
-                page = 1;
-                $main.empty();
-                loadInventoryDetail();
-            },500);
-        }
-    }).on("input", "#searchInput", function() {
-        if(cpLock) {
-            clearTimeout(time);
-            time = setTimeout(function(){ 
-                page = 1;
-                $main.empty();
-                loadInventoryDetail();
-            },500);
-        }
+    $(document).on("submit", ".weui-search-bar__form", function() {
+        page = 1;
+        $main.empty();
+        loadInventoryDetail();
+        return false;
+    }).on("click", "#searchCancel", function() {
+        page = 1;
+        $main.empty();
+        loadInventoryDetail();
     });
     //监听滚动
     $(".infinite").infinite().on("infinite", function() {
@@ -146,7 +130,8 @@
     
     function loadInventoryDetail(){
 		$loading.show();
-		$noMore.hide();
+        $noMore.hide();
+        layer.open({type: 2,content: '加载中'});
 		var params = {
             "search": $("#searchInput")[0].value,
             "page": page,
@@ -160,7 +145,7 @@
 		Utils.ajax('${CPATH}/inventory/inventory', params, 
 			function(data) {
 				$loading.hide();
-				
+				layer.closeAll();
 				if(data.rows.length == 0) {
 					$noMore.show();
 					loading = true;

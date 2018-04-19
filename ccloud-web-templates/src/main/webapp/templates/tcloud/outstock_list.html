@@ -40,29 +40,12 @@
 			setItemBykey("endDate", $.today() + ' 23:59:59');    			
 		</#if>
 		
-		var cpLock = true;
-        var time;
-
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-        }).on("compositionend", "#searchInput", function() {
-            cpLock = true;
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-					setItemBykey("keyword", $("#searchInput").val());
-					combo();
-				},500);
-            }
-        }).on("input", "#searchInput", function() {
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-					setItemBykey("keyword", $("#searchInput").val());
-					combo();
-                },500);
-            }
-        }).on("click", "#searchCancel", function() {
+		$(document).on("submit", ".weui-search-bar__form", function() {
+			setItemBykey("keyword", $("#searchInput").val());
+			combo();
+			return false;
+		}).on("click", "#searchCancel", function() {
+			setItemBykey("keyword", $("#searchInput").val());
 			combo();
 		}).on("change", "#status", function() {
 			setItemBykey("status", $("#status").data('values'));
@@ -166,10 +149,12 @@
 		
 		$loading.show();
 		$noMore.hide();
+		layer.open({type: 2,content: '加载中'});
 		var params = getParam();
 		Utils.ajax('${CPATH}/outstock/outstockList', params,
 			function(data) {
 				$loading.hide();
+				layer.closeAll();
 				if(data.outstockList.length == 0) {
 					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;
@@ -312,7 +297,7 @@
 	
 	function combo() {
 		$main.empty();
-		loading = false;
+		loading = true;
 		page = 1;
 		loadOrderData();
 	}
@@ -430,11 +415,11 @@
 					</div>
 					<div class="none">
 						<a href="" id="outstockId">
-						<hr>
+						<div class="hr"></div>
 							<div class="appendOutstockProductDetail">
 
 							</div>
-							<hr>							
+							<div class="hr"></div>							
 							<div class="gray">
 								<p>
 									联系人：<span id="contact"></span>
@@ -448,7 +433,7 @@
 								</p>
 							</div>
 						</a>
-						<hr>
+						<div class="hr"></div>
 						<div id="allOut" class="button red-button fr">全部出库</div>
 <!--						<div id="partOut" class="button yellow-button fr m-r-5">部分出库</div>-->
 					</div>

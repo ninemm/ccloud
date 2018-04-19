@@ -1,0 +1,511 @@
+<#include "_inc/_layout.html"/>
+<#macro title>产品列表</#macro>
+<#macro css_import>
+    <link type='text/css' rel="stylesheet" href="${CTPATH}/css/swiper.min.css">
+</#macro>
+<#macro css>
+	.layui-m-layer {
+		z-index: 501!important;
+	}
+	#product {
+		bottom: 50px;
+	}
+	.product-content {
+		bottom: 2.25rem;
+	}
+
+	.icon-tags {
+		color: #ea6f5a;
+		font-size: .8rem;
+		margin-right: .2rem;
+		height: 100%;
+		line-height: 100%;
+	}
+
+	.weui-footer_fixed-bottom {
+		bottom: 50px;
+	}
+</#macro>
+<#macro script_import>
+	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
+	<script type='text/javascript' src="${CTPATH}/js/shopping-cart.js"></script>
+</#macro>  
+
+<#macro script>
+$(function() {
+	var cpLock = true;
+	var time;
+
+	$(document).on("compositionstart", "#searchInput", function() {
+		cpLock = false;
+	}).on("compositionend", "#searchInput", function() {
+		cpLock = true;
+		if(cpLock) {
+			clearTimeout(time);
+			time = setTimeout(function(){ 
+				keyword = $(this).val();
+				changeInit();
+			},500);
+		}
+	}).on("input", "#searchInput", function() {
+		if(cpLock) {
+			clearTimeout(time);
+			time = setTimeout(function(){ 
+				keyword = $("#searchInput").val();
+				changeInit();
+			},500);
+		}
+    }).on("click", "#sidebar li", function () {
+        $(this).addClass("active").siblings().removeClass("active");
+        var index = $(this).index();
+     	$('.type').eq(index).show().siblings('.type').hide();
+
+    }).on("click", ".product-content .swiper-slide", function () {
+        $(this).addClass("active").siblings().removeClass("active");
+		tag = $(this).text();
+		if(tag == '全部') {
+			tag = '';
+		}
+		changeInit();
+
+    }).on("click", "#searchCancel", function () {
+    	keyword = $(this).val();
+		changeInit();
+	}).on("click", "#searchClear", function () {
+	keyword = $(this).val();
+	changeInit();
+    }).on("click", "#shoppingCart", function () {
+    	shoppingCart();
+    	
+    }).on("click", "#placeOrder", function () {
+    	order();
+    	
+    }).on("click", ".operate:first-child", function () { //减少商品数量
+      productChange($(this));
+      
+    }).on("click", ".operate:last-child", function () { //增加商品数量
+      productChange($(this));
+      
+    }).on('click', '#confirm-input', function () {
+      var val = parseFloat($currentInput.val());
+      if(val < 0 || val == ""){
+        $currentInput.val(0);
+      }else{
+        $currentInput.val(val);
+      }
+      productChange($currentInput);
+
+    }).on("click", ".common .product-top .weui-cell__ft, #productName", function () {
+    	var $this = $(this).parents(".common");
+    	var productName = $this.find("#productName").text();
+    	var valueName = $this.find("#valueName").text();
+    	var description = $this.find("#description").val();
+    	var product_image_list_store = $this.find("#product_image_list_store").val();
+    	var product_sn = $this.find("#product_sn").val();
+    	var imageS = getImageS(product_image_list_store, product_sn);
+		var seller_name = $this.find("#seller_name").val();
+		var realname = $this.find("#realname").val();
+		var imgSwiper;
+		
+		layer.open({
+		  type: 1,
+		  title: ['商品详情',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+		  ],
+		  content: '<div class="swiper-container">' +
+			'<div class="swiper-wrapper">' + imageS + '</div>' +
+			'<div class="swiper-pagination"></div>' +
+			'</div>' +
+			'<p>名称：' + productName + '</p>' +
+			'<p>规格：' + valueName + '</p>' +
+			'<p>经销商：' + seller_name + '</p>' +
+			'<p>业务员：' + realname + '</p>' +
+			'<p>描述：' + description + '</p>',
+		  anim: 'scale',
+		  className: 'product-detail',
+		  success: function () {
+			imgSwiper = new Swiper('.product-detail .swiper-container', {
+				pagination: {
+					el: '.swiper-pagination',
+				},
+			})
+		  },
+		  btn: '关闭',
+		  end: function () {
+			imgSwiper.destroy();
+		  }
+		});
+	});
+
+    firstInit();
+    total();
+});
+
+var tag = '';
+var keyword = '';
+var newHtml = $(".common").eq(0).html();
+var $tags = $("#tags");
+var $sidebar = $("#sidebar ul");
+var $menuRight = $(".menu-right");
+
+function firstInit(){
+	Utils.ajax('${CPATH}/member/product/productList', {'tag' : tag, 'keyword' : keyword},
+		function(data){
+			initTags(data.tags);
+			combo(data.productList);
+		}
+	);
+}
+
+function changeInit(){
+	layer.open({
+		type: 2,
+		content: '加载中...'
+	});
+
+	$sidebar.empty();
+	$menuRight.empty();
+	Utils.ajax('${CPATH}/member/product/productList', {'tag' : tag, 'keyword' : keyword},
+		function(data){
+			layer.closeAll();
+			combo(data.productList);
+		}
+	);
+}
+
+function combo(productList){
+	initProduct(productList);
+	productNum();
+	calTotal();
+}
+
+function initTags(tags) {
+	$tags.empty();
+	$tags.append("<div class='swiper-slide active'>全部</div>")
+	$.each(tags, function (index, el) {
+		$tags.append("<div class='swiper-slide'>" + el + "</div>");
+	});
+
+	var mySwiper = new Swiper('.product-content .swiper-container', {
+		slidesPerView: 4,
+	})
+}
+
+function initProduct(productList){
+	var categoryId = '';
+
+	$.each(productList, function(index, el) {
+		if(categoryId != el.categoryId) {
+			if(categoryId == '') {
+				$sidebar.append("<li id='" + el.categoryId + "' class='active'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+				$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
+			} else {
+				$sidebar.append("<li id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
+			}
+			categoryId = el.categoryId;
+		}
+
+		var $type = $menuRight.find(".type:last");
+		$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
+		var $newProductDetail = $type.find(".common:last");
+		$newProductDetail.find("#productName").text(el.custom_name);
+		$newProductDetail.find("#valueName").text(el.valueName);
+		
+		var bigPrice = el.price;
+		var convert = el.convert_relate;
+		var smallPrice = (bigPrice / convert).toFixed(2);
+
+		var bigCost = el.cost;
+		var smallCost = (bigCost / convert).toFixed(2);
+		var bigAccountPrice = el.account_price;
+		var smallAccountPrice = (bigAccountPrice / convert).toFixed(2);
+
+		$newProductDetail.find("#bigPriceSpan").text('￥' + bigPrice);
+		$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
+		$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
+		$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
+		$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
+
+		$newProductDetail.find("#bigCost").val(bigCost);
+		$newProductDetail.find("#smallCost").val(smallCost);
+		$newProductDetail.find("#bigAccountPrice").val(bigAccountPrice);
+		$newProductDetail.find("#smallAccountPrice").val(smallAccountPrice);
+
+		$newProductDetail.find("#bigPrice").val(bigPrice);
+		$newProductDetail.find("#smallPrice").val(smallPrice);
+		$newProductDetail.find("#bigUnit").val(el.big_unit);
+		$newProductDetail.find("#smallUnit").val(el.small_unit);
+		$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+		$newProductDetail.find("#productId").val(el.product_id);
+		$newProductDetail.find("#convert").val(el.convert_relate);
+
+		$newProductDetail.find("#sellerId").val(el.seller_id);
+
+		$newProductDetail.find("#description").val(el.description);
+
+		$newProductDetail.find("#image").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
+		$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
+		$newProductDetail.find("#product_sn").val(el.product_sn);
+		$newProductDetail.find("#seller_name").val(el.seller_name);
+		$newProductDetail.find("#realname").val(el.realname);
+	});
+}
+
+function productNum(){
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+		$.each(productList, function(index, el){
+			var $newProductDetail =$("#" + el.sellProductId);
+			$newProductDetail.find("#bigNum").val(el.bigNum);
+			$newProductDetail.find("#smallNum").val(el.smallNum);
+		});
+}
+
+function getImageUrl(product_image_list_store, product_sn) {
+	var imageUrl = "${CTPATH}/images/jp.jpg";
+	$.each(JSON.parse(product_image_list_store), function(index, el) {
+		if(el.imgName.indexOf(product_sn + "_1") != -1) {
+			imageUrl = el.savePath;
+			return false;
+		}
+	});
+
+	return imageUrl;
+}
+
+function getImageS(product_image_list_store, product_sn) {
+	var images = "";
+	$.each(JSON.parse(product_image_list_store), function(index, el) {
+		if(el.imgName.indexOf(product_sn) != -1) {
+			images += "<div class='swiper-slide'><img src='" + el.savePath + "' onerror=\"" + "javascript:this.src='${CTPATH}/images/jp.jpg'" + "\" onClick='imageClick(this)'></div>";
+		}
+	});
+
+	return images != "" ? images : "<div class='swiper-slide'><img src='" + "${CTPATH}/images/jp.jpg" +"' onClick='imageClick(this)'></div>";
+}
+
+var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
+function imageClick(obj){
+	$this = $(obj);
+	var style = "background-image: url(" + $this.attr("src") + ")";
+	$galleryImg.attr("style", style);
+	$gallery.fadeIn(100);
+}
+
+$gallery.on("click", function() {
+	$gallery.fadeOut(100);
+});
+
+function calTotal() {
+ 	var types = $(".type");
+  
+	$.each(types, function(typeIndex, typeEl) {
+		var total = 0;
+		var $typeEl = $(typeEl);
+		var id = $typeEl.attr('id');
+		var products = $typeEl.find('.product_detail')
+		$.each(products, function(index, el) {
+			var $el = $(el);
+			total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
+		});
+
+		var $total = $sidebar.find("#" + id + " .goods-num");
+		if (total > 0) {
+		    $total.show().text(total);
+		} else {
+		    $total.hide().text(total);
+		}
+	});
+}
+
+function productChange(obj){
+      var $el = obj.parents(".common");
+      if($el.length > 0){
+      	var product = getProduct($el);
+      	cart.changeProduct(product);
+      }
+      calTotal();
+      total();
+}
+
+function getProduct($el){
+	return product = {
+		productName : $el.find("#productName").text(),
+		valueName : $el.find("#valueName").text(),
+		
+		bigPriceSpan : $el.find("#bigPriceSpan").text(),
+		smallPriceSpan : $el.find("#smallPriceSpan").text(),
+		bigUnitSpan : $el.find("#bigUnitSpan").text(),
+		smallUnitSpan : $el.find("#smallUnitSpan").text(),
+		stock : $el.find("#stock").text(),
+
+		bigCost : $el.find("#bigCost").val(),
+		smallCost : $el.find("#smallCost").val(),
+		bigAccountPrice : $el.find("#bigAccountPrice").val(),
+		smallAccountPrice : $el.find("#smallAccountPrice").val(),
+
+		bigPrice : $el.find("#bigPrice").val(),
+		smallPrice : $el.find("#smallPrice").val(),
+		bigUnit : $el.find("#bigUnit").val(),
+		smallUnit : $el.find("#smallUnit").val(),
+		sellProductId : $el.find("#sellProductId").val(),
+		sellerId : $el.find("#sellerId").val(),
+		productId : $el.find("#productId").val(),
+		convert : $el.find("#convert").val(),
+
+		bigNum : $el.find("#bigNum").val(),
+		smallNum : $el.find("#smallNum").val(),
+		isGift : 0
+	}
+}
+
+function total(){
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");;
+	var total = 0;
+	$.each(productList, function(index, el) {
+		if(el.isGift == 0) {
+			total += el.bigNum * el.bigPrice;
+			total += el.smallNum * el.smallPrice;
+		}
+	});
+
+	$("#totalNum").text("共" + (productList.length) + "款,合计:" + total + "元")
+
+} 
+
+function shoppingCart(){	
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+	
+	if(productList.length == 0) {
+		$.toptip("你还没有选择商品!", 'warning'); 
+		return;
+	}
+	window.location.href = '${CPATH}/member/product/shoppingCart';
+}
+
+function order(){
+	var productList = getItemBykey("productList") == undefined ? [] : getItemBykey("productList");
+
+	if(productList.length == 0) {
+		$.toptip("你的购物车内没有商品!", 'warning'); 
+		return;
+	}
+	window.location.href = '${CPATH}/member/product/order';
+}
+
+</#macro>
+
+<@layout>
+<div class="weui-content">
+	<div id="product">
+		<header>
+			<div class="weui-search-bar" id="searchBar">
+				<form class="weui-search-bar__form">
+					<div class="weui-search-bar__box">
+						<i class="weui-icon-search"></i> <input type="search"
+							class="weui-search-bar__input" id="searchInput" placeholder="搜索"
+							required=""> <a href="javascript:"
+							class="weui-icon-clear" id="searchClear"></a>
+					</div>
+					<label class="weui-search-bar__label" id="searchText"> <i
+						class="weui-icon-search"></i> <span>请输入商品名称</span>
+					</label>
+				</form>
+				<a href="javascript:" class="weui-search-bar__cancel-btn"
+					id="searchCancel">取消</a>
+			</div>
+		</header>
+		<div class="product-content">
+			<div class="swiper-container t-c">
+				<div class="swiper-wrapper" id="tags">
+					<div class="swiper-slide active">全部</div>
+				</div>
+			</div>
+			<div class="product-inner-content">
+				<aside>
+					<div id="sidebar" class="menu-left">
+						<ul>
+			
+						</ul>
+					</div>
+				</aside>		
+				<article class="menu-right">
+					<div class="" style="display: none">
+						<section class="product_detail weui-panel weui-panel_access common">
+							<div>
+								<input type="hidden" id="sellerId" value="">
+								<input type="hidden" id="sellProductId" value="">
+								<input type="hidden" id="productId" value="">
+								<input type="hidden" id="convert" value="">
+								<input type="hidden" id="bigPrice" value="">
+								<input type="hidden" id="smallPrice" value="">
+								<input type="hidden" id="bigUnit" value="">
+								<input type="hidden" id="smallUnit" value="">
+								<input type="hidden" id="bigCost" value="">
+								<input type="hidden" id="smallCost" value="">
+								<input type="hidden" id="bigAccountPrice" value="">
+								<input type="hidden" id="smallAccountPrice" value="">
+								<input type="hidden" id="isGift" value="0">
+								<input type="hidden" id="description" value="0">
+								<input type="hidden" id="product_image_list_store" value="">
+								<input type="hidden" id="product_sn" value="">
+								<input type="hidden" id="seller_name" value="">
+								<input type="hidden" id="realname" value="">
+								<div class="product-top">
+									<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
+									<div class="weui-cell_access product-top-right">
+										<p class="product_name" id="productName"></p>
+										<div class="product_unit">
+											<p>规格：</p>
+											<span id="valueName"></span>
+										</div>
+										<span class="weui-cell__ft"></span>
+									</div>
+								</div>
+								<div class="product_bUnit">
+									<span class="price" id="bigPriceSpan"></span>
+									<span class="unit" id="bigUnitSpan"></span>
+									<div class="spinner">
+										<div class="operate fl">
+											<i class="icon-minus2"></i>
+										</div>
+										<input type="number" min="0" value="0" class="fl" id="bigNum">
+										<div class="operate fl">
+											<i class="icon-plus2"></i>
+										</div>
+									</div>
+								</div>
+								<div class="product_mUnit">
+									<span class="price" id="smallPriceSpan"></span>
+									<span class="unit" id="smallUnitSpan"></span>
+									<div class="spinner">
+										<div class="operate fl">
+											<i class="icon-minus2"></i>
+										</div>
+										<input type="number" min="0" value="0" class="fl" id="smallNum">
+										<div class="operate fl">
+											<i class="icon-plus2"></i>
+										</div>
+									</div>
+								</div>
+								<div id="stock"></div>
+							</div>
+						</section>
+					</div>
+				</article>
+			</div>
+		</div>
+		</div>
+		<div class="weui-gallery" id="gallery">
+			<span class="weui-gallery__img" id="galleryImg"></span>
+			<div class="weui-gallery__opr">
+			</div>
+		</div>
+</div>
+<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
+	<p class="total bg-white weui-flex__item" id="totalNum"></p>
+<!--	<button id="shoppingCart" class="place-order yellow-button white">购物车</button>-->
+	<button id="placeOrder" class="place-order red-button white">下单</button>
+</footer>
+<#include "_inc/_member_footer_nav.html" />
+</@layout>

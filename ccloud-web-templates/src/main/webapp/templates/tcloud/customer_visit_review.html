@@ -150,11 +150,11 @@
 
 		layer.open({
 		type: 1,
-		title: ['客户审核',
+		title: ['客户拜访审核',
 			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
 		],
 		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
-			'<p class="t-c">是否确认通过该客户审核？</p>',
+			'<p class="t-c">是否确认通过该客户拜访审核？</p>',
 		anim: 'scale',
 		className: 'audit',
 		btn: ['通过','取消'],
@@ -175,11 +175,11 @@
 
 		layer.open({
 		type: 1,
-		title: ['客户审核',
+		title: ['客户拜访审核',
 			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem;margin-top:2.5rem'
 		],
 		content: '<img src="${CTPATH}/images/image_orderpopups.png">' +
-			'<p class="t-c">是否确认拒绝该客户审核？</p>',
+			'<p class="t-c">是否确认拒绝该客户拜访审核？</p>',
 		anim: 'scale',
 		className: 'audit',
 		btn: ['确认','取消'],
@@ -313,8 +313,8 @@
                            			<hr style="border:1px dashed #0000fff"/>
                   						 <div class="weui-uploader__bd">
                        					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
-				                            <#if (customerVisit.imageList) ??>
-			                                <#list customerVisit.imageList as bean>
+				                            <#if (customerVisit.photoList) ??>
+			                                <#list customerVisit.photoList as bean>
 		                            			<#if (list.orderList == bean.orderList)>
 			                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
 		                            			</#if>
@@ -324,10 +324,10 @@
                   						 </div>
                   						 <hr style="border:1px dashed #0000fff"/>
                            		</#list>
-                          		<#else> 
+                          		<#else>
                          				<div class="weui-uploader__bd">
                       					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
-	                            		<#list customerVisit.imageList as bean>
+	                            		<#list customerVisit.photoList as bean>
 		                                   	<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
 		                                </#list>
 	                                </ul>
@@ -395,7 +395,7 @@
                                 <ul class="weui-uploader__files" id="uploaderFiles"></ul>
                                 <div class="weui-uploader__input-box">
                                     <div class="weui-uploader__input-box">
-                                        <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple="" capture="camera">
+                                        <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" multiple>
                                         <input type="hidden" name="pic" id="pic">
                                     </div>
                                 </div>

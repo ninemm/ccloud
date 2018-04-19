@@ -165,6 +165,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		for (Record record : records) {
 			orderProductInfo orderProductInfo = new orderProductInfo();
 			orderProductInfo.setProductName(record.getStr("custom_name"));//产品名称		
+			orderProductInfo.setValueName(record.getStr("valueName"));//产品规格		
 			orderProductInfo.setBarCode(record.getStr("bar_code"));//条码
 			orderProductInfo.setBigUnit(record.getStr("big_unit"));//产品大单位
 			orderProductInfo.setSmallUnit(record.getStr("small_unit"));//产品小单位
@@ -324,11 +325,13 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		if (!receivablesDetail.save()) {
 			return false;
 		}
-
-		//更新计划
-		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
-		if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
-			return false;
+		String isGift = StringUtils.getArrayFirst(paraMap.get("_isGift" + index));
+		if(isGift.equals("0")) {
+			//更新计划
+			BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
+			if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
+				return false;
+			}
 		}
 		
 		return true;
@@ -336,14 +339,13 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 
 	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
 
-		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
-		for (Plans plan : plans) {
-			BigDecimal planNum = plan.getPlanNum();
-			BigDecimal completeNum = productCount.add(plan.getCompleteNum());
-			plan.setCompleteNum(completeNum);
-			plan.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
-			plan.setModifyDate(new Date());
-			if(!plan.update()){
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
+		for (PlansDetail plansDetail : plansDetails) {
+			BigDecimal planNum = plansDetail.getPlanNum();
+			BigDecimal completeNum = productCount.add(plansDetail.getCompleteNum());
+			plansDetail.setCompleteNum(completeNum);
+			plansDetail.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
+			if(!plansDetail.update()){
 				return  false;
 			}
 		}

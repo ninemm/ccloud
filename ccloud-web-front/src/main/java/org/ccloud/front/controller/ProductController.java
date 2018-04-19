@@ -16,10 +16,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Dict;
-import org.ccloud.model.User;
-import org.ccloud.model.Warehouse;
+import org.ccloud.model.*;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
@@ -42,46 +39,42 @@ public class ProductController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
-		List<Record> productRecords = new ArrayList<>();
-		if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
-			productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId());
-		} else {
-			productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
-		}
+		
 		List<Record> compositionRecords = ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
 
 		List<Map<String, Object>> productList = new ArrayList<Map<String, Object>>();
 		List<Map<String, Object>> compositionList = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> goodsCategory=new ArrayList<Map<String, Object>>();
 		
-		Set<String> tagSet = new LinkedHashSet<String>();
+		Set<String> tagSet = SellerProductQuery.me().findTagsBySellerId(sellerId);
+		
+		List<Record> goodsCategoryList=GoodsCategoryQuery.me().findBySellerId(sellerId,"");
+		List<Record> productRecords = new ArrayList<>();
+		if (goodsCategoryList.size()>0) {
+			if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
+				productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),goodsCategoryList.get(0).getStr("categoryId"));
+			} else {
+				productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",goodsCategoryList.get(0).getStr("categoryId"));
+			}
+		}
+		
+		for (Record record : goodsCategoryList) {
+			goodsCategory.add(record.getColumns());
+		}
 		
 		for (Record record : productRecords) {
 			productList.add(record.getColumns());
-			String tags = record.getStr("tags");
-			if (StrKit.notBlank(tags)) {
-				String[] tagArray = tags.split(",", -1);
-				for (String tag : tagArray) {
-					tagSet.add(tag);
-				}
-			}
 		}
 		
 		for (Record record : compositionRecords) {
 			compositionList.add(record.getColumns());
-			String tags = record.getStr("tags");
-			if (StrKit.notBlank(tags)) {
-				String[] tagArray = tags.split(",", -1);
-				for (String tag : tagArray) {
-					tagSet.add(tag);
-				}
-			}
 		}
 		
 		setAttr("refund", refund);
 		setAttr("productList", JSON.toJSON(productList));
+		setAttr("goodsCategory", JSON.toJSON(goodsCategory));
 		setAttr("compositionList", JSON.toJSON(compositionList));
 		setAttr("tags", JSON.toJSON(tagSet));
-
 		render("product.html");
 	}
 
@@ -90,12 +83,16 @@ public class ProductController extends BaseFrontController {
 
 		String keyword = getPara("keyword");
 		String tag = getPara("tag");
-
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag);
+		String categoryId = getPara("categoryId");
+		List<Record> goodsCategory=GoodsCategoryQuery.me().findBySellerId(sellerId,tag);
+		
+		List<Record> productList = new ArrayList<>();
+		if (!StrKit.notBlank(categoryId)) {
+			categoryId=goodsCategory.get(0).getStr("categoryId");
+		}
+		productList=	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId);
 		List<Record> compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword, tag);
-		
 		Set<String> tagSet = new LinkedHashSet<String>();
-		
 		for (Record record : productList) {
 			String tags = record.getStr("tags");
 			if (tags != null) {
@@ -106,7 +103,7 @@ public class ProductController extends BaseFrontController {
 			}
 		}
 		
-		Map<String, Collection<? extends Serializable>> map = ImmutableMap.of("productList", productList, "compositionList", compositionList, "tags", tagSet);
+		Map<String, Collection<? extends Serializable>> map = ImmutableMap.of("productList", productList, "compositionList", compositionList, "tags", tagSet,"goodsCategory",goodsCategory);
 		renderJson(map);
 	}
 
@@ -114,7 +111,7 @@ public class ProductController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "");
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","");
 
 		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
@@ -227,10 +224,14 @@ public class ProductController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		String userId = getPara("userId");
 		String customerTypeId = getPara("customerTypeId");
-		String isOrdered = getPara("isOrdered");
-		String provName = getPara("provName", "");
-		String cityName = getPara("cityName", "");
-		String countryName = getPara("countryName", "");
+//		String isOrdered = getPara("isOrdered");
+//		String provName = getPara("provName", "");
+//		String cityName = getPara("cityName", "");
+//		String countryName = getPara("countryName", "");
+
+		if (StrKit.notBlank(userId)) {
+			selectDataArea = UserQuery.me().findById(userId).getDataArea() + "%";
+		}
 
 		String customerKind = "";
 		Subject subject = SecurityUtils.getSubject();
@@ -242,9 +243,9 @@ public class ProductController extends BaseFrontController {
 			customerKind = Consts.CUSTOMER_KIND_SELLER;
 		}
 
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		Page<Record> customerList = SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
-				selectDataArea, dealerDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
+		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(getPageNumber(), getPageSize(), selectDataArea, customerTypeId, keyword, customerKind);
+//				SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
+//				selectDataArea, dealerDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
 
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
@@ -290,7 +291,7 @@ public class ProductController extends BaseFrontController {
 		String lat = getPara("lat");
 
 		if(getPara("dist")!=null)
-			dist = Double.valueOf(getPara("nearby", "100")).doubleValue();
+			dist = Double.valueOf(getPara("dist", "100")).doubleValue();
 
 
 		BigDecimal latitude = new BigDecimal(lat);

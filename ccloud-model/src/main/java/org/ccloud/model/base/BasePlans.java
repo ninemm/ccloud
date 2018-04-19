@@ -154,6 +154,14 @@ public abstract class BasePlans<M extends BasePlans<M>> extends JModel<M> implem
 		return get("complete_ratio");
 	}
 
+	public void setPlansMonth(java.util.Date plansMonth) {
+		set("plans_month", plansMonth);
+	}
+
+	public java.util.Date getPlansMonth() {
+		return get("plans_month");
+	}
+
 	public void setStartDate(java.util.Date startDate) {
 		set("start_date", startDate);
 	}

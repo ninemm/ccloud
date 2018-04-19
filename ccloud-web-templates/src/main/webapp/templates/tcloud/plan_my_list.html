@@ -1,0 +1,288 @@
+<#include "_inc/_layout.html"/>
+<#macro title>业务员计划列表</#macro>
+<#macro css>
+	#my-order {
+		position: absolute;
+		top: 153px;
+		bottom: 0;
+		width: 100%;
+	}
+</#macro>
+<#macro script>	
+	$(function() {
+		$(".plansShow").css('display','none');
+		combo();
+	});
+	$("#datetime-picker").datetimePicker({
+				times: function () {
+		          return [];
+		        }
+			});
+	$("#datetime-picker").click(function(){
+			$(".picker-items-col:nth-child(5)").hide();
+			$(".picker-items-col:nth-child(4)").hide();
+		});
+	$("#datetime-picker").change(function(){
+		var datePicker = $("#datetime-picker").val();	
+		$("#datetime-picker").val(datePicker.substring(0,7));
+	});
+	$(document).on("click", ".close-picker", function() {
+		var datePicker = $("#datetime-picker").val();
+		$("#datetime-picker").val(datePicker.substring(0,7));
+		planAmount = 0;
+		completeAmount = 0;
+		 combo();
+	});
+	var page = 1;
+	var size = 10;
+	var planAmount = 0;
+	var completeAmount = 0;
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		planAmount = 0;
+		completeAmount = 0;
+		combo();
+		return false;
+	}).on("click", "#searchCancel", function() {
+		planAmount = 0;
+		completeAmount = 0;
+		combo();
+	}).on("change", "#sellerProductId", function() {
+		combo();
+	}).on("click", "#confirm", function() {
+		startDate = $('#start-date').val();
+		endDate = $('#end-date').val();
+		combo();
+	});
+
+	/*$("#type").select({
+		title: "选择计划类型",
+		items: [{
+			title: "周计划", value: "101201"
+		},{
+			title: "月计划", value: "101202"
+		},{
+			title: "年计划", value: "101203"
+		}]
+	});*/
+	$("#sellerProductId").select({
+		title: "选择产品",
+		items: ${sellerProducts!}
+	});
+	$("#start-date").calendar({
+		maxDate: function() {
+			return $('#end-date').val()
+		}
+	});
+	$("#start-date").val($.today());
+	$("#end-date").calendar({
+		minDate: function() {
+			var date = new Date($('#start-date').val().replace(/-/g,"/"));
+			date.setDate(date.getDate() - 1);
+			return date.Format("yyyy-MM-dd")
+		}
+	});
+	$("#end-date").val($.today());
+
+	var $planList = $(".planList");
+	var newHtml = $(".planList").html();
+	var $loading = $("#loading");
+	var $noMore = $("#noMore");
+
+	var loading = false;
+	var startDate = '';
+	var endDate = '';
+	function loadPlanData() {
+
+		$loading.show();
+		$noMore.hide();
+		layer.open({type: 2,content: '加载中'});
+		var dd = $("#datetime-picker").val();
+		var params = {
+			"page": page,
+			"size": size,
+			"keyword": $("#searchInput").val(),
+//			"type": $("#type").data('values'),
+			"type": "101202",
+			"show":$("#show").data('values'),
+			"datetimePicker" : $("#datetime-picker").val(),
+			"sellerProductId": $("#sellerProductId").data('values'),
+			"startDate": startDate,
+			"endDate": endDate
+		}
+		Utils.ajax('${CPATH}/plans/myPlanList', params,
+			function(data) {
+				$loading.hide();
+				layer.closeAll();
+				$("#planAmount").html("");
+				$("#completeAmount").html("");
+				if(data.planList.length == 0) {
+					if($('.planList').length == 0) $noMore.show();
+					loading = true;
+					$("#planAmount").text(planAmount.toFixed(2));
+					$("#completeAmount").text(completeAmount.toFixed(2));
+					return;
+				}
+				$.each(data.planList, function(index, el) {
+					$planList.append(newHtml);
+					var $newPlan = $planList.find(".plan-list-box:last");
+					$newPlan.find("#productName").text(el.custom_name)
+					$newPlan.find("#startDate").text('开始时间：'+el.start_date);
+					$newPlan.find("#endDate").text('结束时间：'+el.end_date);
+					$newPlan.find("#planNum").text(el.plan_num);
+					$newPlan.find("#completeNum").text(el.complete_num);
+					$newPlan.find("#completeRatio").text(el.complete_ratio+"%");
+					$(".plansShow").hide();
+					planAmount += el.planNumAmount;
+					completeAmount += el.completeNumAmount;
+				});
+				$("#planAmount").text(planAmount.toFixed(2));
+				$("#completeAmount").text(completeAmount.toFixed(2));
+				page++;
+				loading = false;
+			}
+		);
+		
+	}
+	
+	//滑动方法
+	$("main").infinite().on("infinite", function() {
+		if(loading) {
+			return;
+		}
+		loading = true;
+		loadPlanData();
+	});
+
+	function combo() {
+		planAmount = 0;
+		completeAmount = 0;
+		$planList.empty();
+		loading = true;
+		page = 1;
+		loadPlanData();
+	}
+
+</#macro>
+<@layout>
+<div class="weui-content">
+	<div class="report-top weui-flex">
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div class="border-right-1px">
+                <p class="ft16">计划金额</p>
+                <p class="ft14" id="planAmount"></p>
+            </div>
+        </div>
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div>
+                <p class="ft16">完成金额</p>
+                <p class="ft14" id="completeAmount"></p>
+            </div>
+        </div>
+        
+    </div>
+	<header>
+		<div class="weui-search-bar" id="SearchBar">
+			<form class="weui-search-bar__form">
+				<div class="weui-search-bar__box">
+					<i class="weui-icon-search"></i>
+					<input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+					<a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+				</div>
+				<label class="weui-search-bar__label" id="searchText">
+					<i class="weui-icon-search"></i>
+					<span>请输入产品名称</span>
+				</label>
+			</form>
+			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+		</div>
+	</header>
+	<article id="my-order" class="ft14">
+		<header class="has-th-list weui-flex">
+			<div class="head-search select-area weui-flex__item">
+					<div class="weui-flex__item">
+						<input type="text" id="sellerProductId" placeholder="产品" class="weui-input" readonly>
+						<i class="icon-sort-desc"></i>
+					</div> 
+					 <div class="weui-flex__item">
+						<input type="text" class="weui-input fr" id='datetime-picker'  readonly="" placeholder="计划月份"/>
+						<i class="icon-sort-desc"></i>
+					</div> 
+			</div>
+		</header>
+		<main>
+			<div class="ft12 planList">
+				<div class="plan-list-box">
+					<div class="weui-cells mg-0">
+						<div class="weui-cell">
+							<div class="weui-cell__bd">
+								<div class="weui-cell">
+									<div class="weui-cell__bd t-c" id="productName" style = "font-size:16px;">
+									</div>
+								</div>
+								<div class="weui-flex gray ft12 startEnd">
+									<div class="weui-flex__item">
+										<span id="startDate"></span>
+									</div>
+									<span style="width:1rem" class="t-c">-</span>
+									<div class="weui-flex__item t-r">
+										<span id="endDate"></span>
+									</div>
+								</div>
+								<div class="weui-cell">
+									<div class="weui-cell__bd weui-flex t-c">
+										<div class="weui-flex__item">
+											<p style = "font-size:12px;">计划数量</p>
+											<p id="planNum" style = "font-size:12px;"></p>
+										</div>
+										<div class="weui-flex__item">
+											<p style = "font-size:12px;">完成数量</p>
+											<p id="completeNum" style = "font-size:12px;"></p>
+										</div>
+										<div class="weui-flex__item">
+											<p style = "font-size:12px;">完成比率</p>
+											<p id="completeRatio" style = "color:red;font-size:12px;font-weight:bold;"></p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="plansShow">
+							
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="weui-loadmore" id="loading" style="display: none;">
+				<i class="weui-loading"></i>
+				<span class="weui-loadmore__tips">正在加载</span>
+			</div>
+			<div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+				<span class="weui-loadmore__tips">暂无数据</span>
+			</div>
+		</main>
+	</article>
+</div>
+<article id="combin-filter" >
+	<div class="filter-item">
+		<h4>日期区间</h4>
+		<div class="relative weui-flex" id="getDate">
+			<input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+			<div style="width:1rem" class="t-c">—</div>
+			<input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+		</div>
+	</div>
+	<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+            <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+            <button class="red-button confirm-search-btn weui-flex__item" id="confirm">确定</button>
+	</footer>
+</article>
+<!-- <@shiro.hasPermission name="/admin/plans/add">
+<a class="hidden-menu" href="${CPATH}/plans">
+	<img src="${CTPATH}/images/order_add.png" alt="">
+</a>
+</@shiro.hasPermission> -->
+<div class="layer"></div>
+<#include "_inc/_goback_bottom.html" />
+</@layout>

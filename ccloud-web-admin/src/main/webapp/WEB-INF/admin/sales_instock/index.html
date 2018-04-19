@@ -85,7 +85,7 @@
 				sortable: true},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%', edit:false,sortable: true},
 				<@shiro.lacksRole name="021"> 
-				{field: "total_reject_amount", title: "订单总额", align: "center", width: '5%',
+				{field: "rejectAmount", title: "订单总额", align: "center", width: '5%',
 					formatter: function(value,row,rowIndex){
 						return formatNumber(value);
 					},

@@ -274,7 +274,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			String keyword = getPara("k");
 			String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 			String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
-					+ "salesRefundInfo.xlsx";
+					+ "销售退货.xlsx";
 			Page<Record> page = SalesRefundInstockQuery.me().paginate(1,Integer.MAX_VALUE, keyword, startDate,
 					endDate, null,null, dataArea,null,null);
 			List<Record> salesRefundList = page.getList();
@@ -371,7 +371,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			
 			ExportParams params = new ExportParams();
 			Workbook wb = ExcelExportUtil.exportBigExcel(params, SalesRefundExcel.class, excellist);
-			File file = new File(filePath);
+			File file = new File(filePath.replace("\\", "/"));
 			FileOutputStream out = null;
 			try {
 				out = new FileOutputStream(file);
@@ -389,7 +389,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			
 			ExcelExportUtil.closeExportBigExcel();
 			
-			renderFile(new File(filePath));
+			renderFile(new File(filePath.replace("\\", "/")));
 		}
 		
 		public void operateHistory() {

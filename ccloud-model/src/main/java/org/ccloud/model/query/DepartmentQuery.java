@@ -35,9 +35,7 @@ import org.ccloud.model.Warehouse;
 
 import com.google.common.collect.Lists;
 import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -687,5 +685,7 @@ public class DepartmentQuery extends JBaseQuery {
 		}
 		return childList;
 	}
+
+	
 
 }

@@ -331,7 +331,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
 					if (StrKit.notBlank(sellProductId)) {
 						if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, date, deptId, dataArea, index,
-								user.getId(), outStockSN, wareHouseId, sellProductId, sellerCustomerId, order_user, order_date)) {
+								user.getId(),
+								outStockSN, wareHouseId, sellProductId, sellerCustomerId, order_user, order_date)) {
 							return false;
 						}
 						count++;
@@ -559,7 +560,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
-				+ "salesOutstockInfo.xlsx";
+				+ "销售出库.xlsx";
 
 		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
 				printStatus, stockOutStatus, null, dataArea, null, null,null,null);
@@ -611,7 +612,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, SalesOutstockExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -629,7 +630,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		ExcelExportUtil.closeExportBigExcel();
 
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}
 	
 	public SalesOutstockExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit) {
@@ -651,13 +652,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		excel.setSaveDate(saveDate);
 		excel.setCreateDate(createDate);
 		excel.setPrintDate(printDate);
-		if (record.get("realname") == null) {
+		if (record.get("bizName") == null) {
 			excel.setBizUser("");
 		} else {
-			excel.setBizUser(record.getStr("realname"));
+			excel.setBizUser(record.getStr("bizName"));
 		}
 		if (record.get("receive_type").toString().equals("0")) {
-			excel.setReceiveType("应收账款");
+			excel.setReceiveType("账期");
 		} else {
 			excel.setReceiveType("现金");
 		}

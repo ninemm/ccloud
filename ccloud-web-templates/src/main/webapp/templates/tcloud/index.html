@@ -101,7 +101,7 @@
 			</div>
 		</#if>
 		</div>
-		<@cc.contents module="article" count="5" orderBy="created" typeSlug="notice" sellerId="${(session.sellerId)!}">
+		<@cc.contents module="article" count="5" orderBy="created" typeSlug="notice,system" sellerId="${(session.sellerId)!}">
         <#if (contents ??) && (contents?size > 0)>
 		<div class="notice weui-cell_access">
             <span class="notice-icon"><i class="icon-volume ft16"></i></span>

@@ -50,7 +50,12 @@ Utils = {
             		callback(res);
             },
             error: function(res) {
-            	toastr.error(res.message);
+				if (res.message) {
+					toastr.error(res.message);
+				} else {
+					toastr.error('失败，请重试');
+				}
+            	
             }
         });
 	},
@@ -283,8 +288,8 @@ function wxLocation() {
                                             $.cookie(Utils.cityCacheName, addComp.city, { expires: 7 });
                                             $.cookie(Utils.countryCacheName, addComp.district, { expires: 7 });
 
-                                            df.resolve();
-
+											df.resolve();
+											
                                         });
                                 };
                             },
@@ -420,4 +425,17 @@ $(function() {
 	}).on('click', '.return_index', function() {
 		location.href = "/";
 	});
+
+	if ($(".hidden-menu")[0]) {
+		var rightMenu = new Headroom($(".hidden-menu")[0], {
+			tolerance: 5,
+			classes: {
+				initial: "animated",
+				pinned: "slideInRight",
+				unpinned: "slideOutRight"
+			},
+			scroller: $('.menu-right, main, .infinite')[0]
+		});
+		rightMenu.init();
+	}
 })

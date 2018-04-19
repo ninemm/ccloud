@@ -34,12 +34,12 @@
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
-		jQuery.mm.initEditTableExport('#_inventoryDetail_table', url, initParams, initFields(), null);
+		jQuery.mm.initEditTableExport('#_inventoryDetail_table', url, initParams, initFields(), null,null,"库存详情");
 		$('button[title^=Export]').html('导出').addClass('btn-primary btn-sm');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');
+		
 	});
-	
 	var initParams = function(params) {
 		var keyword = $('#post-search-input').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
@@ -51,7 +51,6 @@
 			endDate: $('#endDate').val() + " 23:59:59",
 			sortName:params
 		};
-		console.log(params);
 		return param;
 	};
 	

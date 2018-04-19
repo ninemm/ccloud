@@ -20,6 +20,7 @@ import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -46,6 +47,7 @@ import org.ccloud.model.compare.BeanCompareUtils;
 import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerExcel;
 import org.ccloud.model.vo.CustomerVO;
+import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -72,19 +74,20 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 	@RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void list() {
-
+		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sort = getPara("sort");
 		String sortOrder = getPara("sortOrder");
 		Map<String, String[]> paraMap = getParaMap();
 		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
+		String keyword1 = StringUtils.getArrayFirst(paraMap.get("k1"));
 		String customerType = getPara("customerType");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		Page<Record> page = SellerCustomerQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType);
+		Page<Record> page = SellerCustomerQuery.me()._paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType,keyword1);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -140,7 +143,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
-
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 		if(isDealerAdmin || isSuperAdmin) {
 			if(StrKit.notBlank(id)){
 				SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
@@ -151,16 +154,22 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			return;
 		}
 
-		if(StrKit.notBlank(id)) {
-
-			String updated = startProcess(id, new HashMap<String, Object>(), 1);
-
-			if (StrKit.isBlank(updated)) {
-				renderAjaxResultForSuccess("操作成功");
-			} else {
-				renderAjaxResultForError(updated);
+		if(StrKit.notBlank(id) ) {
+			if(isChecked == null || !isChecked) {
+				SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+				sellerCustomer.setIsEnabled(isEnabled);
+				if (sellerCustomer.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
+			}else {
+				String updated = startProcess(id, new HashMap<String, Object>(), 1);
+				if (StrKit.isBlank(updated)) {
+					renderAjaxResultForSuccess("操作成功");
+				} else {
+					renderAjaxResultForError(updated);
+				}
 			}
-		}else {
+		} 
+		
+		else {
 			renderAjaxResultForError("该客户不存在");
 		}
 	}
@@ -177,7 +186,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Customer customer = getModel(Customer.class);
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
-
+		sellerCustomer.setIsChecked(0);
 		String[] customerTypes = getParaValues("customerTypes");
 		List<String> custTypeNameList = new ArrayList<>();
 		for(String customerType : customerTypes)
@@ -396,12 +405,19 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	public void downloading() throws UnsupportedEncodingException {
 
 		String dataArea = getPara("data_area");
-
-		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
-				+ "customerInfo.xlsx";
+		User user = UserQuery.me().findDataArea(dataArea);
+		String filePath = "";
+		if(user == null) {
+			Department department = DepartmentQuery.me().findByDataArea(dataArea);
+			filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
+					+department.getDeptName()+ "的客户信息.xlsx";
+		}else {
+			filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\seller_customer\\"
+					+user.getRealname()+ "的客户信息.xlsx";
+		}
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		Page<Record> page = SellerCustomerQuery.me().paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "");
+		Page<Record> page = SellerCustomerQuery.me()._paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "","");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
@@ -424,7 +440,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, CustomerExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -442,7 +458,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		
 		ExcelExportUtil.closeExportBigExcel();
 
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}
 
 	@RequiresPermissions(value = { "/admin/sellerCustomer/uploading", "/admin/dealer/all",
@@ -717,6 +733,20 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			src.setAreaCode(areaCode);
 			List<String> diffAttrList = BeanCompareUtils.contrastObj(src, dest);
 			setAttr("diffAttrList", diffAttrList);
+			for (int i = 0; i < diffAttrList.size(); i++) {
+				if (diffAttrList.get(i).startsWith("店招图")) {
+					String imageListStore=diffAttrList.get(i).substring(4);
+					String domain = OptionQuery.me().findValue("cdn_domain");
+					List<ImageJson> listI = JSON.parseArray(imageListStore, ImageJson.class);
+					for (ImageJson image : listI) {
+						image.setSavePath(domain + "/" + image.getSavePath());
+						image.setOriginalPath(domain + "/" +image.getOriginalPath());
+					}
+					setAttr("diffAttrImage", listI);
+					diffAttrList.remove(i);
+					break;
+				}
+			}
 		} else if(isEnable.equals("0")) {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("新增客户");
@@ -736,7 +766,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("diffAttrList", diffAttrList);
 		}
 	}
-
+	@Before(Tx.class)
 	@RequiresPermissions(value = { "/admin/sellerCustomer/audit", "/admin/dealer/all" }, logical = Logical.OR)
 	public void complete() {
 		
@@ -744,6 +774,12 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		Integer status = getParaToInt("status");
 		String sellerCustomerId = getPara("id");
 		String comment;
+		SellerCustomer sellerCustomer =  SellerCustomerQuery.me().findById(sellerCustomerId);
+		if (null!=sellerCustomer.getIsChecked()&&sellerCustomer.getIsChecked()==1) {
+			renderAjaxResultForError("客户已审核");
+			return;
+		}
+		sellerCustomer.setIsChecked(1);
 		if (StrKit.notBlank(getPara("comment"))) comment = getPara("comment");
 		else comment = "客户审核批准";
 
@@ -752,7 +788,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		
 		boolean updated = true;
 
-		SellerCustomer sellerCustomer =  SellerCustomerQuery.me().findById(sellerCustomerId);
 		sellerCustomer.setStatus(status == 1 ? SellerCustomer.CUSTOMER_NORMAL : SellerCustomer.CUSTOMER_REJECT);
 
 		WorkFlowService workFlowService = new WorkFlowService();
@@ -896,7 +931,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		message.setSellerId(sellerId);
 		message.setContent(comment);
 		message.setFromUserId(user.getId());
-
 		message.setToUserId(toUser.getId());
 		message.setDeptId(user.getDepartmentId());
 		message.setDataArea(user.getDataArea());
@@ -911,7 +945,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		else
 			renderAjaxResultForError("操作失败");
 	}
-
+	@Before(Tx.class)
 	private String startProcess(String customerId, Map<String, Object> param, int isEnable) {
 
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
@@ -952,9 +986,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				message.setDeptId(user.getDepartmentId());
 				message.setDataArea(user.getDataArea());
 				message.setSellerId(sellerId);
+				message.setObjectId(customerId);
+				message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
 				message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
 				message.setTitle(sellerCustomer.getCustomer().getCustomerName());
-
+				
 				Object customerVO = param.get("customerVO");
 				if (customerVO == null && isEnable == 0) {
 					message.setContent("新增待审核");
@@ -973,11 +1009,12 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
+
 			param.put("isEnable", isEnable);
 
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerId, defKey, param);
-
+			sellerCustomer.setIsChecked(0);
 			sellerCustomer.setProcDefKey(defKey);
 			sellerCustomer.setProcInstId(procInstId);
 			sellerCustomer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
@@ -990,5 +1027,164 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 		return "";
 	}
-
+	//批量启用
+	@Before(Tx.class)
+	public void upIsenable() {
+		String ds = getPara("sellerCustomerItems");
+		boolean flang = true;
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerCustomer> imageList = jsonArray.toJavaList(SellerCustomer.class);
+		for (SellerCustomer sellerCustomer : imageList) {
+			if(isDealerAdmin || isSuperAdmin) {
+				if(StrKit.notBlank(sellerCustomer.getId())){
+					SellerCustomer sC = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+					sC.setIsEnabled(1);
+					if (sC.saveOrUpdate()) flang = true;
+					else {flang = false;break;}
+				} 
+			}
+			if(StrKit.notBlank(sellerCustomer.getId()) ) {
+				SellerCustomer sellerCustomers = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+				if(isChecked == null || !isChecked) {
+					sellerCustomers.setIsEnabled(1);
+					if (sellerCustomers.saveOrUpdate()) flang = true;
+				}else {
+					if(sellerCustomers.getIsEnabled() !=1) {
+						String updated = startProcess(sellerCustomer.getId(), new HashMap<String, Object>(), 1);
+						if (StrKit.isBlank(updated)) {
+							flang = true;
+						} else {
+							flang = false ;
+							break;
+						}
+					}
+				}
+			}else {
+				flang = false ;
+				break;
+			}
+		}
+		renderJson(flang);
+	}
+	//批量停用
+	@Before(Tx.class)
+	public void downIsenable() {
+		String ds = getPara("sellerCustomerItems");
+		boolean flang = true;
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerCustomer> imageList = jsonArray.toJavaList(SellerCustomer.class);
+		for (SellerCustomer sellerCustomer : imageList) {
+			if(isDealerAdmin || isSuperAdmin) {
+				if(StrKit.notBlank(sellerCustomer.getId())){
+					SellerCustomer sC = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+					sC.setIsEnabled(0);
+					if (sC.saveOrUpdate()) flang = true;
+					else {flang = false;break;}
+				} 
+			}
+			if(StrKit.notBlank(sellerCustomer.getId()) ) {
+				SellerCustomer sellerCustomers = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+				if(isChecked == null || !isChecked) {
+					sellerCustomers.setIsEnabled(0);
+					if (sellerCustomers.saveOrUpdate()) flang = true;
+				}else {
+					if(sellerCustomers.getIsEnabled() !=0) {
+						String updated = startProcess(sellerCustomer.getId(), new HashMap<String, Object>(), 1);
+						if (StrKit.isBlank(updated)) {
+							flang = true;
+						} else {
+							flang = false ;
+							break;
+						}
+					}
+				}
+			}else {
+				flang = false ;
+				break;
+			}
+		}
+		renderJson(flang);
+	}
+	
+	
+	public void getCustomerType() {
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+		renderJson(customerTypeList);
+	}
+	
+	//批量保存客户类型
+	@Before(Tx.class)
+	public void saveCustomerTypes () {
+		String ds = getPara("sellerCustomerItems");
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerCustomer> imageList = jsonArray.toJavaList(SellerCustomer.class);
+		String customerTypes = getPara("customerTypes");
+		String[] types = customerTypes.split(",");
+		boolean flang = true;
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		List<String> custTypeNameList = new ArrayList<>();
+		for(String customerType : types) {
+			custTypeNameList.add(CustomerTypeQuery.me().findById(customerType).getStr("name"));
+		}
+		for(SellerCustomer sellerCustomer:imageList) {
+			Map<String, Object> map = Maps.newHashMap();
+			SellerCustomer sC = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+			if(isChecked == null || !isChecked || isSuperAdmin || isDealerAdmin) {
+				sC.setCustomerTypeIds(customerTypes);
+				if (sC.saveOrUpdate()) flang = true;
+				else {flang = false;break;}
+				CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomer.getId());
+				for(String type:types) {
+					CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
+					ccType.setSellerCustomerId(sellerCustomer.getId());
+					ccType.setCustomerTypeId(type);
+					if(!ccType.save()) {
+						flang = false;
+						break;
+					}
+				}
+			}else {
+				if (sC != null && StrKit.notBlank(sellerCustomer.getId())) {
+					Customer customer = CustomerQuery.me().findById(sC.getCustomerId());
+					CustomerVO temp = new CustomerVO();
+					temp.setAreaCode(customer.getProvCode() + "," + customer.getCityCode() + "," + customer.getCountryCode());
+					if(temp.getAreaCode().equals(",,")) temp.setAreaCode("");
+					temp.setAreaName(customer.getProvName() + "," + customer.getCityName() + "," + customer.getCountryName());
+					temp.setCustTypeList(Arrays.asList(types));
+					
+					temp.setCustTypeNameList(custTypeNameList);
+					temp.setContact(customer.getContact());
+					
+					temp.setSubType(sC.getSubType());
+					temp.setCustomerKind(sC.getCustomerKind());
+					
+					temp.setMobile(customer.getMobile());
+					temp.setAddress(customer.getAddress());
+					temp.setNickname(sC.getNickname());
+					temp.setCustomerName(customer.getCustomerName());
+					
+					map.put("customerVO", temp);
+					if(isChecked) {
+						String updated = startProcess(sellerCustomer.getId(), map, 0);
+						if (StrKit.isBlank(updated)) {
+							flang = true;
+						} else {
+							flang = false ;
+							break;
+						}
+					}
+				}	
+			}
+		}
+		renderJson(flang);
+	}
 }

@@ -15,9 +15,13 @@
  */
 package org.ccloud.model.base;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.IBean;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.IDataLoader;
@@ -259,11 +263,11 @@ public abstract class BaseUser<M extends BaseUser<M>> extends JModel<M> implemen
 		return get("wechat_open_id");
 	}
 	
-	public void setWechatUserId(java.lang.String wechatUseriId) {
+	public void setWechatUseriId(java.lang.String wechatUseriId) {
 		set("wechat_userid", wechatUseriId);
 	}
 
-	public java.lang.String getWechatUserId() {
+	public java.lang.String getWechatUseriId() {
 		return get("wechat_userid");
 	}
 

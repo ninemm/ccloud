@@ -30,8 +30,10 @@ import java.util.Map;
 import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -92,8 +94,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		Seller seller = SellerQuery.me().findById(sellerId);
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Seller> sellers = SellerQuery.me().findByDataArea(dataArea);
+		List<Seller> sellers = new ArrayList<>();
+		Subject subject = SecurityUtils.getSubject();
+		if(subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+			sellers = SellerQuery.me().findByDataArea(seller.getStr("data_area") + "%");
+		}else {
+			sellers = SellerQuery.me().findByDataArea(seller.getStr("data_area"));
+		}
 
 		List<Activity> actList = new ArrayList<Activity>();
 		for (Seller se : sellers) {
@@ -237,8 +244,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getPara("sellerId");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String activityId = getPara("activity");
+		String status = getPara("status");
 
-		Page<Record> page = SalesOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, dataArea, activityId);
+		Page<Record> page = SalesOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, dataArea, activityId, status);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -469,12 +477,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		param.put("customerName", customerName);
 		param.put("orderId", orderId);
 
-		String toUserId = "";
+//		String toUserId = "";
 
 		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 
 			List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
 			if (orderReviewers == null || orderReviewers.size() == 0) {
+				renderAjaxResultForError("您没有配置审核人,请联系管理员");
 				return false;
 			}
 
@@ -576,14 +585,55 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		setAttr("taskId", taskId);
 		setAttr("order", order);
+		setAttr("orderId", orderId);
 		setAttr("orderDetailList", orderDetailList);
 		render("audit.html");
 	}
 	
 	@Before(Tx.class)
 	public void complete() {
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String orderId = getPara("id");
+		String[] productNames = getParaValues("productName");
+		String[] bigUnits = getParaValues("bigUnit");
+		String[] smallUnits = getParaValues("smallUnit");
+		String[] bigPriceSpans = getParaValues("bigPriceSpan");
+		String[] smallPriceSpans = getParaValues("smallPriceSpan");
+		Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
+		if (Integer.parseInt(salesOrder.getStr("status"))!=Consts.SALES_ORDER_STATUS_DEFAULT) {
+			renderAjaxResultForError("订单已审核");
+			return;
+		}
+		String salesOrderName="";
+		if (null==salesOrder.getStr("customer_name")){
+			salesOrderName=salesOrder.getStr("salesName");
+		}else {
+			salesOrderName=salesOrder.getStr("customer_name");
+		}
+		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" + 
+				"	        <div></div>\n" + 
+				"	        <p>\n" + 
+				"	          价格修改\n" + 
+				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" + 
+				"	        </p>\n" + 
+				"	        <p>操作人："+salesOrderName+"</p>\n" + 
+				"	         <p>");
 		
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
+		for (int i = 0; i < productNames.length; i++) {
+			if (!orderDetails.get(i).getInt("price").equals(orderDetails.get(i).getInt("product_price"))) {
+				double conver_relate = Double.parseDouble(orderDetails.get(i).getStr("convert_relate"));
+				double price = Double.parseDouble(orderDetails.get(i).getStr("price"));
+				double smallprice=price/conver_relate;
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+				stringBuilder.append("●" + productNames[i] + "<br>");
+				stringBuilder.append("-每" + bigUnits[i] + "价格修改为"+ bigPriceSpans[i]+ "(" + price+ ")<br>");
+				stringBuilder.append("-每" + smallUnits[i] + "价格修改为"+ smallPriceSpans[i]+ "(" +  smallprice+ ")<br>");
+			}
+		}
+		stringBuilder.append("</p>\n" + 
+				"	      </div>");
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String taskId = getPara("taskId");
 		String comment = getPara("comment");
 		String refuseReson = getPara("refuseReson","");
@@ -606,11 +656,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 					+ (refuseReson == "undefined" ? "" : refuseReson);
 			var.put("comment", comment);
 		}
-
 		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
-
+		stringBuilder.append(comments);
 		WorkFlowService workflowService = new WorkFlowService();
-		workflowService.completeTask(taskId, comments, var);
+		workflowService.completeTask(taskId, stringBuilder.toString(), var);
 
 		renderAjaxResultForSuccess("订单审核成功");		
 	}
@@ -770,8 +819,32 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		String outstockInfo = buildOutstockInfo(id);
 		setAttr("outstockInfo", outstockInfo);
-		
+		if (comments.size()==0) {
+			String modifyPrice = modifyPrice(id);
+			setAttr("modifyPrice", modifyPrice);
+		}
 		render("operate_history.html");
+	}
+	
+	private String modifyPrice(String ordedId) {
+		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
+			if (!record.getInt("price").equals(record.getInt("product_price"))) {
+				double conver_relate = Double.parseDouble(record.getStr("convert_relate"));
+				double price = Double.parseDouble(record.getStr("price"));
+				double product_price = Double.parseDouble(record.getStr("product_price"));
+				double smallproductPrice=product_price/conver_relate;
+				double smallprice=price/conver_relate;
+				smallproductPrice=new BigDecimal(smallproductPrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
+				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ product_price+ "(" + price+ ")<br>");
+				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallproductPrice+ "(" +  smallprice+ ")<br>");
+			}
+		}
+		
+		return stringBuilder.toString();
 	}
 	
 	private String buildOutstockInfo(String ordedId) {
@@ -814,9 +887,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getPara("sellerId");
 		String activityId = getPara("activity");
+		String status = getPara("status");
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
-				+ "salesOrderInfo.xlsx";
-		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId);
+				+ "销售订单.xlsx";
+		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId, status);
 		List<Record> salesOderList = page.getList();
 		
 		List<SalesOrderExcel> excellist = Lists.newArrayList();
@@ -872,7 +946,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, SalesOrderExcel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -890,7 +964,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}
 	
 	public SalesOrderExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String activity) {

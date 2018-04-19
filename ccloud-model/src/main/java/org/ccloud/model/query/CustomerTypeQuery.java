@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.ccloud.model.CustomerType;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -69,7 +70,12 @@ public class CustomerTypeQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.name", keyword, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.is_show", show, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "c.data_area", dataArea, params, needWhere);
-
+		if(needWhere && StrKit.isBlank(dataArea)) {
+			fromBuilder.append(" where c.dept_id = '0' ");
+		}
+		if(!needWhere && StrKit.isBlank(dataArea)) {
+			fromBuilder.append(" and c.dept_id = '0' ");
+		}
 		fromBuilder.append(" order by c.create_date ");
 
 		if (params.isEmpty())
@@ -115,6 +121,23 @@ public class CustomerTypeQuery extends JBaseQuery {
 		
 	}
 
+	//去除直营商选项
+	public List<CustomerType> findByDataArea1(String dataArea) {
+		
+		LinkedList<Object> params = new LinkedList<Object>();
+		
+		StringBuilder sql = new StringBuilder("select *");
+		sql.append(" from `cc_customer_type` c");
+		sql.append(" where c.is_show = 1");
+		sql.append(" and c.`code`!='G' ");
+		appendIfNotEmpty(sql, "c.data_area", dataArea, params, false);
+		
+		sql.append(" order by c.create_date");
+		
+		return DAO.find(sql.toString(), params.toArray());
+		
+	}
+	
 	public String findIdByName(String name, String dataArea) {
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
@@ -204,5 +227,10 @@ public class CustomerTypeQuery extends JBaseQuery {
 		
 		return DAO.find(sql.toString());
 		
+	}
+	
+	public List<CustomerType> findByID(String customerTypeIds){
+		String sql = "select * from cc_customer_type where id in ("+customerTypeIds+") ORDER BY create_date ";
+		return DAO.find(sql);
 	}
 }

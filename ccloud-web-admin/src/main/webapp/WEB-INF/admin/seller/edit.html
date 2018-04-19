@@ -27,7 +27,7 @@
 	var $form = $("#form");
 	var $city = $('#cityPicker');
 	var flang = true;
-	$("#brand_option").select2();
+	$("#brand_option").select2({width:'100%'});
 	$("#product_type_store_option").select2({openOnEnter:0});
 	$(function() {
 		$("#checkWarn").hide();
@@ -76,9 +76,9 @@
 		    type: 2,
 		    area: ['580px', '530px'],
 		    fix: false, //不固定
-		    content: '${CPATH}/admin/department/department_tree'
-		});
-	});	
+		    content: '${CPATH}/admin/seller/department_tree'
+			});
+		});	
 		
 		jQuery.mm.initValidator('#form', validatorFields)
 		
@@ -152,7 +152,7 @@
 	
 	function doSubmit(){
 		if(flang==false){
-			alert("销售商编码错误，请重新输入");
+			toastr.error("销售商编码错误，请重新输入");
 			return;
 		}
 		
@@ -366,7 +366,7 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">*产品类型:</label>
 							<div class="input-group col-md-4 col-sm-10">
- 								<select class="form-control input-sm" name="product_type_store" id="product_type_store_option" multiple="multiple" >
+ 								<select class="form-control input-sm" name="product_type_store" id="product_type_store_option" multiple="multiple" style = "width:100%;" >
 								</select>
  							</div>
 						</div>

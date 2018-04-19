@@ -32,6 +32,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.PrintTemplate;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SalesRefundInstock;
+import org.ccloud.model.SalesRefundInstockDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.query.PrintTemplateQuery;
 import org.ccloud.model.query.SalesRefundInstockDetailQuery;
@@ -102,7 +103,8 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 
 		Record refund = SalesRefundInstockQuery.me().findMoreById(refundId);
 		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(refundId);
-
+		SalesRefundInstockDetail instock = SalesRefundInstockDetailQuery.me().findByInstockId(refundId);
+		setAttr("rejectAmount", instock.getStr("rejectAmount"));
 		setAttr("refund", refund);
 		setAttr("refundDetail", refundDetail);
 
@@ -184,6 +186,8 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 		SalesRefundInstock salesRefundInstock = SalesRefundInstockQuery.me().findBySn(refundSn);
 		Record refund = SalesRefundInstockQuery.me().findMoreById(salesRefundInstock.getId());
 		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(salesRefundInstock.getId());
+		SalesRefundInstockDetail instock = SalesRefundInstockDetailQuery.me().findByInstockId(salesRefundInstock.getId());
+		setAttr("rejectAmount", instock.getStr("rejectAmount"));
 
 		setAttr("refund", refund);
 		setAttr("refundDetail", refundDetail);
@@ -213,6 +217,9 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 
 			for (String s : outId) {
 				Record printInfo = SalesRefundInstockQuery.me().findStockInForPrint(s);
+				if (StrKit.isBlank(printInfo.getStr("salesOutStockId"))) {
+					printInfo = SalesRefundInstockQuery.me().findStockInForPrintByNoOrder(s);
+				}
 				List<Record> ProductInfos = SalesRefundInstockQuery.me().findPrintProductInfo(s);
 				Map<String, Object> map = new HashMap<>();
 				map.put("printInfo", printInfo);

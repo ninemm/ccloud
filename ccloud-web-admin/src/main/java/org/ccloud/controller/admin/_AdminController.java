@@ -100,8 +100,8 @@ public class _AdminController extends JBaseController {
 		goodsSales.put("goodsSalesAll", SalesOrderQuery.me().queryGoodsSales(selDataArea, false,"desc"));
 		
 		Map<String, List<Record>> directBusinessAmount = Maps.newHashMap();
-		directBusinessAmount.put("directs_day", SalesOrderQuery.me().querySellerSales(selDataArea, "day","desc"));
-		directBusinessAmount.put("directs_month", SalesOrderQuery.me().querySellerSales(selDataArea, "month","desc"));
+		directBusinessAmount.put("directs_day", SalesOrderQuery.me()._querySellerSales(selDataArea, "day","desc"));
+		directBusinessAmount.put("directs_month", SalesOrderQuery.me()._querySellerSales(selDataArea, "month","desc"));
 		
 		Map<String, List<Record>> amountCollect = Maps.newHashMap();
 		amountCollect.put("amount_weeks", SalesOrderQuery.me().queryAmountBy(selDataArea, "weeks"));
@@ -223,28 +223,26 @@ public class _AdminController extends JBaseController {
 						renderJson(map);
 						return ;
 					}
-				}
-				
-				
-				if (!user.isAdministrator() && tmpList != null) {
-					Department dept = tmpList.get(0);
-					if (dept == null) {
-						renderError(404);
-						return ;
+					if (!user.isAdministrator() && tmpList != null) {
+						Department dept = tmpList.get(0);
+						if (dept == null) {
+							renderError(404);
+							return ;
+						}
+						String dealerDataArea = DepartmentQuery.me().getDealerDataArea(tmpList);
+						setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);
+						setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
+						setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
+						setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
+						setSessionAttr(Consts.SESSION_SELLER_HAS_STORE, dept.get("has_store"));
+					} else {
+						setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
 					}
-					String dealerDataArea = DepartmentQuery.me().getDealerDataArea(tmpList);
-					setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, dealerDataArea);
-					setSessionAttr(Consts.SESSION_SELLER_ID, dept.get("seller_id"));
-					setSessionAttr(Consts.SESSION_SELLER_NAME, dept.get("seller_name"));
-					setSessionAttr(Consts.SESSION_SELLER_CODE, dept.get("seller_code"));
-					setSessionAttr(Consts.SESSION_SELLER_HAS_STORE, dept.get("has_store"));
-				} else {
-					setSessionAttr(Consts.SESSION_DEALER_DATA_AREA, DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
+					MessageKit.sendMessage(Actions.USER_LOGINED, user);
+					CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
+					setSessionAttr(Consts.SESSION_LOGINED_USER, user);
 				}
 			}
-			MessageKit.sendMessage(Actions.USER_LOGINED, user);
-			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
-			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
 //			String change=CookieUtils.get(this, mobile);
 //			if (!mobile.equals(change)) {
 //				if (password.equals(EncryptUtils.encryptPassword("123456", _user.getSalt()))) {

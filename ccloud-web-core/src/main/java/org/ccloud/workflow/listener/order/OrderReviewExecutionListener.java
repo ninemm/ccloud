@@ -53,7 +53,7 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 
 			Object _comment = execution.getVariable("comment");
 			String comment = _comment.toString();
-			this.sendOrderWxMesssage(user.getWechatOpenId(), user.getWechatUserId(), orderId, user.getRealname(), comment);
+			this.sendOrderWxMesssage(user.getWechatOpenId(), user.getWechatUseriId(), orderId, user.getRealname(), comment);
 		}
 
 		System.err.println("--------------执行完成---------------");

@@ -72,26 +72,13 @@
             }]
         })
 
-        var cpLock = true;
-        var time;
-
-        $(document).on("compositionstart", "#searchInput", function() {
-            cpLock = false;
-        }).on("compositionend", "#searchInput", function() {
-            cpLock = true;
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    refresh();},500);
-            }
-        }).on("input", "#searchInput", function() {
-            if(cpLock) {
-                clearTimeout(time);
-                time = setTimeout(function(){ 
-                    setItemBykey("keyword", $("#searchInput").val());
-                    refresh();},500);
-            }
+        $(document).on("submit", ".weui-search-bar__form", function() {
+            setItemBykey("keyword", $("#searchInput").val());
+            refresh();			
+            return false;
+		}).on("click", "#searchCancel", function() {
+            setItemBykey("keyword", $("#searchInput").val());
+            refresh();
         }).on("change", "#status", function() {
             setItemBykey("status", $("#status").data('values'));
             setItemBykey("statusName", $("#status").val());
@@ -212,6 +199,7 @@
 
     function refresh() {
         pageNumber = 1;
+        layer.open({type: 2,content: '加载中'});
         $.ajax({
             url:"${CPATH}/activity/refreshApply",
             type:"post",
@@ -233,13 +221,14 @@
                 pageNumber = 2;
                 for(var i = 0 ; i < data.applyL.length; i++){
                 	var step2=new SetStep({
-			        content:'#'+data.applyL[i].activityApply.id,
-			        steps: data.applyL[i].strings,
-			        stepCounts:data.applyL[i].num,
-			        showBtn : false,
-			        clickAble:true
-			    })
-             }
+                        content:'#'+data.applyL[i].activityApply.id,
+                        steps: data.applyL[i].strings,
+                        stepCounts:data.applyL[i].num,
+                        showBtn : false,
+                        clickAble:true
+                    })
+                }
+                layer.closeAll();
             }
         });
     }

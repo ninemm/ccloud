@@ -3,6 +3,9 @@
 <#macro script_import>
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+	<!-- bootstrap-datetimepicker -->
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
 	<script src="${CPATH}/static/ladda/spin.min.js"></script>
 	<script src="${CPATH}/static/ladda/ladda.min.js"></script>	
 </#macro>
@@ -10,22 +13,26 @@
 <#macro css_import>
 	<!-- bootstrapvalidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	<!-- bootstrap-datetimepicker -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
 </#macro>
 
 <#macro script>
 
 	var $form = $("#form");
 
+	var ti = ${(ti)!};
 	$(function() {
-
+		jQuery.mm.initDatetimepicker('form', '#month', 'month', 'yyyy-MM', 3, 10, 3);
+		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
-
 	});
 
 	var validatorFields = {
-		'userIds': {
+		'month': {
 			validators: {
-				notEmpty: { message: '负责人不能为空' },
+				notEmpty: { message: '计划周期不能为空' },
 			}
 		},
 		'file': {
@@ -34,7 +41,24 @@
 			}
 		}
 	};
-
+	$(document).on("change", "#month", function() {
+			var date = new Date($("#month").val()+"-"+ti);
+			var year = date.getFullYear();
+		    var mon = date.getMonth()+2; 
+		    if(ti == "01"){
+			mon = date.getMonth()+1;
+			}
+			if(mon == "13"){
+				year = date.getFullYear()+1;
+				mon = "01";
+			}    
+		    var  day=date.getTime()-1000*60*60*24; 
+		    date.setTime(day);
+		    var strDay=date.getDate();  
+			$("#startDate").val($("#month").val()+"-"+ti);
+			$("#endDate").val(year+"-"+mon+"-"+strDay);
+			
+		});
 	$('#_user_tree').click(function() {
 		layer.open({
 			title:'负责人',
@@ -46,6 +70,7 @@
 	});
 
 	function doSubmit(){
+		var start = $("#month").val();
 		var l = Ladda.create( document.querySelector( '.ladda-button' ) );	
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -56,6 +81,7 @@
 			},
 			type : "post", 
 			dataType : "json", 
+			data:{"start":start},
 			success : function(data) { 
 			    layer.closeAll();
 				l.start();
@@ -102,13 +128,31 @@
 		<form action="${CPATH}/admin/plans/uploading" enctype="multipart/form-data" method="post" id="form" class="form-horizontal" >
 			<div class="box-body">
 				<div class="form-group col-sm-12 validata-box">
-					<label class="control-label col-sm-2">下载模版:</label>
+					<label class="control-label col-sm-2" style = "padding-top:0px;">下载模版:</label>
 					<div class="input-group col-md-4 col-sm-4-offset-2">
 						<a href="${CPATH}/admin/plans/plansTemplate" target="_black">请点击下载模板</a>
 					</div>
 				</div>
 				<div class="form-group col-sm-12 validata-box">
-					<label class="control-label col-sm-2">*上传文件:</label>
+					<label class="control-label col-sm-2">计划月份:</label>
+					<div class="input-group col-md-4 col-sm-4-offset-2" >
+						 <input id="month" class="form-control" type="text" value="${month!}" name="month" placeholder="活动开始日期" style="height:30px;">
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">开始时间:</label>
+					<div class="input-group col-md-4 col-sm-4-offset-2">
+						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">结束时间:</label>
+					<div class="input-group col-md-4 col-sm-4-offset-2">
+						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
+					</div>
+				</div>
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2" style = "padding-top:0px;">*上传文件:</label>
 					<div class="input-group col-md-4 col-sm-10">
 						<input type="file" id="file" name="file" value="">
 					</div>

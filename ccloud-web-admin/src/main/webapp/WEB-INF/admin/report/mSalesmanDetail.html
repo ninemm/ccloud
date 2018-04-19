@@ -28,8 +28,8 @@
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initEditTableExport3('#_mSalesmanDetailReport_table',url, initParams, initFields(), null);
-		jQuery.mm.initEditTableExport4('#_mSalesmanDetailReportGift_table',urlGift, initParams, initFieldsGift(), null);
+		jQuery.mm.initEditTableExport3('#_mSalesmanDetailReport_table',url, initParams, initFields(), null,null,"部门业务员产品详情");
+		jQuery.mm.initEditTableExport4('#_mSalesmanDetailReportGift_table',urlGift, initParams, initFieldsGift(), null,null,"部门业务员赠品详情");
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');
@@ -106,7 +106,9 @@
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
 				<#if watchHead??>
 					<#list watchHead as bean>
-						{field: "${bean}", title: "${bean}", align: "center",  edit:false},
+						<#if bean != '销售额(元)'>
+							{field: "${bean}", title: "${bean}", align: "center",  edit:false},
+						</#if>
 	   				</#list>
 				</#if>
    			];

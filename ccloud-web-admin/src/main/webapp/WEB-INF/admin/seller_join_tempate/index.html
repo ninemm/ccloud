@@ -163,7 +163,6 @@
 			alert("未选中任何产品!");
 			return;		 
 		 }
-		 console.log($('input[name="data"]:checked').parent().parent().find('td').eq(0).find("input").val());
 		 $('input[name="data"]:checked').parent().parent().each(function(idx, item) {
 		  	var obj = {
 								"printTemplateId":  $(this).find('td').eq(0).find("input").val(),

@@ -4,6 +4,9 @@
 	var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
 	var $uploaderFiles = $('#uploaderFiles');
 
+	var $galleryReview = $("#galleryReview"), $galleryImgReview = $("#galleryImgReview");
+	var $uploaderFilesReview = $('#uploaderFilesReview');
+
 	$(function(){
 		var index;
 		$(document).on("click", ".uploaderFiles li", function() {
@@ -12,9 +15,26 @@
 			$gallery.fadeIn(100);
 		});
 
-	$gallery.on("click", function() {
-		$gallery.fadeOut(100);
-	});
+		$gallery.on("click", function() {
+			$gallery.fadeOut(100);
+		});
+
+		$(document).on("click", ".uploaderFiles li", function() {
+			index = $(this).index();
+			$galleryImgReview.attr("style", this.getAttribute("style"));
+			$galleryReview.fadeIn(100);
+		});
+
+		$galleryReview.on("click", function() {
+			$galleryReview.fadeOut(100);
+		});
+
+		<#if visit.status != '100102' && visit.status != '100104'>
+			$("#length").text($("#comment").val().length + '/' + 50);
+			$(document).on("input", "#comment", function() {
+				$("#length").text($("#comment").val().length + '/' + 50);
+			});
+		</#if>
 	});
 	
 	 function getback() {
@@ -83,7 +103,7 @@
 		        <div class="weui-cell weui-cell_access">
 		            <div class="weui-cell__bd">
 		                <div class="order-customer-info-title">
-		                 	   活动&nbsp;&nbsp;&nbsp;
+		                    活动&nbsp;&nbsp;&nbsp;
 		                </div>
 		                <input type="text" placeholder="" class="weui-input" value="${activity!}">
 		            </div>
@@ -106,8 +126,8 @@
 		            </div>
 		        </div>
 		    </section>
-			<div class="weui-gallery" id="gallery">
-				<span class="weui-gallery__img" id="galleryImg"></span>
+			<div class="weui-gallery" id="galleryReview">
+				<span class="weui-gallery__img" id="galleryImgReview"></span>
 			</div>
 		    <section class="weui-cells weui-cells_form">
 		        <div class="weui-cell">
@@ -115,38 +135,34 @@
 		                <div class="weui-uploader">
 		                    <div class="weui-uploader__hd">
 		                        <p class="weui-uploader__title">附件图片</p>
-		                        <!-- <div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div> -->
+		                        <!--<div class="weui-uploader__info">${(visit.photoList?size)!0}/3</div>-->
 		                    </div>
-		                   <#if activityExecutes?size gt 0>
-		                            		<#list activityExecutes as list>
-		                            			<span class="weui-uploader__info">${list.remark}</span>
-		                            			<hr style="border:1px dashed #0000fff"/>
-		                   						 <div class="weui-uploader__bd" >
-			                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
-							                            <#if (visit.imageList) ??>
-						                                <#list visit.imageList as bean>
-					                            			<#if (list.orderList == bean.orderList)>
-						                                   		<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
-					                            			</#if>
-						                                </#list>
-							                            </#if>
-			                      					</ul>
-		                   						 </div>
-		                   						<hr style="border:1px dashed #0000fff"/>
-		                            		</#list>
-	                            		<#else> 
-                            				<div class="weui-uploader__bd">
-		                       					<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">
-				                            		<#list visit.imageList as bean>
-					                                   	<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
-					                                </#list>
-				                                </ul>
-	                   						 </div>
-		                            	</#if>
-		                        <!--<div class="weui-uploader__input-box">-->
-		                        <!--&lt;!&ndash;<input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="">&ndash;&gt;-->
-		                        <!--<input type="hidden" name="pic" id="pic">-->
-		                        <!--</div>-->
+                            <#if activityExecutes?size gt 0>
+                                <#list activityExecutes as list>
+                                    <span class="weui-uploader__info">${list.remark}</span>
+                                    <hr style="border:1px dashed #0000fff"/>
+		                    <div class="weui-uploader__bd">
+		                        <ul class="weui-uploader__files uploaderFiles" id="uploaderFilesReview">
+		                            <#if (visit.photoList) ??>
+		                                <#list visit.photoList as bean>
+                                            <#if (list.orderList == bean.orderList)>
+		                                        <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+                                            </#if>
+		                                </#list>
+		                            </#if>
+		                        </ul>
+		                    </div>
+                            <hr style="border:1px dashed #0000fff"/>
+                            </#list>
+                        <#else>
+                            <div class="weui-uploader__bd">
+                                <ul class="weui-uploader__files uploaderFiles" id="uploaderFilesReview">
+                                    <#list visit.photoList as bean>
+                                        <li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+                                    </#list>
+                                </ul>
+                            </div>
+                            </#if>
 		                </div>
 		            </div>
 		        </div>
@@ -158,6 +174,50 @@
 		            </div>
 		        </div>
 		    </section>
+			<#if visit.status != '100102' && visit.status != '100104'>
+				<section class="weui-panel weui-panel_access ft14 remark">
+					<div class="weui-cells__title">审核建议</div>
+					<div class="weui-cells weui-cells_form">
+						<div class="weui-cell">
+							<div class="weui-cell__bd">
+								<textarea class="weui-textarea" name="customerVisit.comment" id="comment" placeholder="审核建议" rows="3" disabled>${visit.comment!'无'}</textarea>
+								<div class="weui-textarea-counter" id="length">0/50</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<div class="weui-gallery" id="gallery">
+					<span class="weui-gallery__img" id="galleryImg"></span>
+				</div>
+				<section class="weui-cells weui-cells_form">
+					<div class="weui-cell">
+						<div class="weui-cell__bd">
+							<div class="weui-uploader">
+								<div class="weui-uploader__hd">
+									<p class="weui-uploader__title">审核图片</p>
+									<div class="weui-uploader__info">${(visit.imageList?size)!0}/3</div>
+								</div>
+								<div class="weui-uploader__bd">
+									<ul class="weui-uploader__files" id="uploaderFiles">
+										<#if (visit.imageList) ??>
+											<#list visit.imageList as bean>
+												<li class="weui-uploader__file" style="background-image: url(${bean.savePath})"></li>
+											</#list>
+										</#if>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<section class="weui-panel weui-panel_access ft14 remark">
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd">
+							<i class="icon-map-pin ft16 green"></i> ${(visit.review_address)!}
+						</div>
+					</div>
+				</section>
+			</#if>
 		</main>
 		<footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
 		    <button class="white-button-no-border weui-flex__item _submit_btn border-top-1px return_index">首页</button>

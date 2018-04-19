@@ -79,7 +79,7 @@ public class CustomerVisitController extends BaseFrontController {
 		for(CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypeList2.add(item);
 		}
 
@@ -134,7 +134,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		Page<Record> visitList = CustomerVisitQuery.me().paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null,null, null, null, selectDataArea, dealerDataArea, null);
+		Page<Record> visitList = CustomerVisitQuery.me()._paginateForApp(getPageNumber(), getPageSize(), getPara("id"), null, null,null, null, null, selectDataArea, dealerDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -154,7 +154,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null,null, null, null, null, selectDataArea, dealerDataArea, null);
+		visitList = CustomerVisitQuery.me()._paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), null,null, null, null, null, selectDataArea, dealerDataArea, null);
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -209,7 +209,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		
 		Page<Record> visitList = new Page<>();
-		visitList = CustomerVisitQuery.me().paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"),getPara("user"), getPara("level"), getPara("status"), selectDataArea, dealerDataArea, getPara("searchKey"));
+		visitList = CustomerVisitQuery.me()._paginateForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), getPara("id"), getPara("type"), getPara("nature"),getPara("user"), getPara("level"), getPara("status"), selectDataArea, dealerDataArea, getPara("searchKey"));
 
 		if(StrKit.notBlank(getPara("id"))) {
 			setAttr("id", getPara("id"));
@@ -514,6 +514,10 @@ public class CustomerVisitController extends BaseFrontController {
 		String lng = getPara("lng");
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
+		if (!customerVisit.getStatus().equals(Consts.CUSTOMER_VISIT_STATUS_DEFAULT)) {
+			renderAjaxResultForError("拜访已审核");
+			return;
+		}
 		Integer status = getParaToInt("status");
 		String comment = (status == 1) ? "批准" : "拒绝";
 

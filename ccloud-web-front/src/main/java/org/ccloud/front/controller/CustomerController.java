@@ -78,7 +78,7 @@ public class CustomerController extends BaseFrontController {
 		for(CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypeList2.add(item);
 		}
 
@@ -101,25 +101,32 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void refresh() {
+//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+//		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+//		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+
 		boolean visitAdd = SecurityUtils.getSubject().isPermitted("/admin/customerVisit/add");
 		boolean salesOrderAdd = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/add");
+		boolean salesOrderSeller = SecurityUtils.getSubject().isPermitted("/admin/salesOrder/seller");
 		boolean salesOrder = SecurityUtils.getSubject().isPermitted("/admin/salesOrder");
 		boolean visit = SecurityUtils.getSubject().isPermitted("/admin/customerVisit");
-		
-		Page<Record> customerList = new Page<>();
-		String customerOrderCount = "0";
+
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		if (StrKit.notBlank(getPara("region"))) {
-			String dataArea = UserQuery.me().findById(getPara("region")).getDataArea();
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), dataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			Record r = SellerCustomerQuery.me().getOrderNumber(dataArea, dealerDataArea,  getPara("customerType"), "0", getPara("searchKey"));
-			if (r != null)customerOrderCount = r.getStr("orderCount");
-		} else {
-			customerList = SellerCustomerQuery.me().findByUserTypeForApp(getParaToInt("pageNumber"), getParaToInt("pageSize"), selectDataArea, dealerDataArea, getPara("customerType"), getPara("isOrdered"), getPara("searchKey"));
-			Record r = SellerCustomerQuery.me().getOrderNumber( selectDataArea, dealerDataArea,  getPara("customerType"), "0", getPara("searchKey"));
-			if (r != null)customerOrderCount = r.getStr("orderCount");
+		String region = getPara("region");
+		
+		String custName = getPara("searchKey");
+		String custTypeId = getPara("customerType");
+		Integer pageSize = getParaToInt("pageSize");
+		Integer pageNumber = getParaToInt("pageNumber");
+		
+		if (StrKit.notBlank(region)) {
+			selectDataArea = UserQuery.me().findById(region).getDataArea() + "%";
 		}
+
+		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, custTypeId, custName, "");
+		Long OrderedCustomerCount = SellerCustomerQuery.me().findOrderedCustomerCountByDataArea(selectDataArea, dealerDataArea, custTypeId, custName);
+		String customerOrderCount = OrderedCustomerCount != null ? OrderedCustomerCount.toString() : "0";
 
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
@@ -132,6 +139,19 @@ public class CustomerController extends BaseFrontController {
 			html.append("		</div>\n");
 			html.append("		<div class=\"weui-flex__item customer-href\">\n");
 			html.append("			<div class=\"weui-flex\">\n");
+
+			if (StrKit.notBlank(customer.getStr("member_id")) && customer.getInt("memberOrderStatus") == 1) {
+				html.append("				<a onClick=\"memberOrderClose('" + customer.getStr("member_id") + "', '" + customer.getStr("customer_name") + "')\" class=\"weui-flex__item\">\n");
+				html.append("					<p><i class=\"icon-cart-arrow-down red\"></i></p>\n");
+				html.append("					<p>会员</p>\n");
+				html.append("				</a>\n");
+			}else if (StrKit.notBlank(customer.getStr("member_id")) && customer.getInt("memberOrderStatus") == 0) {
+				html.append("				<a onClick=\"memberOrderOpen('" + customer.getStr("member_id") + "', '" + customer.getStr("customer_name") + "')\" class=\"weui-flex__item\">\n");
+				html.append("					<p><i class=\"icon-cart-arrow-down gray\"></i></p>\n");
+				html.append("					<p>会员</p>\n");
+				html.append("				</a>\n");
+			}
+
 			html.append("				<a href=\"tel:" + customer.getStr("mobile") + "\" class=\"weui-flex__item\">\n");
 			html.append("					<p><i class=\"icon-phone green\"></i></p>\n");
 			html.append("					<p>电话</p>\n");
@@ -154,8 +174,10 @@ public class CustomerController extends BaseFrontController {
 			html.append("			</div>\n");
 			html.append("		</div>\n");
 			html.append("	</div>\n");
-			html.append("	<hr />\n");
-			if (visitAdd || salesOrderAdd) {
+			html.append("	<div class=\"hr\"></div>");
+
+			if (visitAdd || (salesOrderAdd && !customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))
+					|| (salesOrderSeller && customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))) {
 				html.append("	<div class=\"operate-btn\">\n");
 				if (visitAdd) {
 					html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.getStr("customer_name") + "',\n" +
@@ -164,7 +186,8 @@ public class CustomerController extends BaseFrontController {
 							"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
 							"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");				
 				}
-				if (salesOrderAdd) {
+				if ((salesOrderAdd && !customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))
+						|| (salesOrderSeller && customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))) {
 					html.append("		<div class=\"button red-button fr\" onclick=\"newOrder({customerName:'" + customer.getStr("customer_name") + "',\n" +
 							"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
 							"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
@@ -233,7 +256,7 @@ public class CustomerController extends BaseFrontController {
 				html.append("			</div>\n");
 				html.append("		</div>\n");
 				html.append("	</div>\n");
-				html.append("	<hr />\n");
+				html.append("	<div class=\"hr\"></div>");
 				html.append("	<div class=\"operate-btn\">\n");
 				html.append("		<div class=\"button white-button fl border-1px\" onclick=\"newVisit({customerName:'" + customer.get("customer_name").toString() + "',\n" +
 						"                                                                     sellerCustomerId:'" + customer.get("id").toString() + "',\n" +
@@ -294,7 +317,7 @@ public class CustomerController extends BaseFrontController {
 					"							 </p>\n" +
 					"                        </div>\n" +
 					"                        </a>\n" +
-					"                        <hr>\n" +
+					"                        <div class=\"hr\"></div>" +
 					"                        <div>\n");
 			if(order.get("status").toString().equals("0")) html.append("<div class=\"button white-button fl\">撤销</div>\n");
 			html.append(
@@ -343,7 +366,7 @@ public class CustomerController extends BaseFrontController {
 		}
 		String history = getPara("history");
 		setAttr("history", history);	
-		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		setAttr("customerType", JSON.toJSONString(getCustomerType1()));
 		if(StrKit.notBlank(id)) setAttr("type", "edit");
 		else setAttr("type", "add");
 		
@@ -367,6 +390,24 @@ public class CustomerController extends BaseFrontController {
 		return list;
 	}
 
+	//去除直营商
+	public List<Map<String, Object>> getCustomerType1(){
+
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me().findByDataArea1(dataArea);
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for(CustomerType customerType : customerTypeList)
+		{
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", customerType.getName());
+			item.put("value", customerType.getId());
+			list.add(item);
+		}
+
+		return list;
+	}
+
 	@Before(Tx.class)
 	public void save() {
 		
@@ -377,7 +418,7 @@ public class CustomerController extends BaseFrontController {
 		
 		Customer customer = getModel(Customer.class);
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
-
+		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
 		if(StrKit.notBlank(storeId)) {
 			CustomerStore customerStore = CustomerStoreQuery.me().findById(storeId);
@@ -426,6 +467,7 @@ public class CustomerController extends BaseFrontController {
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
 				String waterFont3 = sellerCustomer.getLocation();
+//				String waterFont3 = "湖北省-武汉市-洪山区";
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
@@ -623,16 +665,21 @@ public class CustomerController extends BaseFrontController {
 	public void enable() {
 
 		String id = getPara("id");
-		//int isEnabled = getParaToInt("isEnabled");
-		if(StrKit.notBlank(id)) {
-
-			String updated = startProcess(id, new HashMap<String, Object>(), 1);
-
-			if (StrKit.isBlank(updated)) {
-				renderAjaxResultForSuccess("操作成功");
-			} else {
-				renderAjaxResultForError(updated);
+		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		if(StrKit.notBlank(id) ) {
+			if(isCustomerAudit == null || !isCustomerAudit) {
+				SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
+				sellerCustomer.setIsEnabled(0);
+				if (sellerCustomer.saveOrUpdate()) renderAjaxResultForSuccess("操作成功");
+			}else {
+				String updated = startProcess(id, new HashMap<String, Object>(), 1);
+				if (StrKit.isBlank(updated)) {
+					renderAjaxResultForSuccess("操作成功");
+				} else {
+					renderAjaxResultForError(updated);
+				}
 			}
+		
 		}else {
 			renderAjaxResultForError("该客户不存在");
 		}
@@ -648,6 +695,12 @@ public class CustomerController extends BaseFrontController {
 		Integer status = getParaToInt("status");
 		String sellerCustomerId = getPara("id");
 		String comment = getPara("comment");
+		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
+		if (null!=sellerCustomer.getIsChecked()&&sellerCustomer.getIsChecked()==1) {
+			renderAjaxResultForError("客户已审核");
+			return;
+		}
+		sellerCustomer.setIsChecked(1);
 		if (StrKit.isBlank(comment)) comment = (status == 1) ? "客户审核批准" : "客户审核拒绝";
 
 		boolean updated = true;
@@ -657,7 +710,6 @@ public class CustomerController extends BaseFrontController {
 			oldMessage.setIsRead(Consts.IS_READ);
 			oldMessage.update();
 		}
-		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
 		sellerCustomer.setStatus(status == 1 ? SellerCustomer.CUSTOMER_NORMAL : SellerCustomer.CUSTOMER_REJECT);
 
 		WorkFlowService workFlowService = new WorkFlowService();
@@ -789,6 +841,12 @@ public class CustomerController extends BaseFrontController {
 			kv.set("createTime", DateTime.now().toString("yyyy-MM-dd HH:mm"));
 			kv.set("status", comment);
 			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_AUDIT_MESSAGE, kv);
+			WorkFlowService workflowService = new WorkFlowService();
+			Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
+			if (null==customerVO) {
+				sellerCustomer.setIsEnabled(0);
+				updated = sellerCustomer.saveOrUpdate();
+			}
 		}
 		
 		Map<String, Object> var = Maps.newHashMap();
@@ -883,14 +941,15 @@ public class CustomerController extends BaseFrontController {
 			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 			
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
+
 			param.put("isEnable", isEnable);
 
-			
 			WorkFlowService workflow = new WorkFlowService();
 			String procInstId = workflow.startProcess(customerId, defKey, param);
 
 			sellerCustomer.setProcDefKey(defKey);
 			sellerCustomer.setProcInstId(procInstId);
+			sellerCustomer.setIsChecked(0);
 			sellerCustomer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
 		}
 		
@@ -927,6 +986,10 @@ public class CustomerController extends BaseFrontController {
 
 		// 查看客户库是否存在这个客户
 		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+
+		if (persist != null && sellerCustomer.getId() == null) {
+			return "该客户已存在，请导入";
+		}
 
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()
@@ -1052,14 +1115,14 @@ public class CustomerController extends BaseFrontController {
 
 	public void  getImportCustomerList(){
 		User user = (User) getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String dataArea = user.getDataArea();
 		String customerName = getPara("keyword");
 
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
-
-		Page<Record> customerList = SellerCustomerQuery.me().findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
+		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area");
+		
+		Page<Record> customerList = SellerCustomerQuery.me()._findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());
 		renderJson(map);
@@ -1100,7 +1163,7 @@ public class CustomerController extends BaseFrontController {
 
 		}
 		setAttr("type", "company");
-		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		setAttr("customerType", JSON.toJSONString(getCustomerType1()));
 		render("customer_edit.html");
 	}
 
@@ -1122,7 +1185,7 @@ public class CustomerController extends BaseFrontController {
 			setAttr("storeId", id);
 		}
 		setAttr("type", "around");
-		setAttr("customerType", JSON.toJSONString(getCustomerType()));
+		setAttr("customerType", JSON.toJSONString(getCustomerType1()));
 		render("customer_edit.html");
 	}
 
@@ -1163,6 +1226,11 @@ public class CustomerController extends BaseFrontController {
 
 		} else sellerCustomerId = sellerCustomer1.getId();
 
+
+		if(UserJoinCustomerQuery.me().findBySellerCustomerIdAndUserId(sellerCustomerId, user.getId()) != null) {
+			renderAjaxResultForError("该客户已存在，请不要重复导入");
+			return;
+		}
 
 		String customerTypeIds = getPara("customerTypeIds", "");
 
@@ -1207,4 +1275,39 @@ public class CustomerController extends BaseFrontController {
 		else renderAjaxResultForError(isUpdate);
 
 	}
+
+	public void memberOrderClose() {
+		String member_id = getPara("member_id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
+
+		MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().checkExists(member_id, seller.getId(), user.getId());
+
+		Date date = new Date();
+		memberJoinSeller.setStatus(0);
+		memberJoinSeller.setUnableDate(date);
+		memberJoinSeller.setModifyDate(date);
+		memberJoinSeller.update();
+
+		renderAjaxResultForSuccess("停用终端下单成功");
+	}
+
+	public void memberOrderOpen() {
+		String member_id = getPara("member_id");
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String dealerArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		Seller seller = SellerQuery.me()._findByDataArea(dealerArea);
+
+		MemberJoinSeller memberJoinSeller = MemberJoinSellerQuery.me().checkExists(member_id, seller.getId(), user.getId());
+
+		Date date = new Date();
+		memberJoinSeller.setStatus(1);
+		memberJoinSeller.setModifyDate(date);
+		memberJoinSeller.update();
+
+		renderAjaxResultForSuccess("启用终端下单成功");
+	}
+
+
 }

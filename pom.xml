@@ -29,7 +29,10 @@
 		<module>ccloud-web-admin</module>
 		<module>ccloud-web-templates</module>
 		<module>ccloud-web-front</module>
+		<module>ccloud-web-member</module>
 		<module>ccloud-web-bi</module>
+		
+		<module>ccloud-business</module>
 	</modules>
 	
 	<properties>

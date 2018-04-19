@@ -20,8 +20,12 @@
 									if (result.errorCode > 0) {
 									    $.toptip(result.message, 'error');
 									} else {
-										location.reload();
+//										location.reload();
 										$.toptip(result.message, 'success');
+										$(".getBack").attr("disabled",true);
+										setTimeout( function(){
+										location.href = "${CPATH}/outstock/index";
+													}, 1 * 1000 );
 									}
 									Utils.closeLoadingWin();
 								}
@@ -46,7 +50,7 @@
 				<p>生成时间: ${(outstock.create_date)!}</p>
 				<p>业务员: ${(outstock.realname)!}</p>
 			</div>
-			<hr>
+			<div class="hr"></div>
 			<div class="ft14">
 				<#if outstock.receive_type = 0> <input type="checkbox"
 					name="if-account" checked disabled="disabled" class="weui-agree__checkbox"> <#else> <input
@@ -139,7 +143,7 @@
 				</#if> 
 			</#if> 
 			</#list>
-			<hr>
+			<div class="hr"></div>
 			<div class="t-r ft14">
 				总计： <span class="red">${(outstock.total_amount)?string(',###.##')}元</span>
 			</div>
@@ -153,7 +157,7 @@
 				</p>
 				<p>地址详情：${(outstock.delivery_address)!}</p>
 			</div>
-			<hr>
+			<div class="hr"></div>
 			<div class="ft16">
 				备注信息： <span class="ft14"> <#if outstock.remark??>
 					${(outstock.remark)!} <#else>无 </#if> </span>
@@ -180,7 +184,7 @@
 			<#else>
 			<button class="white-button-no-border weui-flex__item _submit_btn border-top-1px return_index">首页</button>
 			</#if>
-			<button onclick="getback()" class="red-button weui-flex__item">返回</button>
+			<button onclick="getback()" class="red-button weui-flex__item getBack">返回</button>
 		</footer>
 	</div>
 </div>

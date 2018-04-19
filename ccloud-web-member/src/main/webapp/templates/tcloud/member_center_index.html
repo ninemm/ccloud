@@ -1,0 +1,85 @@
+<#include "_inc/_layout.html"/>
+
+<#macro title>用户中心</#macro>
+
+<#macro css> </#macro>
+
+<#macro script>
+$(function() {
+    $(document).on('click', '#service_btn', function() {
+        layer.open({
+			type: 1,
+			title: ['消息提示',
+			'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+			],
+			content: '<img src="${CTPATH}/images/qrcode.png" />' +
+			  '<p class="t-c ft16">服务电话：<a href="tel:027-8888888" class="blue">027-8888888</a></p>',
+			anim: 'scale',
+			className: 'service',
+			btn: '关闭'
+		});
+    });
+});
+</#macro> 
+
+<@layout>
+<article id="my">
+	<header class="user-box">
+		<div class="user-info">
+			<p class="seller ft16"> ${(customer.customer_name)!}
+<!--			<a href="${CPATH}/user/config" class="change-seller">
+				设置
+			</a>-->
+			</p>
+			<div class="user-avatar">
+				<img src="${(member.avatar)!'${CTPATH}/images/avatar.png'}">
+			</div>
+			<p class="name">${(member.realname)!}</p>
+			<p class="mobile">${(member.mobile)!}</p>
+		</div>
+	</header>
+	
+	<div>
+		<div class="weui-cells__title">我的订单</div>
+		<div class="weui-grids">
+			<a href="${CPATH}/member/order/myOrder" class="weui-grid js_grid">
+				<div class="weui-grid__icon">
+					<i class="icon-file"></i>
+				</div>
+				<p class="weui-grid__label">我的订单</p>
+			</a>
+			
+<!--			<a href="${CPATH}/refund/myRefund" class="weui-grid js_grid">
+				<div class="weui-grid__icon">
+					<i class="icon-exchange"></i>
+				</div>
+				<p class="weui-grid__label">退货订单</p>
+			</a>
+			
+			<a class="weui-grid js_grid" href="${CPATH}/refund/index">
+				<div class="weui-grid__icon">
+					<i class="icon-paper"></i>
+				</div>
+				<p class="weui-grid__label">申请退货</p>
+			</a>-->
+		</div>
+		
+		<div class="weui-cells__title">售后服务</div>
+		<div class="weui-grids">
+			<a id="service_btn" class="weui-grid js_grid">
+				<div class="weui-grid__icon">
+					<i class="icon-phone-square"></i>
+				</div>
+				<p class="weui-grid__label">服务热线</p>
+			</a>
+<!--			<a href="${CPATH}/feedback" class="weui-grid js_grid">
+				<div class="weui-grid__icon">
+					<i class="icon-comment"></i>
+				</div>
+				<p class="weui-grid__label">意见反馈</p>
+			</a>-->
+		</div>
+	</div>
+</article>
+<#include "_inc/_member_footer_nav.html" />
+</@layout>

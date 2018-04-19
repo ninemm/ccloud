@@ -122,4 +122,8 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 		}
 		return Db.queryLong(fromBuilder.toString(), dataArea);
 	}
+
+	public UserJoinCustomer findBySellerCustomerIdAndUserId(String sellerCustomerId, String userId){
+		return DAO.doFindFirst("seller_customer_id = ? AND user_id = ?", sellerCustomerId,userId);
+	}
 }

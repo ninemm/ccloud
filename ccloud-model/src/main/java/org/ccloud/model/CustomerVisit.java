@@ -38,7 +38,6 @@ public class CustomerVisit extends BaseCustomerVisit<CustomerVisit> {
 	private static final long serialVersionUID = 1L;
 
 	public List<ImageJson> getPhotoList() {
-
 		String imageListStore = getStr("photo");
 
 		if (StrKit.notBlank(imageListStore)) {
@@ -50,10 +49,10 @@ public class CustomerVisit extends BaseCustomerVisit<CustomerVisit> {
 			return list;
 		}else return new ArrayList<>();
 	}
-	
+
 	public List<ImageJson> getImageList() {
 
-		String imageListStore = getStr("photo");
+		String imageListStore = getStr("image_list_store");
 
 		if (StrKit.notBlank(imageListStore)) {
 			String domain = OptionQuery.me().findValue("cdn_domain");

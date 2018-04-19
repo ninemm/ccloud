@@ -456,6 +456,7 @@ public class _ReportController extends JBaseController {
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("业务员名称");
+		watchHead.add("销售额(元)");
 		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
 		for (SellerProduct sellerProduct : findBySellerId) {
 			String customName=sellerProduct.getCustomName();
@@ -477,6 +478,11 @@ public class _ReportController extends JBaseController {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId,false);
+		for (Record record : list) {
+			String userId=record.getStr("userId");
+			Record record1= SalesOrderQuery.me().findTotalAmountByUserId(startDate,endDate,keyword,userId);
+			record.set("销售额(元)", record1.get("totalAmount"));
+		}
 		renderJson(list);
 	}
 	

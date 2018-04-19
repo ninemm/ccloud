@@ -188,7 +188,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		for(Record customerType : typeList){
 			Map<String, Object> item = new HashMap<>();
-			item.put("id", customerType.getStr("name"));
+			item.put("id", customerType.getStr("id"));
 			item.put("text", customerType.getStr("name"));
 			customerTypeList.add(item);
 		}
@@ -254,6 +254,10 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String commentDesc = getPara("comment");
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
+		if (!customerVisit.getStatus().equals(Consts.CUSTOMER_VISIT_STATUS_DEFAULT)) {
+			renderAjaxResultForError("拜访已审核");
+			return;
+		}
 		Integer status = getParaToInt("status");
 		String comment = (status == 1) ? "批准" : "拒绝";
 
@@ -376,7 +380,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	@SuppressWarnings("deprecation")
 	public void exportExcel(List<Record> dataList, String filePath) throws IOException {
 
-		filePath = filePath +  "客户拜访信息.xls";
+		filePath = filePath +  "客户拜访记录.xls";
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
@@ -459,7 +463,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 				row.createCell(13).setCellValue(record.get("review_date")!=null?(String)sdf.format(record.get("review_date")):"");
 			}
       
-		   fileOut = new FileOutputStream(filePath);
+		   fileOut = new FileOutputStream(filePath.replace("\\", "/"));
 		   wb.write(fileOut);  
 		} catch (Exception io) {
 			io.printStackTrace();
@@ -475,7 +479,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			if (wb != null)
 				wb.close();
 		}
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 
 	}
 	
@@ -532,7 +536,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
+		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
 		if(imageList.size() == 0) renderAjaxResultForError();
 		else renderAjaxResultForSuccess();
 	}
@@ -546,7 +550,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		String domain = OptionQuery.me().findByKey("cdn_domain").getOptionValue();
-		List<Record> imageList = CustomerVisitQuery.me().findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
+		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
 
 		String zipFileName = "拜访图片.zip";
 

@@ -68,7 +68,6 @@
     });
     
     var callback = function(x) {
-        console.log(x);
     }
 
     function doChange() {
@@ -87,6 +86,26 @@
 		    }]
 	    });
     }
+	
+	$("#myQR").click(function() {
+		Utils.ajax('${CPATH}/user/getQrcode', '',
+			function(data){
+
+			layer.open({
+				type: 1,
+				title: ['我的二维码',
+				'border-bottom: 1px solid #eee;height:2rem;line-height:2rem'
+				],
+				content: '<img src=\'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' + data.ticket +  '\' />' ,
+				anim: 'scale',
+				className: 'service',
+				btn: '关闭'
+			});
+	
+		}
+	);
+
+	});
 </#macro>
 
 <@layout>
@@ -100,6 +119,14 @@
 		</a>
 	</div>
 	<div class="weui-cells">
+		<a class="weui-cell weui-cell_access" id ="myQR">
+			<div class="weui-cell__bd">
+				<p>我的二维码</p>
+			</div>
+			<div class="weui-cell__ft"></div>
+		</a>
+	</div>
+	<div class="weui-cells">
 		<a class="weui-cell weui-cell_access" href="javascript:;">
 			<div class="weui-cell__bd">
 				<p>新消息通知</p>
@@ -107,14 +134,19 @@
 			<div class="weui-cell__ft"></div>
 		</a>
 	</div>
-	<div class="weui-cells">
-		<a class="weui-cell weui-cell_access" href="${CPATH}/user/choice"> 
-			<div class="weui-cell__bd">
-				<p>切换账套</p>
-			</div>
-			<div class="weui-cell__ft">${(session.sellerName)!}</div>
-		</a>
-	</div>
+	
+	<#if session['sellerList']?? && session['sellerList']?size gt 1>
+		<div class="weui-cells">
+			<a class="weui-cell weui-cell_access" href="${CPATH}/user/choice"> 
+				<div class="weui-cell__bd">
+					<p>切换账套</p>
+				</div>
+				<div class="weui-cell__ft">${(session.sellerName)!}</div>
+			</a>
+		</div>
+	</#if>
+	
+	
 	<div class="weui-cells">
 		<a class="weui-cell weui-cell_access">
 			<div class="weui-cell__bd">

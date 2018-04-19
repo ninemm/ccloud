@@ -18,8 +18,12 @@
 <#macro script>
 
 var $form = $("#form");
-$("#station_option").select2();
-$("#group_id").select2();
+$("#station_option").select2({
+		width: '100%'
+	});
+$("#group_id").select2({
+		width: '100%'
+	});
 function getStation(){
 	$.ajax({
 	url:"${CPATH}/admin/user/getStation",
@@ -97,7 +101,7 @@ var validatorFields = {
             notEmpty: { message: '用户密码不能为空' },
         }
 	},
-	'user.group_id': {
+	'group': {
 		validators: {
             notEmpty: { message: '用户分组不能为空' },
         }

@@ -75,10 +75,10 @@
     }
     
     function productCount(params) {
-    	$.showLoading();
+    	layer.open({type: 2,content: '加载中'});
 		Utils.ajax('${CPATH}/report/getOtherProductCount', params, 
 			function(data){
-				$.hideLoading();
+				layer.closeAll();
 	            var length = data.length;
 	            var $tbody = $("#product_body tbody");
 	            $tbody.empty();

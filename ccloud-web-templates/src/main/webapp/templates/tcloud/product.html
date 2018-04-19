@@ -56,30 +56,16 @@
 
 <#macro script>
 $(function() {
-	var cpLock = true;
-	var time;
 	var refund = '${refund!}';
 	setItemBykey("refund", refund);
 
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				keyword = $(this).val();
-				changeInit();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				keyword = $("#searchInput").val();
-				changeInit();
-			},500);
-		}
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		keyword = $("#searchInput").val();
+		changeInit();
+		return false;
+	}).on("click", "#searchCancel", function() {
+		keyword = $("#searchInput").val();
+		changeInit();
 	}).on("click", ".gift-open", function () {
         if ($(this).text() === "展开") {
 	        $(this).text("收起");
@@ -96,11 +82,16 @@ $(function() {
     }).on("click", ".product-content .swiper-slide", function () {
         $(this).addClass("active").siblings().removeClass("active");
 		tag = $(this).text();
+		categoryId='';
 		if(tag == '全部') {
 			tag = '';
 		}
 		changeInit();
-
+		
+    }).on("click", "[name='category']", function () {
+		$(this).addClass("active").siblings().removeClass("active");
+    		categoryId = $(this).attr("id");
+    		changeInit();
     }).on("click", "#searchCancel", function () {
     	keyword = $(this).val();
 		changeInit();
@@ -218,13 +209,15 @@ var newHtml = $(".common").eq(0).html();
 var $tags = $("#tags");
 var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
-
+var categoryId = '';
+var map = {};
 function firstInit(){
 	var tags = ${tags!};
 	initTags(tags);
 	var productList = ${productList!};
 	var compositionList = ${compositionList!};
-	combo(productList, compositionList);
+	var goodsCategory = ${goodsCategory!};
+	combo(productList, compositionList,goodsCategory);
 }
 
 function changeInit(){
@@ -235,16 +228,16 @@ function changeInit(){
 
 	$sidebar.empty();
 	$menuRight.empty();
-	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword}, 
+	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword,'categoryId':categoryId}, 
 		function(data){
 			layer.closeAll();
-			combo(data.productList, data.compositionList);
+			combo(data.productList, data.compositionList, data.goodsCategory);
 		}
 	);
 }
 
-function combo(productList, compositionList){
-	initProduct(productList);
+function combo(productList, compositionList,goodsCategory){
+	initProduct(productList,goodsCategory);
 	initComposition(compositionList);
 	productNum();
 	compositionNum();
@@ -257,33 +250,36 @@ function initTags(tags) {
 	$.each(tags, function (index, el) {
 		$tags.append("<div class='swiper-slide'>" + el + "</div>");
 	});
-
 	var mySwiper = new Swiper('.product-content .swiper-container', {
 		width: $('#sidebar').width(),
 	})
 }
 
-function initProduct(productList){
-	var categoryId = '';
-
-	$.each(productList, function(index, el) {
-		if(categoryId != el.categoryId) {
-			if(categoryId == '') {
-				$sidebar.append("<li id='" + el.categoryId + "' class='active'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
-				$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
-			} else {
-				$sidebar.append("<li id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'>8</span> </li>");
+function initProduct(productList,goodsCategory){
+	$.each(goodsCategory, function(index, el) {
+		map[el.categoryId] = 0;
+		if(categoryId==''){
+			$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+			$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
+			categoryId=el.categoryId;
+		}else{
+			if(categoryId != el.categoryId){
+				$sidebar.append("<li name='category' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
 				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
+			}else{
+				$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+				$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
 			}
-			categoryId = el.categoryId;
 		}
-
-		var $type = $menuRight.find(".type:last");
+	});
+	
+	var $type = $menuRight.find("#"+categoryId);
+	$.each(productList, function(index, el) {
 		$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
 		var $newProductDetail = $type.find(".common:last");
 		$newProductDetail.find("#productName").text(el.custom_name);
 		$newProductDetail.find("#valueName").text(el.valueName);
-		
+		$newProductDetail.find("#categoryId").val(categoryId);
 		var bigPrice = el.price;
 		var convert = el.convert_relate;
 		var smallPrice = (bigPrice / convert).toFixed(2);
@@ -332,17 +328,21 @@ function productNum(){
 
 var compositionHtml = $(".composition").eq(0).html();
 function initComposition(compositionList){
+	map['composition']=0;
 	if(compositionList.length > 0) {
-		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'>8</span> </li>");
+		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'></span> </li>");
 		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
 	}
 	
 	var parentId = '';
+	var totalCount = 0;
 	$.each(compositionList, function(index, el) {
 		if(parentId != el.parent_id) {
 			parentId = el.parent_id;
 			var $type = $menuRight.find(".type:last");
-			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.id  + "' >" + compositionHtml + "</section>");
+			$type.find(".composition:last").find("#comTotalCount").val(totalCount);
+			totalCount = 0;			
+			$type.append("<section class='product_detail weui-panel weui-panel_access composition' id='" + el.parent_id + "' >" + compositionHtml + "</section>");
 			var $newProductDetail = $type.find(".composition:last");
 			$newProductDetail.find("#compositionName").text(el.name);
 			
@@ -360,6 +360,7 @@ function initComposition(compositionList){
 			var smallCount = (el.main_product_count%el.main_convert).toFixed(0);
 			var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
 			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);
+			totalCount = totalCount + (el.main_product_count/el.main_convert).toFixed(2) * 1 + (el.sub_product_count/el.sub_convert).toFixed(2) * 1;
 			var bigCountHtml = "";
 			var smallCountHtml = "";
 			var sub_bigCountHtml = "";
@@ -388,7 +389,9 @@ function initComposition(compositionList){
 			}
 		}else{
 			var sub_bigCount = (el.sub_product_count/el.sub_convert).toFixed(0);
-			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);		
+			var sub_smallCount = (el.sub_product_count%el.sub_convert).toFixed(0);
+			var sub_count = (el.sub_product_count/el.sub_convert).toFixed(2);
+			totalCount = (Number(totalCount) + Number(sub_count)).toFixed(2);
 			var sub_bigCountHtml = "";
 			var sub_smallCountHtml = "";
 			var $type = $menuRight.find(".type:last");
@@ -410,6 +413,11 @@ function initComposition(compositionList){
 					$newProductDetail.find("#subProduct").append(""+el.sub_product_name + ' ' + sub_bigCountHtml + sub_smallCountHtml +"");
 				}		
 			}
+		}
+		
+		if (index == compositionList.length-1) {
+			$type.find(".composition:last").find("#comTotalCount").val(totalCount);
+			totalCount = 0;
 		}
 
 	});
@@ -459,29 +467,35 @@ $gallery.on("click", function() {
 });
 
 function calTotal() {
- 	var types = $(".type");
-  
-	$.each(types, function(typeIndex, typeEl) {
+	$.each(map,function(key,values){ 
+		map[key]=0;
+	});
+	var productList = getItemBykey("productList");
+	$.each(productList, function(Index, product) {
 		var total = 0;
-		var $typeEl = $(typeEl);
-		var id = $typeEl.attr('id');
-		var products = $typeEl.find('.product_detail')
-		$.each(products, function(index, el) {
-			var $el = $(el);
-			if(id == 'composition'){
-				total += Number($el.find("#compositionNum").val());
-			}else{
-				total += Number($el.find("#bigNum").val()) + Number($el.find("#smallNum").val());
-			}
-		});
-
-		var $total = $sidebar.find("#" + id + " .goods-num");
+		var id =product.categoryId;
+		total += Number(product.bigNum)+ Number(product.smallNum);
+		var value = map[id];
+		map[id] = Number(total)+Number(value);
+	});
+	
+	var compositionList = getItemBykey("compositionList")
+	$.each(compositionList, function(Index, composition) {
+		var total = 0;
+		total += Number(composition.compositionNum);
+		var value = map['composition'];
+		map['composition'] = Number(total)+Number(value);
+	});
+	
+	$.each(map,function(key,values){ 
+		var $total = $sidebar.find("#" + key + " .goods-num");
+		var total=values;
 		if (total > 0) {
 		    $total.show().text(total);
 		} else {
 		    $total.hide().text(total);
 		}
-	});
+	});    
 }
 
 function productChange(obj){
@@ -504,13 +518,13 @@ function getProduct($el){
 	return product = {
 		productName : $el.find("#productName").text(),
 		valueName : $el.find("#valueName").text(),
-		
 		bigPriceSpan : $el.find("#bigPriceSpan").text(),
 		smallPriceSpan : $el.find("#smallPriceSpan").text(),
 		bigUnitSpan : $el.find("#bigUnitSpan").text(),
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
 		stock : $el.find("#stock").text(),
-
+		categoryId : $el.find("#categoryId").val(),
+		
 		bigCost : $el.find("#bigCost").val(),
 		smallCost : $el.find("#smallCost").val(),
 		bigAccountPrice : $el.find("#bigAccountPrice").val(),
@@ -564,8 +578,9 @@ function getComposition($el){
 		compositionId : $el.find("#compositionId").val(),
 
 		compositionNum : $el.find("#compositionNum").val(),
+		compositionCount : $el.find("#comTotalCount").val(),
 		
-		compositionValueName : $el.find("#compositionValueName").text(),
+		compositionValueName : $el.find("#compositionValueName").html(),
 		compositionSub : $el.find("#gift").html()
 	}
 }
@@ -663,6 +678,7 @@ function order(){
 									<input type="hidden" id="description" value="0">
 									<input type="hidden" id="product_image_list_store" value="">
 									<input type="hidden" id="product_sn" value="">
+									<input type="hidden" id="categoryId" value="">
 									<div class="product-top">
 										<img src="" id="image" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 										<div class="weui-cell_access product-top-right">
@@ -711,6 +727,7 @@ function order(){
 									<input type="hidden" id="compositionPrice" value="">
 									<input type="hidden" id="product_image_list_store" value="">
 									<input type="hidden" id="product_sn" value="">
+									<input type="hidden" id="comTotalCount" value="">
 									<div class="product-top">
 										<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
 										<div class="weui-cell_access product-top-right">
@@ -737,7 +754,7 @@ function order(){
 									<div id="stock"></div>
 									<div id="activityName" class="activityName"></div>
 								</div>
-								<hr>
+								<div class="hr"></div>
 								<div id="gift" class="weui-flex">
 									<span>
 										<i class="icon-tags"></i>
@@ -766,6 +783,6 @@ function order(){
 	<footer class="weui-footer weui-footer_fixed-bottom weui-flex">
 		<p class="total bg-white weui-flex__item" id="totalNum"></p>
 		<button id="shoppingCart" class="place-order yellow-button white">购物车</button>
-		<button id="placeOrder" class="place-order red-button white">下单</button>
+		<button id="placeOrder" class="place-order red-button white"><#if refund?? && refund == '1'>下一步<#else>下单</#if></button>
 	</footer>
 </@layout>

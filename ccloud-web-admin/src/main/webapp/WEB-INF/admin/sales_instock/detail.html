@@ -12,19 +12,19 @@
 
 <#macro script>
 	$(document).ready(function() {
-		<@shiro.hasRole name="021"> 
-			var total_amount=0;
-    			<#list refundDetail as detail>
-				<#if detail.is_gift?? && detail.is_gift == 1>
-					total_amount=total_amount;
-				<#else>
-					total_amount=total_amount+${(detail.tax_price*detail.product_count / detail.convert_relate)}
-				</#if>
-			</#list>
+			<@shiro.hasRole name="021"> 
+				var total_amount=0;
+	    			<#list refundDetail as detail>
+					<#if detail.is_gift?? && detail.is_gift == 1>
+						total_amount=reject_amount;
+					<#else>
+						total_amount=reject_amount+${(detail.tax_price*detail.reject_product_count / detail.convert_relate)}
+					</#if>
+				</#list>
 			$("#total_amount").text("￥"+formatNumber(total_amount));
     		</@shiro.hasRole>	
     		<@shiro.lacksRole name="021"> 
-			$("#total_amount").text("￥"+formatNumber(${(refund.total_reject_amount)!}));
+			$("#total_amount").text("￥"+formatNumber(${(rejectAmount)!}));
     		</@shiro.lacksRole>	
     		
     		$(".subtotal").each(function(){
@@ -68,15 +68,15 @@
 						<td>${detail_index + 1}</td>
 						<td>${detail.custom_name!}</td>
 						<td>${detail.valueName!}</td>
-						<td>${(detail.product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
-						<td>${detail.product_count % detail.convert_relate} ${detail.small_unit}</td>
+						<td>${(detail.reject_product_count / detail.convert_relate)?floor} ${detail.big_unit + ' (x' + detail.convert_relate + detail.small_unit + ')' }</td>
+						<td>${detail.reject_product_count % detail.convert_relate} ${detail.small_unit}</td>
 						<td><#if detail.is_composite?? && detail.is_composite == 1>是<#else>否</#if></td>
 						<td><#if detail.is_gift?? && detail.is_gift == 1>是<#else>否</#if></td>
 						<@shiro.hasRole name="021"> 
 							<td>￥ <#if detail.is_gift?? && detail.is_gift == 1>0<#else><span class="subtotal" data-value="${(detail.tax_price*detail.product_count / detail.convert_relate)}"></span></#if></td>
 						</@shiro.hasRole>	
     						<@shiro.lacksRole name="021"> 
-							<td>￥ <#if detail.is_gift?? && detail.is_gift == 1>0<#else>${detail.product_amount!}</#if></td>
+							<td>￥ <#if detail.is_gift?? && detail.is_gift == 1>0<#else>${detail.reject_amount!}</#if></td>
     						</@shiro.lacksRole>	
 					</tr>
 				</#list>

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.weixin.sdk.api.QrcodeApi;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
@@ -169,17 +170,17 @@ public class UserController extends BaseFrontController {
 		keepPara();
 		String action = getPara(0, "index");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+//		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+//		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		
-		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
-		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
-		setAttr("totalOrderCount", totalOrderCount.intValue());
-		setAttr("totalCustomerCount", totalCustomerCount.intValue());
-		setAttr("orderTotal", SalesOrderQuery.me().getToDo(user.getUsername()).size());
-		setAttr("customerVisitTotal",CustomerVisitQuery.me().getToDo(user.getUsername()).size());
-		setAttr("customerTotal",SellerCustomerQuery.me().getToDo(user.getUsername()).size());
-		setAttr("activityApplyTotal", ActivityApplyQuery.me().getToDo(user.getUsername(), dealerDataArea).size());
+//		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
+//		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
+//		setAttr("totalOrderCount", totalOrderCount.intValue());
+//		setAttr("totalCustomerCount", totalCustomerCount.intValue());
+		setAttr("orderTotal", SalesOrderQuery.me().findToDoOrderReviewCount(user.getUsername()));
+		setAttr("customerVisitTotal", CustomerVisitQuery.me().findToDoCustomerVisitReviewCount(user.getUsername()));
+		setAttr("customerTotal", SellerCustomerQuery.me().findToDoCustomerReviewCount(user.getUsername()));
+		setAttr("activityApplyTotal", ActivityApplyQuery.me().findToDoActivityReviewCount(user.getUsername()));
 		
 		render(String.format("user_center_%s.html", action));
 	}
@@ -194,7 +195,7 @@ public class UserController extends BaseFrontController {
 			setAttr("avatar", wxUserResult.getStr("headimgurl"));
 			setAttr("nickname", wxUserResult.getStr("nickname"));
 		}
-		
+
 		render("user_bind.html");
 	}
 	
@@ -392,6 +393,14 @@ public class UserController extends BaseFrontController {
 	public void timeout() {
 		render("timeout.html");
 		return;
+	}
+
+	public void getQrcode()
+	{
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String str = "{\"expire_seconds\": 604800, \"action_name\": \"QR_STR_SCENE\", \"action_info\": {\"scene\": {\"scene_str\":\"" + user.getId() + "\"}}}";
+		ApiResult apiResult = QrcodeApi.create(str);
+		renderText(apiResult.getJson());
 	}
 	
 }

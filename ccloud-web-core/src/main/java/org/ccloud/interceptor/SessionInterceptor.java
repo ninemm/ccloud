@@ -16,6 +16,7 @@
 package org.ccloud.interceptor;
 
 import org.ccloud.Consts;
+import org.ccloud.model.Member;
 import org.ccloud.model.User;
 
 import com.jfinal.aop.Interceptor;
@@ -27,10 +28,11 @@ public class SessionInterceptor implements Interceptor {
 	public void intercept(Invocation inv) {
 		//判断session里面有没有user
 		User user =  inv.getController().getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Member member =  inv.getController().getSessionAttr(Consts.SESSION_LOGINED_MEMBER);
 		//获取访问地址
 		String controllerKey = inv.getControllerKey();
 		//筛选掉后台
-		if (user != null || controllerKey.startsWith(Consts.FIRST_URL)) {
+		if (user != null|| member != null || controllerKey.startsWith(Consts.FIRST_URL)) {
 			inv.invoke();
 		} else {
 			inv.getController().redirect("/user/timeout");

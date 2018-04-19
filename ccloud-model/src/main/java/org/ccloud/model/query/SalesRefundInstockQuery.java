@@ -230,26 +230,28 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		if (!sellerProduct.update()) {
 			return false;
 		}
-
-		//更新计划
-		BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
-		if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
-			return false;
+		String isGift = StringUtils.getArrayFirst(paraMap.get("_isGift" + index));
+		if(isGift.equals("0")) {
+			//更新计划
+			BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
+			if (StrKit.notBlank(order_user)) {
+				if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
+					return false;
+				}
+			}
 		}
-		
 		return true;
 	}
 
 	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
 
-		List<Plans> plans = PlansQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
-		for (Plans plan : plans) {
-			BigDecimal planNum = plan.getPlanNum();
-			BigDecimal completeNum = plan.getCompleteNum().subtract(productCount);
-			plan.setCompleteNum(completeNum);
-			plan.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
-			plan.setModifyDate(new Date());
-			if(!plan.update()){
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
+		for (PlansDetail plansDetail : plansDetails) {
+			BigDecimal planNum = plansDetail.getPlanNum();
+			BigDecimal completeNum = plansDetail.getCompleteNum().subtract(productCount);
+			plansDetail.setCompleteNum(completeNum);
+			plansDetail.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
+			if(!plansDetail.update()){
 				return  false;
 			}
 		}
@@ -393,7 +395,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmpty(fromBuilder, "o.status", status, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.name", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ct.id", customerTypeId, params, needWhere);
 //		needWhere = appendIfNotEmpty(fromBuilder, "o.customer_type_id", customerTypeId, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
@@ -494,14 +496,27 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 	
 	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate, String printStatus,String stockInStatus ,String dataArea,String sort,String order) {
-		String select = "select r.*, c.customer_name,c.contact,c.mobile,w.name as warehouseName,ct.name as customerTypeName,u.realname ";
+		LinkedList<Object> params = new LinkedList<Object>();
+		String select = "select r.*, c.customer_name,c.contact,c.mobile,w.name as warehouseName,ct.name as customerTypeName,u.realname,t1.rejectAmount ";
 		StringBuilder fromBuilder = new StringBuilder(" from `cc_sales_refund_instock` r");
+		fromBuilder.append(" LEFT JOIN (SELECT SUM(sd.reject_amount) as rejectAmount,sd.refund_instock_id ");
+		fromBuilder.append(" from cc_sales_refund_instock_detail sd ");
+		fromBuilder.append(" WHERE 	sd.data_area LIKE '"+dataArea+"' ");
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and sd.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and sd.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append(" GROUP BY sd.refund_instock_id) t1 on t1.refund_instock_id = r.id ");
 		fromBuilder.append(" left join cc_seller_customer cc ON r.customer_id = cc.id ");
 		fromBuilder.append(" left join cc_customer c on cc.customer_id = c.id ");
 		fromBuilder.append(" left join cc_warehouse w on r.warehouse_id = w.id ");
 		fromBuilder.append(" left join cc_customer_type ct on r.customer_type_id = ct.id ");
 		fromBuilder.append(" left join user u on r.biz_user_id = u.id ");
-		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, needWhere);
 		
@@ -545,5 +560,22 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Record findStockInForPrintByNoOrder(String inStockId) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(" SELECT sr.id as salesRefundInstockId, sr.instock_sn, sr.payment_type, sr.remark AS stockInRemark, c.address AS delivery_address, sr.total_reject_amount, ");
+		stringBuilder.append(" cs.customer_kind, c.id AS customerId, c.customer_name, c.contact AS ccontact, c.mobile AS cmobile, c.address AS ");
+		stringBuilder.append(" caddress, ct. NAME AS customerTypeName, ct. CODE AS customerTypeCode, u.realname, u.mobile, w. CODE AS ");
+		stringBuilder.append(" warehouseCode, cp.factor, w.`name` AS warehouseName, w.phone AS warehousePhone, sr.create_date AS returnOrderTime, ");
+		stringBuilder.append(" sr.remark, sn.seller_name as sellerName, sr.total_reject_amount AS total_amount, sr.id AS orderId, sr.input_user_id AS biz_user_id, sr.create_date as order_date, sn.id AS sellerId, pt.context AS printFootContext ");
+		stringBuilder.append(" FROM cc_sales_refund_instock  sr LEFT JOIN cc_seller_customer cs ON sr.customer_id = cs.id ");
+		stringBuilder.append(" LEFT JOIN cc_customer c ON cs.customer_id = c.id ");
+		stringBuilder.append(" LEFT JOIN cc_seller sn ON sn.id = sr.seller_id LEFT JOIN cc_customer_type ct ON sr.customer_type_id = ");
+		stringBuilder.append(" ct.id LEFT JOIN cc_price_system cp ON cp.id = ct.price_system_id LEFT JOIN USER u ON sr.input_user_id = u.id LEFT ");
+		stringBuilder.append(" JOIN cc_warehouse w ON sr.warehouse_id = w.id LEFT JOIN cc_seller_join_template cjt ON cjt.seller_id = sn.id LEFT ");
+		stringBuilder.append(" JOIN cc_print_template pt ON pt.id = cjt.print_template_id WHERE sr.id = ? ");
+		
+		return Db.findFirst(stringBuilder.toString(), inStockId);
 	}
 }

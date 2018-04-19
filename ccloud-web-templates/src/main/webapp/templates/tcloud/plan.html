@@ -14,9 +14,8 @@
 <#macro script_import>
 </#macro>
 <#macro script>
-
+var flang = true;
 $(function() {
-	$(".startDate").append('开始时间'+' <span class="require">*</span>');
 	$("#datetime-picker").datetimePicker({
 				times: function () {
 		          return [];
@@ -40,12 +39,12 @@ $(function() {
 			$("#datetime-picker").val(date3.Format("yyyy-MM"));
 			date3.setDate(1);
 			$("#start-date").val(date3.Format("yyyy-MM-dd"));
-			 var currentMonth=date3.getMonth();
-			 var nextMonth=++currentMonth;
-			 var nextMonthFirstDay=new Date(date3.getFullYear(),nextMonth,1);
-			 var oneDay=1000*60*60*24;
-			 var date4 = new Date(nextMonthFirstDay-oneDay);
-			 $("#end-date").val(date4.Format("yyyy-MM-dd"));
+			var currentMonth=date3.getMonth();
+			var nextMonth=++currentMonth;
+			var nextMonthFirstDay=new Date(date3.getFullYear(),nextMonth,1);
+			var oneDay=1000*60*60*24;
+			var date4 = new Date(nextMonthFirstDay-oneDay);
+			$("#end-date").val(date4.Format("yyyy-MM-dd"));
 		}
 		if($("#typeId").val()==101203){
 			$("#datetime-picker").val(date3.Format("yyyy"));
@@ -99,11 +98,23 @@ $(function() {
 		});
 	})
 	
-	/*var date2 = new Date();
-	date2.setDate((new Date()).getDate()+7);
+	var date2 = new Date();
+	/*date2.setDate((new Date()).getDate()+7);
 	$("#end-date").val(date2.Format("yyyy-MM-dd"));*/
 	$productList.empty();
 	addProduct();
+	$("#type").val("月计划");
+	$("#typeId").val("101202");
+	$("#datetime-picker").show();
+	$("#datetime-picker").val(date2.Format("yyyy-MM"));
+	date2.setDate(1);
+	$("#start-date").val(date2.Format("yyyy-MM-dd"));
+	 var currentMonth=date2.getMonth();
+	 var nextMonth=++currentMonth;
+	 var nextMonthFirstDay=new Date(date2.getFullYear(),nextMonth,1);
+	 var oneDay=1000*60*60*24;
+	 var date4 = new Date(nextMonthFirstDay-oneDay);
+	 $("#end-date").val(date4.Format("yyyy-MM-dd"));
  })
 
 var productInfoMap = ${productItems!};
@@ -111,7 +122,7 @@ var productInfoMap = ${productItems!};
 var $productList = $(".productList");
 var newHtml = $(".productList").html();
 
-$("#type").select({
+/*$("#type").select({
 	title: "选择计划类型",
 	items: [{
 		title: "周计划", value: "101201"
@@ -160,7 +171,7 @@ $("#type").select({
 			}
 		}
 	}
-});
+});*/
 
 function addProduct(){
 	$productList.append(newHtml);
@@ -169,6 +180,21 @@ function addProduct(){
 			title: "选择产品",
 			items: productInfoMap,
 			onChange: function(obj){
+				var startDate = $("#start-date").val();
+				var endDate = $("#end-date").val();
+				$.ajax({
+					url:"${CPATH}/plans/checkProduct",
+					type:"post",
+					dataType:"json",
+					data:{"sellerProductId":this.data['values'],"startDate":startDate,"endDate":endDate},
+					success:function(data)
+					{
+						if(data == false){
+							$.toptip("该月份产品计划已经存在");
+							flang = false;
+						}
+					}
+				});
 				var $product = $(this)[0].$input.parents(".productInfo");
 				$product.find("#productId").val(this.data['values']);
 			}
@@ -176,6 +202,11 @@ function addProduct(){
 }
 
 function doSubmit(){
+	if(flang == false){
+		$.toptip("该月份产品计划已经存在");
+		return;
+	}
+							
 	$("#form").ajaxSubmit({
 			beforeSubmit: function() {
 				return true
@@ -184,23 +215,27 @@ function doSubmit(){
 			dataType : "json",
 			success : function(data) {
 				layer.closeAll();
-				$.modal({
-					title: data.message,
-					buttons: [
-						{ text: "查看计划", className: "default", onClick: function(){
-							location.href = "${CPATH}/plans/myPlans";
-						}
-						},
-						{ text: "继续新增", className: "primary", onClick: function(){
-							location.href = '${CPATH}/plans';
-						}
-						},
-					]
-				});
+				if (data.errorCode == 0) {
+					$.modal({
+						title: data.message,
+						buttons: [
+							{ text: "查看计划", className: "default", onClick: function(){
+								location.href = "${CPATH}/plans/mPlans";
+							}
+							},
+							{ text: "继续新增", className: "primary", onClick: function(){
+								location.href = '${CPATH}/plans';
+							}
+							},
+						]
+					});
+				} else {
+					$.toptip(data.message, 'error');
+				}
 			},
 			error : function() {
 				layer.closeAll();
-				alert("信息提交错误");
+				$.toptip("信息提交错误");
 			}
 		});
 }
@@ -220,18 +255,27 @@ function deleteTr(obj){
 						<div class="order-customer-info-title">计划类型
 							<span class="require">*</span>
 						</div>
-						<i class="icon-sort-desc fr"></i>
+						<!-- <i class="icon-sort-desc fr"></i> -->
 						<input type="text" class="weui-input fr" id="type" name="type" readonly="" placeholder="请选择计划类型">
 						<input type="hidden" class="weui-input fr" id="typeId" name="typeId" value="">
 					</div>
 				</div>
 				<div class="weui-cell">
 					<div class="weui-cell__bd">
-						<div class="order-customer-info-title startDate">
+						<div class="order-customer-info-title startDate">计划月份
+							<span class="require">*</span>
+						</div>
+						<i class="icon-sort-desc fr"></i>
+						<input type="text" class="weui-input fr" id='datetime-picker' name = "datetime-picker" style="display:none;" readonly=""/>
+					</div>
+				</div>
+				<!-- <div class="weui-cell">
+					<div class="weui-cell__bd">
+						<div class="order-customer-info-title startDate">开始时间
+							<span class="require">*</span>
 						</div>
 						<i class="icon-sort-desc fr"></i>
 						<input type="text" class="weui-input fr" id="start-date" name="start-date" readonly="">
-						<input type="text" class="weui-input fr" id='datetime-picker' style="display:none;" readonly=""/>
 					</div>
 				</div>
 				<div class="weui-cell endDate">
@@ -242,7 +286,7 @@ function deleteTr(obj){
 						<i class="icon-sort-desc fr"></i>
 						<input type="text" class="weui-input fr" id="end-date" name="end-date" readonly="">
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</div>
 		<div class="weui-cells__title">计划明细</div>

@@ -45,7 +45,7 @@ public class RefundController extends BaseFrontController{
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
 		
@@ -102,7 +102,7 @@ public class RefundController extends BaseFrontController{
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
 		
@@ -267,96 +267,104 @@ public class RefundController extends BaseFrontController{
 		renderAjaxResultForSuccess("订单审核成功");
 	}
 	
-//	@Before(Tx.class)
-//	public synchronized void saveRefundByUser() {
-//		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-//		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-//		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
-//		Warehouse warehouse = WarehouseQuery.me().findRefundWareHouse(sellerId);
-//		if (warehouse == null) {
-//			renderAjaxResultForError("找不到对应仓库");
-//			return;
-//		}
-//		
-//		Map<String, String[]> paraMap = getParaMap();
-//		String result = this.saveRefund(paraMap, user, sellerId, sellerCode, warehouse);
-//		if (StrKit.isBlank(result)) {
-//			renderAjaxResultForSuccess("退货成功");
-//		} else {
-//			renderAjaxResultForError(result);
-//		}		
-//	}
-//
-//	private String saveRefund(final Map<String, String[]> paraMap, final User user, 
-//			final String sellerId, final String sellerCode, final Warehouse warehouse) {
-//		final String[] result = {""};
-//		Db.tx(new IAtom() {
-//			@Override
-//			public boolean run() throws SQLException {
-//				
-//				String orderId = StrKit.getRandomUUID();
-//				Date date = new Date();
-//
-//				SalesRefundInstock salesRefundInstock =  SalesRefundInstockQuery.me()
-//						.insertAppByUser(orderId, paraMap, user, sellerId, sellerCode, date, warehouse);
-//				
-//				String[] sellProductIds = paraMap.get("sellProductId");
-//				// 常规商品
-//				if (sellProductIds != null && sellProductIds.length > 0) {
-//					
-//					for (int index = 0; index < sellProductIds.length; index++) {
-//						if (StrKit.notBlank(sellProductIds[index])) {
-//							String message = SalesRefundInstockDetailQuery.me().insertForAppByUser(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
-//									user.getDepartmentId(), user.getDataArea(), index);
-//							if (StrKit.notBlank(message)) {
-//								result[0] = message;
-//								return false;
-//							}
-//							
-//						}
-//
-//					}
-//				}
-//				
-//				String[] giftSellProductIds = paraMap.get("giftSellProductId");
-//				// 赠品
-//				if (giftSellProductIds != null && giftSellProductIds.length > 0) {
-//					for (int index = 0; index < giftSellProductIds.length; index++) {
-//						if (StrKit.notBlank(giftSellProductIds[index])) {
-//							String message = SalesRefundInstockDetailQuery.me().insertForAppGiftByUser(paraMap, orderId, sellerId, sellerCode, user.getId(),
-//									date, user.getDepartmentId(), user.getDataArea(), index);
-//							if (StrKit.notBlank(message)) {
-//								result[0] = message;
-//								return false;
-//							}
-//						}
-//
-//					}
-//				}
-//
-//				String[] compositionIds = paraMap.get("compositionId");
-//				String[] compositionNums = paraMap.get("compositionNum");
-//				// 组合商品
-//				if (compositionIds != null && compositionIds.length > 0) {
-//					for (int index = 0; index < compositionIds.length; index++) {
-//						String productId = compositionIds[index];
-//						String number = compositionNums[index];
-//						List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
-//						for (SellerProduct sellerProduct : list) {
-//							String message = SalesRefundInstockDetailQuery.me().insertForAppCompositionByUser(sellerProduct, orderId, sellerId, sellerCode,
-//									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
-//									Integer.parseInt(number), user.getId());
-//							if (StrKit.notBlank(message)) {
-//								result[0] = message;
-//								return false;
-//							}
-//						}
-//					}
-//				}
-//				return true;
-//			}
-//		});
-//		return result[0];
-//	}
+	@Before(Tx.class)
+	public synchronized void saveRefundByUser() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		Warehouse warehouse = WarehouseQuery.me().findRefundWareHouse(sellerId);
+		if (warehouse == null) {
+			renderAjaxResultForError("找不到对应仓库");
+			return;
+		}
+		
+		Map<String, String[]> paraMap = getParaMap();
+		String result = this.saveRefund(paraMap, user, sellerId, sellerCode, warehouse);
+		if (StrKit.isBlank(result)) {
+			renderAjaxResultForSuccess("退货成功");
+		} else {
+			renderAjaxResultForError(result);
+		}		
+	}
+
+	private String saveRefund(final Map<String, String[]> paraMap, final User user, 
+			final String sellerId, final String sellerCode, final Warehouse warehouse) {
+		final String[] result = {""};
+		Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+				
+				String orderId = StrKit.getRandomUUID();
+				Date date = new Date();
+
+				SalesRefundInstock salesRefundInstock =  SalesRefundInstockQuery.me()
+						.insertAppByUser(orderId, paraMap, user, sellerId, sellerCode, date, warehouse);
+				BigDecimal totalRejectAmount = new BigDecimal(0);
+				String[] sellProductIds = paraMap.get("sellProductId");
+				// 常规商品
+				if (sellProductIds != null && sellProductIds.length > 0) {
+					
+					for (int index = 0; index < sellProductIds.length; index++) {
+						if (StrKit.notBlank(sellProductIds[index])) {
+							Map<String, Object> map = SalesRefundInstockDetailQuery.me().insertForAppByUser(paraMap, orderId, date,
+									user.getDepartmentId(), user.getDataArea(), index);
+							String status = map.get("status").toString();
+							if (status.equals("false")) {
+								return false;
+							} else {
+        						totalRejectAmount = totalRejectAmount.add(new BigDecimal(map.get("productAmount").toString()));
+        					}
+						}
+
+					}
+				}
+				
+				String[] giftSellProductIds = paraMap.get("giftSellProductId");
+				// 赠品
+				if (giftSellProductIds != null && giftSellProductIds.length > 0) {
+					for (int index = 0; index < giftSellProductIds.length; index++) {
+						if (StrKit.notBlank(giftSellProductIds[index])) {
+							Map<String, Object> map = SalesRefundInstockDetailQuery.me().insertForAppGiftByUser(paraMap, orderId,
+									date, user.getDepartmentId(), user.getDataArea(), index);
+							String status = map.get("status").toString();
+							if (status.equals("false")) {
+								return false;
+							} else {
+        						totalRejectAmount = totalRejectAmount.add(new BigDecimal(map.get("productAmount").toString()));
+        					}
+						}
+
+					}
+				}
+
+				String[] compositionIds = paraMap.get("compositionId");
+				String[] compositionNums = paraMap.get("compositionNum");
+				// 组合商品
+				if (compositionIds != null && compositionIds.length > 0) {
+					for (int index = 0; index < compositionIds.length; index++) {
+						String productId = compositionIds[index];
+						String number = compositionNums[index];
+						List<SellerProduct> list = SellerProductQuery.me().findByCompositionId(productId);
+						for (SellerProduct sellerProduct : list) {
+							Map<String, Object> map = SalesRefundInstockDetailQuery.me().insertForAppCompositionByUser(sellerProduct, orderId,
+									date, user.getDepartmentId(), user.getDataArea(),
+									Integer.parseInt(number));
+							String status = map.get("status").toString();
+							if (status.equals("false")) {
+								return false;
+							}
+						}
+						totalRejectAmount = totalRejectAmount.add(list.get(0).getPrice());
+					}
+				}
+        		salesRefundInstock.setTotalRejectAmount(totalRejectAmount);
+        		if (!salesRefundInstock.save()) {            	
+        			return false;
+        		}				
+				return true;
+			}
+		});
+		return result[0];
+	}
 
 }

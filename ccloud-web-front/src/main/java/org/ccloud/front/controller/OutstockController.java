@@ -2,18 +2,11 @@ package org.ccloud.front.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.google.common.collect.Maps;
-import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
-import com.jfinal.plugin.activerecord.tx.Tx;
-import org.activiti.engine.task.Comment;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.*;
@@ -21,10 +14,6 @@ import org.ccloud.model.query.*;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
-import org.ccloud.utils.StringUtils;
-import org.ccloud.wechat.WechatJSSDKInterceptor;
-import org.ccloud.workflow.listener.order.OrderReviewUtil;
-import org.ccloud.workflow.service.WorkFlowService;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -55,7 +44,7 @@ public class OutstockController extends BaseFrontController {
 		for (CustomerType customerType : customerTypeList) {
 			Map<String, Object> item = new HashMap<>();
 			item.put("title", customerType.getName());
-			item.put("value", customerType.getName());
+			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
 
@@ -196,7 +185,7 @@ public class OutstockController extends BaseFrontController {
 					inventoryDetail.setOutCount(storeCount);
 					inventoryDetail.setOutPrice(inventory.getOutPrice());
 					inventoryDetail.setBalanceAmount(oldDetail.getBalanceAmount().subtract(record.getBigDecimal("product_amount")));
-					inventoryDetail.setBalanceCount(storeCount);
+					inventoryDetail.setBalanceCount(oldBalanceCount.subtract(storeCount));
 					inventoryDetail.setBalancePrice(oldDetail.getBalancePrice());
 					inventoryDetail.setBizBillSn(salesOutstock.getOutstockSn());
 					inventoryDetail.setBizDate(record.getDate("create_date"));
@@ -246,6 +235,17 @@ public class OutstockController extends BaseFrontController {
 						return false;
 					}
 
+					String isGift = record.getStr("is_gift");
+					if(isGift.equals("0")) {
+						//找到业务员ID
+						String orderUserId = SalesOrderQuery.me().findByOutstockId(record.getStr("outstock_id")).getBizUserId();
+						//更新计划
+						
+						BigDecimal bigProductCount = new BigDecimal(record.getStr("product_count")).divide(new BigDecimal(record.getStr("convert_relate")), 2, BigDecimal.ROUND_HALF_UP);
+						if (!updatePlans(orderUserId, record.getStr("sell_product_id"), record.getStr("create_date"), bigProductCount)) {
+							return false;
+						}
+					}
 				}
 
 				SalesOrder salesOrder = SalesOrderQuery.me().findByOutstockId(outstockId);
@@ -282,7 +282,6 @@ public class OutstockController extends BaseFrontController {
 					result[0] = "出库单状态更新错误";
 					return false;
 				}
-
 				salesOrder.setStatus(Consts.SALES_ORDER_STATUS_ALL_OUT);
 				salesOrder.setModifyDate(date);
 
@@ -432,6 +431,22 @@ public class OutstockController extends BaseFrontController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("outstockDetail", outstockDetail);
 		renderJson(map);
+	}
+	
+	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
+
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
+		for (PlansDetail plansDetail : plansDetails) {
+			BigDecimal planNum = plansDetail.getPlanNum();
+			BigDecimal completeNum = productCount.add(plansDetail.getCompleteNum());
+			plansDetail.setCompleteNum(completeNum);
+			plansDetail.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
+			if(!plansDetail.update()){
+				return  false;
+			}
+		}
+
+		return true;
 	}
 
 }

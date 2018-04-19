@@ -1,0 +1,99 @@
+<#macro script_import></#macro> 
+<#macro script></#macro> 
+<#macro css_import></#macro> 
+<#macro css></#macro>
+<#macro title></#macro>
+<#macro layout>
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  	<title><@title /></title>
+  	<meta name="keywords" content="${META_KEYWORDS!}">
+  	<meta name="description" content="${META_DESCRIPTION!}">
+  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  	<meta name="renderer" content="webkit">
+  	
+	<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+  	<link type="image/x-icon" rel="shortcut icon" href="${CTPATH}/favicon.ico">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/animate.min.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/weui.min.css">
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/jquery-weui.min.css"> 
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/icomoon.css">
+	<link type='text/css' rel="stylesheet" href="${CPATH}/static/plugins/toastr/toastr.css">
+
+	<@css_import />
+
+	<link type='text/css' rel="stylesheet" href="${CTPATH}/css/style.css?time=${.now?string['hhmmSSsss']}">
+
+  	<#if css ??>
+  		<style type="text/css">
+  		<@css />
+  		</style>
+  	</#if>
+
+</head>
+
+<body ontouchstart>
+	
+	<#nested>
+	
+	<div style="display: none;">
+		${OPTION('jpblog_statistical_code')!}
+	</div>
+	
+    <!-- jQuery -->
+	<script type='text/javascript' src="${CTPATH}/js/jquery-3.2.1.min.js"></script>
+	<script type='text/javascript' src="${CPATH}/static/plugins/jquery/jquery.form.min.js"></script>
+	<!-- fastclick -->
+	<script type='text/javascript' src="${CTPATH}/js/fastclick.js"></script>
+	<!-- Bootstrap -->
+	<script type='text/javascript' src="${CTPATH}/js/jquery-weui.js"></script>
+	<script type='text/javascript' src="${CTPATH}/js/historyUtils.js"></script>
+	<script type='text/javascript' src="${CPATH}/static/plugins/toastr/toastr.js"></script>
+	<script type='text/javascript' src="${CPATH}/static/layer_mobile/layer.js"></script>
+	<@script_import />
+	<script type='text/javascript' src="${CTPATH}/js/comm.js"></script>
+	<script type="text/javascript">
+		if (Utils.devMode) {
+	        document.write("<script type=\"text/javascript\" src=\"" + '${CTPATH}' + "/js/vconsole.min.js\">" + "<\/script>");
+	    }
+	
+	    $(function() {
+        	FastClick.attach(document.body);
+        	initToast();
+		});	
+	    
+	    function initToast(){
+	    	toastr.options = {
+	    	  "closeButton": true,
+	    	  "debug": false,
+	    	  "newestOnTop": false,
+	    	  "progressBar": true,
+	    	  "positionClass": "toast-top-center",
+	    	  "preventDuplicates": false,
+	    	  "onclick": null,
+	    	  "showDuration": "300",
+	    	  "hideDuration": "1000",
+	    	  "timeOut": "2000",
+	    	  "extendedTimeOut": "1000",
+	    	  "showEasing": "swing",
+	    	  "hideEasing": "linear",
+	    	  "showMethod": "fadeIn",
+	    	  "hideMethod": "fadeOut"
+	    	}
+	    }
+	</script>
+	
+	<#if script ??>
+	<script type="text/javascript">
+		<@script />
+	</script>
+	</#if>
+</body>
+</html>
+</#macro>

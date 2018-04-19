@@ -47,6 +47,7 @@
 	var initParams = function(params) {
 		var actId = $("#activityId").find("option:selected").val();
 		var ssId = $("#sellerId").find("option:selected").val();
+		var status = $("#status").find("option:selected").val();
 		var keyword = $('#search').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
@@ -56,7 +57,8 @@
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
 			activity: actId,
-			sellerId: ssId
+			sellerId: ssId,
+			status: status
 		};
 		return param;
 	};
@@ -123,7 +125,7 @@
 				},
 				{field: "action", title: "操作", align: "center", width: '15%',
 				formatter: function(value, row, rowIndex) {
-					var strHtml ='<a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
+					var strHtml ='<div style = "white-space:nowrap"><a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
 					strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="history(\'' + row.id + '\',\'' +row.proc_inst_id + '\')" >操作记录</a> ';
 					
 					<@shiro.hasPermission name="/admin/salesOrder/check">
@@ -134,6 +136,7 @@
 					</@shiro.hasPermission>			
                     /*strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="proc(\''+row.id+'\')" >proc</a> ';
                     strHtml = strHtml + '<a class="btn btn-xs btn-warning btn-flat" onclick="cancel(\''+row.id+'\')" >取消</a> ';*/
+					strHtml += '</div>';
 					return strHtml;
 				},
 				edit:false
@@ -335,10 +338,20 @@
 		                </select>
 	                </div>
                 </div>
-                <div class="col-sm-4" style="text-align:center;">
-                    <input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
-                </div>
-			</div>
+                <div class="col-sm-4">
+                    <label class="control-label col-sm-4">状态:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+		                <select class="form-control" id="status">
+							${DICT_BOX('order_status', 'select')}
+		                </select>
+	                </div>
+                </div> 
+            </div>               
+			<div class="form-group">
+			    <div class="col-sm-12" style="text-align:center;">
+			    	<a id="search-submit" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-search"></i> 搜索</a>
+			    </div>
+            </div>
 		</form>
 	</div>
 	<div class="row content-row">
@@ -351,7 +364,9 @@
 			
 		</div>
 		<div class="jp-right">
-		    <button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchDown()"><i class="fa fa-download"></i> 导出</button>
+			<@shiro.hasPermission name="/admin/salesOrder/downloading">
+		    	<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchDown()"><i class="fa fa-download"></i> 导出</button>
+			</@shiro.hasPermission>
 		</div>
 	</div>
 	<div class="box">

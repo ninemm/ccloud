@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -94,9 +96,30 @@ public class _UserController extends JBaseCRUDController<User> {
 
 		Page<User> page = UserQuery.me().paginateUser(getPageNumber(), getPageSize(), keyword, dataArea, "u.create_date",
 				userId);
+		List<User> list = page.getList();
+		for (User user : list) {
+			try {
+				if (StrKit.notBlank(user.getNickname())) {
+					String nickname = URLDecoder.decode(user.getNickname(), "utf-8");
+					user.setNickname(nickname);
+				}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
 		if (page != null) {
 			setAttr("page", page);
 		}
+//		String nickname = get("nickname");
+//		try {
+//			if (StrKit.notBlank(nickname)) {
+//				nickname = URLDecoder.decode((String) get("nickname"), "utf-8");
+//			}
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return nickname;
 
 	}
 
@@ -104,6 +127,15 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 		final User user = getModel(User.class);
+		try {
+			if (StrKit.notBlank(user.getNickname())) {
+				String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
+				user.setNickname(nickname);
+			}
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
@@ -321,7 +353,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				userHistory.setUserNames(user.getUserNames());
 				userHistory.setDataArea(user.getDataArea());
 				userHistory.setWechatOpenId(user.getWechatOpenId());
-				userHistory.setWechatUserid(user.getWechatUserId());
+				userHistory.setWechatUserid(user.getWechatUseriId());
 				userHistory.setCreateDate(new Date());
 				userHistory.save();
 			}
@@ -460,16 +492,12 @@ public class _UserController extends JBaseCRUDController<User> {
 		render("upload.html");
 	}
 	
-	@RequiresPermissions(value = { "/admin/user/uploading", "/admin/dealer/all",
-	"/admin/all" }, logical = Logical.OR)
 	public void userTemplate() {
 		String realPath = getSession().getServletContext().getRealPath("\\") +"\\WEB-INF\\admin\\user\\userTemplate.xls";
 		renderFile(new File(realPath.replace("\\", "/")));
 	}
 	
 	@Before(Tx.class)
-	@RequiresPermissions(value = { "/admin/user/uploading", "/admin/dealer/all",
-			"/admin/all" }, logical = Logical.OR)
 	public void uploading() {
 		int inCnt = 0;
 		int existCnt = 0;
@@ -579,7 +607,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		//String deptIds = getPara("deptId");
 		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
-				+ "userInfo.xlsx";
+				+ "用户信息.xlsx";
 		String userId = "";
 		Page<User> page = UserQuery.me().paginateUser(1, Integer.MAX_VALUE,  keyword, dataArea, "u.create_date",userId);
 		List<User> userList = page.getList();
@@ -598,7 +626,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, UserExecel.class, excellist);
-		File file = new File(filePath);
+		File file = new File(filePath.replace("\\", "/"));
 		FileOutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
@@ -616,7 +644,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		
 		ExcelExportUtil.closeExportBigExcel();
 		
-		renderFile(new File(filePath));
+		renderFile(new File(filePath.replace("\\", "/")));
 	}	
 	
 	@Before(UCodeInterceptor.class)
@@ -667,7 +695,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		userHistory.setUserNames(user.getUserNames());
 		userHistory.setDataArea(user.getDataArea());
 		userHistory.setWechatOpenId(user.getWechatOpenId());
-		userHistory.setWechatUserid(user.getWechatUserId());
+		userHistory.setWechatUserid(user.getWechatUseriId());
 		userHistory.setCreateDate(new Date());
 		userHistory.save();
 //		renderAjaxResultForSuccess("更新成功");

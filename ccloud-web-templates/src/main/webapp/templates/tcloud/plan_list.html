@@ -3,7 +3,7 @@
 <#macro css>
 	#my-order {
 		position: absolute;
-		top: 44px;
+		top: 151px;
 		bottom: 0;
 		width: 100%;
 	}
@@ -11,34 +11,47 @@
 <#macro script>	
 	$(function() {
 		$(".plansShow").css('display','none');
+		$("#productSearch").hide();
 		combo();
 	});
-
-	var cpLock = true;
-	var time;
-
-	$(document).on("compositionstart", "#searchInput", function() {
-		cpLock = false;
-	}).on("compositionend", "#searchInput", function() {
-		cpLock = true;
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
-	}).on("input", "#searchInput", function() {
-		if(cpLock) {
-			clearTimeout(time);
-			time = setTimeout(function(){ 
-				combo();
-			},500);
-		}
+	$("#datetime-picker").datetimePicker({
+				times: function () {
+		          return [];
+		        }
+			});
+	$("#datetime-picker").click(function(){
+			$(".picker-items-col:nth-child(5)").hide();
+			$(".picker-items-col:nth-child(4)").hide();
+		});
+	$("#datetime-picker").change(function(){
+		var datePicker = $("#datetime-picker").val();
+		$("#datetime-picker").val(datePicker.substring(0,7));
+	});
+	$(document).on("click", ".close-picker", function() {
+		var datePicker = $("#datetime-picker").val();
+		$("#datetime-picker").val(datePicker.substring(0,7));
+		planAmount = 0;
+		completeAmount = 0;
+		 combo();
+	});
+	var page = 1;
+	var size = 10;
+	var planAmount = 0;
+	var completeAmount = 0;
+	$(document).on("submit", ".weui-search-bar__form", function() {
+		planAmount = 0;
+		completeAmount = 0;
+		combo();
+		return false;
 	}).on("click", "#searchCancel", function() {
+		planAmount = 0;
+		completeAmount = 0;
 		combo();
 	}).on("change", "#type", function() {
 		combo();
 	}).on("change", "#userId", function() {
+		combo();
+	}).on("change", "#sellerProductId", function() {
 		combo();
 	}).on("click", "#confirm", function() {
 		startDate = $('#start-date').val();
@@ -56,12 +69,68 @@
 			title: "年计划", value: "101203"
 		}]
 	});
+	
+	$("#show").select({
+		title: "选择查看方式",
+		items: [{
+			title: "业务员", value: "101204"
+		},{
+			title: "产品", value: "101205"
+		}],
+		onChange: function(obj){
+			page = 1;
+			var params = {
+				"page": page,
+				"size": size,
+				"keyword": $("#searchInput").val(),
+				"userId": $("#userId").data('values'),
+//				"type": $("#type").data('values'),
+				"datetimePicker" : $("#datetime-picker").val(),
+				"type": "101202",
+				"show":$("#show").data('values'),
+				"startDate": startDate,
+				"endDate": endDate
+			}
+			var showType = $("#show").data('values');
+			$(".planList").html("");
+			if(showType == "101205"){
+				planAmount = 0;
+				completeAmount = 0;
+				$("#userSearch").hide();
+				$("#productSearch").show();
+				showSellerProduct(params);
+				$(".userId").hide();
+				$(".sellerProductId").show();
+			}else{
+				$("#userSearch").show();
+				$("#productSearch").hide();
+				planAmount = 0;
+				completeAmount = 0;
+				showBizUser(params);
+				$(".userId").show();
+				$(".sellerProductId").hide();
+			}
+			
+		} 
+	});
 
 	$("#userId").select({
 		title: "选择业务员",
-		items: ${userIds!}
+		items: ${userIds!},
+		onChange: function(obj){
+				planAmount = 0;
+				completeAmount = 0;
+		} 
 	});
-
+	
+	$("#sellerProductId").select({
+		title: "选择产品",
+		items: ${sellerProducts!},
+		onChange: function(obj){
+				planAmount = 0;
+				completeAmount = 0;
+		}
+	});
 	$("#start-date").calendar({
 		maxDate: function() {
 			return $('#end-date').val()
@@ -85,14 +154,11 @@
 	var loading = false;
 	var startDate = '';
 	var endDate = '';
-	var page = 1;
-	var size = 10;
 	//点击计划事件
 	function showPlans(el){
-		var username = $(el).find("#userName").text();
 		var typeName = $(el).find("#typeName").text();
-		var startDate = $(el).find("#startDate").text();
-		var endDate = $(el).find("#endDate").text();
+		var userId = $(el).find("#userId").val();
+		var plansId = $(el).find("#plansId").val();
 		if($(el).find(".plansShow").is(":hidden")){
 			$(el).find(".plansShow").html("");
 			$(el).find(".plansShow").show();
@@ -100,89 +166,204 @@
 			$(el).find(".plansShow").html("");
 			$(el).find(".plansShow").hide();
 		}
-		$.ajax({
-			url:"${CPATH}/plans/getPlans",
-			type:"post",
-			dataType:"json",
-			data:{"username":username,'typeName':typeName,'startDate':startDate,'endDate':endDate},
-			success:function(data)
-			{	
-				var html = "";
-				for (var i in data) {
-				 	html += '<div class="weui-cell">'
-							+'<div class="weui-cell__bd t-c" id="productName">'+data[i].custom_name
-							+'</div>'
-							+'</div>'
-							+'<div class="weui-cell">'
-							+'<div class="weui-cell__bd weui-flex t-c">'
-							+'<div class="weui-flex__item">'
-							+'<p>计划数量</p>'
-							+'<p id="planNum">'+data[i].plan_num+'</p>'
-							+'</div>'
-							+'<div class="weui-flex__item">'
-							+'<p>完成数量</p>'
-							+'<p id="completeNum">'+data[i].complete_num+'</p>'
-							+'</div>'
-							+'<div class="weui-flex__item">'
-							+'<p>完成比率</p>'
-							+'<p id="completeRatio">'+data[i].complete_ratio+'%</p>'
-							+'</div>'
-							+'</div>'
-							+'</div>';
+		var showType = $("#show").data('values');
+		if(showType == "101205"){
+			$.ajax({
+				url:"${CPATH}/plans/getSellerProductPlans",
+				type:"post",
+				dataType:"json",
+				data:{"sellerProductId":userId,'typeName':typeName,'plansId':plansId },
+				success:function(data)
+				{	
+					var html = '<div class="weui-cell">'
+								+'<div class="weui-cell__bd weui-flex t-c">'
+								+'<div class="weui-flex__item">'
+								+'<p style = "font-size:12px;">业务员</p>'
+								+'</div>'
+								+'<div class="weui-flex__item">'
+								+'<p style = "font-size:12px;">计划数量</p>'
+								+'</div>'
+								+'<div class="weui-flex__item">'
+								+'<p style = "font-size:12px;">完成数量</p>'
+								+'</div>'
+								+'<div class="weui-flex__item">'
+								+'<p style = "font-size:12px;">完成比率</p>'
+								+'</div>'
+								+'</div>'
+								+'</div>';
+					for (var i in data) {
+					 	html += '<div class="weui-cell">'
+								+'<div class="weui-cell__bd weui-flex t-c">'
+								+'<div class="weui-flex__item">'
+								+'<p id="userName" style = "font-size:12px;">'+data[i].realname+'</p>'
+								+'</div>'
+								+'<div class="weui-flex__item">'
+								+'<p id="planNum" style = "font-size:12px;">'+data[i].plan_num+'</p>'
+								+'</div>'
+								+'<div class="weui-flex__item">'
+								+'<p id="completeNum" style = "font-size:12px;">'+data[i].complete_num+'</p>'
+								+'</div>'
+								+'<div class="weui-flex__item">'
+								+'<p id="completeRatio" style = "color:red;font-size:12px;font-weight:bold;">'+data[i].complete_ratio+'%</p>'
+								+'</div>'
+								+'</div>'
+								+'</div>';
+					}
+						$(el).find(".plansShow").append(html);
 				}
-					$(el).find(".plansShow").append(html);
-			}
-		});
+			});
+		}else{
+				$.ajax({
+				url:"${CPATH}/plans/getPlans",
+				type:"post",
+				dataType:"json",
+				data:{"userId":userId,'typeName':typeName,'plansId':plansId},
+				success:function(data)
+				{	
+					var html = "";
+					for (var i in data) {
+					 	html += '<div class="weui-cell">'
+								+'<div class="weui-cell__bd t-c" id="productName" style = "font-size:13px;">'+data[i].custom_name
+								+'</div>'
+								+'</div>'
+								+'<div class="weui-cell">'
+								+'<div class="weui-cell__bd weui-flex t-c">'
+								+'<div class="weui-flex__item">'
+								+'<p style = "font-size:12px;">计划数量</p>'
+								+'<p id="planNum" style = "font-size:12px;">'+data[i].plan_num+'</p>'
+								+'</div>'
+								+'<div class="weui-flex__item">'
+								+'<p style = "font-size:12px;">完成数量</p>'
+								+'<p id="completeNum" style = "font-size:12px;">'+data[i].complete_num+'</p>'
+								+'</div>'
+								+'<div class="weui-flex__item">'
+								+'<p style = "font-size:12px;">完成比率</p>'
+								+'<p id="completeRatio" style = "color:red;font-size:12px;font-weight:bold;">'+data[i].complete_ratio+'%</p>'
+								+'</div>'
+								+'</div>'
+								+'</div>';
+					}
+						$(el).find(".plansShow").append(html);
+				}
+			});
+		}
 	}
 	function loadPlanData() {
 
 		$loading.show();
 		$noMore.hide();
+		layer.open({type: 2,content: '加载中'});
 	
 		var params = {
 			"page": page,
 			"size": size,
 			"keyword": $("#searchInput").val(),
 			"userId": $("#userId").data('values'),
-			"type": $("#type").data('values'),
+//			"type": $("#type").data('values'),
+			"type": "101202",
+			"show":$("#show").data('values'),
+			"datetimePicker" : $("#datetime-picker").val(),
+			"sellerProductId": $("#sellerProductId").data('values'),
 			"startDate": startDate,
 			"endDate": endDate
 		}
+		var showType = $("#show").data('values');
+		if(showType == "101205"){
+			
+			showSellerProduct(params);
+			$(".userId").hide();
+			$(".sellerProductId").show();
+		} else {
+			showBizUser(params);
+			$(".userId").show();
+			$(".sellerProductId").hide();
+		}
+		
+	}
 
+	function showBizUser(params){	
+		layer.open({type: 2,content: '加载中'});
 		Utils.ajax('${CPATH}/plans/planList', params,
 			function(data) {
 				$loading.hide();
+				layer.closeAll();
 				if(data.planList.length == 0) {
 					if($('.planList').length == 0) $noMore.show();
+					$("#planAmount").text(planAmount.toFixed(2));
+					$("#completeAmount").text(completeAmount.toFixed(2));
 					loading = true;
 					return;
 				}
-		
 				$.each(data.planList, function(index, el) {
 					$planList.append(newHtml);
 					 var old = index-1;
 					var $newPlan = $planList.find(".plan-list-box:last");
 					var plans = data.planList[old];
 					
-					if((plans==null) || (plans.realname!=el.realname || 
-							plans.typeName !=el.typeName || 
-							plans.start_date!=el.start_date || 
-							plans.end_date != el.end_date)){
 						$newPlan.find("#userName").text(el.realname);
+						$newPlan.find("#userId").val(el.user_id);
 						$newPlan.find("#typeName").text(el.typeName);
+						$newPlan.find("#typeName").text(el.typeName);
+						$newPlan.find("#plansId").val(el.plans_id);
 						$newPlan.find("#startDate").text('开始时间：'+el.start_date);
 						$newPlan.find("#endDate").text('结束时间：'+el.end_date);
-						$(".plansShow").hide();
-					}else{
-						$newPlan.hide();
-					}
+						$newPlan.find("#planNumAmount").text(el.AmountPlan);
+						$newPlan.find("#completeNumAmount").text(el.AmountComplete);
+						$newPlan.find("#amountCompleteRatio").text((el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
+						$(".plansShow").hide();  
+						planAmount += el.AmountPlan;
+						completeAmount += el.AmountComplete;
 				});
+				$("#planAmount").text(planAmount.toFixed(2));
+				$("#completeAmount").text(completeAmount.toFixed(2));
 				page++;
 				loading = false;
 			}
 		);
 	}
-
+	
+	
+	function showSellerProduct(params){
+		layer.open({type: 2,content: '加载中'});
+		Utils.ajax('${CPATH}/plans/planList', params,
+			function(data) {
+				$loading.hide();
+				layer.closeAll();
+				$("#planAmount").html("");
+				$("#completeAmount").html("");
+				
+				if(data.planList.length == 0) {
+					if($('.planList').length == 0) $noMore.show();
+					loading = true;
+					$("#planAmount").text(planAmount.toFixed(2));
+					$("#completeAmount").text(completeAmount.toFixed(2));
+					return;
+				}
+				$.each(data.planList, function(index, el) {
+					$planList.append(newHtml);
+					 var old = index-1;
+					var $newPlan = $planList.find(".plan-list-box:last");
+					var plans = data.planList[old];
+					$newPlan.find("#userName").text(el.custom_name);
+					$newPlan.find("#userId").val(el.seller_product_id);
+					$newPlan.find("#plansId").val(el.plans_id);
+					$newPlan.find("#typeName").text(el.typeName);
+					$newPlan.find("#startDate").text('开始时间：'+el.start_date);
+					$newPlan.find("#endDate").text('结束时间：'+el.end_date);
+					$newPlan.find("#planNumAmount").text(el.AmountPlan);
+					$newPlan.find("#completeNumAmount").text(el.AmountComplete);
+					$newPlan.find("#amountCompleteRatio").text((el.AmountComplete/el.AmountPlan*100).toFixed(2)+"%");
+					$(".plansShow").hide();
+					planAmount += el.AmountPlan;
+					completeAmount += el.AmountComplete;
+				});
+				$("#planAmount").text(planAmount.toFixed(2));
+				$("#completeAmount").text(completeAmount.toFixed(2));
+				page++;
+				loading = false;
+			}
+		);
+	}
 	//滑动方法
 	$("main").infinite().on("infinite", function() {
 		if(loading) {
@@ -194,7 +375,7 @@
 
 	function combo() {
 		$planList.empty();
-		loading = false;
+		loading = true;
 		page = 1;
 		loadPlanData();
 	}
@@ -202,6 +383,23 @@
 </#macro>
 <@layout>
 <div class="weui-content">
+	<div class="report-top weui-flex">
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div class="border-right-1px">
+                <p class="ft16">计划金额</p>
+                <p class="ft14" id="planAmount"></p>
+            </div>
+        </div>
+        <div class="weui-flex__item">
+            <img src="${CTPATH}/images/money.png" alt="">
+            <div>
+                <p class="ft16">完成金额</p>
+                <p class="ft14" id="completeAmount"></p>
+            </div>
+        </div>
+        
+    </div>
 	<header>
 		<div class="weui-search-bar" id="SearchBar">
 			<form class="weui-search-bar__form">
@@ -212,7 +410,8 @@
 				</div>
 				<label class="weui-search-bar__label" id="searchText">
 					<i class="weui-icon-search"></i>
-					<span>请输入业务员名称</span>
+					<span id = "userSearch">请输入业务员名称</span>
+					<span id = "productSearch">请输入产品名称</span>
 				</label>
 			</form>
 			<a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
@@ -222,19 +421,31 @@
 		<header class="has-th-list weui-flex">
 			<div class="head-search select-area weui-flex__item">
 				<div class="weui-flex">
-					<div class="weui-flex__item">
+					<!-- <div class="weui-flex__item">
 						<input type="text" id="type" class="weui-input" readonly placeholder="计划类型">
 						<i class="icon-sort-desc"></i>
-					</div>
-					<div class="weui-flex__item">
+					</div> -->
+					<div class="weui-flex__item userId">
 						<input type="text" id="userId" placeholder="业务员" class="weui-input" readonly>
 						<i class="icon-sort-desc"></i>
 					</div>
+					<div class="weui-flex__item sellerProductId">
+						<input type="text" id="sellerProductId" placeholder="产品" class="weui-input" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" id="show" placeholder="显示方式" class="weui-input" readonly>
+						<i class="icon-sort-desc"></i>
+					</div>
+					<div class="weui-flex__item">
+						<input type="text" class="weui-input fr" id='datetime-picker'  readonly="" placeholder="计划月份"/>
+						<i class="icon-sort-desc"></i>
+					</div> 
 				</div>
 			</div>
-			<div id="combin-filter-btn">
+			<!-- <div id="combin-filter-btn">
 				<i class="icon-th-list"></i>
-			</div>
+			</div> -->
 		</header>
 		<main>
 			<div class="ft12 planList">
@@ -242,9 +453,11 @@
 					<div class="weui-cells mg-0" onclick="showPlans(this)">
 						<div class="weui-cell">
 							<div class="weui-cell__bd">
-								<div class="customer_name">
-									<span id="userName"></span>
-									<span class="fr orange ft12" id="typeName"></span>
+								<div class="customer_name" style = "font-weight:545;">
+									<span id="userName" style = "font-size:16px;"></span>
+									<input type = "hidden" id = "userId" value = ""/>
+									<input type = "hidden" id = "plansId" value = ""/>
+									<span class="fr orange ft12" id="typeName" ></span>
 								</div>
 								<div class="weui-flex gray ft12 startEnd">
 									<div class="weui-flex__item">
@@ -253,6 +466,17 @@
 									<span style="width:1rem" class="t-c">-</span>
 									<div class="weui-flex__item t-r">
 										<span id="endDate"></span>
+									</div>
+								</div>
+								<div class="weui-flex gray ft12 startEnd">
+									<div class="weui-flex__item" >计划金额：
+										<span id="planNumAmount" class="fr red ft12" style = "float:none;"></span>
+									</div>
+									<div class="weui-flex__item t-r">完成金额：
+										<span id="completeNumAmount" class="fr red ft12" style = "float:none;"></span>
+									</div>
+									<div class="weui-flex__item t-r">完成比例：
+										<span id="amountCompleteRatio" class="fr red ft12" style = "float:none;"></span>
 									</div>
 								</div>
 							</div>
@@ -287,11 +511,11 @@
             <button class="red-button confirm-search-btn weui-flex__item" id="confirm">确定</button>
 	</footer>
 </article>
-<@shiro.hasPermission name="/admin/plans/add">
+<!-- <@shiro.hasPermission name="/admin/plans/add">
 <a class="hidden-menu" href="${CPATH}/plans">
 	<img src="${CTPATH}/images/order_add.png" alt="">
 </a>
-</@shiro.hasPermission>
+</@shiro.hasPermission> -->
 <div class="layer"></div>
 <#include "_inc/_goback_bottom.html" />
 </@layout>
