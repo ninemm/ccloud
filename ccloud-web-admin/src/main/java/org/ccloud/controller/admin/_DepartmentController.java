@@ -248,7 +248,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 				pid=OptionQuery.me().findValue("qywechat_default_deptid");
 			}else {
 				//查找一级经销商的企业微信id
-				String qywxDeptid = department.getQywxDeptid();
+				String qywxDeptid =  DepartmentQuery.me().findParentidBysellerId(department_id);
 				if (StringUtils.isNotBlank(qywxDeptid)) {
 					pid=qywxDeptid;
 				}else {

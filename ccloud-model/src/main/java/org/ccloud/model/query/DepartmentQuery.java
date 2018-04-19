@@ -700,8 +700,8 @@ public class DepartmentQuery extends JBaseQuery {
 	}
 	
 	public String findParentidBysellerId(String id) {
-		String sql="SELECT cs.jpwx_open_id FROM cc_seller cs LEFT JOIN department d ON cs.dept_id = d.id WHERE d.id=(SELECT d.parent_id FROM cc_seller cs LEFT JOIN department d ON cs.dept_id = d.id WHERE cs.id = ?)";
-		return Db.findFirst(sql,id).getStr("jpwx_open_id");
+		String sql="SELECT d.qywx_deptid FROM department d WHERE d.id =( SELECT d.parent_id from department d WHERE d.id = ?)";
+		return Db.findFirst(sql,id).getStr("qywx_deptid");
 	}
 
 
