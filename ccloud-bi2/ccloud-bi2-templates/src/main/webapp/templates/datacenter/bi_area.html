@@ -87,10 +87,9 @@
     
     $(function() {
 
-        if(countryName.length != 0) {
+        if(cityName.length != 0) {
             renderCityMap({"name": cityName}, curProvName);
-            //provName = provName + "省";
-        } else if(cityName.length != 0){
+        } else if(provName.length != 0){
             renderProvMap({"name": curProvName}, true);
         } else {
             renderChinaMap(true);
@@ -155,9 +154,11 @@
         provName = '';
         cityName = '';
         countryName = '';
+        $.cookie(Utils.provCacheName, provName, { expires: 7 });
+        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
         
         initData();
-        refreshStockData();
     }
 
     //回到省界面
@@ -165,13 +166,15 @@
         
         cityName = '';
         countryName = '';
-        
-        provName = strKit.convertProvName(provName);
-        renderProvMap({"name": provName}, true);
+        $.cookie(Utils.provCacheName, provName, { expires: 7 });
+        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+
+        curProvName = strKit.convertProvName(provName);
+        renderProvMap({"name": curProvName}, true);
         $('#city').css('visibility','hidden');
       
         initData();
-        refreshStockData();
     }
 
     //做时间的切换选择
@@ -208,6 +211,7 @@
     function renderProvMap (result, isRender) {
         
         cityName = '';
+        countryName = '';
         var maxData = 0;
         
         if(result.name == '北京' || result.name == '上海' || result.name == '天津' || result.name == '台湾' || result.name == '重庆'){
@@ -215,6 +219,10 @@
         } else {
             provName = result.name + '省';
         }
+
+        $.cookie(Utils.provCacheName, provName, { expires: 7 });
+        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
         
         $.ajax({
             url:"${CPATH}/biSales/queryMapData",
@@ -308,13 +316,17 @@
         });
         
         initData();
-        refreshStockData();
     }
 
     //点击地图上的市
     function renderCityMap(rel, selectProv) {
         var maxData = 0;
         cityName = rel.name;
+
+        $.cookie(Utils.provCacheName, provName, { expires: 7 });
+        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+
         $.ajax({
             url:"${CPATH}/biSales/queryMapData",
             type:"post",
@@ -535,7 +547,6 @@
                 });
             });
             initData();
-            refreshStockData();
         });
     }
 
