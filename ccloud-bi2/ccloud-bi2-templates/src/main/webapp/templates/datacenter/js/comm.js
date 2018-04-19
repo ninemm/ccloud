@@ -71,7 +71,7 @@ var $combinSearch;
 $(document).on('click', '#combin-filter-btn, #dealer-select', function () { //打开组合筛选
 	$combinSearch = $("#" + $(this).data('target'));
 	openCombinSearch();
-}).on('click', '#combin-filter .cancel-search-btn', function () { //关闭组合筛选
+}).on('click', '.cancel-search-btn', function () { //关闭组合筛选
 	closeCombinSearch();
 }).on("click", ".layer", function () { //点击遮罩关闭菜单、组合筛选
 	closeCombinSearch();
