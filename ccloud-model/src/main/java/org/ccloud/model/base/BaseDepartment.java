@@ -194,5 +194,12 @@ public abstract class BaseDepartment<M extends BaseDepartment<M>> extends JModel
 	public java.lang.String getDataArea() {
 		return get("data_area");
 	}
+	
+	public java.lang.String getQywxDeptid() {
+		return getStr("qywx_deptid");
+	}
 
+	public void setQywxDeptid(java.lang.String qywxDeptid) {
+		set("qywx_deptid", qywxDeptid);
+	}
 }

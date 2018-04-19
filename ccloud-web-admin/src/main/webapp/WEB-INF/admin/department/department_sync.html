@@ -41,10 +41,10 @@
                 success:function(data) {
                     $("#dataTbody").empty();
                     $.each(data,function(index,el){
-                        if(el.jpwx_open_id){ 
-                            $("#dataTbody").append("<tr data-id='"+el.id+"'><td align='center'></td><td align='center'>"+(index+1)+"</td><td align='center'>"+el.seller_name+"</td><td align='center'>已同步</td></tr>");
+                        if(el.qywx_deptid){ 
+                            $("#dataTbody").append("<tr data-id='"+el.id+"'><td align='center'></td><td align='center'>"+(index+1)+"</td><td align='center'>"+el.dept_name+"</td><td align='center'>已同步</td></tr>");
                         }else{
-                            $("#dataTbody").append("<tr data-id='"+el.id+"'><td align='center'><input type='checkbox' name='checkItem' value='"+el.id+"'/></td><td align='center'>"+(index+1)+"</td><td align='center'>"+el.seller_name+"</td><td align='center'>未同步</td></tr>");
+                            $("#dataTbody").append("<tr data-id='"+el.id+"'><td align='center'><input type='checkbox' name='checkItem' value='"+el.id+"'/></td><td align='center'>"+(index+1)+"</td><td align='center'>"+el.dept_name+"</td><td align='center'>未同步</td></tr>");
                         }
                     })
                 }
@@ -54,22 +54,22 @@
         
         $("#synchronous").click(function(){
             var l = Ladda.create( document.querySelector( '.ladda-button' ) );  
-            var sellerIds="";
+            var departmentIds="";
             $.each($('input:checkbox'),function(){
                 if(this.checked){
                         if($(this).val()!='on'){
-                            sellerIds=sellerIds+$(this).val()+",";
+                            departmentIds=departmentIds+$(this).val()+",";
                         }
                 }
             });
-           if(sellerIds==""){
+           if(departmentIds==""){
                 toastr.error('你没有选择同步对象','操作失败');
             }else{
                 l.start();
                 $.ajax({
                     url:"${CPATH}/admin/department/synchronous",
                     type:"post",
-                    data:{"sellerIds":sellerIds},
+                    data:{"departmentIds":departmentIds},
                     dataType:"json",
                     success:function(data) {
                         if (data.errorCode > 0) {
@@ -107,7 +107,7 @@
                         <select class="form-control" id="dataArea">
                             <option value="">--请选择--</option>
                             <#list list! as list >
-                            <option value="${list.data_area!}">${(list.seller_name)!}</option>
+                            <option value="${list.data_area!}">${(list.dept_name)!}</option>
                             </#list>
                         </select>
                     </div>
@@ -123,7 +123,7 @@
                 <tr>
                     <th class="col-sm-2 center" style="text-align: center;"><input type='checkbox' id="all"/></th>
                     <th class="col-sm-2 center" style="text-align: center;">序号</th>
-                    <th class="col-sm-4 center" style="text-align: center;">经销商名称</th>
+                    <th class="col-sm-4 center" style="text-align: center;">部门名称</th>
                     <th class="col-sm-4 center" style="text-align: center;">是否同步</th>
                 </tr>
             </thead>

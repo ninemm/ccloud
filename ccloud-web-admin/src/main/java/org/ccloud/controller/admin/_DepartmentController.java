@@ -38,7 +38,7 @@ import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
-import org.ccloud.wwechat.WorkWechatContactApiConfigInterceptor;
+//import org.ccloud.wwechat.WorkWechatContactApiConfigInterceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
@@ -219,7 +219,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}
 	
 	public void organizationSyn() {
-		List<Record>list = DepartmentQuery.me().findSellerName();
+		List<Record>list = DepartmentQuery.me().findDataArea();
 		setAttr("list", list);
 		render("department_sync.html");
 	}
@@ -237,33 +237,33 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	
 	//@Before(WorkWechatContactApiConfigInterceptor.class)
 	public void synchronous() {
-		String sellerIds = getPara("sellerIds");
-		String[] sellerId = sellerIds.split(",");
-		for (String seller_id : sellerId) {
+		String departmentIds = getPara("departmentIds");
+		String[] departmentId = departmentIds.split(",");
+		for (String department_id : departmentId) {
 			//获取层级
-			String deptLevel = DepartmentQuery.me().findDeptLevelBysellerId(seller_id);
-			Seller seller = SellerQuery.me().findById(seller_id);
-			int pid;
-			if (deptLevel.equals("1")) {
-				pid=Integer.parseInt(OptionQuery.me().findValue("qywechat_default_deptid"));
+			Department department = DepartmentQuery.me().findById(department_id);
+			Integer deptLevel =department.getDeptLevel();
+			String pid;
+			if (deptLevel==1) {
+				pid=OptionQuery.me().findValue("qywechat_default_deptid");
 			}else {
 				//查找一级经销商的企业微信id
-				String parentid = DepartmentQuery.me().findParentidBysellerId(seller_id);
-				if (StringUtils.isNotBlank(parentid)) {
-					pid=Integer.parseInt(parentid);
+				String qywxDeptid = department.getQywxDeptid();
+				if (StringUtils.isNotBlank(qywxDeptid)) {
+					pid=qywxDeptid;
 				}else {
 					renderAjaxResultForError("父部门没有同步");
 					return;
 				}
 			}
-			String json="{\"name\": \""+seller.getSellerName()+"\",\"parentid\": "+pid+"}";
+			String json="{\"name\": \""+department.getDeptName()+"\",\"parentid\": "+pid+"}";
 			ApiResult createDepartment = ConDepartmentApi.createDepartment(json);
 			if (createDepartment.getInt("errcode")!=0) {
 				renderAjaxResultForError("同步失败");
 				return;
 			}
-			seller.setJpwxOpenId(createDepartment.getInt("id").toString());
-			seller.update();
+			department.setQywxDeptid(createDepartment.getInt("id").toString());
+			department.update();
 		}
 		renderAjaxResultForSuccess("同步成功");
 	}
