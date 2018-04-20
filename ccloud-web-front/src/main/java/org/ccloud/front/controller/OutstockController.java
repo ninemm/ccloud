@@ -235,6 +235,17 @@ public class OutstockController extends BaseFrontController {
 						return false;
 					}
 
+					String isGift = record.getStr("is_gift");
+					if(isGift.equals("0")) {
+						//找到业务员ID
+						String orderUserId = SalesOrderQuery.me().findByOutstockId(record.getStr("outstock_id")).getBizUserId();
+						//更新计划
+						
+						BigDecimal bigProductCount = new BigDecimal(record.getStr("product_count")).divide(new BigDecimal(record.getStr("convert_relate")), 2, BigDecimal.ROUND_HALF_UP);
+						if (!updatePlans(orderUserId, record.getStr("sell_product_id"), record.getStr("create_date"), bigProductCount)) {
+							return false;
+						}
+					}
 				}
 
 				SalesOrder salesOrder = SalesOrderQuery.me().findByOutstockId(outstockId);
@@ -271,7 +282,6 @@ public class OutstockController extends BaseFrontController {
 					result[0] = "出库单状态更新错误";
 					return false;
 				}
-
 				salesOrder.setStatus(Consts.SALES_ORDER_STATUS_ALL_OUT);
 				salesOrder.setModifyDate(date);
 
@@ -421,6 +431,22 @@ public class OutstockController extends BaseFrontController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("outstockDetail", outstockDetail);
 		renderJson(map);
+	}
+	
+	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
+
+		List<PlansDetail> plansDetails = PlansDetailQuery.me().findBySales(order_user, sellerProductId, orderDate.substring(0,10));
+		for (PlansDetail plansDetail : plansDetails) {
+			BigDecimal planNum = plansDetail.getPlanNum();
+			BigDecimal completeNum = productCount.add(plansDetail.getCompleteNum());
+			plansDetail.setCompleteNum(completeNum);
+			plansDetail.setCompleteRatio(completeNum.multiply(new BigDecimal(100)).divide(planNum, 2, BigDecimal.ROUND_HALF_UP));
+			if(!plansDetail.update()){
+				return  false;
+			}
+		}
+
+		return true;
 	}
 
 }

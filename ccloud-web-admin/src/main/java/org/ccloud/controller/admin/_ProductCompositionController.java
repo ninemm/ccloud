@@ -34,18 +34,24 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.listener.order.OrderReviewUtil;
+import org.ccloud.workflow.service.WorkFlowService;
 import org.ccloud.model.Activity;
 import org.ccloud.model.ProductComposition;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.ActivityQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.ProductCompositionQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.UserQuery;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
@@ -419,6 +425,18 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
         		if (!salesOrder.save()) {
         			return false;
         		}
+        		//是否开启
+        		boolean isStartProc = isStart(sellerCode, paraMap);
+        		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
+        		if (isStartProc && StrKit.notBlank(proc_def_key)) {
+        			if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
+        				return false;
+        			}
+        		} else {
+        			SalesOutstockQuery.me().pass(orderId, user.getId(), sellerId, sellerCode);
+        			OrderReviewUtil.sendOrderMessage(sellerId, StringUtils.getArrayFirst(paraMap.get("customerName")), "订单审核通过", user.getId(), user.getId(),
+        					user.getDepartmentId(), user.getDataArea(), orderId);
+        		}
             	return true;
             }
 
@@ -430,6 +448,81 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		BigDecimal total = new BigDecimal(0);
 		total = new BigDecimal(sellerProduct.getStr("productCount")).multiply(new BigDecimal(num));
 		return total;
+	}
+	
+	private boolean isStart(String sellerCode, Map<String, String[]> paraMap) {
+		//是否开启
+		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
+		if(startProc != null && startProc) { 
+			return true;
+		}
+		//超过数量(件)
+		Float startNum = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_NUM_LIMIT + sellerCode);
+		Float productTotal = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("productTotalCount")));
+		if(startNum != null && productTotal > startNum) { 
+			return true;
+		}
+		//超过金额(元)
+		Float startPrice = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_PRICE_LIMIT + sellerCode);
+		Float total = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("total")));
+		if(startPrice != null && total > startPrice) { 
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean start(String orderId, String customerName, String proc_def_key) {
+
+		WorkFlowService workflow = new WorkFlowService();
+
+		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
+
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		
+		Map<String, Object> param = Maps.newHashMap();
+		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
+		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
+		param.put("customerName", customerName);
+		param.put("orderId", orderId);
+
+//		String toUserId = "";
+
+		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
+
+			List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
+			if (orderReviewers == null || orderReviewers.size() == 0) {
+				renderAjaxResultForError("您没有配置审核人,请联系管理员");
+				return false;
+			}
+
+			String orderReviewUserName = "";
+			for (User u : orderReviewers) {
+				if (StrKit.notBlank(orderReviewUserName)) {
+					orderReviewUserName = orderReviewUserName + ",";
+				}
+
+				orderReviewUserName += u.getStr("username");
+				OrderReviewUtil.sendOrderMessage(sellerId, customerName, "订单审核",  user.getId(), u.getStr("id"),
+						user.getDepartmentId(), user.getDataArea(), orderId);
+			}
+			param.put("manager", orderReviewUserName);
+		}
+
+		String procInstId = workflow.startProcess(orderId, proc_def_key, param);
+
+		salesOrder.setProcKey(proc_def_key);
+		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);
+		salesOrder.setProcInstId(procInstId);
+
+		if(!salesOrder.update()) {
+			return false;
+		}
+
+		return true;
 	}
 	
 }

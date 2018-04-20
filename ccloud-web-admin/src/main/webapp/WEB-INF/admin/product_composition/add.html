@@ -181,17 +181,17 @@
 	}
 
 	function customerChange(obj){
+		var proc_def_key = "";
 		var customer = customerInfoMap[obj.val()].columns;
 
 		$("#contact").val(customer.contact);
 		$("#mobile").val(customer.mobile);
-
+		$("#customerName").val(customer.customer_name);
 		var address = customer.prov_name + customer.city_name + customer.country_name + " " + customer.address
 		$("#address").val(address);
 		$("#deliveryAddress").val(address);
 		
 		var $customerSelect = $("#customerId");
-		
 		$.post('${CPATH}/admin/salesOrder/customerTypeById', { customerId: $("#customerId").val() },
 			function(data){
 				var $customerTypeSelect = $("#customerType");
@@ -204,7 +204,10 @@
 						discount = 1;
 					}				
 					$customerTypeSelect.append("<option value='" + obj.id + "'>" + obj.name + "</option>");
-					customerTypeCodeMap[obj.id] = obj.code;
+					customerTypeCodeMap[obj.id] = {
+						code:obj.code,
+						proc_def_key : obj.proc_def_key
+						};
 				});
 
 				$customerTypeSelect.change(function(){
@@ -224,7 +227,8 @@
 	}
 	
 	function customerTypeChange(obj){
-		$("#customerTypeCode").val(customerTypeCodeMap[obj.val()]);
+		$("#customerTypeCode").val(customerTypeCodeMap[obj.val()].code);
+		$("#proc_def_key").val(customerTypeCodeMap[obj.val()].proc_def_key);
 	}
 	
 	function changeBigPrice(obj){
@@ -452,6 +456,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*客户名称:</label>
 						<div class="input-group col-md-4 col-sm-10">
+							<input type="hidden" id="customerName" name="customerName" value="" >
 							<select id="customerId" name="customerId" class="form-control">
 							</select>
 						</div>
@@ -471,6 +476,7 @@
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*客户类型:</label>
 						<div class="input-group col-md-4 col-sm-10">
+							<input type="hidden" id="proc_def_key" name="proc_def_key" value="" >
 							<input  type="hidden" id="customerTypeCode" name="customerTypeCode" value="" >
 							<select id="customerType" name="customerType" class="form-control">
 							</select>
