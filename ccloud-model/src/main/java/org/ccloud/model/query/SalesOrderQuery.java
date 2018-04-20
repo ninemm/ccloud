@@ -794,7 +794,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		params.add(dataArea);
 		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
 		params.add(Consts.SALES_ORDER_STATUS_REJECT);
-		params.add(Consts.CUSTOMER_KIND_COMMON);		
+		params.add(Consts.CUSTOMER_KIND_SELLER);		
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -2685,6 +2685,110 @@ public class SalesOrderQuery extends JBaseQuery {
 		if (params.isEmpty())
 			return Db.find(fromBuilder.toString());
 
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> findCustomerOrderByUserId(String startDate, String endDate, String keyword, String userId , String isGift) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sqlBuilder = new StringBuilder("SELECT o.sell_product_id, csp.custom_name,cc.customer_name, cs.customer_id ,FORMAT((o.product_count - IFNULL(t1.product_count,0))/cp.convert_relate,2) as count,o.is_gift ");
+		sqlBuilder.append(" FROM cc_sales_order_detail o");
+		sqlBuilder.append(" LEFT JOIN cc_sales_order cs ON o.order_id = cs.id");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product csp ON o.sell_product_id = csp.id");
+		sqlBuilder.append(" LEFT JOIN cc_product cp ON csp.product_id = cp.id");
+		sqlBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=cs.customer_id");
+		sqlBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
+		sqlBuilder.append(" LEFT JOIN ( SELECT cs.input_user_id,o.sell_product_id,o.product_count,o.is_gift FROM cc_sales_refund_instock_detail o");
+		sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock cs ON cs.id = o.refund_instock_id");
+		sqlBuilder.append(" WHERE cs.status not in (?, ?) AND cs.input_user_id = ?");
+		if (isGift.equals("0")) {
+			sqlBuilder.append(" AND o.is_gift = 0");
+		} else {
+			sqlBuilder.append(" AND o.is_gift = 1");
+		}
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
+		params.add(userId);
+		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.customer_id,o.is_gift");
+		sqlBuilder.append(" ) t1 on t1.input_user_id = cs.biz_user_id AND t1.sell_product_id = o.sell_product_id AND t1.is_gift = o.is_gift");
+		sqlBuilder.append(" WHERE cs.biz_user_id = ?");
+		params.add(userId);
+		if (keyword.equals("print")) {
+			sqlBuilder.append(" AND o.print_time >= ? AND o.print_time <= ?");
+		} else {
+			sqlBuilder.append(" AND o.create_date >= ? AND o.create_date <= ?");
+		}
+		params.add(startDate);
+		params.add(endDate);
+		if (isGift.equals("0")) {
+			sqlBuilder.append(" AND o.is_gift = 0");
+		} else {
+			sqlBuilder.append(" AND o.is_gift = 1");
+		}		
+		sqlBuilder.append(" AND EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = cs.status and os.status != ? and os.status != ?)");
+		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
+		params.add(Consts.SALES_ORDER_STATUS_REJECT);		
+		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.customer_id,o.is_gift");
+		return Db.find(sqlBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> findCustomerTotalAmountByUserId(String startDate, String endDate, String userId,
+			String keyword) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("");
+		fromBuilder.append(" SELECT SUM(o.total_amount) - IFNULL(t1.refund_count,0) AS count,o.customer_id FROM cc_sales_order o");
+		fromBuilder.append(" LEFT JOIN ( SELECT SUM(o.total_reject_amount) as refund_count,o.input_user_id FROM cc_sales_refund_instock o");
+		fromBuilder.append(" WHERE o.biz_user_id = ? AND o.`status` not in (?, ?)");
+		fromBuilder.append(" AND o.create_date >= ? AND o.create_date <= ?");
+		fromBuilder.append(" ) t1 ON t1.input_user_id = o.biz_user_id");
+		fromBuilder.append(" WHERE EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = o.status and os.status != ? and os.status != ?)");
+		fromBuilder.append(" AND o.biz_user_id = ?");
+		if (keyword.equals("print")) {
+			fromBuilder.append(" AND o.print_time >= ? and o.print_time <= ?");
+		} else {
+			fromBuilder.append(" AND o.create_date >= ? and o.create_date <= ?");
+		}
+		fromBuilder.append(" GROUP BY o.customer_id");
+		params.add(userId);
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);	
+		params.add(startDate);
+		params.add(endDate);		
+		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
+		params.add(Consts.SALES_ORDER_STATUS_REJECT);
+		params.add(userId);
+		params.add(startDate);
+		params.add(endDate);		
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	public List<Record> findTotalAmountByUser(String startDate, String endDate, String dataArea, String status) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("");
+		fromBuilder.append(" SELECT SUM(o.total_amount) - IFNULL(t1.refund_count,0) AS count,o.biz_user_id FROM cc_sales_order o");
+		fromBuilder.append(" LEFT JOIN ( SELECT SUM(o.total_reject_amount) as refund_count,o.input_user_id FROM cc_sales_refund_instock o");
+		fromBuilder.append(" WHERE o.data_area LIKE ? AND o.`status` not in (?, ?)");
+		fromBuilder.append(" AND o.create_date >= ? AND o.create_date <= ?");
+		if (status.equals("print")) {
+			fromBuilder.append(" AND o.is_print = 1");
+		}
+		fromBuilder.append(" ) t1 ON t1.input_user_id = o.biz_user_id");
+		fromBuilder.append(" WHERE EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = o.status and os.status != ? and os.status != ?)");
+		fromBuilder.append(" AND o.data_area like ?");
+		if (status.equals("print")) {
+			fromBuilder.append(" AND o.print_time >= ? and o.print_time <= ?");
+		} else {
+			fromBuilder.append(" AND o.create_date >= ? and o.create_date <= ?");
+		}
+		fromBuilder.append(" GROUP BY o.biz_user_id");
+		params.add(dataArea);
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);	
+		params.add(startDate);
+		params.add(endDate);		
+		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
+		params.add(Consts.SALES_ORDER_STATUS_REJECT);
+		params.add(dataArea);
+		params.add(startDate);
+		params.add(endDate);
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
  }

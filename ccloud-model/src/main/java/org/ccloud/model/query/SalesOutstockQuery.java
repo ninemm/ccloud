@@ -697,5 +697,57 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+
+	public List<Record> findOutTotalAmountByUser(String startDate, String endDate, String dataArea, String status) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("");
+		fromBuilder.append(" SELECT SUM(o.total_amount) - IFNULL(t1.refund_count,0) AS count, cso.biz_user_id FROM cc_sales_outstock o");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock cj ON cj.outstock_id = o.id");
+		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = cj.order_id");
+		fromBuilder.append(" LEFT JOIN ( SELECT SUM(o.total_reject_amount) as refund_count,o.input_user_id FROM cc_sales_refund_instock o");
+		fromBuilder.append(" WHERE o.data_area LIKE ? AND o.`status` in (?, ?)");
+		fromBuilder.append(" AND o.biz_date >= ? AND o.biz_date <= ?");
+		fromBuilder.append(" ) t1 ON t1.input_user_id = cso.biz_user_id");
+		fromBuilder.append(" WHERE o.status != ?");
+		fromBuilder.append(" AND o.data_area like ?");
+		fromBuilder.append(" AND o.biz_date >= ? and o.biz_date <= ?");
+		fromBuilder.append(" GROUP BY cso.biz_user_id");
+		params.add(dataArea);
+		params.add(Consts.SALES_REFUND_INSTOCK_PART_OUT);
+		params.add(Consts.SALES_REFUND_INSTOCK_ALL_OUT);	
+		params.add(startDate);
+		params.add(endDate);		
+		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		params.add(dataArea);
+		params.add(startDate);
+		params.add(endDate);
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> findCustomerOutTotalAmountByUserId(String startDate, String endDate, String userId) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("");
+		fromBuilder.append(" SELECT SUM(o.total_amount) - IFNULL(t1.refund_count,0) AS count, o.customer_id FROM cc_sales_outstock o");
+		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock cj ON cj.outstock_id = o.id");
+		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = cj.order_id");
+		fromBuilder.append(" LEFT JOIN ( SELECT SUM(o.total_reject_amount) as refund_count,o.input_user_id FROM cc_sales_refund_instock o");
+		fromBuilder.append(" WHERE o.input_user_id = ? AND o.`status` in (?, ?)");
+		fromBuilder.append(" AND o.biz_date >= ? AND o.biz_date <= ?");
+		fromBuilder.append(" ) t1 ON t1.input_user_id = cso.biz_user_id");
+		fromBuilder.append(" WHERE o.status != ?");
+		fromBuilder.append(" AND cso.biz_user_id = ?");
+		fromBuilder.append(" AND o.biz_date >= ? and o.biz_date <= ?");
+		fromBuilder.append(" GROUP BY o.customer_id");
+		params.add(userId);
+		params.add(Consts.SALES_REFUND_INSTOCK_PART_OUT);
+		params.add(Consts.SALES_REFUND_INSTOCK_ALL_OUT);	
+		params.add(startDate);
+		params.add(endDate);		
+		params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		params.add(userId);
+		params.add(startDate);
+		params.add(endDate);
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
 	
 }
