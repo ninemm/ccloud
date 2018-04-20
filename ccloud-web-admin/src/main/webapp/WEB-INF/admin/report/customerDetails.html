@@ -44,7 +44,7 @@ datetimepicker.min.css">
 		
 		var keyword = $('#status  option:selected').val();
 		if(keyword == ""){
-			keyword = "so.create_date";
+			keyword = "order";
 		}
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
@@ -64,7 +64,7 @@ datetimepicker.min.css">
 		
 		var keyword = $('#status  option:selected').val();
 		if(keyword == ""){
-			keyword = "so.create_date";
+			keyword = "order";
 		}
 		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
@@ -79,35 +79,14 @@ datetimepicker.min.css">
 		return param;
 	};
 	
-	function orderTime(){
-		$('#post-search-input').val("orderTime");
+	$("#search-submit").click(function() {
 		var validate = $('#form').data('bootstrapValidator');
 		validate.validate();
 		if (validate.isValid()){
 			$table.bootstrapTable('refresh');
 			$tableGift.bootstrapTable('refresh');
 		}
-	};
-	
-	function prints(){
-		$('#post-search-input').val("print");
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
-	};
-	
-	function complete(){
-		$('#post-search-input').val("complete");
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
-	};
+	});
 	
 	var initFields = function() {
 		var fields =
@@ -198,14 +177,14 @@ datetimepicker.min.css">
 					<div class="col-sm-8 input-group input-group-sm">
 						<select class="form-control" name="status" id="status">
 							<option value="">--请选择--</option>
-							<option value="so.create_date">已下单</option>
-							<option value="so.print_time">已打印</option>
-							<option value="sok.biz_date">已出库</option>
+							<option value="order">已下单</option>
+							<option value="print">已打印</option>
+							<option value="outstock">已出库</option>
 						</select>
 					</div>
 				</div>
 				<div class="col-md-4" style="text-align:center;">
-					<input onclick="prints()" class="btn btn-sm btn-primary btn-flat" type="button" value="查询">
+					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
 				</div>
 			</div>
 		</form>

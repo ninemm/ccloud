@@ -2708,7 +2708,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
 		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
 		params.add(userId);
-		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.input_user_id,o.is_gift");
+		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.customer_id,o.is_gift");
 		sqlBuilder.append(" ) t1 on t1.input_user_id = cs.biz_user_id AND t1.sell_product_id = o.sell_product_id AND t1.is_gift = o.is_gift");
 		sqlBuilder.append(" WHERE cs.biz_user_id = ?");
 		params.add(userId);
@@ -2756,6 +2756,8 @@ public class SalesOrderQuery extends JBaseQuery {
 		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
 		params.add(Consts.SALES_ORDER_STATUS_REJECT);
 		params.add(userId);
+		params.add(startDate);
+		params.add(endDate);		
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	public List<Record> findTotalAmountByUser(String startDate, String endDate, String dataArea, String status) {

@@ -529,39 +529,39 @@ public class _ReportController extends JBaseController {
 	}
 	
 	//我部门的业务员详细
-	public void mSalesmanDetailReportList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId,false);
-		for (Record record : list) {
-			String userId=record.getStr("userId");
-			Record record1= SalesOrderQuery.me().findTotalAmountByUserId(startDate,endDate,keyword,userId);
-			record.set("销售额(元)", record1.get("totalAmount"));
-		}
-		renderJson(list);
-	}
-	
-	//我部门的业务员赠品详细
-	public void mSalesmanDetailGiftReportList() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
-		}
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId,true);
-		renderJson(list);
-	}
+//	public void mSalesmanDetailReportList() {
+//		String keyword = getPara("k");
+//		if (StrKit.notBlank(keyword)) {
+//			keyword = StringUtils.urlDecode(keyword);
+//			setAttr("k", keyword);
+//		}
+//		String startDate = getPara("startDate");
+//		String endDate = getPara("endDate");
+//		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+//		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+//		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId,false);
+//		for (Record record : list) {
+//			String userId=record.getStr("userId");
+//			Record record1= SalesOrderQuery.me().findTotalAmountByUserId(startDate,endDate,keyword,userId);
+//			record.set("销售额(元)", record1.get("totalAmount"));
+//		}
+//		renderJson(list);
+//	}
+//	
+//	//我部门的业务员赠品详细
+//	public void mSalesmanDetailGiftReportList() {
+//		String keyword = getPara("k");
+//		if (StrKit.notBlank(keyword)) {
+//			keyword = StringUtils.urlDecode(keyword);
+//			setAttr("k", keyword);
+//		}
+//		String startDate = getPara("startDate");
+//		String endDate = getPara("endDate");
+//		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+//		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+//		List<Record> list = SalesOrderQuery.me().findByMSalesmanDetail(startDate,endDate,keyword, dataArea,sellerId,true);
+//		renderJson(list);
+//	}
 	
 	//我部门的直营商详细
 	public void mSellerDetail() {
@@ -658,14 +658,21 @@ public class _ReportController extends JBaseController {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
-			setAttr("k", keyword);
+			setAttr("keyword", keyword);
 		}
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		Map<String, String> map = getProductMap(getPara("productNames"));
 		String isGift = getPara("isGift");
-		List<Record> list = SalesOrderQuery.me().findCustomerOrderByUserId(startDate,endDate,keyword, userId,isGift);
-		List<Record> totalList = SalesOrderQuery.me().findCustomerTotalAmountByUserId(startDate, endDate, userId, keyword);
+		List<Record> list = new ArrayList<>();
+		List<Record> totalList = new ArrayList<>();
+		if (keyword.equals("order") || keyword.equals("print")) {
+			list = SalesOrderQuery.me().findCustomerOrderByUserId(startDate,endDate,keyword, userId,isGift);
+			totalList = SalesOrderQuery.me().findCustomerTotalAmountByUserId(startDate, endDate, userId, keyword);
+		} else {
+			list = SalesOutstockDetailQuery.me().findCustomerOutStockByUserId(userId, startDate, endDate, isGift);
+			totalList = SalesOutstockQuery.me().findCustomerOutTotalAmountByUserId(startDate, endDate, userId);
+		}
 		List<Map<String, String>> orderResult = new ArrayList<>();
 		String customerId = "";
 		Map<String, String> userOrderMap = new HashMap<>();
