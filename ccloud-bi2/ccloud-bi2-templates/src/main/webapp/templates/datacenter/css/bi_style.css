@@ -844,6 +844,7 @@ body.modal-open {
 	position: fixed;
 	bottom: 5rem;
 	right: .5rem;
+	z-index: 1900;
 }
 
 .filter-item {
