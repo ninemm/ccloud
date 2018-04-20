@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ import org.ccloud.model.UserGroupRel;
 import org.ccloud.model.UserHistory;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserGroupRelQuery;
@@ -758,7 +760,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		String sortOrder = getPara("sortOrder");
 		Map<String, String[]> paraMap = getParaMap();
 		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
-		String departmentType = getPara("departmentType");
+		String departmentType = getPara("departmentType")+"%";
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
@@ -773,66 +775,68 @@ public class _UserController extends JBaseCRUDController<User> {
 //	@Before(WorkWechatContactApiConfigInterceptor.class)
 	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
 	public void synUser(){
-		String userId = getPara("userId");
+		String userIds = getPara("userIds");
 		String departmentType = getPara("departmentType");
-		User user = UserQuery.me().findById(userId);
-		Department department = DepartmentQuery.me().findByDataArea(departmentType);
-		//获取部门下成员信息
-		ApiResult apiResult = ConUserApi.getDepartmentUserList(department.getQywxDeptid(), "1", "");
-		boolean isExist = false;
-
-		if(!apiResult.getErrorCode().equals(0)) {
-			renderAjaxResultForError();
-			return;
-		}
-		List<Map<String, Object>> userList = apiResult.getList("userlist");
-		for(Map<String, Object> item : userList){
-
-			//判断是否存在该用户
-			if(item.get("mobile").equals(user.getMobile())) {
-				isExist = true;
-				user.setWechatUseriId(item.get("userid").toString());
-
-				if (!user.saveOrUpdate()) {
-					renderAjaxResultForError();
-					return;
-				}
-
-				String json = "{\"userid\": \"" + item.get("userid").toString() +
-						"\", \"name\": \"" + user.getRealname().toLowerCase() +
-						"\", \"mobile\": \"" + item .get("mobile").toString() +
-						"\", \"department\": " + item.get("department").toString() +
-						"\",position\": \"" + item.get("position").toString() +
-						"\", \"enable\":1, \"to_invite\": false," + "}";
-				ApiResult apiResult1 = ConUserApi.updateUser(json);
-
-				if(!apiResult1.getErrorCode().equals(0)) {
-					renderAjaxResultForError();
-					return;
+		String[] user_Ids = userIds.split(",");
+		for (String userId : user_Ids) {
+			User user = UserQuery.me().findById(userId);
+			Department department = DepartmentQuery.me().findByDataArea(departmentType);
+			//获取部门下成员信息
+			ApiResult apiResult = ConUserApi.getDepartmentUserList("1", "1", "");
+			boolean isExist = false;
+			if(!apiResult.getErrorCode().equals(0)) {
+				renderAjaxResultForError();
+				return;
+			}
+			List<Map<String, Object>> userList = apiResult.getList("userlist");
+			for(Map<String, Object> item : userList){
+				//判断是否存在该用户
+				if(item.get("mobile").equals(user.getMobile())) {
+					isExist = true;
+					user.setWechatUseriId(item.get("userid").toString());
+					if (!user.saveOrUpdate()) {
+						renderAjaxResultForError();
+						return;
+					}
+					ArrayList<Integer>list=  (ArrayList<Integer>) item.get("department");
+					String array = "[";
+					    // List转换成数组
+				    for (int i = 0; i < list.size(); i++) {
+				    		array=array+list.get(i).toString()+",";
+				    }
+				    array=array+department.getQywxDeptid()+"]";
+					String json = "{\"userid\": \"" + item.get("userid").toString() +
+							"\", \"name\": \"" + user.getRealname().toLowerCase() +
+							"\", \"mobile\": \"" + user.getMobile()+
+							"\", \"department\": " + array +
+							"\", \"enable\":1, \"to_invite\": false," + "}";
+					ApiResult apiResult1 = ConUserApi.updateUser(json);
+					if (apiResult1.getInt("errcode")!=0) {
+						renderAjaxResultForError("同步失败");
+						return;
+					}
 				}
 			}
-		}
-		if(!isExist){
-
-			String json = "{\"userid\": \"" + user.getId() +
-					"\", \"name\": \"" + user.getRealname() +
-					"\", \"mobile\": \"" + user.getMobile();
-
-			if(user.getAvatar() != null && user.getAvatar().length() != 0) json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
-
-			json = json + "\", \"department\": [" + department.getQywxDeptid() + "]," +
-					"\"position\": \"" + user.getStationId() +
-					"\", \"enable\":1, \"to_invite\": false," + "}";
-			ApiResult apiResult1 = ConUserApi.createUser(json);
-
-			if(apiResult1.getErrorCode().equals(0)){
-
-				user.setWechatUseriId(user.getId());
-				if(!user.saveOrUpdate()){
-					renderAjaxResultForError();
-					return;
+			if(!isExist){
+	
+				String json = "{\"userid\": \"" + user.getId() +
+						"\", \"name\": \"" + user.getRealname() +
+						"\", \"mobile\": \"" + user.getMobile();
+	
+				if(user.getAvatar() != null && user.getAvatar().length() != 0) json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
+	
+				json = json + "\", \"department\": [" + department.getQywxDeptid() + "]," +
+						"\"position\": \"" + user.getStationId() +
+						"\", \"enable\":1, \"to_invite\": false," + "}";
+				ApiResult apiResult1 = ConUserApi.createUser(json);
+				if (apiResult1.getInt("errcode")!=0) {
+					user.setWechatUseriId(user.getId());
+					if(!user.saveOrUpdate()){
+						renderAjaxResultForError("同步失败");
+						return;
+					}
+					
 				}
-
 			}
 		}
 		renderAjaxResultForSuccess();

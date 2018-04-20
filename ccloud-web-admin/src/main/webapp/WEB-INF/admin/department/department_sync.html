@@ -88,9 +88,9 @@
             var departmentIds="";
             $.each($('input:checkbox'),function(){
                 if(this.checked){
-                        if($(this).val()!='on'){
-                            departmentIds=departmentIds+$(this).val()+",";
-                        }
+					if($(this).val()!='on'){
+					    departmentIds=departmentIds+$(this).val()+",";
+					}
                 }
             });
            if(departmentIds==""){
