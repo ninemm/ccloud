@@ -9,11 +9,11 @@ import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.HashKit;
 import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.weixin.sdk.api.ApiConfigKit;
 import com.jfinal.weixin.sdk.api.JsTicket;
 import com.jfinal.weixin.sdk.api.JsTicketApi;
 import com.jfinal.weixin.sdk.api.JsTicketApi.JsApiType;
+import org.ccloud.cache.JCacheKit;
 
 public class WechatJSSDKInterceptor implements Interceptor {
 
@@ -26,11 +26,11 @@ public class WechatJSSDKInterceptor implements Interceptor {
 		Controller controller = inv.getController();
 		HttpServletRequest request = controller.getRequest();
 		
-		String jsapi_ticket = CacheKit.get(CACHE_NAME, CACHE_KEY);
+		String jsapi_ticket = JCacheKit.get(CACHE_NAME, CACHE_KEY);
 		if (StrKit.isBlank(jsapi_ticket)) {
 			JsTicket jsApiTicket = JsTicketApi.getTicket(JsApiType.jsapi);
 			jsapi_ticket = jsApiTicket.getTicket();
-			CacheKit.put(CACHE_NAME, CACHE_KEY, jsapi_ticket);
+			JCacheKit.put(CACHE_NAME, CACHE_KEY, jsapi_ticket);
 		}
 
 		String nonce_str = create_nonce_str();

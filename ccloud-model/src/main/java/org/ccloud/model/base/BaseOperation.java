@@ -17,11 +17,12 @@ package org.ccloud.model.base;
 
 import java.util.List;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
 
 import com.jfinal.plugin.activerecord.IBean;
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -40,39 +41,39 @@ public abstract class BaseOperation<M extends BaseOperation<M>> extends JModel<M
 	
 	@SuppressWarnings("unchecked")
     public static void clearAllList() {
-        List<String> list = CacheKit.getKeys(ALL_USER_PERMISSION);
+        List<String> list = (List<String>)JCacheKit.getKeys(ALL_USER_PERMISSION);
         if (list != null && list.size() > 0) {
             for (String key : list) {
 
                 // 过滤
 
-                CacheKit.remove(ALL_USER_PERMISSION, key);
+                JCacheKit.remove(ALL_USER_PERMISSION, key);
             }
         }
     }
 	
     public static void clearListByKey(String id) {
-        Object o = CacheKit.get(ALL_USER_PERMISSION, id);
+        Object o = JCacheKit.get(ALL_USER_PERMISSION, id);
         if (o != null) {
-        	CacheKit.remove(ALL_USER_PERMISSION, id);
+        	JCacheKit.remove(ALL_USER_PERMISSION, id);
         }
     }	
 	
 	public void removeCache(Object key){
 		if(key == null) return;
-		CacheKit.remove(CACHE_NAME, key);
+		JCacheKit.remove(CACHE_NAME, key);
 	}
 
 	public void putCache(Object key,Object value){
-		CacheKit.put(CACHE_NAME, key, value);
+		JCacheKit.put(CACHE_NAME, key, value);
 	}
 
 	public M getCache(Object key){
-		return CacheKit.get(CACHE_NAME, key);
+		return JCacheKit.get(CACHE_NAME, key);
 	}
 
 	public M getCache(Object key,IDataLoader dataloader){
-		return CacheKit.get(CACHE_NAME, key, dataloader);
+		return JCacheKit.get(CACHE_NAME, key, dataloader);
 	}
 
 	@Override

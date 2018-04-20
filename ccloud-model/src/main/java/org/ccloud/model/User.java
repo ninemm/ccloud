@@ -15,11 +15,12 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.OperationQuery;
 
-import com.jfinal.plugin.ehcache.CacheKit;
+
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class User extends BaseUser<User> {
 	public boolean save() {
 		removeCache(getMobile());
 		removeCache(getWechatOpenId());
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		return super.save();
 	}
 
@@ -54,7 +55,7 @@ public class User extends BaseUser<User> {
 		removeCache(getUsername());
 		removeCache(getMobile());
 		removeCache(getWechatOpenId());
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.saveOrUpdate();
 	}
@@ -66,7 +67,7 @@ public class User extends BaseUser<User> {
 		removeCache(getUsername());
 		removeCache(getMobile());
 		removeCache(getWechatOpenId());
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.update();
 	}
@@ -77,7 +78,7 @@ public class User extends BaseUser<User> {
 		removeCache(getId());
 		removeCache(getMobile());
 		removeCache(getWechatOpenId());
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.delete();
 	}
@@ -86,7 +87,7 @@ public class User extends BaseUser<User> {
 	public boolean deleteById(Object idValue) {
 		
 		removeCache(idValue);
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.deleteById(idValue);
 	}

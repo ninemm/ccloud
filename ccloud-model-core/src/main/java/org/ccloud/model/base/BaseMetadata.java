@@ -16,6 +16,7 @@
 package org.ccloud.model.base;
 
 import org.ccloud.cache.CacheManager;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Metadata;
 import org.ccloud.model.core.JModel;
@@ -39,19 +40,19 @@ public abstract class BaseMetadata<M extends BaseMetadata<M>> extends JModel<M> 
 
 	public void removeCache(Object key){
 		if(key == null) return;
-		CacheManager.me().getCache().remove(CACHE_NAME, key);
+		JCacheKit.remove(CACHE_NAME, key);
 	}
 
 	public void putCache(Object key,Object value){
-		CacheManager.me().getCache().put(CACHE_NAME, key, value);
+		JCacheKit.put(CACHE_NAME, key, value);
 	}
 
 	public M getCache(Object key){
-		return CacheManager.me().getCache().get(CACHE_NAME, key);
+		return JCacheKit.get(CACHE_NAME, key);
 	}
 
 	public M getCache(Object key,IDataLoader dataloader){
-		return CacheManager.me().getCache().get(CACHE_NAME, key, dataloader);
+		return JCacheKit.get(CACHE_NAME, key, dataloader);
 	}
 
 	public Metadata createMetadata(){

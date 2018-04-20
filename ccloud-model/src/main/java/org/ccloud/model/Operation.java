@@ -17,10 +17,11 @@ package org.ccloud.model;
 
 import java.util.List;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.base.BaseOperation;
 import org.ccloud.model.core.Table;
 
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -35,10 +36,10 @@ public class Operation extends BaseOperation<Operation> {
 
 	@SuppressWarnings("unchecked")
 	public List<String> getFromListCache(Object key, IDataLoader dataloader) {
-		Object data = CacheKit.get(CACHE_KEY, key);
+		Object data = JCacheKit.get(CACHE_KEY, key);
 		if (data == null) {
 			data = dataloader.load();
-			CacheKit.put(CACHE_KEY, key, data);
+			JCacheKit.put(CACHE_KEY, key, data);
 		}
 		return (List<String>)data;
 	}

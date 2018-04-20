@@ -17,6 +17,7 @@ package org.ccloud.model.base;
 
 import java.util.List;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.GoodsSpecificationValue;
 import org.ccloud.model.core.JModel;
@@ -24,7 +25,7 @@ import org.ccloud.model.core.JModel;
 import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.IBean;
 import com.jfinal.plugin.activerecord.tx.Tx;
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -53,19 +54,19 @@ public abstract class BaseProduct<M extends BaseProduct<M>> extends JModel<M> im
 
 	public void removeCache(Object key){
 		if(key == null) return;
-		CacheKit.remove(CACHE_NAME, key);
+		JCacheKit.remove(CACHE_NAME, key);
 	}
 
 	public void putCache(Object key,Object value){
-		CacheKit.put(CACHE_NAME, key, value);
+		JCacheKit.put(CACHE_NAME, key, value);
 	}
 
 	public M getCache(Object key){
-		return CacheKit.get(CACHE_NAME, key);
+		return JCacheKit.get(CACHE_NAME, key);
 	}
 
 	public M getCache(Object key,IDataLoader dataloader){
-		return CacheKit.get(CACHE_NAME, key, dataloader);
+		return JCacheKit.get(CACHE_NAME, key, dataloader);
 	}
 
 	@Override

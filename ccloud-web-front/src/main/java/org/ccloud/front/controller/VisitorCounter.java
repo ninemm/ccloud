@@ -15,12 +15,12 @@
  */
 package org.ccloud.front.controller;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.core.JBaseController;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 
 import com.jfinal.aop.Clear;
-import com.jfinal.plugin.ehcache.CacheKit;
 
 @Clear
 @RouterNotAllowConvert
@@ -40,9 +40,9 @@ public class VisitorCounter extends JBaseController {
 			return;
 		}
 
-		Long visitorCount = CacheKit.get(CACHE_NAME, buildKey(id, type));
+		Long visitorCount = JCacheKit.get(CACHE_NAME, buildKey(id, type));
 		visitorCount = visitorCount == null ? 0 : visitorCount;
-		CacheKit.put(CACHE_NAME, buildKey(id, type), visitorCount + 1);
+		JCacheKit.put(CACHE_NAME, buildKey(id, type), visitorCount + 1);
 		renderJavascript("");
 	}
 
@@ -53,18 +53,18 @@ public class VisitorCounter extends JBaseController {
 			return;
 		}
 
-		Long visitorCount = CacheKit.get(CACHE_NAME, buildKey(id, type));
+		Long visitorCount = JCacheKit.get(CACHE_NAME, buildKey(id, type));
 		visitorCount = visitorCount == null ? 0 : visitorCount;
 		renderText(visitorCount + "");
 	}
 
 	public static long getVisitorCount(String id, String type) {
-		Long visitorCount = CacheKit.get(CACHE_NAME, buildKey(id, type));
+		Long visitorCount = JCacheKit.get(CACHE_NAME, buildKey(id, type));
 		return visitorCount == null ? 0 : visitorCount;
 	}
 
 	public static void clearVisitorCount(String id, String type) {
-		CacheKit.remove(CACHE_NAME, buildKey(id, type));
+		JCacheKit.remove(CACHE_NAME, buildKey(id, type));
 	}
 
 	private static String buildKey(String id, String type) {

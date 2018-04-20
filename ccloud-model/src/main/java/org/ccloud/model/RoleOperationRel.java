@@ -15,9 +15,10 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 import java.util.List;
@@ -35,10 +36,10 @@ public class RoleOperationRel extends BaseRoleOperationRel<RoleOperationRel> {
 
 	@SuppressWarnings("unchecked")
 	public List<String> getFromListCache(Object key, IDataLoader dataloader) {
-		Object data = CacheKit.get(CACHE_KEY, key);
+		Object data = JCacheKit.get(CACHE_KEY, key);
 		if (data == null) {
 			data = dataloader.load();
-			CacheKit.put(CACHE_KEY, key, data);
+			JCacheKit.put(CACHE_KEY, key, data);
 		}
 		return (List<String>)data;
 	}

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.ccloud.Consts;
+import org.ccloud.cache.JCacheKit;
+import org.ccloud.cache.impl.J2Cache;
 import org.ccloud.model.ModelSorter.ISortModel;
 import org.ccloud.model.base.BaseContent;
 import org.ccloud.model.core.Table;
@@ -41,7 +43,6 @@ import org.ccloud.utils.StringUtils;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 @Table(tableName = "content", primaryKey = "id")
@@ -66,7 +67,7 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 	private Object object;
 
 	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachekeys");
+		Set<String> inCacheKeys = JCacheKit.get(CACHE_NAME, "cachekeys");
 
 		Set<String> cacheKeyList = new HashSet<String>();
 		if (inCacheKeys != null) {
@@ -74,23 +75,23 @@ public class Content extends BaseContent<Content> implements ISortModel<Content>
 		}
 
 		cacheKeyList.add(key.toString());
-		CacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
+		JCacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
 
-		return CacheKit.get("content_list", key, dataloader);
+		return JCacheKit.get("content_list", key, dataloader);
 	}
 
 	public void clearList() {
-		Set<String> list = CacheKit.get(CACHE_NAME, "cachekeys");
+		Set<String> list = JCacheKit.get(CACHE_NAME, "cachekeys");
 		if (list != null && list.size() > 0) {
 			for (String key : list) {
 				if (!key.startsWith("module:")) {
-					CacheKit.remove("content_list", key);
+					JCacheKit.remove("content_list", key);
 					continue;
 				}
 
 				// 不清除其他模型的内容
 				if (key.startsWith("module:" + getModule())) {
-					CacheKit.remove("content_list", key);
+					JCacheKit.remove("content_list", key);
 				}
 			}
 		}
