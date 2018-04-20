@@ -28,14 +28,13 @@ datetimepicker.min.css">
 	var $table = $("#_customerDetailsReport_table");
 	var $tableGift = $("#_customerDetailsReportGift_table");
 	var url = '${CPATH}/admin/report/customerDetailsReportList';
-	var urlGift = '${CPATH}/admin/report/customerDetailsGiftReportList';
 
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
 		jQuery.mm.initEditTableExport3('#_customerDetailsReport_table',url, initParams,  initFields(), null,null,"销售详情（客户）");
-		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',urlGift, initParams, initFieldsGift(), null,null,"赠品详情（客户）");
+		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',url, initGiftParams, initFieldsGift(), null,null,"赠品详情（客户）");
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');
@@ -53,13 +52,35 @@ datetimepicker.min.css">
 			user_id: $('#user_id').find("option:selected").val(),
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
+			productNames: $('#productNames').val(),
+			isGift: "0",
+			sortName:params
+		};
+		return param;
+	};
+	
+	
+	var initGiftParams = function(params) {
+		
+		var keyword = $('#status  option:selected').val();
+		if(keyword == ""){
+			keyword = "so.create_date";
+		}
+		if (keyword) keyword = encodeURIComponent(keyword);
+		var param = {
+			k: keyword,
+			user_id: $('#user_id').find("option:selected").val(),
+			startDate: $('#startDate').val() + " 00:00:00",
+			endDate: $('#endDate').val() + " 23:59:59",
+			productNames: $('#productNames').val(),
+			isGift: "1",
 			sortName:params
 		};
 		return param;
 	};
 	
 	function orderTime(){
-		$('#post-search-input').val("so.create_date");
+		$('#post-search-input').val("orderTime");
 		var validate = $('#form').data('bootstrapValidator');
 		validate.validate();
 		if (validate.isValid()){
@@ -69,7 +90,7 @@ datetimepicker.min.css">
 	};
 	
 	function prints(){
-		$('#post-search-input').val("so.print_time");
+		$('#post-search-input').val("print");
 		var validate = $('#form').data('bootstrapValidator');
 		validate.validate();
 		if (validate.isValid()){
@@ -79,7 +100,7 @@ datetimepicker.min.css">
 	};
 	
 	function complete(){
-		$('#post-search-input').val("sok.biz_date");
+		$('#post-search-input').val("complete");
 		var validate = $('#form').data('bootstrapValidator');
 		validate.validate();
 		if (validate.isValid()){
@@ -143,6 +164,7 @@ datetimepicker.min.css">
 <section class="content">
 	<div class="row content-row">
     	<form class="form-horizontal" role="form" id="form">
+    			<input id="productNames" value="${productNames!}" type="hidden">
 			<div class="form-group">
 				<div class="col-sm-4">
 					<label class="control-label col-sm-4">业务员:</label>
