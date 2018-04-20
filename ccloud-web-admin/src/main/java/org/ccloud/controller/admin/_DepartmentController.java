@@ -235,6 +235,9 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 		String[] departmentId = departmentIds.split(",");
 		for (String department_id : departmentId) {
 			//获取层级
+			if(department_id.equals("")) {
+				continue;
+			}
 			Department department = DepartmentQuery.me().findById(department_id);
 			Integer deptLevel =department.getDeptLevel();
 			String pid;
@@ -252,6 +255,12 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 			}
 			String json="{\"name\": \""+department.getDeptName()+"\",\"parentid\": "+pid+"}";
 			ApiResult createDepartment = ConDepartmentApi.createDepartment(json);
+			if (createDepartment.getInt("errcode")==60004) {
+				renderAjaxResultForError("父部门没有同步");
+				return;
+			}else if(createDepartment.getInt("errcode")==60008){
+				continue;
+			}
 			if (createDepartment.getInt("errcode")!=0) {
 				renderAjaxResultForError("同步失败");
 				return;

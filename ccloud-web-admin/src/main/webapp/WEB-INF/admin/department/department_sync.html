@@ -28,14 +28,6 @@
             $('input[name=checkItem]').each(function(){
                 this.checked = $this.checked;
             })
-        }).on('click', 'input[name=checkItem]', function(){
-            var all = $('input[name=checkItem]').length;
-            var now = $('input[name=checkItem]:checked').length;
-            if(all == now) {
-                $('#all')[0].checked = true;
-            } else {
-                $('#all')[0].checked = false;
-            }
         })
         
         $("#dataArea").change(function() {
@@ -59,10 +51,10 @@
     var initFields = function() {
 		var fields =
 			[
-				{field: "", title: "<input type='checkbox' onclick='checkA(this)' name='data1' value=''/>", align: "center", width: '5%',
+				{field: "", title: "<input type='checkbox' onclick='checkA(this)' name='dataItem1' value=''/>", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml = '';
-					if(!row.qywx_deptid) {strHtml = '<input type="checkbox" name="data" id="data" value="'+row.id+'"/>';}
+					strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.id+'"/>';
 					return strHtml;
 				},
 				edit:false
@@ -79,8 +71,21 @@
 					else {return "未同步";}
 				},
 				 edit:false},
+				 {field: "", title: "操作", align: "center", width: '10%',
+					formatter: function(value, row, rowIndex) {
+						var strHtml = '<a href="javascript:void(0);" onclick="synchronousChange(\''+row.id+'\')" class="btn btn-xs bg-olive btn-flat synchronousChange"  data-style="expand-right">同步</a>'
+						return strHtml;
+					},
+				 edit:false}
 			];
 		return fields;
+	}
+	
+	function checkA(checkbox) {
+		var items = document.getElementsByName("dataItem");
+		for (var i = 0; i < items.length; i++) {
+			items[i].checked = checkbox.checked;
+		}
 	}
 	
 	  $("#synchronous").click(function(){
@@ -108,7 +113,6 @@
                         } else {
                             toastr.success(data.message, '同步成功');
                         }
-                        change();
                         setTimeout( function(){
                             l.stop();
                         }, 2 * 1000 );
@@ -116,6 +120,25 @@
                 });
             }
         });
+	
+		function synchronousChange(id){
+            var departmentIds=id;
+            $.ajax({
+                url:"${CPATH}/admin/department/synchronous",
+                type:"post",
+                data:{"departmentIds":departmentIds},
+                dataType:"json",
+                success:function(data) {
+                    if (data.errorCode > 0) {
+                        toastr.error(data.message, '同步失败');
+                    } else {
+                        toastr.success(data.message, '同步成功');
+                    }
+                    setTimeout( function(){
+                    }, 2 * 1000 );
+                }
+            });
+		}
 	
 </#macro>
 <@layout active_id=p child_active_id=c>
