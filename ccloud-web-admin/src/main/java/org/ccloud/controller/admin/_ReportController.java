@@ -569,11 +569,13 @@ public class _ReportController extends JBaseController {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		setAttr("startDate", date);
 		setAttr("endDate", date);
-		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+//		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("直营商名称");
-		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameByDataArea(dataArea);
+//		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameByDataArea(dataArea);
+		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameBySellerId(sellerId);
 		String productNames = "";
 		for (int i = 0; i < findBySellerId.size(); i++) {
 			String customName = findBySellerId.get(i).getStr("custom_name");
