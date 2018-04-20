@@ -305,4 +305,9 @@ public class SellerProductQuery extends JBaseQuery {
 		}
 		return tagSet;
 	}
+
+	public List<Record> findCustomNameBySellerId(String sellerId) {
+		String sql ="SELECT sp.custom_name FROM cc_seller_product sp WHERE sp.seller_id =?";
+		return Db.find(sql,sellerId);
+	}
 }
