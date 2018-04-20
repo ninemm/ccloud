@@ -76,36 +76,6 @@
 		}
 	});
 	
-	function orderTime(){
-		$('#post-search-input').val("so.create_date");
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
-	};
-	
-	function prints(){
-		$('#post-search-input').val("so.print_time");
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
-	};
-	
-	function complete(){
-		$('#post-search-input').val("sok.biz_date");
-		var validate = $('#form').data('bootstrapValidator');
-		validate.validate();
-		if (validate.isValid()){
-			$table.bootstrapTable('refresh');
-			$tableGift.bootstrapTable('refresh');
-		}
-	};
-	
 	var initFields = function() {
 		var fields =
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },

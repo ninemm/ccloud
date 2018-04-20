@@ -749,5 +749,5 @@ public class SalesOutstockQuery extends JBaseQuery {
 		params.add(endDate);
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
-	
+
 }
