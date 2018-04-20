@@ -156,4 +156,48 @@
         <button class="red-button weui-flex__item _submit_btn"onclick="getback()">返回</button>
     </footer>
 </div>
+<div class="" style="display: none">
+	<section class="product_detail weui-panel weui-panel_access composition">
+		<div>
+			<div class="product-top">
+				<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
+				<div class="weui-cell_access product-top-right">
+					<p class="product_name" id="compositionName"></p>
+					<div class="product_unit">
+						<div class="main-good">主</div>
+						<div id="compositionValueName"></div>
+					</div>
+					<span class="weui-cell__ft"></span>
+				</div>
+			</div>
+			<div class="product_bUnit">
+				<span class="price" id="compositionPriceSpan"></span>
+				<div class="spinner">
+					<div class="operate fl">
+						<i class="icon-minus2"></i>
+					</div>
+					<input type="number" min="0" value="0" class="fl" id="compositionNum">
+					<div class="operate fl">
+						<i class="icon-plus2"></i>
+					</div>
+				</div>
+			</div>
+			<div id="stock"></div>
+			<div id="activityName" class="activityName"></div>
+		</div>
+		<hr>
+		<div id="gift" class="weui-flex">
+			<span>
+				<i class="icon-tags"></i>
+			</span>
+			<div class="weui-flex__item">
+				<p id="sub">
+					<span id="subProduct"> </span>
+				</p>
+				<p id="subsubProduct" class="none">
+				</p>
+			</div>
+		</div>
+	</section>
+</div>
 </@layout>
