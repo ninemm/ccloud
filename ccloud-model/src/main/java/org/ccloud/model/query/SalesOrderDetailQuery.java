@@ -670,11 +670,11 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		} else {
 			sqlBuilder.append(" AND o.is_gift = 1");
 		}
-		params.add(startDate);
-		params.add(endDate);		
 		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
 		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
 		params.add(dataArea);
+		params.add(startDate);
+		params.add(endDate);		
 		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.input_user_id,o.is_gift");
 		sqlBuilder.append(" ) t1 on t1.input_user_id = cs.biz_user_id AND t1.sell_product_id = o.sell_product_id AND t1.is_gift = o.is_gift");
 		sqlBuilder.append(" WHERE o.data_area LIKE ?");
@@ -720,11 +720,11 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		} else {
 			sqlBuilder.append(" AND o.is_gift = 1");
 		}
-		params.add(startDate);
-		params.add(endDate);		
 		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
 		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
 		params.add(dataArea);
+		params.add(startDate);
+		params.add(endDate);		
 		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.seller_id,o.is_gift");
 		sqlBuilder.append(" ) t1 on t1.seller_id = cs.seller_id AND t1.sell_product_id = o.sell_product_id AND t1.is_gift = o.is_gift");
 		sqlBuilder.append(" WHERE o.data_area LIKE ?");
