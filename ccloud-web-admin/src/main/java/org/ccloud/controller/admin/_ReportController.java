@@ -14,10 +14,14 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.InventoryDetail;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.Seller;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.InventoryDetailQuery;
+import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SalesOutstockDetailQuery;
+import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
@@ -454,16 +458,74 @@ public class _ReportController extends JBaseController {
 		setAttr("endDate", date);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		//得到表头
-		List<String>watchHead=new ArrayList<>();
+		List<String> watchHead = new ArrayList<>();
 		watchHead.add("业务员名称");
 		watchHead.add("销售额(元)");
-		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameBySellerId(sellerId);
-		for (Record record : findBySellerId) {
-			String customName=record.getStr("custom_name");
+		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		String productNames = "";
+		for (int i = 0; i < findBySellerId.size(); i++) {
+			String customName = findBySellerId.get(i).getCustomName();
 			watchHead.add(customName);
+			if (i == findBySellerId.size() - 1) {
+				productNames = productNames + customName;
+			} else {
+				productNames = productNames + customName + ",";
+			}			
 		}
+		setAttr("productNames", productNames);
 		setAttr("watchHead", watchHead);
 		render("mSalesmanDetail.html");
+	}
+	
+	//我部门的业务员详细
+	public void mSalesmanDetailReportListNew() {
+		String status = getPara("status");
+		if (StrKit.notBlank(status)) {
+			setAttr("k", status);
+		}
+		Map<String, String> map = getProductMap(getPara("productNames"));
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String isGift = getPara("isGift");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		List<Record> list = new ArrayList<>();
+		List<Record> totalList = new ArrayList<>();
+		if (status.equals("order") || status.equals("print")) {
+			list = SalesOrderDetailQuery.me().findOrderByDataArea(dataArea, status, startDate, endDate, isGift);
+			totalList = SalesOrderQuery.me().findTotalAmountByUser(startDate, endDate, dataArea, status);
+		} else {
+			list = SalesOutstockDetailQuery.me().findOutStockByDataArea(dataArea, status, startDate, endDate, isGift);
+			totalList = SalesOutstockQuery.me().findOutTotalAmountByUser(startDate, endDate, dataArea, status);
+		}
+		List<Map<String, String>> orderResult = new ArrayList<>();
+		String userId = "";
+		Map<String, String> userOrderMap = new HashMap<>();
+		for (int i = 0; i < list.size(); i++) {
+			if (!userId.equals(list.get(i).getStr("biz_user_id"))) {
+				if (i != 0) {
+					orderResult.add(userOrderMap);
+					userOrderMap = new HashMap<>();
+				}
+				userOrderMap.putAll(map);
+				userId = list.get(i).getStr("biz_user_id");
+				userOrderMap.put("业务员名称", list.get(i).getStr("realname"));
+				userOrderMap.put("销售额(元)", "0");
+				userOrderMap.put("userId", list.get(i).getStr("biz_user_id"));
+			}
+			userOrderMap.put(list.get(i).getStr("custom_name"), list.get(i).getStr("count"));
+			
+			if (i == list.size() - 1) {
+				orderResult.add(userOrderMap);
+			}
+		}
+		for (Map<String, String> result : orderResult) {
+			for (Record record : totalList) {
+				if (result.get("userId").equals(record.getStr("biz_user_id"))) {
+					result.put("销售额(元)", record.getStr("count"));
+				}	
+			}
+		}
+		renderJson(orderResult);
 	}
 	
 	//我部门的业务员详细

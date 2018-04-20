@@ -794,7 +794,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		params.add(dataArea);
 		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
 		params.add(Consts.SALES_ORDER_STATUS_REJECT);
-		params.add(Consts.CUSTOMER_KIND_COMMON);		
+		params.add(Consts.CUSTOMER_KIND_SELLER);		
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
@@ -2756,6 +2756,35 @@ public class SalesOrderQuery extends JBaseQuery {
 		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
 		params.add(Consts.SALES_ORDER_STATUS_REJECT);
 		params.add(userId);
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	public List<Record> findTotalAmountByUser(String startDate, String endDate, String dataArea, String status) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder fromBuilder = new StringBuilder("");
+		fromBuilder.append(" SELECT SUM(o.total_amount) - IFNULL(t1.refund_count,0) AS count,o.biz_user_id FROM cc_sales_order o");
+		fromBuilder.append(" LEFT JOIN ( SELECT SUM(o.total_reject_amount) as refund_count,o.input_user_id FROM cc_sales_refund_instock o");
+		fromBuilder.append(" WHERE o.data_area LIKE ? AND o.`status` not in (?, ?)");
+		fromBuilder.append(" AND o.create_date >= ? AND o.create_date <= ?");
+		if (status.equals("print")) {
+			fromBuilder.append(" AND o.is_print = 1");
+		}
+		fromBuilder.append(" ) t1 ON t1.input_user_id = o.biz_user_id");
+		fromBuilder.append(" WHERE EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = o.status and os.status != ? and os.status != ?)");
+		fromBuilder.append(" AND o.data_area like ?");
+		if (status.equals("print")) {
+			fromBuilder.append(" AND o.print_time >= ? and o.print_time <= ?");
+		} else {
+			fromBuilder.append(" AND o.create_date >= ? and o.create_date <= ?");
+		}
+		fromBuilder.append(" GROUP BY o.biz_user_id");
+		params.add(dataArea);
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);	
+		params.add(startDate);
+		params.add(endDate);		
+		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
+		params.add(Consts.SALES_ORDER_STATUS_REJECT);
+		params.add(dataArea);
 		params.add(startDate);
 		params.add(endDate);
 		return Db.find(fromBuilder.toString(), params.toArray());
