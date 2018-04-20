@@ -794,7 +794,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		params.add(dataArea);
 		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
 		params.add(Consts.SALES_ORDER_STATUS_REJECT);
-		params.add(Consts.CUSTOMER_KIND_COMMON);		
+		params.add(Consts.CUSTOMER_KIND_SELLER);		
 		if (ifGift) {
 			fromBuilder.append(" and sd.is_gift=1 ");
 		}else {
