@@ -305,15 +305,17 @@ public class UserController extends BaseFrontController {
 						return false;
 					}
 					
-					User user = userList.get(0);
-					user.setAvatar(wxUserResult.getStr("headimgurl"));
-					user.setNickname(wxUserResult.getStr("nickname"));
-					user.setWechatOpenId(openId);
-					if (!user.saveOrUpdate()) {
-						ret.set("message", "手机号绑定失败，请联系管理员");
-						return false;
+					for (User user : userList) {
+						user.setAvatar(wxUserResult.getStr("headimgurl"));
+						user.setNickname(wxUserResult.getStr("nickname"));
+						user.setWechatOpenId(openId);
+						if (!user.saveOrUpdate()) {
+							ret.set("message", "手机号绑定失败，请联系管理员");
+							return false;
+						}						
 					}
 					
+					User user = userList.get(0);
 					// 获取用户权限
 					initUserRole(user.getUsername(), user.getPassword(), true);
 
