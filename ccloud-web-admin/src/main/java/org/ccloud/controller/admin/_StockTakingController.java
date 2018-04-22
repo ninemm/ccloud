@@ -87,14 +87,14 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		String userId = user.getId();
 		if (id != null) {
 			StockTaking stockTaking = StockTakingQuery.me().findById(id);
+			List<Record> ilist = StockTakingDetailQuery.me()._findByStockTakingDetailId(id,stockTaking.getWarehouseId());
 			setAttr("stockTaking", stockTaking);
+			setAttr("ilist", ilist);
 		}
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(userId);
 		setAttr("wlist", wlist);
 		List<User> ulist = UserQuery.me().findUserList(userId);
 		setAttr("ulist", ulist);
-		List<StockTakingInfo> ilist = StockTakingDetailQuery.me().findByStockTakingDetailId(id);
-		setAttr("ilist", ilist);
 		
 	}
 
