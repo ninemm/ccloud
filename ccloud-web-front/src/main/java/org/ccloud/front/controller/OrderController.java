@@ -205,7 +205,7 @@ public class OrderController extends BaseFrontController {
 		setAttr("images", images);
 		setAttr("orderDetailList", orderDetailList);
 
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","");
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","",null,null);
 
 		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
