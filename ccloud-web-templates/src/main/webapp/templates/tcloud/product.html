@@ -211,6 +211,12 @@ var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
 var categoryId = '';
 var map = {};
+var pageNumber = 2;
+var pageSize = 10;
+var loading = false;
+
+var $endNode = null;
+var $loadmore = $(".weui-loadmore");
 function firstInit(){
 	var tags = ${tags!};
 	initTags(tags);
@@ -260,7 +266,7 @@ function initProduct(productList,goodsCategory){
 		map[el.categoryId] = 0;
 		if(categoryId==''){
 			$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-			$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
+			$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
 			categoryId=el.categoryId;
 		}else{
 			if(categoryId != el.categoryId){
@@ -268,7 +274,7 @@ function initProduct(productList,goodsCategory){
 				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
 			}else{
 				$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-				$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
+				$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
 			}
 		}
 	});
@@ -314,6 +320,7 @@ function initProduct(productList,goodsCategory){
 		$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
 		$newProductDetail.find("#product_sn").val(el.product_sn);
 	});
+	$type.append( '<div class="weui-loadmore"><i class="weui-loading"></i><span class="weui-loadmore__tips">正在加载</span></div>');
 }
 
 function productNum(){
@@ -624,6 +631,11 @@ function order(){
 	window.location.href = '${CPATH}/product/order';
 }
 
+ 	//监听滚动
+    $(".infinite").infinite().on("infinite", function() {
+		alert(123);
+    });
+ 
 </#macro>
 
 <@layout>
@@ -659,7 +671,7 @@ function order(){
 							</ul>
 						</div>
 					</aside>
-					<article class="menu-right">
+					<article class="menu-right infinite">
 						<div class="" style="display: none">
 							<section class="product_detail weui-panel weui-panel_access common">
 								<div>
