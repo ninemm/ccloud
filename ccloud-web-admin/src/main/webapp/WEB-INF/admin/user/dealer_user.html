@@ -1,0 +1,138 @@
+<#include "../_inc/_layout.html"/>
+
+<#macro script_import>
+    <script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
+    <script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
+    <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
+    <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+</#macro>
+
+<#macro css_import>
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+    <link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+</#macro>
+<#macro css>
+    .select2-container {
+        box-sizing: border-box;
+        display: inline-block;
+        margin: 0;
+        position: relative;
+        vertical-align: middle;
+        margin-bottom: 4px;
+    }
+</#macro>
+
+<#macro script>
+    var $table = $("#_user_table");
+    var $form = $("#form");
+
+    var url = '${CPATH}/admin/user/dealerUserList';
+
+    var batchFlg = true;
+
+    $(function() {
+
+        var departmentType = ${(departmentType)};
+        $("#department_type").select2({
+            data:departmentType
+        })
+
+        jQuery.mm.initEditTable('#_user_table', url, initParams, initFields(), null);
+
+    });
+
+    $("#search-submit").click(function() {
+        $table.bootstrapTable('refresh');
+    });
+
+    var initParams = function(params) {
+
+        var keyword = $('#search').val();
+        var departmentType = $('#department_type').val();
+
+        var param = {
+            size: params.limit,
+            page: params.offset/params.limit + 1,
+            departmentType: departmentType,
+            k: keyword,
+            sort: params.sort,      //排序列名
+            sortOrder: params.order //排位命令（desc,asc）
+        };
+        return param;
+    };
+
+    var initFields = function() {
+        var fields =
+        [
+            {field: "id", title: "id", align: "center", visible:false, edit:false},
+            {field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%',
+                formatter: function(value, row, rowIndex) {
+                    return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.id + '">';
+                },
+                edit:false
+            },
+            {field: "username", title: "用户名", align: "center", width: '8%',sortable: true, edit:false},
+            {field: "realname", title: "真实姓名", align: "center", width: '8%',sortable: true, edit:false},
+            {field: "nickname", title: "昵称", align: "center", width: '5%',sortable: true, edit: false},
+            {field: "mobile", title: "手机号", align: "center", width: '5%',sortable: true, edit: false},
+            {field: "department_name", title: "部门", align: "center", width: '5%',sortable: true, edit: false},
+            {field: "group_name", title: "分组", align: "center", width: '5%',sortable: true, edit: false},
+
+            {field: "action", title: "操作", align: "center", width: '20%',
+                formatter: function(value, row, rowIndex) {
+                    var strHtml = '<a href="' + # + '" class="btn btn-xs bg-olive btn-flat">同步</a> ';
+                    return strHtml;
+                },
+                edit:false
+            }
+        ];
+        return fields;
+    }
+
+</#macro>
+
+<@layout active_id=p child_active_id=c>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>用户同步</h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li>用户同步</li>
+        <li class="active">用户同步</li>
+    </ol>
+</section>
+<!-- Main content -->
+<section class="content">
+    <div class="row content-row">
+        <form id="form" class="form-horizontal" >
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <a href="#" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-refresh"></i> 同步</a>
+                </div>
+                <div class="col-sm-3">
+                    <label class="control-label col-sm-5">组织机构:</label>
+                    <div class="col-sm-7 input-group input-group-sm">
+                        <select  class="form-control" name="department_type" id="department_type">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <label class="control-label col-sm-4">用户名:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+                        <input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索姓名">
+                    </div>
+                </div>
+                <div class="col-sm-1">
+                    <input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+                </div>
+            </div>
+            <div class="box">
+                <table class="table table-striped table-hover table-condensed" id="_user_table" ></table>
+            </div>
+        </form>
+    </div>
+</section>
+
+</@layout>

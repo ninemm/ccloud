@@ -171,9 +171,17 @@ public class SellerQuery extends JBaseQuery {
 		String sql="SELECT * from cc_seller where dept_id= ?";
 		return DAO.findFirst(sql,deptId);
 	}
-
+	
 	public Seller _findByDataArea(String dataArea){
 		String sql="SELECT s.* from cc_seller s join department d on s.dept_id = d.id where data_area = ?";
 		return DAO.findFirst(sql,dataArea);
+	}
+	
+	public List<Record> findDeptByLevel(){
+		StringBuilder sql = new StringBuilder("SELECT CONCAT(d.data_area, '%') AS id, cs.seller_name AS text ");
+		sql.append("FROM department d ");
+		sql.append("JOIN cc_seller cs ON d.id = cs.dept_id ");
+		sql.append("WHERE (d.dept_level = '1' OR d.dept_level = '2') AND cs.jpwx_open_id is not null ");
+		return Db.find(sql.toString());
 	}
 }

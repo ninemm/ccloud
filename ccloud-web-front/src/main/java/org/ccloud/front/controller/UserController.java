@@ -299,20 +299,22 @@ public class UserController extends BaseFrontController {
 				ApiResult wxUserResult = UserApi.getUserInfo(openId);
 				if (wxUserResult != null) {
 					
-					List<User> userList = UserQuery.me().findByMobile(mobile);
+					List<User> userList = UserQuery.me().findAllByMobile(mobile);
 					if (userList == null || userList.size() == 0) {
 						ret.set("message", "手机号不存在，请联系管理员");
 						return false;
 					}
 					
-					User user = userList.get(0);
-					user.setAvatar(wxUserResult.getStr("headimgurl"));
-					user.setNickname(wxUserResult.getStr("nickname"));
-					user.setWechatOpenId(openId);
-					if (!user.saveOrUpdate()) {
-						ret.set("message", "手机号绑定失败，请联系管理员");
-						return false;
+					for (User user : userList) {
+						user.setAvatar(wxUserResult.getStr("headimgurl"));
+						user.setNickname(wxUserResult.getStr("nickname"));
+						user.setWechatOpenId(openId);
+						if (!user.saveOrUpdate()) {
+							ret.set("message", "手机号绑定失败，请联系管理员");
+							return false;
+						}						
 					}
+					User user = userList.get(0);
 					
 					// 获取用户权限
 					initUserRole(user.getUsername(), user.getPassword(), true);

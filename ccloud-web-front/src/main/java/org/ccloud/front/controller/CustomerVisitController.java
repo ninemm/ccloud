@@ -436,7 +436,7 @@ public class CustomerVisitController extends BaseFrontController {
 			
 			JSONArray array = JSON.parseArray(picJson);
 			for (int i = 0; i < array.size(); i++) {
-				JSONObject obj = array.getJSONObject(i);
+				JSONObject obj = (JSONObject) array.get(i);
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
 				String orderList = obj.getString("orderList");
@@ -779,7 +779,7 @@ public class CustomerVisitController extends BaseFrontController {
 			
 			JSONArray array = JSON.parseArray(picJson);
 			for (int i = 0; i < array.size(); i++) {
-				JSONObject obj = array.getJSONObject(i);
+				JSONObject obj = (JSONObject) array.get(i);
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
 				String orderList = obj.getString("orderList");
@@ -855,7 +855,7 @@ public class CustomerVisitController extends BaseFrontController {
 			
 			JSONArray array = JSON.parseArray(picJson);
 			for (int i = 0; i < array.size(); i++) {
-				JSONObject obj = array.getJSONObject(i);
+				JSONObject obj = (JSONObject) array.get(i);
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
 				String orderList = obj.getString("orderList");
@@ -978,7 +978,7 @@ public class CustomerVisitController extends BaseFrontController {
 			
 			JSONArray array = JSON.parseArray(picJson);
 			for (int i = 0; i < array.size(); i++) {
-				JSONObject obj = array.getJSONObject(i);
+				JSONObject obj = (JSONObject) array.get(i);
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
 				String orderList = obj.getString("orderList");

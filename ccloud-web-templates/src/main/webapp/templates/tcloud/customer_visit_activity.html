@@ -239,7 +239,9 @@
     
 
     function doSubmit() {
+    	
     	$(".pic").val(JSON.stringify(imageArr));
+        console.log(imageArr);
         $.ajax({
             url: '${CPATH}/customerVisit/saveActivityVisit',
             method: 'post',

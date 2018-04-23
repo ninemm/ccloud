@@ -372,7 +372,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
         	String sPIds = "";
         	for(SellerProduct sellerProduct : sellerProducts) {
         		SellerProduct sellerP = SellerProductQuery.me().findbyCustomerNameAndSellerIdAndProductId(sellerProduct.getCustomName(), sId);
-        		sPIds += "'"+sellerP.getId()+"',";
+        		if(sellerP !=null) {
+        			sPIds += "'"+sellerP.getId()+"',";
+        		}
         	}
         	sellerProductIds = sPIds.substring(0, sPIds.length()-1);
         }
