@@ -38,7 +38,7 @@ public class BiManagerQuery extends JBaseQuery {
 	public List<Record> findAllSeller() {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder(" select s.seller_name, d.data_area ");
+		StringBuilder sqlBuilder = new StringBuilder(" select s.seller_name, d.data_area as dealer_data_area ");
 		sqlBuilder.append(" from cc_seller s join cc_department d on s.dept_id = d.id ");
 		sqlBuilder.append(" where LENGTH(d.data_area) = ? ");
 		params.add(6);
@@ -65,7 +65,7 @@ public class BiManagerQuery extends JBaseQuery {
 
 	public List<Record> findAllBrand() {
 
-		StringBuilder sqlBuilder = new StringBuilder(" select id, name ");
+		StringBuilder sqlBuilder = new StringBuilder(" select id as brand_id, name ");
 		sqlBuilder.append(" from cc_brand ");
 
 		return Db.find(sqlBuilder.toString());
@@ -89,7 +89,7 @@ public class BiManagerQuery extends JBaseQuery {
 
 	public List<Record> findAllProduct() {
 
-		StringBuilder sqlBuilder = new StringBuilder(" select p.id, concat(p.name,' ',t1.valueName) as name  ");
+		StringBuilder sqlBuilder = new StringBuilder(" select p.id as product_id, concat(p.name,' ',t1.valueName) as name  ");
 		sqlBuilder.append(" from cc_product p ");
 		sqlBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 
@@ -102,8 +102,10 @@ public class BiManagerQuery extends JBaseQuery {
 	public List<Record> findProductByUser(String id) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder(" select product_id ");
-		sqlBuilder.append(" from bi_user_join_product ");
+		StringBuilder sqlBuilder = new StringBuilder(" select up.product_id, concat(p.name,' ',t1.valueName) as name ");
+		sqlBuilder.append(" from bi_user_join_product up ");
+		sqlBuilder.append(" join cc_product p on up.product_id = p.id ");
+		sqlBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 		appendIfNotEmpty(sqlBuilder, "user_id", id, params, true);
 
 		return Db.find(sqlBuilder.toString(), params.toArray());

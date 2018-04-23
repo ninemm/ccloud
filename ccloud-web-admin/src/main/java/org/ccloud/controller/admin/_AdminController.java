@@ -117,6 +117,13 @@ public class _AdminController extends JBaseController {
 			CookieUtils.put(this, Consts.COOKIE_LOGINED_USER, user.getId().toString());
 			setSessionAttr(Consts.SESSION_LOGINED_USER, user);
 
+			// 数据查看时的数据域
+			if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+				setSessionAttr(Consts.SESSION_SELECT_DATAAREA, DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea()) + "%");
+			} else {
+				setSessionAttr(Consts.SESSION_SELECT_DATAAREA, user.getDataArea() + "%");
+			}
+
 			List<Record> sellerByUser = BiManagerQuery.me().findSellerByUser(user.getId());
 			String sellerArray[] = new String[sellerByUser.size()];
 			String sellerNameArray[] = new String[sellerByUser.size()];

@@ -75,14 +75,21 @@ public class _BiManagerController extends JBaseController {
 			userSellerList.add(record.getStr("dealer_data_area"));
 		}
 
-		List<Record> sellers = BiManagerQuery.me().findAllSeller();
+		List<Record> sellers = null;
+		if(SecurityUtils.getSubject().isPermitted("/admin/all")){
+			sellers = BiManagerQuery.me().findAllSeller();
+		} else {
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			sellers = BiManagerQuery.me().findSellerByUser(user.getId());
+		}
+
 		List<Map<String, Object>> checkList = new ArrayList<>();
 		List<Map<String, Object>> uncheckList = new ArrayList<>();
 		for (Record record : sellers) {
 			Map<String, Object> map = new HashMap<>();
-			map.put("id", record.getStr("data_area"));
+			map.put("id", record.getStr("dealer_data_area"));
 			map.put("name", record.getStr("seller_name"));
-			if (userSellerList.contains(record.getStr("data_area"))) {
+			if (userSellerList.contains(record.getStr("dealer_data_area"))) {
 				checkList.add(map);
 			} else {
 				uncheckList.add(map);
@@ -100,11 +107,13 @@ public class _BiManagerController extends JBaseController {
 		String[] ids = getParaValues("array[]");
 
 		BiManagerQuery.me().delUSellerByUserId(id);
-		for (String s : ids) {
-			BiUserJoinSeller biUserJoinSeller = new BiUserJoinSeller();
-			biUserJoinSeller.setUserId(id);
-			biUserJoinSeller.setDealerDataArea(s);
-			biUserJoinSeller.save();
+		if(ids != null) {
+			for (String s : ids) {
+				BiUserJoinSeller biUserJoinSeller = new BiUserJoinSeller();
+				biUserJoinSeller.setUserId(id);
+				biUserJoinSeller.setDealerDataArea(s);
+				biUserJoinSeller.save();
+			}
 		}
 
 		renderAjaxResultForSuccess("保存成功");
@@ -118,14 +127,21 @@ public class _BiManagerController extends JBaseController {
 			userBrandList.add(record.getStr("brand_id"));
 		}
 
-		List<Record> brands = BiManagerQuery.me().findAllBrand();
+		List<Record> brands = null;
+		if(SecurityUtils.getSubject().isPermitted("/admin/all")){
+			brands = BiManagerQuery.me().findAllBrand();
+		} else {
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			brands = BiManagerQuery.me().findBrandByUser(user.getId());
+		}
+
 		List<Map<String, Object>> checkList = new ArrayList<>();
 		List<Map<String, Object>> uncheckList = new ArrayList<>();
 		for (Record record : brands) {
 			Map<String, Object> map = new HashMap<>();
-			map.put("id", record.getStr("id"));
+			map.put("id", record.getStr("brand_id"));
 			map.put("name", record.getStr("name"));
-			if (userBrandList.contains(record.getStr("id"))) {
+			if (userBrandList.contains(record.getStr("brand_id"))) {
 				checkList.add(map);
 			} else {
 				uncheckList.add(map);
@@ -143,11 +159,13 @@ public class _BiManagerController extends JBaseController {
 		String[] ids = getParaValues("array[]");
 
 		BiManagerQuery.me().delUBrandBByUserId(id);
-		for (String s : ids) {
-			BiUserJoinBrand biUserJoinBrand = new BiUserJoinBrand();
-			biUserJoinBrand.setUserId(id);
-			biUserJoinBrand.setBrandId(s);
-			biUserJoinBrand.save();
+		if(ids != null) {
+			for (String s : ids) {
+				BiUserJoinBrand biUserJoinBrand = new BiUserJoinBrand();
+				biUserJoinBrand.setUserId(id);
+				biUserJoinBrand.setBrandId(s);
+				biUserJoinBrand.save();
+			}
 		}
 
 		renderAjaxResultForSuccess("保存成功");
@@ -161,14 +179,21 @@ public class _BiManagerController extends JBaseController {
 			userProductList.add(record.getStr("product_id"));
 		}
 
-		List<Record> products = BiManagerQuery.me().findAllProduct();
+		List<Record> products = null;
+		if(SecurityUtils.getSubject().isPermitted("/admin/all")){
+			products = BiManagerQuery.me().findAllProduct();
+		} else {
+			User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+			products = BiManagerQuery.me().findProductByUser(user.getId());
+		}
+
 		List<Map<String, Object>> checkList = new ArrayList<>();
 		List<Map<String, Object>> uncheckList = new ArrayList<>();
 		for (Record record : products) {
 			Map<String, Object> map = new HashMap<>();
-			map.put("id", record.getStr("id"));
+			map.put("id", record.getStr("product_id"));
 			map.put("name", record.getStr("name"));
-			if (userProductList.contains(record.getStr("id"))) {
+			if (userProductList.contains(record.getStr("product_id"))) {
 				checkList.add(map);
 			} else {
 				uncheckList.add(map);
@@ -186,11 +211,13 @@ public class _BiManagerController extends JBaseController {
 		String[] ids = getParaValues("array[]");
 
 		BiManagerQuery.me().delUProductByUserId(id);
-		for (String s : ids) {
-			BiUserJoinProduct biUserJoinProduct = new BiUserJoinProduct();
-			biUserJoinProduct.setUserId(id);
-			biUserJoinProduct.setProductId(s);
-			biUserJoinProduct.save();
+		if(ids != null) {
+			for (String s : ids) {
+				BiUserJoinProduct biUserJoinProduct = new BiUserJoinProduct();
+				biUserJoinProduct.setUserId(id);
+				biUserJoinProduct.setProductId(s);
+				biUserJoinProduct.save();
+			}
 		}
 
 		renderAjaxResultForSuccess("保存成功");
