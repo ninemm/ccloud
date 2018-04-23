@@ -49,6 +49,8 @@ import org.ccloud.model.QyBasicflowtype;
 import org.ccloud.model.QyBasicshowtype;
 import org.ccloud.model.QyExpensedetail;
 import org.ccloud.model.SalesOrderDetail;
+import org.ccloud.model.Seller;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.YxBasicchannelinfo;
 import org.ccloud.model.YxBasicchanneltypeinfo;
 import org.ccloud.model.activity.ActivityMaps;
@@ -69,6 +71,8 @@ import org.ccloud.model.query.QyBasicshowtypeQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerProductQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.YxBasicchannelinfoQuery;
 import org.ccloud.model.query.YxBasicchanneltypeinfoQuery;
 import org.ccloud.model.vo.ExTemplate;
@@ -464,19 +468,19 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	private String findFlowDictType(String code) {
 		String type = null;
 		if (code.equals("101101")) {
-			return "feeType_name_PR";
+			return Consts.FLOW_DICT_TYPE_NAME_PR;
 		} else if (code.equals("101102")) {
-			return "feeType_name_raise";
+			return Consts.FLOW_DICT_TYPE_NAME_RAISE;
 		} else if (code.equals("101103")) {
-			return "feeType_name_AD";
+			return Consts.FLOW_DICT_TYPE_NAME_AD;
 		} else if (code.equals("101104")) {
-			return "feeType_name_display";
+			return Consts.FLOW_DICT_TYPE_NAME_DISPLAY;
 		} else if (code.equals("101105")) {
-			return "channel_define";
+			return Consts.FLOW_DICT_TYPE_NAME_CHANNEL;
 		} else if (code.equals("101106")) {
-			return "feeType_name_gift";
+			return Consts.FLOW_DICT_TYPE_NAME_GIFT;
 		} else if (code.equals("101107")) {
-			return "feeType_name_SA";
+			return Consts.FLOW_DICT_TYPE_NAME_SA;
 		}
 		return type;
 	}
@@ -565,7 +569,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
 				Activity activity = new Activity();
 				activity.setId(StrKit.getRandomUUID());
-				activity.setSellerId("03b4197eaaff438389647892b7151bf5");
+				Seller seller = SellerQuery.me().findbyCode(qyExpense.getFranchiserCode());
+				activity.setSellerId(seller.getId());
 				activity.setCode(qyExpense.getActivityNo());
 				activity.setTitle(qyExpense.getExpenseName());
 				activity.setStartTime(DateUtils.strToDate(qyExpense.getExpenseBeginDate(), DateUtils.DEFAULT_MID_FORMATTER));
@@ -583,7 +588,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setIsPublish(0);
 				activity.setCreateDate(new Date());
 				acList.add(activity);
-				getExpenseDetailsList(dlist, qyExpense.getExpenseID(), activity.getId(), activity.getInvestType(), activity.getProcCode());
+				getExpenseDetailsList(dlist, qyExpense.getExpenseID(), activity.getId(), activity.getInvestType(), activity.getProcCode(), seller.getId());
 			}
 		}
 		Db.batchSave(acList, acList.size());
@@ -618,7 +623,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
-	private void getExpenseDetailsList(List<ExpenseDetail> dlist, String expenseId, String actId, String typeId, String flowNo) {
+	private void getExpenseDetailsList(List<ExpenseDetail> dlist, String expenseId, String actId, String typeId, String flowNo, String sellerId) {
 		List<ExpensesDetail> expenseList = MidDataUtil.getExpenseDetail(expenseId, typeId);
 		for (ExpensesDetail expensesDetail : expenseList) {
 			ExpenseDetail expenseDetail = new ExpenseDetail();
@@ -631,11 +636,17 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			String name = QyBasicfeetypeQuery.me().findNameById(expensesDetail.getCostType());
 			Dict code = DictQuery.me().findbyName(name);
 			getItem(expenseDetail, expensesDetail, 5);
-			if (dict.equals("feeType_name_display")) {
+			if (dict.equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY)) {
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
 				String item2Value = QyBasicshowtypeQuery.me().findNameById(expenseDetail.getItem2());
 				Dict displayCode = DictQuery.me().findShowType(item2Value);
 				expenseDetail.setItem2(displayCode.getValue());
+			} else if (dict.equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL) 
+					|| dict.equals(Consts.FLOW_DICT_TYPE_NAME_SA)) {
+				SellerProduct sellerProduct = SellerProductQuery.me().findByProductSn(expenseDetail.getItem2(), sellerId);
+				if (sellerProduct != null) {
+					expenseDetail.setItem2(sellerProduct.getId());
+				}
 			}
 			if (StrKit.notBlank(expensesDetail.getChannelID())) {
 				expenseDetail.setItem1(expensesDetail.getChannelID());
@@ -645,7 +656,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				} else {
 					expenseDetail.setItem1("A1");
 				}
-			}			
+			}
 			expenseDetail.setCreateDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
 			expenseDetail.setModifyDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
 			if (expensesDetail.getFlag().equals("0")) {

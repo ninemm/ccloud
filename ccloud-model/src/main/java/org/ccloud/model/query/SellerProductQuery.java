@@ -293,4 +293,15 @@ public class SellerProductQuery extends JBaseQuery {
 				"GROUP BY csp.id) t1 where t1.custom_name = '"+customName+"' and t1.seller_id = '"+sellerId+"' and  t1.cps_name ='"+cpsName+"'";
 		return DAO.find(sql);
 	}
+
+	public SellerProduct findByProductSn(String productSn, String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT * FROM cc_seller_product cs LEFT JOIN cc_product cp ON cp.id = cs.product_id ");
+		fromBuilder.append("WHERE product_sn = ? AND seller_id = ?");
+		List<SellerProduct> list =  DAO.find(fromBuilder.toString(), productSn, sellerId);
+		if (list.size() > 0) {
+			return list.get(0);
+		} else {
+			return null;
+		}
+	}
 }
