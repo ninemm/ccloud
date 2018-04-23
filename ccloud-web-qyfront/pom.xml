@@ -72,14 +72,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.ccloud</groupId>
-            <artifactId>ccloud-web-templates</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.drewnoakes</groupId>
             <artifactId>metadata-extractor</artifactId>
             <version>2.11.0</version>
@@ -136,10 +128,6 @@
                         <overlay>
                             <groupId>org.ccloud</groupId>
                             <artifactId>ccloud-web-front</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>org.ccloud</groupId>
-                            <artifactId>ccloud-web-templates</artifactId>
                         </overlay>
                     </overlays>
                 </configuration>

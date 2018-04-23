@@ -88,6 +88,22 @@
         </dependency>
 
         <dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-web-bi</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+			<scope>compile</scope>
+		</dependency>
+
+        <dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-web-member</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+			<scope>compile</scope>
+		</dependency>
+
+        <dependency>
 	        	<groupId>com.drewnoakes</groupId>
 	        	<artifactId>metadata-extractor</artifactId>
 	        	<version>2.11.0</version>
@@ -141,6 +157,14 @@
                             <groupId>org.ccloud</groupId>
                             <artifactId>ccloud-web-core</artifactId>
                         </overlay>
+                        <overlay>
+							<groupId>org.ccloud</groupId>
+							<artifactId>ccloud-web-bi</artifactId>
+						</overlay>
+                        <overlay>
+							<groupId>org.ccloud</groupId>
+							<artifactId>ccloud-web-member</artifactId>
+						</overlay>
                         <overlay>
                             <groupId>org.ccloud</groupId>
                             <artifactId>ccloud-web-templates</artifactId>
