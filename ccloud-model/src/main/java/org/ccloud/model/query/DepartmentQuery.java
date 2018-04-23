@@ -21,6 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.Consts;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
