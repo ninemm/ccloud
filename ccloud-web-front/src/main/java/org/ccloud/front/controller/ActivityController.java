@@ -449,7 +449,11 @@ public class ActivityController extends BaseFrontController {
 		var.put("comment", comment);
 
 		WorkFlowService workflowService = new WorkFlowService();
-		workflowService.completeTask(taskId, comment, var);
+		int completeTask = workflowService.completeTask(taskId, comment, var);
+		if (completeTask==1) {
+			renderAjaxResultForError("已审核");
+			return;
+		}
 
 		ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
 		String customerName = activityApply.get("customer_name");

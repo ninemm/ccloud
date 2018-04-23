@@ -245,8 +245,13 @@ public class _CustomerController extends JBaseCRUDController<Customer> {
 		String comment = getPara("comment");
 
 		WorkFlowService workflowService = new WorkFlowService();
-		workflowService.completeTask(taskId, comment, null);
-
+		
+		int completeTask = workflowService.completeTask(taskId, comment, null);
+		if (completeTask==1) {
+			renderAjaxResultForError("已审核");
+			return;
+		}
+		
 		if (customer.saveOrUpdate())
 			renderAjaxResultForSuccess("客户修改审核成功");
 		else

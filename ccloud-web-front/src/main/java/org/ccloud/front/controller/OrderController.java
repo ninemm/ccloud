@@ -625,8 +625,13 @@ public class OrderController extends BaseFrontController {
 				String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 				stringBuilder.append(comments);
 				WorkFlowService workflowService = new WorkFlowService();
-				workflowService.completeTask(taskId, stringBuilder.toString(), var);
-
+				
+				int completeTask = workflowService.completeTask(taskId, stringBuilder.toString(), var);
+				if (completeTask==1) {
+					renderAjaxResultForError("已审核");
+					return false;
+				}
+				
 				//审核订单后将message中是否阅读改为是
 				Message message = MessageQuery.me().findByObjectIdAndToUserId(orderId, user.getId());
 				if (null != message) {
