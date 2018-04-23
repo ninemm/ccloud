@@ -29,9 +29,9 @@ public class Customer extends BaseCustomer<Customer> {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String CUSTOMER_NORMAL = "100101";
-	public static final String CUSTOMER_AUDIT = "100102";
-	public static final String CUSTOMER_REJECT = "100103";
+	public static final String CUSTOMER_NORMAL = "100101";//已审核
+	public static final String CUSTOMER_AUDIT = "100102";//待审核
+	public static final String CUSTOMER_REJECT = "100103";//审核拒绝
 	public static final String CUSTOMER_BULU = "100104"; // 待补录
 
 	@Override
