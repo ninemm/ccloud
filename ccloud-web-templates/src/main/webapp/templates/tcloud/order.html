@@ -508,6 +508,29 @@ $(function() {
 
 	var flg = true;
 	function doSubmit(){
+		var activityApplyId = $("#activityId").val();
+		var sellerProductIds = "";
+		$("input[name='sellProductId']").each(function(index,item){
+			sellerProductIds += ""+item.value+",";
+		})
+		var result = true;
+		$.ajax({
+			url : '${CPATH}/activity/checkProduct',
+			data:{"activityApplyId":activityApplyId,"sellerProductIds":sellerProductIds.substring(0,sellerProductIds.length-1)},
+			type:"post",
+			dataType:"json",
+			async : false,
+			success:function(data){
+				if(data == false){
+					$.toptip("赠品不在活动费用明细中");
+					result = false;
+				}
+			},
+			
+		})
+		if(result == false){
+			return;
+		}
 		var refund = getItemBykey("refund");
 		if (refund == '1') {
 			$('#form').attr("action", "${CPATH}/refund/saveRefundByUser")
@@ -730,7 +753,7 @@ $(function() {
 							<input type="text" class="weui-input" id="discount" value="无" readonly>
 						</div>
 					</div>
-					<div class="weui-cell weui-cell_access" style="display: none" id="activityApply">
+					<div class="weui-cell weui-cell_access" style="display: block" id="activityApply">
 						<div class="weui-cell__bd select-area">
 							<div class="order-customer-info-title">
 								参与活动
