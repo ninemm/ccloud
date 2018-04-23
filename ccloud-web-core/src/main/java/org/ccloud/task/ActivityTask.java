@@ -18,10 +18,7 @@ package org.ccloud.task;
 import java.util.Date;
 import java.util.List;
 
-import org.ccloud.Consts;
 import org.ccloud.model.Activity;
-import org.ccloud.model.ActivityApply;
-import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityQuery;
 
 import com.jfinal.kit.LogKit;
@@ -37,11 +34,6 @@ public class ActivityTask implements ITask {
 			if(endTime.before(new Date())) {
 				activity.setIsPublish(0);
 				activity.update();
-				List<ActivityApply> activityApplies = ActivityApplyQuery.me().getByACtivityId(activity.getId());
-				for(ActivityApply activityApply :activityApplies) {
-					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_VERIFICATION);
-					activityApply.update();
-				}
 			}
 		}
 	}
