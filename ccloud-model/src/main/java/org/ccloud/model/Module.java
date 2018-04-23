@@ -15,9 +15,10 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class Module extends BaseModule<Module> implements ISortModel<Module> {
 		
 		clearList();
 		
-		CacheKit.remove(Module.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Module.CACHE_NAME, CACHE_KEY);
 		return super.save();
 	}
 
@@ -55,7 +56,7 @@ public class Module extends BaseModule<Module> implements ISortModel<Module> {
 		clearList();
 		
 		removeCache(getId());
-		CacheKit.remove(Module.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Module.CACHE_NAME, CACHE_KEY);
 		
 		return super.saveOrUpdate();
 	}
@@ -66,7 +67,7 @@ public class Module extends BaseModule<Module> implements ISortModel<Module> {
 		clearList();
 		
 		removeCache(getId());
-		CacheKit.remove(Module.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Module.CACHE_NAME, CACHE_KEY);
 		
 		return super.update();
 	}
@@ -77,7 +78,7 @@ public class Module extends BaseModule<Module> implements ISortModel<Module> {
 		clearList();
 		
 		removeCache(getId());
-		CacheKit.remove(Module.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Module.CACHE_NAME, CACHE_KEY);
 		
 		return super.delete();
 	}
@@ -88,7 +89,7 @@ public class Module extends BaseModule<Module> implements ISortModel<Module> {
 		clearList();
 		
 		removeCache(idValue);
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.deleteById(idValue);
 	}	
@@ -133,7 +134,7 @@ public class Module extends BaseModule<Module> implements ISortModel<Module> {
 	}
 
 	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachekeys");
+		Set<String> inCacheKeys = JCacheKit.get(CACHE_NAME, "cachekeys");
 
 		Set<String> cacheKeyList = new HashSet<String>();
 		if (inCacheKeys != null) {
@@ -141,19 +142,19 @@ public class Module extends BaseModule<Module> implements ISortModel<Module> {
 		}
 
 		cacheKeyList.add(key.toString());
-		CacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
+		JCacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
 
-		return CacheKit.get("module_list", key, dataloader);
+		return JCacheKit.get("module_list", key, dataloader);
 	}
 
 	public void clearList() {
-		Set<String> list = CacheKit.get(CACHE_NAME, "cachekeys");
+		Set<String> list = JCacheKit.get(CACHE_NAME, "cachekeys");
 		if (list != null && list.size() > 0) {
 			for (String key : list) {
 
 				// 过滤
 
-				CacheKit.remove("module_list", key);
+				JCacheKit.remove("module_list", key);
 			}
 		}
 	}

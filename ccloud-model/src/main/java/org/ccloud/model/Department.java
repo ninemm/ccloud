@@ -15,9 +15,10 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		
 		clearList();
 		
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		return super.save();
 	}
 
@@ -56,7 +57,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		clearList();
 		
 		removeCache(getId());
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.saveOrUpdate();
 	}
@@ -67,7 +68,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		clearList();
 		
 		removeCache(getId());
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.update();
 	}
@@ -78,7 +79,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		clearList();
 		
 		removeCache(getId());
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.delete();
 	}
@@ -89,13 +90,13 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		clearList();
 		
 		removeCache(idValue);
-		CacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
 		
 		return super.deleteById(idValue);
 	}
 
 	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachekeys");
+		Set<String> inCacheKeys = JCacheKit.get(CACHE_NAME, "cachekeys");
 
 		Set<String> cacheKeyList = new HashSet<String>();
 		if (inCacheKeys != null) {
@@ -103,9 +104,9 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		}
 
 		cacheKeyList.add(key.toString());
-		CacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
+		JCacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
 
-		return CacheKit.get("dept_list", key, dataloader);
+		return JCacheKit.get("dept_list", key, dataloader);
 	}
 	
 	public Department getParent() {
@@ -147,13 +148,13 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	}
 	
     public void clearList() {
-        Set<String> list = CacheKit.get(CACHE_NAME, "cachekeys");
+        Set<String> list = JCacheKit.get(CACHE_NAME, "cachekeys");
         if (list != null && list.size() > 0) {
             for (String key : list) {
 
                 // 过滤
 
-                CacheKit.remove("dept_list", key);
+                JCacheKit.remove("dept_list", key);
             }
         }
     }

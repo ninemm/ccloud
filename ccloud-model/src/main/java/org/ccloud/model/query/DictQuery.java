@@ -15,19 +15,18 @@
  */
 package org.ccloud.model.query;
 
+import com.google.common.collect.ComparisonChain;
+import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.ehcache.IDataLoader;
+import org.ccloud.cache.JCacheKit;
+import org.ccloud.model.Dict;
+import org.ccloud.utils.StringUtils;
+
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.ccloud.model.Dict;
-import org.ccloud.utils.StringUtils;
-
-import com.google.common.collect.ComparisonChain;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.ehcache.CacheKit;
-import com.jfinal.plugin.ehcache.IDataLoader;
 
 public class DictQuery extends JBaseQuery {
 
@@ -84,7 +83,7 @@ public class DictQuery extends JBaseQuery {
 	}
 	
 	public String findName(final String key) {
-		String value = CacheKit.get(Dict.CACHE_NAME, key, new IDataLoader() {
+		String value = JCacheKit.get(Dict.CACHE_NAME, key, new IDataLoader() {
 			@Override
 			public Object load() {
 				Dict dict = DAO.doFindFirst("`value` =  ?", key);

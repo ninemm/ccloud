@@ -5,9 +5,8 @@
 		 monitoring="autodetect"
 		 dynamicConfig="true">
 
-	<!-- 
     <diskStore path="java.io.tmpdir"/>
-	-->
+	
 	<!-- 
 	属性简介：
 		maxElementsInMemory：缓存最大个数

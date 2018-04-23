@@ -26,8 +26,8 @@ import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Table;
 import com.jfinal.plugin.activerecord.TableMapping;
-import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.IDataLoader;
+import org.ccloud.cache.JCacheKit;
 
 @SuppressWarnings("serial")
 public class JModel<M extends JModel<M>> extends Model<M> {
@@ -150,7 +150,7 @@ public class JModel<M extends JModel<M>> extends Model<M> {
 		if (null != whereSQL && !"".equals(whereSQL.trim())) {
 			sqlBuilder.append(" WHERE ").append(whereSQL);
 		}
-		return CacheKit.get(cacheName, key, new IDataLoader() {
+		return JCacheKit.get(cacheName, key, new IDataLoader() {
 			@Override
 			public Object load() {
 				return Db.queryLong(tc(sqlBuilder.toString()), params);

@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.Operation;
@@ -27,7 +28,6 @@ import org.ccloud.model.query.OperationQuery;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.Lists;
-import com.jfinal.plugin.ehcache.CacheKit;
 
 public class MenuManager {
 
@@ -97,7 +97,7 @@ public class MenuManager {
 		}
 
 		HookInvoker.menuInitAfter(this);
-		CacheKit.put(CACHE_NAME, user.getId(), htmlBuilder.toString());
+		JCacheKit.put(CACHE_NAME, user.getId(), htmlBuilder.toString());
 		return htmlBuilder.toString();
 	}
 
@@ -149,22 +149,22 @@ public class MenuManager {
 	@SuppressWarnings("unchecked")
     public static void clearAllList() {
 		Operation.clearAllList();
-        List<String> list = CacheKit.getKeys(CACHE_NAME);
+        List<String> list = (List<String>)JCacheKit.getKeys(CACHE_NAME);
         if (list != null && list.size() > 0) {
             for (String key : list) {
 
                 // 过滤
 
-                CacheKit.remove(CACHE_NAME, key);
+                JCacheKit.remove(CACHE_NAME, key);
             }
         }
     }
 	
     public static void clearListByKey(String userId) {
     	Operation.clearListByKey(userId);
-        String htmlBuilder = CacheKit.get(CACHE_NAME, userId);
+        String htmlBuilder = JCacheKit.get(CACHE_NAME, userId);
         if (htmlBuilder != null) {
-        	CacheKit.remove(CACHE_NAME, userId);
+        	JCacheKit.remove(CACHE_NAME, userId);
         }
         
     }
@@ -175,9 +175,9 @@ public class MenuManager {
 				if (ids[i].equals("0")) {
 					continue;
 				}
-		        String htmlBuilder = CacheKit.get(CACHE_NAME, ids[i]);
+		        String htmlBuilder = JCacheKit.get(CACHE_NAME, ids[i]);
 		        if (htmlBuilder != null) {
-		        	CacheKit.remove(CACHE_NAME, ids[i]);
+		        	JCacheKit.remove(CACHE_NAME, ids[i]);
 		        }
 			}
 		}

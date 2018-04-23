@@ -15,10 +15,11 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 
 import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class GoodsCategory extends BaseGoodsCategory<GoodsCategory> implements I
     }
 
     public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-        Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachecategorykeys");
+        Set<String> inCacheKeys = JCacheKit.get(CACHE_NAME, "cachecategorykeys");
 
         Set<String> cacheKeyList = new HashSet<String>();
         if (inCacheKeys != null) {
@@ -101,19 +102,19 @@ public class GoodsCategory extends BaseGoodsCategory<GoodsCategory> implements I
         }
 
         cacheKeyList.add(key.toString());
-        CacheKit.put(CACHE_NAME, "cachecategorykeys", cacheKeyList);
+        JCacheKit.put(CACHE_NAME, "cachecategorykeys", cacheKeyList);
 
-        return CacheKit.get("category_list", key, dataloader);
+        return JCacheKit.get("category_list", key, dataloader);
     }
 
     public void clearList() {
-        Set<String> list = CacheKit.get(CACHE_NAME, "cachecategorykeys");
+        Set<String> list = JCacheKit.get(CACHE_NAME, "cachecategorykeys");
         if (list != null && list.size() > 0) {
             for (String key : list) {
 
                 // 过滤
 
-                CacheKit.remove("category_list", key);
+                JCacheKit.remove("category_list", key);
             }
         }
     }

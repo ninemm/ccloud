@@ -15,8 +15,9 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.ModelSorter.ISortModel;
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 import org.ccloud.model.core.Table;
 import org.ccloud.model.base.BaseStation;
@@ -85,7 +86,7 @@ public class Station extends BaseStation<Station> implements ISortModel<Station>
     }
 
     public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-        Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachestationkeys");
+        Set<String> inCacheKeys = JCacheKit.get(CACHE_NAME, "cachestationkeys");
 
         Set<String> cacheKeyList = new HashSet<String>();
         if (inCacheKeys != null) {
@@ -93,19 +94,19 @@ public class Station extends BaseStation<Station> implements ISortModel<Station>
         }
 
         cacheKeyList.add(key.toString());
-        CacheKit.put(CACHE_NAME, "cachestationkeys", cacheKeyList);
+        JCacheKit.put(CACHE_NAME, "cachestationkeys", cacheKeyList);
 
-        return CacheKit.get("station_list", key, dataloader);
+        return JCacheKit.get("station_list", key, dataloader);
     }
 
     public void clearList() {
-        Set<String> list = CacheKit.get(CACHE_NAME, "cachestationkeys");
+        Set<String> list = JCacheKit.get(CACHE_NAME, "cachestationkeys");
         if (list != null && list.size() > 0) {
             for (String key : list) {
 
                 // 过滤
 
-                CacheKit.remove("station_list", key);
+                JCacheKit.remove("station_list", key);
             }
         }
     }

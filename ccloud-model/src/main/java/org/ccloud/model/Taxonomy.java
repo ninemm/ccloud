@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.ModelSorter.ISortModel;
 import org.ccloud.model.base.BaseTaxonomy;
 import org.ccloud.model.core.Table;
@@ -28,7 +29,7 @@ import org.ccloud.model.router.TaxonomyRouter;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.core.JFinal;
-import com.jfinal.plugin.ehcache.CacheKit;
+
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 @Table(tableName = "taxonomy", primaryKey = "id")
@@ -47,7 +48,7 @@ public class Taxonomy extends BaseTaxonomy<Taxonomy> implements ISortModel<Taxon
 	private String activeClass;
 
 	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-		Set<String> inCacheKeys = CacheKit.get(CACHE_NAME, "cachekeys");
+		Set<String> inCacheKeys = JCacheKit.get(CACHE_NAME, "cachekeys");
 
 		Set<String> cacheKeyList = new HashSet<String>();
 		if (inCacheKeys != null) {
@@ -55,23 +56,23 @@ public class Taxonomy extends BaseTaxonomy<Taxonomy> implements ISortModel<Taxon
 		}
 
 		cacheKeyList.add(key.toString());
-		CacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
+		JCacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
 
-		return CacheKit.get("taxonomy_list", key, dataloader);
+		return JCacheKit.get("taxonomy_list", key, dataloader);
 	}
 
 	public void clearList() {
-		Set<String> list = CacheKit.get(CACHE_NAME, "cachekeys");
+		Set<String> list = JCacheKit.get(CACHE_NAME, "cachekeys");
 		if (list != null && list.size() > 0) {
 			for (String key : list) {
 				if (!key.startsWith("module:")) {
-					CacheKit.remove("taxonomy_list", key);
+					JCacheKit.remove("taxonomy_list", key);
 					continue;
 				}
 
 				// 不清除其他模型的内容
 				if (key.startsWith("module:" + getContentModule())) {
-					CacheKit.remove("taxonomy_list", key);
+					JCacheKit.remove("taxonomy_list", key);
 				}
 			}
 		}

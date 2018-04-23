@@ -15,10 +15,11 @@
  */
 package org.ccloud.model.query;
 
+import org.ccloud.cache.CacheManager;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.Option;
 import org.ccloud.utils.StringUtils;
 
-import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 public class OptionQuery extends JBaseQuery {
@@ -31,7 +32,8 @@ public class OptionQuery extends JBaseQuery {
 	}
 
 	public String findValue(final String key) {
-		String value = CacheKit.get(Option.CACHE_NAME, key, new IDataLoader() {
+		
+		String value = JCacheKit.get(Option.CACHE_NAME, key, new IDataLoader() {
 			@Override
 			public Object load() {
 				Option option = DAO.doFindFirst("option_key =  ?", key);
@@ -46,7 +48,7 @@ public class OptionQuery extends JBaseQuery {
 	}
 
 	public boolean saveOrUpdate(String key, String value) {
-		CacheKit.remove(Option.CACHE_NAME, key);
+		JCacheKit.remove(Option.CACHE_NAME, key);
 		boolean save = false;
 		Option option = DAO.doFindFirst("option_key =  ?", key);
 		if (null == option) {

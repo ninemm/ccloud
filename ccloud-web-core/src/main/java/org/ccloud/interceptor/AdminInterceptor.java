@@ -15,13 +15,13 @@
  */
 package org.ccloud.interceptor;
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.menu.MenuManager;
 import org.ccloud.model.User;
 
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
-import com.jfinal.plugin.ehcache.CacheKit;
 
 public class AdminInterceptor implements Interceptor {
 	
@@ -50,7 +50,7 @@ public class AdminInterceptor implements Interceptor {
 		
 		if (user != null) {
 //			controller.setAttr("_menu_html", MenuManager.me().generateHtml());
-			String htmlBuilder = CacheKit.get(MenuManager.CACHE_NAME, user.getId());
+			String htmlBuilder = JCacheKit.get(MenuManager.CACHE_NAME, user.getId());
 			if (htmlBuilder != null) {
 				controller.setAttr("_menu_html", htmlBuilder);
 			} else {
