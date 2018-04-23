@@ -659,8 +659,12 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 		stringBuilder.append(comments);
 		WorkFlowService workflowService = new WorkFlowService();
-		workflowService.completeTask(taskId, stringBuilder.toString(), var);
-
+		
+		int completeTask = workflowService.completeTask(taskId, stringBuilder.toString(), var);
+		if (completeTask==1) {
+			renderAjaxResultForError("已审核");
+			return;
+		}
 		renderAjaxResultForSuccess("订单审核成功");		
 	}
 	

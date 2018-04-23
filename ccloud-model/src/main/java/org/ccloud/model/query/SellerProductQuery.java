@@ -152,7 +152,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
-	public List<Record> findProductListForApp(String sellerId, String keyword, String tag, String categoryId) {
+	public List<Record> findProductListForApp(String sellerId, String keyword, String tag, String categoryId, Integer pageNumber,Integer pageSize) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.store_count, sp.price, sp.cost, sp.account_price, sp.tags,"
 				+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
@@ -172,7 +172,9 @@ public class SellerProductQuery extends JBaseQuery {
 		}
 
 		fromBuilder.append(" ORDER BY gc.`parent_id`, gc.`order_list`, gc.`id`, sp.order_list ");
-
+		if (null!=pageSize) {
+			fromBuilder.append("limit "+pageNumber+","+ pageSize);
+		}
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	
@@ -258,7 +260,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return DAO.findFirst(sql, sellerProductId,sellerId);
 	}
 
-	public List<Record> findProductListForAppByCar(String sellerId, String keyword, String tag, String wareHouseId, String categoryId) {
+	public List<Record> findProductListForAppByCar(String sellerId, String keyword, String tag, String wareHouseId, String categoryId, Integer pageNumber,Integer pageSize) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT sp.id AS sell_product_id, sp.product_id, sp.custom_name, sp.price, sp.cost, sp.account_price, sp.tags,"
 				+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
@@ -280,7 +282,9 @@ public class SellerProductQuery extends JBaseQuery {
 		}
 
 		fromBuilder.append(" ORDER BY gc.`parent_id`, gc.`order_list`, gc.`id`, sp.order_list ");
-
+		if (null!=pageSize) {
+			fromBuilder.append("limit "+pageNumber+","+ pageSize);
+		}
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 	

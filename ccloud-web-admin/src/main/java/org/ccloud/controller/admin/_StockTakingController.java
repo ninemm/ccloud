@@ -95,7 +95,6 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		setAttr("wlist", wlist);
 		List<User> ulist = UserQuery.me().findUserList(userId);
 		setAttr("ulist", ulist);
-		
 	}
 
 	public void enable() {
