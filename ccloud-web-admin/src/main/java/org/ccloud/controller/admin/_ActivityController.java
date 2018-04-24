@@ -815,7 +815,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	public void orderDetailsList() {
 		String activityApplyId = getPara("activityApplyId");
 		String startDate = getPara("startDate");
-		
 		String endDate = getPara("endDate");
 		Page<Record> page = ActivityQuery.me().orderDetailsPaginate(getPageNumber(), getPageSize(),startDate, endDate,activityApplyId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
@@ -858,6 +857,16 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				page.getList().get(i).set("photo", list);
 			}
 		}
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}
+	
+	//活动的所有拜访订单
+	public void orderAllDetailsList() {
+		String activityId = getPara("id");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		Page<Record> page = ActivityQuery.me().orderAllDetailsPaginate(getPageNumber(), getPageSize(),startDate, endDate,activityId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
 	}

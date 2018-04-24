@@ -343,4 +343,16 @@ public class ActivityQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 	}
 
+	public Page<Record> orderAllDetailsPaginate(int pageNumber, int pageSize, String startDate, String endDate,
+			String activityId) {
+		String select = "SELECT cso.id, cso.order_sn,cc.customer_name,cso.total_amount,cso.receive_type,cso.create_date " ; 
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order cso");
+		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON cso.activity_apply_id = caa.id ");
+		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id= caa.activity_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=cso.customer_id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
+		fromBuilder.append(" WHERE ca.id='"+activityId+"'");
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+	}
+
 }

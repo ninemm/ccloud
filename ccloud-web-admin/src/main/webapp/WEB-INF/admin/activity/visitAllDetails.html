@@ -27,13 +27,16 @@
 <#macro script>
 
 	var $table = $("#_activityVisitDetails_table");
+	var $tableOrder = $("#_activityOrderDetails_table");
 	var url = '${CPATH}/admin/activity/visitAllDetailsList';
+	var url1 = '${CPATH}/admin/activity/orderAllDetailsList';
 	var $form = $("#form");
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields)
 		jQuery.mm.initEditTable('#_activityVisitDetails_table', url, initParams, initFields(), null);
+		jQuery.mm.initEditTable('#_activityOrderDetails_table', url1, initParams, initFieldsOrder(), null);
 	});
 
 	$("#search-submit").click(function() {
@@ -88,6 +91,32 @@
 		return fields;
 	};
 	
+	var initFieldsOrder = function() {
+		var fields =
+			[	
+				{field: "order_sn", title: "订货单号", align: "center", width: '10%', edit:false},
+				{field: "customer_name", title: "客户名称", align: "center", width: '10%', edit:false},
+				{field: "total_amount", title: "订单总额", align: "center", width: '10%', edit:false},
+				{field: "receive_type", title: "付款方式", align: "center", width: '10%', 
+					formatter: function(value, row, rowIndex) {
+   						if (value == 1) return '现结';
+   						else return '账期';
+   					},
+   					edit: false
+				},
+				{field: "create_date", title: "下单时间", align: "center", width: '10%', edit:false},
+				{field: "action", title: "操作", align: "center", width: '15%',
+					formatter: function(value, row, rowIndex) {
+						var strHtml ='<div style = "white-space:nowrap"><a class="btn btn-xs btn-primary btn-flat" onclick="detail(\''+row.id+'\')" >详细</a> ';
+						strHtml += '</div>';
+						return strHtml;
+					},
+					edit:false
+				}
+			];
+		return fields;
+	};
+	
 	var validatorFields = {
 		'startDate': {
 			validators: {
@@ -107,6 +136,15 @@
 			type: 2, 
 			area: ['48%', '75%'],
 			content: '${CPATH}/admin/activity/img/' + id
+		}); 
+	}
+	
+	function detail(id) {
+		layer.open({
+			title:"订单详细",
+			type: 2, 
+			area: ['70%', '80%'],
+			content: '${CPATH}/admin/salesOrder/detail/' + id
 		}); 
 	}
 
@@ -155,6 +193,12 @@
 		</div>
 		<div class="box">
 			<table class="table table-striped table-hover table-condensed" id="_activityVisitDetails_table" ></table>
+		</div>
+		<div id="toolbar2">
+			<h2>活动订单</h2>
+		</div>	
+		<div class="box">
+			<table class="table table-striped table-hover table-condensed" id="_activityOrderDetails_table" ></table>
 		</div>
 	</form>
 	<!-- /.box -->
