@@ -811,16 +811,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(map);
 	}
 	
+//	活动相关订单
 	public void orderDetailsList() {
 		String activityApplyId = getPara("activityApplyId");
 		String startDate = getPara("startDate");
 		
 		String endDate = getPara("endDate");
-//		String keyword = getPara("k");
-//		if (StrKit.notBlank(keyword)) {
-//			keyword = StringUtils.urlDecode(keyword);
-//			setAttr("k", keyword);
-//		}
 		Page<Record> page = ActivityQuery.me().orderDetailsPaginate(getPageNumber(), getPageSize(),startDate, endDate,activityApplyId);
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);

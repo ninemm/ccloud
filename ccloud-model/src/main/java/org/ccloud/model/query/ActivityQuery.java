@@ -334,14 +334,11 @@ public class ActivityQuery extends JBaseQuery {
 
 	public Page<Record> orderDetailsPaginate(int pageNumber, int pageSize, String startDate, String endDate,
 			String activityApplyId) {
-		String select = "SELECT csp.custom_name , TRUNCATE(( csod.product_count / cp.convert_relate) , 2) productCount , t1.valueName specificationValue,csod.is_gift , csod.product_price ,( CASE WHEN csod.is_gift = '1' THEN '0.00' ELSE csod.product_amount END) product_amount" ; 
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_activity_apply caa");
-		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.activity_apply_id = caa.id");
-		fromBuilder.append(" LEFT JOIN cc_sales_order_detail csod ON csod.order_id = cso.id");
-		fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csp.id = csod.sell_product_id");
-		fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv");
-		fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 ON t1.product_set_id = csp.product_id");
-		fromBuilder.append(" LEFT JOIN cc_product cp ON csp.product_id = cp.id");
+		String select = "SELECT cso.id, cso.order_sn,cc.customer_name,cso.total_amount,cso.receive_type,cso.create_date " ; 
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order cso");
+		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON cso.activity_apply_id = caa.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=cso.customer_id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
 		fromBuilder.append(" WHERE caa.id='"+activityApplyId+"'");
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 	}
