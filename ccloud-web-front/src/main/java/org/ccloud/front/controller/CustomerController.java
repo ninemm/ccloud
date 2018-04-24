@@ -466,7 +466,8 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-				String waterFont3 = sellerCustomer.getLocation();
+//				String waterFont3 = sellerCustomer.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
 //				String waterFont3 = "湖北省-武汉市-洪山区";
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 

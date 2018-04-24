@@ -103,4 +103,9 @@ public class ExpenseDetailQuery extends JBaseQuery {
 		return DAO.findFirst(sql);
 	}
 	
+	public ExpenseDetail findActivityApplyId(String activityApplyId) {
+		String sql = "select c.* from cc_expense_detail c LEFT JOIN cc_activity_apply a on a.expense_detail_id = c.id where a.id = ?";
+		return DAO.findFirst(sql, activityApplyId);
+	}
+	
 }

@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableMap;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
@@ -43,12 +45,7 @@ import org.ccloud.model.Station;
 import org.ccloud.model.User;
 import org.ccloud.model.UserGroupRel;
 import org.ccloud.model.UserHistory;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.GroupQuery;
-import org.ccloud.model.query.StationQuery;
-import org.ccloud.model.query.UserGroupRelQuery;
-import org.ccloud.model.query.UserHistoryQuery;
-import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.model.vo.UserExecel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -725,6 +722,41 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 		}
 		map.put("valid", result);
+		renderJson(map);
+	}
+
+	public void dealerUser(){
+		List<Record> department  = SellerQuery.me().findDeptByLevel();
+
+		List<Map<String, Object>> departmentList = new ArrayList<>();
+
+		for(Record name : department) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", name.getStr("id"));
+			item.put("text", name.getStr("text"));
+			departmentList.add(item);
+		}
+
+		setAttr("departmentType", JSON.toJSON(departmentList));
+		render("dealer_user.html");
+	}
+
+	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
+	public void dealerUserList(){
+
+		String sort = getPara("sort");
+		String sortOrder = getPara("sortOrder");
+		Map<String, String[]> paraMap = getParaMap();
+		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
+		String departmentType = getPara("departmentType");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+
+		Page<Record> page = UserQuery.me().paginateByDeptAndKey(getPageNumber(), getPageSize(), keyword, departmentType, sort, sortOrder);
+		List<Record> customerList = page.getList();
+
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
 	}
 }

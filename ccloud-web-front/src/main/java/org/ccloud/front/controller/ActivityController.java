@@ -765,4 +765,22 @@ public class ActivityController extends BaseFrontController {
 		}
 		renderJson(list);
 	}
+	
+	//检查下单中下的赠品单的品项和活动投入类型中的终端客情的产品进行比对
+	public void checkProduct() {
+		boolean flang = true;
+		String activityApplyId = getPara("activityApplyId");
+		String[] sellerProductIds = getPara("sellerProductIds").split(",");
+		Activity activity = ActivityQuery.me().findById(ActivityApplyQuery.me().findById(activityApplyId).getActivityId());
+		if(activity.getInvestType().equals(Consts.INVEST_SLOTTING_FEE) || activity.getInvestType().equals(Consts.INVEST_CUSTOMER_VISITE)) {
+			ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findActivityApplyId(activityApplyId);
+			for(int i = 0 ; i < sellerProductIds.length ; i++ ) {
+				if(!sellerProductIds[i].equals(expenseDetail.getItem2())) {
+					flang = false;
+					break;
+				}
+			}
+		}
+		renderJson(flang);
+	}
 }
