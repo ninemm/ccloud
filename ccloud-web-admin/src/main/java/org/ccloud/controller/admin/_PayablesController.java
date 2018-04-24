@@ -35,16 +35,18 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.model.Customer;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
-import org.ccloud.model.PurchaseInstock;
+//import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.User;
+import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.PayablesDetailQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PaymentQuery;
-import org.ccloud.model.query.PurchaseInstockQuery;
+//import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.payablesExcel;
 import com.google.common.collect.ImmutableMap;
@@ -106,7 +108,13 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> map;
 		if(!id.equals("")) {
-			Page<PayablesDetail> page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea);
+			Customer customer = CustomerQuery.me().findById(id);
+			Page<PayablesDetail> page = new Page<>();
+			if(customer!=null) {
+				page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea);
+			}else {
+				page = PayablesDetailQuery.me().paginateSeller(getPageNumber(), getPageSize(), id,deptDataArea);
+			}
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}else {
 			map = new HashMap<String, Object>();
@@ -127,10 +135,11 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		}
 		String object_id = getPara("object_id");
 		String balance_amount = getPara("balance_amount");
+		String pay_amount = getPara("pay_amount");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//通过客户Id找到应收账款主表ID
 		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type, user.getDepartmentId() );
-		PurchaseInstock purchaseInstock = PurchaseInstockQuery.me().findBySn(ref_sn);
+//		PurchaseInstock purchaseInstock = PurchaseInstockQuery.me().findBySn(ref_sn);
 		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		Page<Payment> page = PaymentQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,deptDataArea);
 		
@@ -138,11 +147,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		for(int i = 0; i < page.getList().size(); i++) {
 			actAmount = actAmount.add(page.getList().get(i).getActAmount());
 		}
-		if (purchaseInstock==null) {
-			balance_amount = payables.getBalanceAmount().toString();
-		}else {
-			balance_amount = (purchaseInstock.getTotalAmount().subtract(actAmount)).toString();
-		}
+		balance_amount = (new BigDecimal(pay_amount).subtract(actAmount)).toString();
 		String userDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<User> list = UserQuery.me().findIdAndNameByDataArea(userDataArea);
 	

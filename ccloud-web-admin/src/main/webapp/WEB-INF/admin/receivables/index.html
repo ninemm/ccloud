@@ -137,7 +137,7 @@
 				 formatter: function(value, row, rowIndex){
 				 	/*return '<a href="javascript:void(0);" onclick="detailMoney(\''
 				 			+row.ref_sn +'\',\''+row.ref_type+'\',\''+row.object_id+'\',\''+row.balance_amount+'\')" class="btn btn-sm" >收款详情</a>';*/
-				 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount;
+				 	var url = '${CPATH}/admin/receivables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount+'&&receive_amount='+row.receive_amount;
 			 		return '<a href="' + url + '" class="btn btn-sm" >收款详情</a>';
 				 },
 				 edit:false}
