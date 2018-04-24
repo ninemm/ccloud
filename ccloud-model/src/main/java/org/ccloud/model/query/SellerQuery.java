@@ -176,4 +176,9 @@ public class SellerQuery extends JBaseQuery {
 		String sql="SELECT s.* from cc_seller s join department d on s.dept_id = d.id where data_area = ?";
 		return DAO.findFirst(sql,dataArea);
 	}
+
+	public Record _findByOrderId(String orderId) {
+		String sql="SELECT s.id FROM cc_sales_order so LEFT JOIN cc_customer_type ct ON ct.id = so.customer_type_id LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id LEFT JOIN cc_seller s ON s.customer_id = sc.customer_id WHERE so.id =?";
+		return Db.findFirst(sql,orderId);
+	}
 }
