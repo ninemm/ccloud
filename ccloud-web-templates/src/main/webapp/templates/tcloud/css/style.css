@@ -175,6 +175,15 @@ a {
   color: #ea6f5a;
 }
 
+.weui-agree__checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+.weui-agree__checkbox:checked::before{
+  font-size: 18px;
+}
+
 .weui-grid:nth-child(4n + 1) .weui-grid__icon i {
   color: #9c89b9;
 }
