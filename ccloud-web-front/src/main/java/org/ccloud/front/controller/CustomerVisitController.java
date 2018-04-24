@@ -451,8 +451,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -928,8 +928,16 @@ public class CustomerVisitController extends BaseFrontController {
 	public void addActivityApplyVisit() {
 		String activityApplyId = getPara("applyId");
 		String orderList = getPara("orderList");
+		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findByActivityApplyId(activityApplyId);
+		String dict_type = expenseDetail.getFlowDictType();
+		String has_size = "0";
+		String check_size = null;
+		if (dict_type.equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
+			has_size = "1";
+		}		
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		if(customerVisits.size()>0) {
+			check_size = customerVisits.get(0).getCheckSize();
 			setAttr("imgeLists",JSON.toJSON(JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class)));
 			setAttr("customerVisit",CustomerVisitQuery.me().findMoreById(customerVisits.get(0).getId()));
 		}
@@ -937,6 +945,8 @@ public class CustomerVisitController extends BaseFrontController {
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityIdAndOrderList(record.getStr("activity_id"),orderList);
 		ActivityExecute activityExecute = ActivityExecuteQuery.me()._findbyActivityIdAndOrderList(record.getStr("activity_id"), orderList);
 		List<Map<String, String>> list = getVisitTypeList();
+		setAttr("has_size", has_size);
+		setAttr("check_size", check_size);
 		setAttr("problem", JSON.toJSONString(list));
 		setAttr("activityExecutes",JSON.toJSONString(activityExecutes));
 		setAttr("activityExecuteId",activityExecute.getId());
