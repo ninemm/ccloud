@@ -249,7 +249,7 @@
 			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_gift', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
 		} else if (choose == 101107) {
 			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th></tr>');
-			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" style = "width:100px;">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><tr>');
 			$(".product").select2({
 				data: ${productOptionList},
 				width: "100%",
@@ -280,7 +280,7 @@
 				notEmpty: { message: '活动开始时间不能为空' }
 			}
 		},
-		'endDate': {
+		'endDate ': {
 			validators: {
 				notEmpty: { message: '活动结束时间不能为空' }
 			}
@@ -288,6 +288,11 @@
 		'activity.category': {
 			validators: {
 				notEmpty: { message: '活动类型不能为空' }
+			}
+		},
+		'activity.join_num': {
+			validators: {
+				notEmpty: { message: '客户参与数不能为空' }
 			}
 		},
 		'activity.area_type': {
@@ -628,12 +633,12 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<!-- <div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">每个客户参与次数：</label>
+							<div class="col-sm-5 validata-box">
+								<label class="control-label col-sm-4">客户参与数：</label>
 								<div class="input-group col-sm-8">
 									<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
 								</div>
-							</div> -->
+							</div>
 							<!-- <div class="col-sm-5 validata-box">
 								<label class="control-label col-sm-4">时间限制：</label>
 								<div class="input-group col-sm-8">
@@ -642,12 +647,12 @@
 									</select>
 								</div>
 							</div> -->
-							<div class="col-sm-5 validata-box">
+							<!-- <div class="col-sm-5 validata-box">
 								<label class="control-label col-sm-4">名额：</label>
 								<div class="input-group col-sm-8">
 									<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
 								</div>
-							</div>
+							</div> -->
 							<div class="col-sm-5 validata-box investNum">
 								<label class="control-label col-sm-4">投入数量:</label>
 								<div class="input-group col-sm-8">
@@ -836,7 +841,7 @@
 							</td>
 							<td>
 								<div class = "validata-box" style="padding-left:35%;">
-									<input class="form-control input-sm" type="text" id="orderList" style="width:40%;text-align:center;" name="orderList" >
+									<input class="form-control input-sm" type="text" id="orderList" style="width:60px;text-align:center;" name="orderList" >
 								</div>
 							</td>
 							</td>
