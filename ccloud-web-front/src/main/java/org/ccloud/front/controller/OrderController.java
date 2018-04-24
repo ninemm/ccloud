@@ -359,7 +359,7 @@ public class OrderController extends BaseFrontController {
 	
 	private String buildOutstockInfo(String ordedId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
-
+		
 		StringBuilder stringBuilder = new StringBuilder();
 
 		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
