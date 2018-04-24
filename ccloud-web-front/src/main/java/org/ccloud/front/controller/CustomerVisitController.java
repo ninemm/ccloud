@@ -726,10 +726,18 @@ public class CustomerVisitController extends BaseFrontController {
 	public void getActivityExecute() {
 		String activityApplyId = getPara("activityApplyId");
 		Map<String, Object> map = new HashMap<>();
+		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findByActivityApplyId(activityApplyId);
+		String dict_type = expenseDetail.getFlowDictType();
+		boolean size = false;
+		String check_size = null;
+		if (dict_type.equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
+			size = true;
+		}
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		String orderList = String.valueOf(customerVisits.size()+1);
 		map.put("activityExecute", JSON.toJSON(ActivityExecuteQuery.me().findbyActivityIdAndOrderList(ActivityApplyQuery.me().findById(activityApplyId).getActivityId(),orderList)));
 		if(customerVisits.size()>0) {
+			check_size = customerVisits.get(0).getCheckSize();
 			if(customerVisits.get(0).getPhoto() == null && customerVisits.size()>1) {
 				map.put("imgeLists",JSON.parseArray(customerVisits.get(1).getPhoto(), ImageJson.class));
 			}else {
@@ -738,6 +746,8 @@ public class CustomerVisitController extends BaseFrontController {
 			map.put("maxOrderList", customerVisits.size());
 		}
 		map.put("domain",OptionQuery.me().findValue("cdn_domain"));
+		map.put("size", size);
+		map.put("check_size", check_size);
 		renderJson(map);
 	}
 	

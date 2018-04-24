@@ -314,4 +314,12 @@ public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends 
 	public java.lang.String getActivityExecuteId() {
 		return getStr("activity_execute_id");
 	}
+	
+	public void setCheckSize(java.lang.String checkSize) {
+		set("check_size", checkSize);
+	}
+
+	public java.lang.String getCheckSize() {
+		return getStr("check_size");
+	}	
 }

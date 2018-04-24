@@ -102,5 +102,11 @@ public class ExpenseDetailQuery extends JBaseQuery {
 				+ " where c.id = '"+id+"'";
 		return DAO.findFirst(sql);
 	}
+
+	public ExpenseDetail findByActivityApplyId(String activityApplyId) {
+		StringBuilder builder = new StringBuilder("SELECT * FROM cc_expense_detail cc LEFT JOIN cc_activity_apply ca ON ca.expense_detail_id = cc.id ");
+		builder.append(" WHERE ca.id = ?");
+		return DAO.findFirst(builder.toString(), activityApplyId);
+	}
 	
 }
