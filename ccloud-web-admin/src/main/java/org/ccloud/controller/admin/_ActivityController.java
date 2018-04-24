@@ -253,7 +253,6 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	    	activity.setInvestType(investTypes);
 	    }
 	    activity.setUnit(unit);
-	    activity.setJoinNum(1);
 		activity.setSellerId(sellerId);
 		activity.setAreaType(areaNames);
 		activity.setStartTime(sdate);
