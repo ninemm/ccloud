@@ -191,7 +191,8 @@ public class ActivityQuery extends JBaseQuery {
 	public Page<Record> putDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String id, String status) {
 		String select = "SELECT caa.`status`,caa.id activityApplyId,u.id userId,u.realname,csc.id customerId,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address,caa.create_date putDate,IFNULL(t1.executeNum , 0) executeNum,";	
 		select=select+"(SELECT d.`name` FROM dict d WHERE d.`key`= ca.invest_type AND d.type='"+Consts.INVEST_TYPE+"') investType,( SELECT d.`name` FROM dict d WHERE d.`key` = ca.time_interval AND d.type = '"+Consts.ACTIVE_TIME_INTERVAL;
-		select=select+"') timeInterval,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id,csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type_ids,ca.*";
+		select=select+"') timeInterval,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id,csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type_ids,";
+		select=select+" IFNULL(caa.apply_num , 0) apply_num , IFNULL(caa.apply_area , '无') apply_area , IFNULL(caa.apply_amount , 0) apply_amount ,ca.*";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_activity_apply caa ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id");
 		fromBuilder.append(" LEFT JOIN `user` u ON u.id=caa.biz_user_id");
@@ -293,7 +294,7 @@ public class ActivityQuery extends JBaseQuery {
 	public Page<Record> visitAllDetailsPaginate(int pageNumber, int pageSize, String keyword, String startDate,
 			String endDate, String activityId) {
 		String select = "SELECT ccv.id customerVisitId,u.realname,ca.proc_code,(SELECT d.`name` FROM dict d WHERE d.`key` = ca.invest_type AND d.type = '"+Consts.INVEST_TYPE+"') investType,cc.customer_name,CONCAT(cc.prov_name,cc.city_name,cc.country_name,cc.address) address";
-		select = select+",caa.create_date putDate ,ccv.photo,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type";
+		select = select+",caa.create_date putDate ,ccv.photo,IFNULL(ccv.check_size,'无') check_size,( SELECT group_concat(cct.`name`) FROM cc_customer_type cct WHERE LOCATE(cct.id , csc.customer_type_ids) > 0 GROUP BY csc.customer_type_ids) customer_type";
 		StringBuilder fromBuilder = new StringBuilder(" FROM cc_customer_visit ccv ");
 		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON caa.id=ccv.active_apply_id ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id=caa.activity_id ");
@@ -333,15 +334,24 @@ public class ActivityQuery extends JBaseQuery {
 
 	public Page<Record> orderDetailsPaginate(int pageNumber, int pageSize, String startDate, String endDate,
 			String activityApplyId) {
-		String select = "SELECT csp.custom_name , TRUNCATE(( csod.product_count / cp.convert_relate) , 2) productCount , t1.valueName specificationValue,csod.is_gift , csod.product_price ,( CASE WHEN csod.is_gift = '1' THEN '0.00' ELSE csod.product_amount END) product_amount" ; 
-		StringBuilder fromBuilder = new StringBuilder(" FROM cc_activity_apply caa");
-		fromBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.activity_apply_id = caa.id");
-		fromBuilder.append(" LEFT JOIN cc_sales_order_detail csod ON csod.order_id = cso.id");
-		fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csp.id = csod.sell_product_id");
-		fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv");
-		fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 ON t1.product_set_id = csp.product_id");
-		fromBuilder.append(" LEFT JOIN cc_product cp ON csp.product_id = cp.id");
+		String select = "SELECT cso.id, cso.order_sn,cc.customer_name,cso.total_amount,cso.receive_type,cso.create_date " ; 
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order cso");
+		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON cso.activity_apply_id = caa.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=cso.customer_id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
 		fromBuilder.append(" WHERE caa.id='"+activityApplyId+"'");
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+	}
+
+	public Page<Record> orderAllDetailsPaginate(int pageNumber, int pageSize, String startDate, String endDate,
+			String activityId) {
+		String select = "SELECT cso.id, cso.order_sn,cc.customer_name,cso.total_amount,cso.receive_type,cso.create_date " ; 
+		StringBuilder fromBuilder = new StringBuilder(" FROM cc_sales_order cso");
+		fromBuilder.append(" LEFT JOIN cc_activity_apply caa ON cso.activity_apply_id = caa.id ");
+		fromBuilder.append(" LEFT JOIN cc_activity ca ON ca.id= caa.activity_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer csc ON csc.id=cso.customer_id");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cc.id=csc.customer_id");
+		fromBuilder.append(" WHERE ca.id='"+activityId+"'");
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 	}
 
