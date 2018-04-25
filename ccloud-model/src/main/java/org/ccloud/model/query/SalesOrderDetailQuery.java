@@ -15,7 +15,6 @@
  */
 package org.ccloud.model.query;
 
-import static org.hamcrest.CoreMatchers.nullValue;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
