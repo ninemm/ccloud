@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.kit.Ret;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -16,42 +17,15 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerJoinCorp;
-import org.ccloud.model.CustomerJoinCustomerType;
-import org.ccloud.model.CustomerStore;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Department;
-import org.ccloud.model.Dict;
-import org.ccloud.model.MemberJoinSeller;
-import org.ccloud.model.Message;
-import org.ccloud.model.Seller;
-import org.ccloud.model.SellerCustomer;
-import org.ccloud.model.User;
-import org.ccloud.model.UserJoinCustomer;
-import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.*;
 import org.ccloud.model.compare.BeanCompareUtils;
-import org.ccloud.model.query.CustomerJoinCorpQuery;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
-import org.ccloud.model.query.CustomerQuery;
-import org.ccloud.model.query.CustomerStoreQuery;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.DictQuery;
-import org.ccloud.model.query.MemberJoinSellerQuery;
-import org.ccloud.model.query.MessageQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.UserJoinCustomerQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.model.vo.CustomerVO;
 import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
 import org.joda.time.DateTime;
@@ -66,7 +40,6 @@ import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Kv;
-import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -155,6 +128,7 @@ public class CustomerController extends BaseFrontController {
 		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, custTypeId, custName, "");
 		Long OrderedCustomerCount = SellerCustomerQuery.me().findOrderedCustomerCountByDataArea(selectDataArea, dealerDataArea, custTypeId, custName);
 		String customerOrderCount = OrderedCustomerCount != null ? OrderedCustomerCount.toString() : "0";
+		long customerCount = SellerCustomerQuery.me().findCustomerCount(selectDataArea);
 
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
@@ -236,6 +210,7 @@ public class CustomerController extends BaseFrontController {
 		map.put("totalRow", customerList.getTotalRow());
 		map.put("totalPage", customerList.getTotalPage());
 		map.put("orderCount", customerOrderCount);
+		map.put("customerCount", customerCount);
 		renderJson(map);
 	}
 
@@ -494,8 +469,9 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//				String waterFont3 = sellerCustomer.getLocation();
-				String waterFont3 = "湖北省-武汉市-洪山区";
+
+				String waterFont3 = sellerCustomer.getLocation();
+//				String waterFont3 = "湖北省-武汉市-洪山区";
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
@@ -879,7 +855,12 @@ public class CustomerController extends BaseFrontController {
 		
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", status);
-		workFlowService.completeTask(taskId, comment, var);
+
+		int completeTask = workFlowService.completeTask(taskId, comment, var);
+		if (completeTask==1) {
+			renderAjaxResultForError("已审核");
+			return;
+		}
 		
 		Message message = new Message();
 		message.setSellerId(sellerId);

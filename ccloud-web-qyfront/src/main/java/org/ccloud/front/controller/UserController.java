@@ -17,13 +17,7 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
-import org.ccloud.model.query.ActivityApplyQuery;
-import org.ccloud.model.query.CustomerVisitQuery;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerCustomerQuery;
-import org.ccloud.model.query.SmsCodeQuery;
-import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
@@ -175,7 +169,13 @@ public class UserController extends BaseFrontController {
 		keepPara();
 		String action = getPara(0, "index");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		
+//		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+//		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+
+//		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
+//		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
+//		setAttr("totalOrderCount", totalOrderCount.intValue());
+//		setAttr("totalCustomerCount", totalCustomerCount.intValue());
 		setAttr("orderTotal", SalesOrderQuery.me().findToDoOrderReviewCount(user.getUsername()));
 		setAttr("customerVisitTotal", CustomerVisitQuery.me().findToDoCustomerVisitReviewCount(user.getUsername()));
 		setAttr("customerTotal", SellerCustomerQuery.me().findToDoCustomerReviewCount(user.getUsername()));
