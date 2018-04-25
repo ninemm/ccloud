@@ -21,15 +21,15 @@
 <#macro script>	
 	var $table = $("#_mSalesmanDetailReport_table");
 	var $tableGift = $("#_mSalesmanDetailReportGift_table");
-	var url = '${CPATH}/admin/report/mSalesmanDetailReportListNew';
-	var urlGift = '${CPATH}/admin/report/mSalesmanDetailReportListNew';
+	var url = '${CPATH}/admin/report/mSalesmanDetailReportList';
+	var urlGift = '${CPATH}/admin/report/mSalesmanDetailGiftReportList';
 
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
 		jQuery.mm.initEditTableExport3('#_mSalesmanDetailReport_table',url, initParams, initFields(), null,null,"部门业务员产品详情");
-		jQuery.mm.initEditTableExport4('#_mSalesmanDetailReportGift_table',urlGift, initGiftParams, initFieldsGift(), null,null,"部门业务员赠品详情");
+		jQuery.mm.initEditTableExport4('#_mSalesmanDetailReportGift_table',urlGift, initParams, initFieldsGift(), null,null,"部门业务员赠品详情");
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');
@@ -38,14 +38,13 @@
 	var initParams = function(params) {
 		var keyword = $('#status  option:selected').val();
 		if(keyword == ""){
-			keyword = "order";
+			keyword = "so.create_date";
 		}
+		if (keyword) keyword = encodeURIComponent(keyword);
 		var param = {
-			status: keyword,
+			k: keyword,
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
-			productNames: $('#productNames').val(),
-			isGift: "0",
 			sortName:params
 		};
 		return param;
@@ -167,9 +166,9 @@
 					<div class="col-sm-8 input-group input-group-sm">
 						<select class="form-control" name="status" id="status">
 							<option value="">--请选择--</option>
-							<option value="order">已下单</option>
-							<option value="print">已打印</option>
-							<option value="outstock">已出库</option>
+							<option value="so.create_date">已下单</option>
+							<option value="so.print_time">已打印</option>
+							<option value="sok.biz_date">已出库</option>
 						</select>
 					</div>
 				</div>

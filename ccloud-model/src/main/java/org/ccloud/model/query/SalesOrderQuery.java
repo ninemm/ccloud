@@ -644,7 +644,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id=sp.seller_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sum(srid.product_count) count , srid.sell_product_id , sri.outstock_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON srid.refund_instock_id=sri.id ");
-		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
+		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
 		fromBuilder.append(" GROUP BY srid.sell_product_id , srid.refund_instock_id) t1 ON t1.outstock_id = sok.id AND t1.sell_product_id = sd.sell_product_id ");
 //		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		fromBuilder.append(" where EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = so.status and os.status != ? and os.status != ?) and sc.customer_kind = ? ");
@@ -698,7 +698,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id=so.customer_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sum(srid.product_count) count , srid.sell_product_id , sri.outstock_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON srid.refund_instock_id=sri.id ");
-		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
+		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
 		fromBuilder.append(" GROUP BY srid.sell_product_id , srid.refund_instock_id) t1 ON t1.outstock_id = sok.id AND t1.sell_product_id = sd.sell_product_id ");
 //		fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		fromBuilder.append(" where EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = so.status and os.status != ? and os.status != ?) and sc.customer_kind = ? ");
@@ -751,7 +751,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sum(srid.product_count) count , srid.sell_product_id , sri.outstock_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON srid.refund_instock_id=sri.id ");
-		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
+		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")");
 		fromBuilder.append(" GROUP BY srid.sell_product_id , srid.refund_instock_id) t1 ON t1.outstock_id = sok.id AND t1.sell_product_id = sd.sell_product_id ");
 		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+")");
@@ -802,7 +802,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_customer c ON c.id = sc.customer_id ");
 		fromBuilder.append(" LEFT JOIN( SELECT sum(srid.product_count) count , srid.sell_product_id , sri.outstock_id FROM cc_sales_refund_instock_detail srid ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock sri ON srid.refund_instock_id=sri.id ");
-		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
+		fromBuilder.append(" where sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sri.data_area like ? ");
 		fromBuilder.append(" GROUP BY srid.sell_product_id , srid.refund_instock_id) t1 ON t1.outstock_id = sok.id AND t1.sell_product_id = sd.sell_product_id ");
 		fromBuilder.append(" where EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = so.status and os.status != ? and os.status != ?) and sc.customer_kind = ? ");
 //		fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_SELLER);
@@ -858,7 +858,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			}else {
 				fromBuilder.append("and sod.is_gift=0");
 			}
-			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("s.seller_name '直营商名称'");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -907,7 +907,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			}else {
 				fromBuilder.append("and sod.is_gift=0");
 			}
-			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder.append("u.realname '业务员名称',u.id userId");
 		fromBuilder.append(" FROM cc_sales_order so ");
@@ -979,7 +979,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			}else {
 				fromBuilder1.append("' and sod.is_gift=0");
 			}
-			fromBuilder1.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
+			fromBuilder1.append(" and sri.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+")),0))/"+convertRelate+" , 2) '"+customName+"' ,");
 		}
 		fromBuilder1.append("c.customer_name '客户名称',sc.id ");
 		StringBuilder fromBuilder=new StringBuilder(" FROM cc_sales_order so ");
@@ -2289,7 +2289,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" FROM cc_sales_order so ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.order_id=so.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock cso ON cso.id=sojo.outstock_id ");
-		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(sri.total_reject_amount) , 0) amount , sri.outstock_id FROM cc_sales_refund_instock sri WHERE sri. STATUS NOT IN("+Consts.SALES_REFUND_INSTOCK_DEFUALT+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY sri.outstock_id) t1 ON t1.outstock_id in (cso.id) ");
+		fromBuilder.append(" LEFT JOIN( SELECT IFNULL(SUM(sri.total_reject_amount) , 0) amount , sri.outstock_id FROM cc_sales_refund_instock sri WHERE sri. STATUS NOT IN("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") GROUP BY sri.outstock_id) t1 ON t1.outstock_id in (cso.id) ");
 		fromBuilder.append(" WHERE so.biz_user_id ='"+userId+"'");
 		fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") ");
 		fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");

@@ -430,8 +430,12 @@
 													<#break>
 												</#if>
 											</#list>
-
-											<p>${(orderDetail.custom_name)!}</p>
+											<p>
+												<span>${(orderDetail.custom_name)!}</span>
+												<#if orderDetail.store_count??>
+													<span style="float: right;">剩余: <a style="color: red;">${(orderDetail.store_count)!}</a>${(orderDetail.big_unit)!}</span>
+												</#if>
+											</p>
 											<div class="p-l-15">
 												<div class="weui-flex__item">
 													<div class="fl">
@@ -509,7 +513,11 @@
 											</#list>
 
 											<p>
-												<span class="tag">赠品</span>${(orderDetail.custom_name)!}</p>
+												<span class="tag">赠品</span>${(orderDetail.custom_name)!}
+												<#if orderDetail.store_count??>
+													<span style="float: right;">剩余: <a style="color: red;">${(orderDetail.store_count)!}</a>${(orderDetail.big_unit)!}</span>
+												</#if>
+											</p>
 											<div class="t-r relative">
 												<input type="hidden" name="bigPriceSpan" id="bigPriceSpan" value="${(orderDetail.product_price)!}">
 												<input type="hidden" name="bigPrice" id="bigPrice" value="${(orderDetail.product_price)!}">

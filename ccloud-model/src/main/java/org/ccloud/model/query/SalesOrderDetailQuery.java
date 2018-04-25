@@ -15,6 +15,8 @@
  */
 package org.ccloud.model.query;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -66,12 +68,16 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 	
 	public List<Record> orderAgainDetail(String orderId) {
-
+		Record record =SellerQuery.me()._findByOrderId(orderId);
+		String sellerId=record.getStr("id");
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT sod.*,g.goods_category_id as categoryId, sp.custom_name,sp.tax_price,sp.account_price, sp.price,sp.bar_code, sp.cost, ");
 		sqlBuilder.append(" p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, ");
 		sqlBuilder.append(" w.code as warehouseCode, t1.valueName,w.name as warehouseName, IFNULL(cpc1.seller_product_id,cpc.seller_product_id) as sub_id, IFNULL(cpc.name,cpc1.name) as comName, ");
 		sqlBuilder.append(" IFNULL(cpc.main_product_count,cpc1.sub_product_count) as comCount, IFNULL(cpc.price,cpc1.price) as comPrice ");
+		if (null != sellerId) {
+			sqlBuilder.append(" ,IFNULL(t3.count,0) store_count");
+		}
 		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
@@ -81,6 +87,10 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_product_composition cpc1 ON cpc1.parent_id = sod.composite_id AND cpc1.sub_seller_product_id = sod.sell_product_id ");
 		sqlBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		sqlBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		if (null != sellerId) {
+			sqlBuilder.append(" LEFT JOIN(SELECT SUM(sp.store_count) count,p.id FROM cc_seller_product sp LEFT JOIN cc_product p ON p.id=sp.product_id WHERE sp.seller_id='");
+			sqlBuilder.append(sellerId+"' GROUP BY p.id) t3 ON t3.id=p.id");
+		}
 		sqlBuilder.append(" WHERE order_id = ? ");
 		sqlBuilder.append(" ORDER BY sod.composite_id, sod.is_gift asc ");
 
@@ -670,11 +680,11 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		} else {
 			sqlBuilder.append(" AND o.is_gift = 1");
 		}
-		params.add(startDate);
-		params.add(endDate);		
 		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
 		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
 		params.add(dataArea);
+		params.add(startDate);
+		params.add(endDate);		
 		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.input_user_id,o.is_gift");
 		sqlBuilder.append(" ) t1 on t1.input_user_id = cs.biz_user_id AND t1.sell_product_id = o.sell_product_id AND t1.is_gift = o.is_gift");
 		sqlBuilder.append(" WHERE o.data_area LIKE ?");
@@ -695,6 +705,56 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
 		params.add(Consts.SALES_ORDER_STATUS_REJECT);		
 		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.biz_user_id,o.is_gift");
+		sqlBuilder.append(" ORDER BY cs.biz_user_id");
+		return Db.find(sqlBuilder.toString(), params.toArray());
+	}
+
+	public List<Record> findSellerOrderByDataArea(String dataArea, String keyword, String startDate, String endDate,
+			String isGift) {
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sqlBuilder = new StringBuilder("SELECT o.sell_product_id, csp.custom_name,s.id sellerId,s.seller_name,FORMAT((o.product_count - IFNULL(t1.product_count,0))/cp.convert_relate,2) as count,o.is_gift ");
+		sqlBuilder.append(" FROM cc_sales_order_detail o");
+		sqlBuilder.append(" LEFT JOIN cc_sales_order cs ON o.order_id = cs.id");
+		sqlBuilder.append(" LEFT JOIN cc_seller_product csp ON o.sell_product_id = csp.id");
+		sqlBuilder.append(" LEFT JOIN cc_product cp ON csp.product_id = cp.id");
+		sqlBuilder.append(" LEFT JOIN cc_seller s ON s.id = csp.seller_id");
+		sqlBuilder.append(" LEFT JOIN ( SELECT cs.seller_id,o.sell_product_id,o.product_count,o.is_gift FROM cc_sales_refund_instock_detail o");
+		sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock cs ON cs.id = o.refund_instock_id");
+		sqlBuilder.append(" WHERE cs.status not in (?, ?) AND o.data_area LIKE ?");
+		sqlBuilder.append(" AND cs.create_date >= ? AND cs.create_date <= ?");
+		if (keyword.equals("print")) {
+			sqlBuilder.append("AND cs.is_print = 1");
+		}
+		if (isGift.equals("0")) {
+			sqlBuilder.append(" AND o.is_gift = 0");
+		} else {
+			sqlBuilder.append(" AND o.is_gift = 1");
+		}
+		params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+		params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
+		params.add(dataArea);
+		params.add(startDate);
+		params.add(endDate);		
+		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.seller_id,o.is_gift");
+		sqlBuilder.append(" ) t1 on t1.seller_id = cs.seller_id AND t1.sell_product_id = o.sell_product_id AND t1.is_gift = o.is_gift");
+		sqlBuilder.append(" WHERE o.data_area LIKE ?");
+		params.add(dataArea);
+		if (keyword.equals("print")) {
+			sqlBuilder.append(" AND cs.print_time >= ? AND cs.print_time <= ?");
+		} else {
+			sqlBuilder.append(" AND cs.create_date >= ? AND cs.create_date <= ?");
+		}
+		params.add(startDate);
+		params.add(endDate);
+		if (isGift.equals("0")) {
+			sqlBuilder.append(" AND o.is_gift = 0");
+		} else {
+			sqlBuilder.append(" AND o.is_gift = 1");
+		}		
+		sqlBuilder.append(" AND EXISTS(SELECT os.status FROM cc_sales_order_status os WHERE os.status = cs.status and os.status != ? and os.status != ?)");
+		params.add(Consts.SALES_ORDER_STATUS_CANCEL);
+		params.add(Consts.SALES_ORDER_STATUS_REJECT);		
+		sqlBuilder.append(" GROUP BY o.sell_product_id, cs.seller_id,o.is_gift");
 		sqlBuilder.append(" ORDER BY cs.biz_user_id");
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}

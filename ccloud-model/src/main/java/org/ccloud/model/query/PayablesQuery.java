@@ -88,7 +88,7 @@ public class PayablesQuery extends JBaseQuery {
 				fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END like '%"+keyword+"%' ");
 			}
 		}
-		fromBuilder.append(" and r.dept_id = '"+deptId+"' ORDER BY r.create_date DESC");
+//		fromBuilder.append(" and r.dept_id = '"+deptId+"' ORDER BY r.create_date DESC");
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
@@ -134,8 +134,8 @@ public class PayablesQuery extends JBaseQuery {
 		return DAO.findFirst(select);
 	}
 	
-	public Payables findByObjIdAndDeptId(String objId, String objType,String deptId) {
-		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"' and dept_id = '"+deptId+"'";
+	public Payables findByObjIdAndDeptId(String objId, String objType) {
+		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"'";
 		return DAO.findFirst(select);
 	}
 	

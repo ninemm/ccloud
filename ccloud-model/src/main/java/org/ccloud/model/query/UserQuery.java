@@ -137,6 +137,14 @@ public class UserQuery extends JBaseQuery {
 		return userList;
 	}
 	
+	public List<User> findAllByMobile(String mobile) {
+		StringBuilder sqlBuilder = new StringBuilder("select * ");
+		sqlBuilder.append("from `user` ");
+		sqlBuilder.append("where mobile = ?");
+		sqlBuilder.append("order by status desc");
+		return DAO.find(sqlBuilder.toString(), mobile);
+	}	
+	
 //	public List<User> findByMobile(final String mobile) {
 //		return DAO.doFindByCache(User.CACHE_NAME, mobile, "mobile = ? AND status = 1", mobile);
 //	}
