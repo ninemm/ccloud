@@ -16,6 +16,8 @@
 package org.ccloud.model;
 
 import com.jfinal.kit.StrKit;
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 import org.ccloud.model.base.BaseGroupRoleRel;
 
@@ -30,13 +32,47 @@ public class GroupRoleRel extends BaseGroupRoleRel<GroupRoleRel> {
 
 	@Override
     public boolean saveOrUpdate() {
-
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
         if (null == get(getPrimaryKey())) {
             set("id", StrKit.getRandomUUID());
             return super.save();
         }
         return super.update();
     }
+
+	@Override
+	public boolean save() {
+
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+		return super.save();
+	}
+
+	@Override
+	public boolean update() {
+
+		//removeCache(getId());
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+
+		return super.update();
+	}
+
+	@Override
+	public boolean delete() {
+
+		//removeCache(getId());
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+
+		return super.delete();
+	}
+
+	@Override
+	public boolean deleteById(Object idValue) {
+
+		//removeCache(idValue);
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+
+		return super.deleteById(idValue);
+	}
 
 }
 

@@ -33,16 +33,13 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.ccloud.Consts;
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.menu.MenuManager;
-import org.ccloud.model.Department;
-import org.ccloud.model.Group;
-import org.ccloud.model.Station;
-import org.ccloud.model.User;
-import org.ccloud.model.UserGroupRel;
-import org.ccloud.model.UserHistory;
+import org.ccloud.model.*;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.StationQuery;
@@ -228,6 +225,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 	    	Db.batchSave(userGroupRelList, userGroupRelList.size());
 	    	clearUserCache(user);
+			JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(user.getId()));
 			renderAjaxResultForSuccess("ok");
 		} else {
 			renderAjaxResultForError("false");
@@ -400,6 +398,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		user.setStationId(stationIds);
 		if (user.saveOrUpdate()) {
 			MenuManager.clearListByKey(id);
+			clearUserCache(UserQuery.me().findById(id));
 			renderAjaxResultForSuccess("保存成功");
 		} else {
 			renderAjaxResultForError("保存失败");
@@ -468,6 +467,8 @@ public class _UserController extends JBaseCRUDController<User> {
 				userGroupRelList.add(userGroupRel);
 			}
 	    	Db.batchSave(userGroupRelList, userGroupRelList.size());
+		    clearUserCache(UserQuery.me().findById(id));
+		    JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(id));
 			renderAjaxResultForSuccess("保存成功");
 		}else {
 			  for (UserGroupRel userGroupRel : userGroupRels) {
@@ -481,6 +482,8 @@ public class _UserController extends JBaseCRUDController<User> {
 				  userGroupRelList.add(userGroupRel);
 			}
 		    Db.batchSave(userGroupRelList, userGroupRelList.size());
+		    clearUserCache(UserQuery.me().findById(id));
+		    JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(id));
 			renderAjaxResultForSuccess("保存成功");
 		}
 	}
