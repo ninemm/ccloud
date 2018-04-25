@@ -150,7 +150,7 @@
             success:function(data) {
                 $(".weui-loadmore").hide();
                 $(".infinite").destroyInfinite();
-				$("#customerCount1").html(data.totalRow+" 个");
+				$("#customerCount1").html(data.customerCount+" 个");
 				$("#orderCount1").html(data.orderCount+" 个");
                 if (data.totalPage > pageNumber) {
                     loading = false;
