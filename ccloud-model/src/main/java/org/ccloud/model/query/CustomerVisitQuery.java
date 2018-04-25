@@ -165,15 +165,13 @@ public class CustomerVisitQuery extends JBaseQuery {
 		StringBuilder sql = new StringBuilder("SELECT ccv.id,ccv.user_id,ccv.visit_user realname,ccv.seller_customer_id,ccv.question_type,ccv.question_desc,ccv.advice,ccv.photo,ccv.vedio,ccv.lng,ccv.lat,ccv.location,ccv.review_id,");
 		sql.append("ccv.review_user,ccv.solution,ccv.comment,ccv.review_lng,ccv.review_lat,ccv.review_address,ccv.review_date,ccv.image_list_store,ccv.status,ccv.proc_def_key,ccv.proc_inst_id,ccv.dept_id,ccv.data_area,");
 		sql.append("ccv.create_date,ccv.modify_date,ccv.active_apply_id,ccv.activity_execute_id,");
-		sql.append("cc.prov_name,cc.city_name,cc.country_name,cc.address ,cc.customer_name, cc.contact, cc.mobile, d.name as typeName, t1.title, t1.name as expenseDetailName,t1.activitApplyId ");
+		sql.append("cc.prov_name,cc.city_name,cc.country_name,cc.address ,cc.customer_name, cc.contact, cc.mobile, d.name as typeName ");
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN dict d ON ccv.question_type = d.value ");
-		sql.append("LEFT JOIN (SELECT a.id as activitApplyId,ca.title,d.name from cc_activity_apply a LEFT JOIN cc_activity ca on ca.id = a.activity_id LEFT JOIN cc_expense_detail ce on ce.id = a.expense_detail_id LEFT JOIN dict d on d.type = ce.flow_dict_type and d.`value` = ce.item1) t1"
-				+ " on t1.activitApplyId = ccv.active_apply_id ");
 //		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
-		sql.append("WHERE ccv.id = ? limit 1");
+		sql.append("WHERE ccv.id = ?");
 
 		return DAO.findFirst(sql.toString(), id);
 	}
