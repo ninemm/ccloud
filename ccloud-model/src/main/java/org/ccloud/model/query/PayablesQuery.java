@@ -66,17 +66,17 @@ public class PayablesQuery extends JBaseQuery {
 		if(id.equals("1")) {
 			select = "SELECT CASE WHEN cs.id IS NOT NULL THEN cs.id ELSE s.id END AS id,CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS name,r.pay_amount,r.act_amount,r.balance_amount";
 			fromBuilder = new StringBuilder(" FROM `cc_payables` AS r LEFT JOIN `cc_supplier` AS cs on r.obj_id=cs.id LEFT JOIN cc_seller s ON r.obj_id = s.id ");
-			appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);if(!keyword.equals("")) {
-			fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END like '%"+keyword+"%' ");
+			appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
+			if(!keyword.equals("")) {
+				fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END like '%"+keyword+"%' ");
 			}
+			fromBuilder.append(" AND r.dept_id = '"+deptId+"' GROUP BY cs.id ");
 		}else {
 			select = " SELECT  r.obj_id AS id  , t1.customerTypeNames,CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END AS name , r.pay_amount, r.act_amount, r.balance_amount  ";
+			fromBuilder = new StringBuilder(" FROM `cc_payables` AS r inner JOIN (SELECT c1.id, c1.customer_id, ct.id AS customer_type_id, GROUP_CONCAT(ct.NAME) AS customerTypeNames FROM cc_seller_customer c1 INNER JOIN cc_customer_join_customer_type cjct ON c1.id =cjct.seller_customer_id INNER JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
 			if(!("0".equals(id)) && id != null){
-				fromBuilder = new StringBuilder(" FROM `cc_payables` AS r INNER JOIN (SELECT c1.id, c1.customer_id, ct.id AS customer_type_id, GROUP_CONCAT(ct.NAME) AS customerTypeNames FROM cc_seller_customer c1 INNER JOIN cc_customer_join_customer_type cjct ON c1.id =cjct.seller_customer_id INNER JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
 				fromBuilder.append(" WHERE cjct.customer_type_id = '"+ id+"'");
 				b = false;
-			}else {
-				fromBuilder = new StringBuilder(" FROM `cc_payables` AS r LEFT JOIN (SELECT c1.id, c1.customer_id, ct.id AS customer_type_id, GROUP_CONCAT(ct.NAME) AS customerTypeNames FROM cc_seller_customer c1 INNER JOIN cc_customer_join_customer_type cjct ON c1.id =cjct.seller_customer_id INNER JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
 			}
 			fromBuilder.append(" and c1.seller_id = ? GROUP BY c1.id ) t1 ON r.obj_id = t1.id LEFT JOIN `cc_customer` AS c ON c.id = t1.customer_id LEFT JOIN `cc_supplier` AS cs on r.obj_id=cs.id LEFT JOIN cc_seller s ON r.obj_id = s.id  ");
 			params.add(sellerId);
@@ -88,7 +88,6 @@ public class PayablesQuery extends JBaseQuery {
 				fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END like '%"+keyword+"%' ");
 			}
 		}
-//		fromBuilder.append(" and r.dept_id = '"+deptId+"' ORDER BY r.create_date DESC");
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
