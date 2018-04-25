@@ -56,7 +56,7 @@ function updateOptions(){
 		url: "${CPATH}/admin/payables/getOptions",
 		async: false,
 		success: function(data){
-			var optionsHtml = '<option value="0" >全部</option>';
+			var optionsHtml = '<option value="0" >客户</option>';
 			optionsHtml += '<option value="1" >供应商</option>';
 			if(data.length && data.length>=1){
 				for(var i in data){

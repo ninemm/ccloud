@@ -618,6 +618,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.setModifyUserId(user.getId());
 		seller.setIsInited(0);
 		seller.setDeptId(department.getId());
+		seller.setDataArea(department.getDataArea());
 	}
 	
 	@Before(Tx.class)

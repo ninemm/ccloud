@@ -127,6 +127,7 @@ public class CustomerController extends BaseFrontController {
 		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, custTypeId, custName, "");
 		Long OrderedCustomerCount = SellerCustomerQuery.me().findOrderedCustomerCountByDataArea(selectDataArea, dealerDataArea, custTypeId, custName);
 		String customerOrderCount = OrderedCustomerCount != null ? OrderedCustomerCount.toString() : "0";
+		long customerCount = SellerCustomerQuery.me().findCustomerCount(selectDataArea);
 
 		StringBuilder html = new StringBuilder();
 		for (Record customer : customerList.getList())
@@ -208,6 +209,7 @@ public class CustomerController extends BaseFrontController {
 		map.put("totalRow", customerList.getTotalRow());
 		map.put("totalPage", customerList.getTotalPage());
 		map.put("orderCount", customerOrderCount);
+		map.put("customerCount", customerCount);
 		renderJson(map);
 	}
 
