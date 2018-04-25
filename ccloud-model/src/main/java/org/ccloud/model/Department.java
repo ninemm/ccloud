@@ -15,6 +15,7 @@
  */
 package org.ccloud.model;
 
+import com.jfinal.plugin.ehcache.CacheKit;
 import org.ccloud.RedisConsts;
 import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
@@ -102,7 +103,8 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 	}
 
 	public <T> T getFromListCache(Object key, IDataLoader dataloader) {
-		Set<String> inCacheKeys = JCacheKit.get(CACHE_NAME, "cachekeys");
+		String cacheKeyName = "cachekeys";
+		Set<String> inCacheKeys = JCacheKit.get(CACHE_NAME, cacheKeyName);
 
 		Set<String> cacheKeyList = new HashSet<String>();
 		if (inCacheKeys != null) {
@@ -110,7 +112,9 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		}
 
 		cacheKeyList.add(key.toString());
-		JCacheKit.put(CACHE_NAME, "cachekeys", cacheKeyList);
+		synchronized (cacheKeyList) {
+			JCacheKit.put(CACHE_NAME, cacheKeyName, cacheKeyList);
+		}
 
 		return JCacheKit.get("dept_list", key, dataloader);
 	}

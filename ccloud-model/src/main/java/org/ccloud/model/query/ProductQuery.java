@@ -198,8 +198,8 @@ public class ProductQuery extends JBaseQuery {
 				+ "LEFT JOIN cc_seller_product csp on csp.product_id=cp.id "
 				+ "LEFT JOIN cc_seller cs on cs.id=csp.seller_id "
 				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
-				+ "WHERE u.id=? and cs.seller_type=0 and u.data_area='"+dataArea+"' GROUP BY cp.id";
-		return DAO.find(sql, userId);
+				+ "WHERE u.id=? and cs.seller_type=0 and u.data_area=? GROUP BY cp.id";
+		return DAO.find(sql, userId, dataArea);
 	}
 	
 	public List<Product> findAllByUser(String userId,String dataArea,String supplierId){

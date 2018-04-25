@@ -119,8 +119,8 @@ public class SellerQuery extends JBaseQuery {
 	}
 	
 	public Seller findByDeptAndSellerType(String deptId,int sellerType){
-		String sql = "select * from cc_seller where dept_id = '"+deptId+"' and seller_type ="+sellerType;
-		return DAO.findFirst(sql);
+		String sql = "select * from cc_seller where dept_id = ? and seller_type = ?";
+		return DAO.findFirst(sql, deptId, sellerType);
 	}
 	
 	public List<Seller> findAllByUserId(String userId){
@@ -135,9 +135,9 @@ public class SellerQuery extends JBaseQuery {
 	}
 	
 	public List<Seller> findSellerRegion(String dataArea){
-		StringBuilder sqlBuilder = new StringBuilder("select c_s.id,c_s.seller_name from department d inner join cc_seller c_s on d.id = c_s.dept_id where d.data_area like '"+dataArea+"'");
+		StringBuilder sqlBuilder = new StringBuilder("select c_s.id,c_s.seller_name from cc_seller c_s where c_s.data_area like ?");
 		sqlBuilder.append("order by order_list,dept_level ");
-		return DAO.find(sqlBuilder.toString());
+		return DAO.find(sqlBuilder.toString(), dataArea);
 
 	}
 	
@@ -148,18 +148,18 @@ public class SellerQuery extends JBaseQuery {
 	
 	public Record findByCustomerId(final String customerId) {
 		
-		return Db.findFirst("select s.* , d.data_area from cc_seller s join department d on s.dept_id = d.id where s.customer_id = ?" , customerId);
+		return Db.findFirst("select s.* from cc_seller s where s.customer_id = ?" , customerId);
 	}
 
 	public List<Seller> findByDataArea(String dataArea) {
-		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.* FROM `cc_seller` cs LEFT JOIN department d ON d.id = cs.dept_id WHERE d.data_area LIKE '"+dataArea+"'");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT cs.* FROM `cc_seller` cs WHERE cs.data_area LIKE ?");
 		sqlBuilder.append(" GROUP BY cs.id ORDER BY cs.seller_type");
-		return DAO.find(sqlBuilder.toString());
+		return DAO.find(sqlBuilder.toString(), dataArea);
 	}
 
 	public Seller findBySellerCustomerId(String customerId) {
-		StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM cc_seller cs  LEFT JOIN cc_seller_customer csc ON csc.seller_id=cs.id WHERE csc.id='"+customerId+"'");
-		return DAO.findFirst(sqlBuilder.toString());
+		StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM cc_seller cs  LEFT JOIN cc_seller_customer csc ON csc.seller_id=cs.id WHERE csc.id=?");
+		return DAO.findFirst(sqlBuilder.toString(), customerId);
 	}
 	
 	public Seller findbyCode(String sellerCode) {
@@ -177,13 +177,16 @@ public class SellerQuery extends JBaseQuery {
 		return DAO.findFirst(sql,dataArea);
 	}
 
-	public List<Record> findDeptByLevel(){
-		StringBuilder sql = new StringBuilder("SELECT d.data_area id,d.dept_name text from department d LEFT JOIN cc_seller cs ON cs.dept_id = d.id WHERE d.dept_level IN(1 , 2) AND d.qywx_deptid is NOT NULL  AND cs.id IS NOT NULL ");
-		return Db.find(sql.toString());
-	}
-
 	public Record _findByOrderId(String orderId) {
 		String sql="SELECT s.id FROM cc_sales_order so LEFT JOIN cc_customer_type ct ON ct.id = so.customer_type_id LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id LEFT JOIN cc_seller s ON s.customer_id = sc.customer_id WHERE so.id =?";
 		return Db.findFirst(sql,orderId);
+	}
+	
+	public List<Record> findDeptByLevel(){
+		StringBuilder sql = new StringBuilder("SELECT CONCAT(d.data_area, '%') AS id, cs.seller_name AS text ");
+		sql.append("FROM department d ");
+		sql.append("JOIN cc_seller cs ON d.id = cs.dept_id ");
+		sql.append("WHERE (d.dept_level = '1' OR d.dept_level = '2') AND cs.jpwx_open_id is not null ");
+		return Db.find(sql.toString());
 	}
 }

@@ -131,7 +131,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 		final User user = getModel(User.class);
-		try {
+	/*	try {
 			if (StrKit.notBlank(user.getNickname())) {
 				String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
 				user.setNickname(nickname);
@@ -139,7 +139,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
