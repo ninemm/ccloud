@@ -137,11 +137,12 @@ public class _RoleController extends JBaseCRUDController<Role> {
     public void permission() {
         String roleId = getPara("id");
         setAttr("id", getPara("id"));
-        try {
+        /*try {
 			setAttr("role_name", new String(getPara("roleName").getBytes("ISO-8859-1"),"UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
-		}
+		}*/
+        setAttr("role_name", new String(getPara("roleName")));
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 		List<Role> ownRoleList = null;
 		if (!isSuperAdmin) {
