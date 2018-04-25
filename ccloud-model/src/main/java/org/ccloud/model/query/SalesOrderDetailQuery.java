@@ -748,5 +748,24 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" ORDER BY cs.biz_user_id");
 		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
-
+	
+	public List<SalesOrderDetail> findByActivityApplyId(String activityApplyID) {
+		StringBuilder sqlBuilder = new StringBuilder("select o.id, MOD(o.product_count, cp.convert_relate) as smallCount, FLOOR(o.product_count/cp.convert_relate) as bigCount, ");
+		sqlBuilder.append("cu.mid_idno,cp.product_sn,o.is_gift, cc.create_date from cc_sales_order_detail o ");
+		sqlBuilder.append("LEFT JOIN cc_sales_order cc ON o.order_id = cc.id ");
+		sqlBuilder.append("LEFT JOIN cc_seller_customer cs on cs.id = cc.customer_id ");
+		sqlBuilder.append("LEFT JOIN cc_customer cu on cu.id = cs.customer_id ");
+		sqlBuilder.append("LEFT JOIN cc_seller_product csp ON csp.id = o.sell_product_id ");
+		sqlBuilder.append("LEFT JOIN cc_product cp on cp.id = csp.product_id ");
+		List<Object> param = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmpty(sqlBuilder, "cc.activity_apply_id", activityApplyID, param, needWhere);
+		if (needWhere) {
+			sqlBuilder.append(" where cc.status not in (1001,1002) ");
+		} else {
+			sqlBuilder.append(" and cc.status not in (1001,1002) ");
+		}
+		sqlBuilder.append("ORDER BY cc.create_date asc");
+		return DAO.find(sqlBuilder.toString(), param.toArray());
+	}
 }

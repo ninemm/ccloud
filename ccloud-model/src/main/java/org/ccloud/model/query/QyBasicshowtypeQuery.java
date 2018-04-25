@@ -19,7 +19,9 @@ import java.util.LinkedList;
 
 import org.ccloud.model.QyBasicshowtype;
 
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
 /**
@@ -76,6 +78,17 @@ public class QyBasicshowtypeQuery extends JBaseQuery {
 		QyBasicshowtype showtype = DAO.doFindFirst("ShowTypeID = ?", id);
 		if (showtype != null) {
 			return showtype.getShowTypeName();
+		} else {
+			return null;
+		}
+	}
+
+	public String findIdByDict(String key) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT s.ShowTypeID FROM qy_basicshowtype s LEFT JOIN dict d ON d.`name` = s.ShowTypeName ");
+		fromBuilder.append("WHERE d.key = ? ");
+		Record record = Db.findFirst(fromBuilder.toString(), key);
+		if (record != null) {
+			return record.getStr("ShowTypeID");
 		} else {
 			return null;
 		}

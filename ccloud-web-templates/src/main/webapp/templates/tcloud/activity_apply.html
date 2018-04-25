@@ -233,6 +233,11 @@ function getSurplusInfo(ids,titles) {
 					$newApply.find("#maxNum").val(el.num);
 					$newApply.find("#ableNum").html("("+el.num+")");
 				}
+				if (el.area) {
+					$newApply.find(".area").show();
+				} else {
+					$newApply.find(".area").hide();
+				}
 				$newApply.find("#maxAmount").val(el.amount);
 				$newApply.find("#ableMoney").html("("+el.amount+")");
             });			
@@ -584,6 +589,15 @@ function doChange(key){
 									<input type="hidden" id="maxAmount">
 								</div>
 							</div>
+							<div class="weui-cell weui-cell_access area" style="display:none;">
+								<div class="weui-cell__bd">
+									<span>
+										申请尺寸
+										<span class="require"></span>
+									</span>
+									<input type="tel" class="weui-input fr" id="apply_area" name="apply_area" value="1*1*1" placeholder="请填写尺寸(n*n*n)" required>
+								</div>
+							</div>							
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">

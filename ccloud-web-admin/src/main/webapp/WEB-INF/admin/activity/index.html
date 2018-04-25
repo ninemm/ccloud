@@ -185,10 +185,16 @@
 			url:"${CPATH}/admin/activity/getMidData",
 			type:"post",
 			dataType:"json",
+			data: {
+				"startDate" : $("#startDate").val(),
+				"endDate" : $("#endDate").val()
+			},			
 			success:function(data) {
 				layer.closeAll();
 				if(data.errorCode == 0) {
 					toastr.success(data.message, '操作成功');
+					$("#startDate").val("");
+					$("#endDate").val("");
 					$table.bootstrapTable('refresh');
 				} else {
 					toastr.error(data.message,'操作失败');

@@ -410,7 +410,8 @@ public class CustomerVisitController extends BaseFrontController {
 		String activityExceuteId = getPara("activity_execute_id");
 		if(!activityApplyId.equals("")) {
 			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
-			if(customerVisits.size()>0) {
+			List<ActivityExecute> executeList = ActivityExecuteQuery.me().findbyActivityApplyId(activityApplyId);
+			if(customerVisits.size() > 0 && executeList.size() > 0) {
 				for(CustomerVisit visit:customerVisits) {
 					if(!visit.getStatus() .equals(Consts.CUSTOMER_VISIT_STATUS_PASS)) {
 						renderAjaxResultForError("您的拜访未审核通过！");
@@ -554,7 +555,7 @@ public class CustomerVisitController extends BaseFrontController {
 				List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(customerVisit.getActiveApplyId());
 				ActivityApply activityApply = ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId());
 				List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
-				if(customerVisits.size() == activityExecutes.size()) {
+				if(customerVisits.size() == activityExecutes.size() || activityExecutes.size() == 0) {
 					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_VERIFICATION);
 					activityApply.update();
 				}
@@ -731,10 +732,18 @@ public class CustomerVisitController extends BaseFrontController {
 	public void getActivityExecute() {
 		String activityApplyId = getPara("activityApplyId");
 		Map<String, Object> map = new HashMap<>();
+		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findByActivityApplyId(activityApplyId);
+		String dict_type = expenseDetail.getFlowDictType();
+		boolean size = false;
+		String check_size = null;
+		if (dict_type.equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
+			size = true;
+		}
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		String orderList = String.valueOf(customerVisits.size()+1);
 		map.put("activityExecute", JSON.toJSON(ActivityExecuteQuery.me().findbyActivityIdAndOrderList(ActivityApplyQuery.me().findById(activityApplyId).getActivityId(),orderList)));
 		if(customerVisits.size()>0) {
+			check_size = customerVisits.get(0).getCheckSize();
 			if(customerVisits.get(0).getPhoto() == null && customerVisits.size()>1) {
 				map.put("imgeLists",JSON.parseArray(customerVisits.get(1).getPhoto(), ImageJson.class));
 			}else {
@@ -743,6 +752,8 @@ public class CustomerVisitController extends BaseFrontController {
 			map.put("maxOrderList", customerVisits.size());
 		}
 		map.put("domain",OptionQuery.me().findValue("cdn_domain"));
+		map.put("size", size);
+		map.put("check_size", check_size);
 		renderJson(map);
 	}
 	
@@ -924,8 +935,16 @@ public class CustomerVisitController extends BaseFrontController {
 		String activityApplyId = getPara("applyId");
 		String orderList = getPara("orderList");
 		CustomerVisit cv = CustomerVisitQuery.me().findByActivityApplyIdAndOrderList(activityApplyId, orderList);
+		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findByActivityApplyId(activityApplyId);
+		String dict_type = expenseDetail.getFlowDictType();
+		String has_size = "0";
+		String check_size = null;
+		if (dict_type.equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
+			has_size = "1";
+		}		
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		if(customerVisits.size()>0) {
+			check_size = customerVisits.get(0).getCheckSize();
 			setAttr("imgeLists",JSON.toJSON(JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class)));
 			setAttr("customerVisit",CustomerVisitQuery.me().findMoreById(customerVisits.get(0).getId()));
 		}
@@ -936,6 +955,8 @@ public class CustomerVisitController extends BaseFrontController {
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityIdAndOrderList(record.getStr("activity_id"),orderList);
 		ActivityExecute activityExecute = ActivityExecuteQuery.me()._findbyActivityIdAndOrderList(record.getStr("activity_id"), orderList);
 		List<Map<String, String>> list = getVisitTypeList();
+		setAttr("has_size", has_size);
+		setAttr("check_size", check_size);
 		setAttr("problem", JSON.toJSONString(list));
 		setAttr("activityExecutes",JSON.toJSONString(activityExecutes));
 		setAttr("activityExecuteId",activityExecute.getId());
@@ -994,8 +1015,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					

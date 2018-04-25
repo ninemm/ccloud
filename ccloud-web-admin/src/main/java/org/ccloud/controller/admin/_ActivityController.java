@@ -48,9 +48,12 @@ import org.ccloud.model.QyBasicfeetype;
 import org.ccloud.model.QyBasicflowtype;
 import org.ccloud.model.QyBasicshowtype;
 import org.ccloud.model.QyExpensedetail;
+import org.ccloud.model.SalesOrderDetail;
 import org.ccloud.model.Seller;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.YxBasicchannelinfo;
 import org.ccloud.model.YxBasicchanneltypeinfo;
+import org.ccloud.model.activity.ActivityMaps;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityExecuteTemplateQuery;
@@ -66,7 +69,9 @@ import org.ccloud.model.query.QyBasicfeetypeQuery;
 import org.ccloud.model.query.QyBasicflowtypeQuery;
 import org.ccloud.model.query.QyBasicshowtypeQuery;
 import org.ccloud.model.query.QyExpensedetailQuery;
+import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.YxBasicchannelinfoQuery;
 import org.ccloud.model.query.YxBasicchanneltypeinfoQuery;
@@ -462,19 +467,19 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	private String findFlowDictType(String code) {
 		String type = null;
 		if (code.equals("101101")) {
-			return "feeType_name_PR";
+			return Consts.FLOW_DICT_TYPE_NAME_PR;
 		} else if (code.equals("101102")) {
-			return "feeType_name_raise";
+			return Consts.FLOW_DICT_TYPE_NAME_RAISE;
 		} else if (code.equals("101103")) {
-			return "feeType_name_AD";
+			return Consts.FLOW_DICT_TYPE_NAME_AD;
 		} else if (code.equals("101104")) {
-			return "feeType_name_display";
+			return Consts.FLOW_DICT_TYPE_NAME_DISPLAY;
 		} else if (code.equals("101105")) {
-			return "channel_define";
+			return Consts.FLOW_DICT_TYPE_NAME_CHANNEL;
 		} else if (code.equals("101106")) {
-			return "feeType_name_gift";
+			return Consts.FLOW_DICT_TYPE_NAME_GIFT;
 		} else if (code.equals("101107")) {
-			return "feeType_name_SA";
+			return Consts.FLOW_DICT_TYPE_NAME_SA;
 		}
 		return type;
 	}
@@ -547,19 +552,23 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	//中间库同步数据
 	@Before(Tx.class)
 	public void getMidData() {
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 //		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();//测试数据
 		String[] date = DateUtils.getStartDateAndEndDateByType("month");
-		List<Expense> expenseList = MidDataUtil.getExpensesInfo(date[0], date[1], "1", Consts.GET_MID_DATA_TOTALROW);
+		List<Expense> expenseList = new ArrayList<>();
+		if (StrKit.isBlank(startDate)) {
+			expenseList = MidDataUtil.getExpensesInfo(date[0], date[1], "1", Consts.GET_MID_DATA_TOTALROW);
+		} else {
+			expenseList = MidDataUtil.getExpensesInfo(startDate, endDate, "1", Consts.GET_MID_DATA_TOTALROW);
+		}
 		List<Activity> acList = new ArrayList<>();
 		List<ExpenseDetail> dlist = new ArrayList<>();
 		for (Expense qyExpense : expenseList) {
 			if (!ActivityQuery.me().isExist(qyExpense.getFlowNo())) {
 				Activity activity = new Activity();
-				Seller seller = SellerQuery.me().findbyCode(qyExpense.getFranchiserCode());
-				if (seller == null) {
-					continue;
-				}
 				activity.setId(StrKit.getRandomUUID());
+				Seller seller = SellerQuery.me().findbyCode(qyExpense.getFranchiserCode());
 				activity.setSellerId(seller.getId());
 				activity.setCode(qyExpense.getActivityNo());
 				activity.setTitle(qyExpense.getExpenseName());
@@ -568,17 +577,17 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setCategory(Consts.ACTIVITY_CATEGORY_CODE);
 				String[] value = getAreaType(qyExpense.getExpenseName());
 				activity.setInvestType(DictQuery.me().findbyName(value[0]).getValue());
-				activity.setAreaType(value[1]);
+				activity.setAreaType("湖北省-武汉市-武昌区");
 				activity.setInvestAmount(new BigDecimal(qyExpense.getApplyAmount()));
 				activity.setProcCode(qyExpense.getFlowNo());
+				activity.setProcId(qyExpense.getFlowID());
 				activity.setPlanCode(qyExpense.getActivityNo());
 				activity.setContent(qyExpense.getMemo());
 				activity.setTimeInterval(qyExpense.getInputDay().toString());
 				activity.setIsPublish(0);
 				activity.setCreateDate(new Date());
 				acList.add(activity);
-//				dlist = getExpenseDetailList(qyExpense.getExpenseID(), activity.getId(), activity.getInvestType());
-				getExpenseDetailsList(dlist, qyExpense.getExpenseID(), activity.getId(), activity.getInvestType(), activity.getProcCode());
+				getExpenseDetailsList(dlist, qyExpense.getExpenseID(), activity.getId(), activity.getInvestType(), activity.getProcCode(), seller.getId());
 			}
 		}
 		Db.batchSave(acList, acList.size());
@@ -613,7 +622,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderAjaxResultForSuccess("同步成功");
 	}
 	
-	private void getExpenseDetailsList(List<ExpenseDetail> dlist, String expenseId, String actId, String typeId, String flowNo) {
+	private void getExpenseDetailsList(List<ExpenseDetail> dlist, String expenseId, String actId, String typeId, String flowNo, String sellerId) {
 		List<ExpensesDetail> expenseList = MidDataUtil.getExpenseDetail(expenseId, typeId);
 		for (ExpensesDetail expensesDetail : expenseList) {
 			ExpenseDetail expenseDetail = new ExpenseDetail();
@@ -626,17 +635,27 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			String name = QyBasicfeetypeQuery.me().findNameById(expensesDetail.getCostType());
 			Dict code = DictQuery.me().findbyName(name);
 			getItem(expenseDetail, expensesDetail, 5);
-			if (dict.equals("feeType_name_display")) {
+			if (dict.equals(Consts.FLOW_DICT_TYPE_NAME_DISPLAY)) {
 				expenseDetail.setDisplayDictType(findDisplayType(code.getValue()));
 				String item2Value = QyBasicshowtypeQuery.me().findNameById(expenseDetail.getItem2());
-				Dict displayCode = DictQuery.me().findbyName(item2Value);
+				Dict displayCode = DictQuery.me().findShowType(item2Value);
 				expenseDetail.setItem2(displayCode.getValue());
+			} else if (dict.equals(Consts.FLOW_DICT_TYPE_NAME_CHANNEL) 
+					|| dict.equals(Consts.FLOW_DICT_TYPE_NAME_SA)) {
+				SellerProduct sellerProduct = SellerProductQuery.me().findByProductSn(expenseDetail.getItem2(), sellerId);
+				if (sellerProduct != null) {
+					expenseDetail.setItem2(sellerProduct.getId());
+				}
 			}
 			if (StrKit.notBlank(expensesDetail.getChannelID())) {
 				expenseDetail.setItem1(expensesDetail.getChannelID());
 			} else {
-				expenseDetail.setItem1(code.getValue());
-			}			
+				if (code != null) {
+					expenseDetail.setItem1(code.getValue());
+				} else {
+					expenseDetail.setItem1("A1");
+				}
+			}
 			expenseDetail.setCreateDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
 			expenseDetail.setModifyDate(DateUtils.strToDate(expensesDetail.getCreateTime(), DateUtils.DEFAULT_MID_FORMATTER_TWO));
 			if (expensesDetail.getFlag().equals("0")) {
@@ -905,142 +924,229 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 					renderAjaxResultForError("同步图片失败!");
 					return;
 				}else {
-					ScenePhoto=ScenePhoto.substring(1, ScenePhoto.length()-1);
+					ScenePhoto = ScenePhoto.substring(1, ScenePhoto.length() - 1);
 				}
 			}
 			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
 			Long shopId = addCustomer(YxActivity.getStr("customerId"));
-			if (shopId==null) {
+			if (shopId == null) {
 				renderAjaxResultForError("同步客户失败!");
 				return;
 			}
-			Map<String, Object> map = jointMap(YxActivity);
+			String message = "success";
 			if (YxActivity.getStr("invest_type").equals(Consts.INVES_PUBLICK)) {
-				//公关赞助
-				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_PR);
-				map.put("IDNO",midIdno.getIdno());
-				map.put("ScenePhoto",ScenePhoto);
-				try {
-					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityBrandInfo", map);
-					activityApply.setStatus(5);
-					activityApply.update();
-					midIdno.setIdno(midIdno.getIdno()+1);
-					midIdno.update();
-				} catch (Exception e) {
-					e.printStackTrace();
-					renderAjaxResultForError("加入核销失败!");
-					return;
-				}
+				message = SYN_INVES_PUBLICK(activityApply, ScenePhoto, YxActivity, shopId);
 			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CONSUMPTION_CULTIVATION)) {
-				//消费培育
-				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_RAISE);
-				map.put("IDNO",midIdno.getIdno());
-				map.put("ScenePhoto",ScenePhoto);
-				try {
-					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityProductJudge", map);
-					activityApply.setStatus(5);
-					activityApply.update();
-					midIdno.setIdno(midIdno.getIdno()+1);
-					midIdno.update();
-				} catch (Exception e) {
-					e.printStackTrace();
-					renderAjaxResultForError("加入核销失败!");
-					return;
-				}
+				message = SYN_INVEST_CONSUMPTION_CULTIVATION(activityApply, ScenePhoto, YxActivity, shopId);
 			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)) {
-				//终端广告
-				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_AD);
-				map.put("IDNO",midIdno.getIdno());
-				map.put("CustomerCode",shopId+"");
-				map.put("ShopID",shopId);
-				map.put("ExecutePhotoIds",ScenePhoto);
-				try {
-					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopAdInfo", map);
-					activityApply.setStatus(5);
-					activityApply.update();
-					midIdno.setIdno(midIdno.getIdno()+1);
-					midIdno.update();
-				} catch (Exception e) {
-					e.printStackTrace();
-					renderAjaxResultForError("加入核销失败!");
-					return;
-				}
+				message = SYN_INVEST_TERMINSL_ADVERTISWMENT(activityApply, ScenePhoto, YxActivity, shopId);
 			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_DISPLAY)) {
-				//终端陈列 
-				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_DISPLAY);
-				map.put("IDNO",midIdno.getIdno());
-				map.put("CustomerCode",shopId+"");
-				map.put("ShopID",shopId);
-				map.put("GiftPhotoId",ScenePhoto);
-				try {
-					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopShowInfo", map);
-					activityApply.setStatus(5);
-					activityApply.update();
-					midIdno.setIdno(midIdno.getIdno()+1);
-					midIdno.update();
-				} catch (Exception e) {
-					e.printStackTrace();
-					renderAjaxResultForError("加入核销失败!");
-					return;
-				}
+				message = SYN_INVEST_TERMINSL_DISPLAY(activityApply, ScenePhoto, YxActivity, shopId);
 			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CUSTOMER_VISITE)) {
-				//终端客情
-				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_CHANNEL);
-				map.put("IDNO",midIdno.getIdno());
-				map.put("CustomerCode",shopId+"");
-				map.put("ShopID",shopId);
-				map.put("ActivityPhotos",ScenePhoto);
-				try {
-					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityDisplayInfo", map);
-					activityApply.setStatus(5);
-					activityApply.update();
-					midIdno.setIdno(midIdno.getIdno()+1);
-					midIdno.update();
-				} catch (Exception e) {
-					e.printStackTrace();
-					renderAjaxResultForError("加入核销失败!");
-					return;
-				}
+				message = SYN_INVEST_CUSTOMER_VISITE(activityApply, ScenePhoto, YxActivity, shopId);
 			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_SUPERMARKET_GIFT)) {
-				//商超赠品
-				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_GIFT);
-				map.put("IDNO",midIdno.getIdno());
-				map.put("CustomerCode",shopId+"");
-				map.put("ShopID",shopId);
-				try {
-					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityMarketGiftInfo", map);
-					activityApply.setStatus(5);
-					activityApply.update();
-					midIdno.setIdno(midIdno.getIdno()+1);
-					midIdno.update();
-				} catch (Exception e) {
-					e.printStackTrace();
-					renderAjaxResultForError("加入核销失败!");
-					return;
-				}
+				message = SYN_INVEST_SUPERMARKET_GIFT(activityApply, ScenePhoto, YxActivity, shopId);
 			}else {
-				//进场费
-				MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.FLOW_DICT_TYPE_NAME_SA);
-				map.put("IDNO",midIdno.getIdno());
-				map.put("CustomerCode",shopId+"");
-				map.put("ShopID",shopId);
-				map.put("ExecutePhotoIds",ScenePhoto);
-				try {
-					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityEntryCostInfo", map);
-					activityApply.setStatus(5);
-					activityApply.update();
-					midIdno.setIdno(midIdno.getIdno()+1);
-					midIdno.update();
-				} catch (Exception e) {
-					e.printStackTrace();
-					renderAjaxResultForError("加入核销失败!");
-					return;
-				}
+				message = SYN_INVEST_SLOTTING_FEE(activityApply, ScenePhoto, YxActivity, shopId);
+			}
+			
+			if (StrKit.isBlank(message)) {
+				renderAjaxResultForError("核销发生错误");
+				return;
 			}
 		}
 		renderAjaxResultForSuccess("加入核销成功");
 	}
 	
+	private String SYN_INVES_PUBLICK(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+		//公关赞助
+		String SYN_ID = StrKit.getRandomUUID();
+		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
+		if (orderID == null) {
+			renderAjaxResultForError("同步订单失败!");
+			return null;
+		}
+		Map<String, Object> map = ActivityMaps.INVES_PUBLICK_MAP(YxActivity, SYN_ID, ScenePhoto, orderID);
+		try {
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityBrandInfo", map);
+			activityApply.setStatus(5);
+			activityApply.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderAjaxResultForError("加入核销失败!");
+			return null;
+		}		
+		return "true";
+	}
+	
+	private String SYN_INVEST_CONSUMPTION_CULTIVATION(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+		//消费培育
+		String SYN_ID = StrKit.getRandomUUID();
+		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
+		if (orderID == null) {
+			renderAjaxResultForError("同步订单失败!");
+			return null;
+		}
+		Map<String, Object> map = ActivityMaps.INVEST_CONSUMPTION_CULTIVATION_MAP(YxActivity, SYN_ID, ScenePhoto, orderID);			
+		try {
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityProductJudge", map);
+			activityApply.setStatus(5);
+			activityApply.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderAjaxResultForError("加入核销失败!");
+			return null;
+		}		
+		return "true";
+	}
+	
+	private String SYN_INVEST_TERMINSL_ADVERTISWMENT(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+		//终端广告
+		String SYN_ID = StrKit.getRandomUUID();
+		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
+		if (orderID == null) {
+			renderAjaxResultForError("同步订单失败!");
+			return null;
+		}	
+		Map<String, Object> map = ActivityMaps.INVEST_TERMINSL_ADVERTISWMENT_MAP(YxActivity, SYN_ID, ScenePhoto, shopId);
+		try {
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopAdInfo", map);
+			activityApply.setStatus(5);
+			activityApply.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderAjaxResultForError("加入核销失败!");
+			return null;
+		}		
+		return "true";
+	}
+	
+	private String SYN_INVEST_TERMINSL_DISPLAY(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+		//终端陈列 
+		String SYN_ID = StrKit.getRandomUUID();
+		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
+		List<CustomerVisit> vistitList = CustomerVisitQuery.me().getCustomerListByActivity(activityApply.getId());
+		if (orderID == null) {
+			renderAjaxResultForError("同步订单失败!");
+			return null;
+		}
+		try {
+			Map<String, Object> map = ActivityMaps.INVEST_TERMINSL_DISPLAY_MAP(YxActivity, SYN_ID, ScenePhoto, shopId);
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopShowInfo", map);
+			for (int i = 0; i < vistitList.size(); i++) {
+				if (i != 0) {
+					orderID = null;
+				}
+				List<String> list = Lists.newArrayList();
+				JSONArray picList = JSON.parseArray(vistitList.get(i).getPhoto());
+				for (int a = 0; a < picList.size(); a++) {
+					JSONObject obj = picList.getJSONObject(a);
+					String savePath = obj.getString("savePath");
+//					String photoId = StrKit.getRandomUUID();
+					list.add(savePath);
+				}	
+				Map<String, Object> detailMap = ActivityMaps.INVEST_TERMINSL_ADVERTISWMENT_DETAIL_MAP(vistitList.get(i), SYN_ID, list.toString(), shopId, orderID);
+				HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityShopShowInfoDetail", detailMap);
+			}
+			activityApply.setStatus(5);
+			activityApply.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderAjaxResultForError("加入核销失败!");
+			return null;
+		}
+		return "true";
+	}
+	
+	private String SYN_INVEST_CUSTOMER_VISITE(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+		//终端客情
+		String SYN_ID = StrKit.getRandomUUID();
+		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
+		if (orderID == null) {
+			renderAjaxResultForError("同步订单失败!");
+			return null;
+		}
+		Map<String, Object> map = ActivityMaps.INVEST_CUSTOMER_VISITE_MAP(YxActivity, SYN_ID, ScenePhoto, shopId, orderID);
+		try {
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityDisplayInfo", map);
+			activityApply.setStatus(5);
+			activityApply.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderAjaxResultForError("加入核销失败!");
+			return null;
+		}		
+		return "true";
+	}
+	
+	private String SYN_INVEST_SUPERMARKET_GIFT(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+		//商超赠品
+		String SYN_ID = StrKit.getRandomUUID();
+		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
+		if (orderID == null) {
+			renderAjaxResultForError("同步订单失败!");
+			return null;
+		}
+		Map<String, Object> map = ActivityMaps.INVEST_SUPERMARKET_GIFT_MAP(YxActivity, SYN_ID, ScenePhoto, shopId, orderID);
+		Map<String, Object> executeMap = ActivityMaps.INVEST_SUPERMARKET_GIFT_EXECUTE_MAP(YxActivity, SYN_ID, orderID);
+		try {
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityMarketGiftInfo", map);
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityMarketGiftExecuteInfo", executeMap);
+			activityApply.setStatus(5);
+			activityApply.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderAjaxResultForError("加入核销失败!");
+			return null;
+		}		
+		return "true";
+	}
+	
+	private String SYN_INVEST_SLOTTING_FEE(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+		//进场费
+		String SYN_ID = StrKit.getRandomUUID();
+		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
+		if (orderID == null) {
+			renderAjaxResultForError("同步订单失败!");
+			return null;
+		}
+		Map<String, Object> map = ActivityMaps.INVEST_SLOTTING_FEE_MAP(YxActivity, SYN_ID, ScenePhoto, shopId, orderID);
+		Map<String, Object> giftMap = ActivityMaps.INVEST_SLOTTING_FEE_GIFT_MAP(YxActivity, ScenePhoto, shopId, orderID);
+		try {
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityEntryCostInfo", map);
+			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityEntryCostGiftInfo", giftMap);
+			activityApply.setStatus(5);
+			activityApply.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+			renderAjaxResultForError("加入核销失败!");
+			return null;
+		}		
+		return "true";
+	}	
+	
+	private String synOrder(String activityApplyId, Record YxActivity, String shopId) {
+		List<SalesOrderDetail> salesOrderDetail = SalesOrderDetailQuery.me().findByActivityApplyId(activityApplyId);	
+		String orderId = "";
+		if(salesOrderDetail.size() > 0) {
+			orderId = StrKit.getRandomUUID();
+		}
+		try {
+			for (int i = 0; i < salesOrderDetail.size(); i++) {
+				if (i == 0) {
+					Map<String, Object> orderMap = ActivityMaps.orderMap(orderId, YxActivity, shopId, salesOrderDetail.get(i).getStr("create_date"));
+					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/Order", orderMap);
+				}
+				Map<String, Object> orderDetailMap = ActivityMaps.orderDetailMap(orderId, salesOrderDetail.get(i));
+				HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/OrderDetail", orderDetailMap);				
+			}
+			return orderId;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	public void editTemplate() {
 		String activityExecteId = getPara("activityExecteId");
 		List<ActivityExecuteTemplate> activityExecuteTemplates = ActivityExecuteTemplateQuery.me().findActivityExecuteId(activityExecteId);
@@ -1060,39 +1166,19 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	//新增客户
 	public Long addCustomer(String customerId) {
 		Record Customer = CustomerQuery.me().findByCustomerId(customerId);
-		Customer Customer1 = CustomerQuery.me().findById(customerId);
+		Customer CustomerInfo = CustomerQuery.me().findById(customerId);
 		Long ShopID = Customer.getLong("ShopID");
 		if (ShopID!=null) {
 			return ShopID;
 		}else {
 			MidIdno midIdno = MidIdnoQuery.me().findByTypeName(Consts.CUSTOMER_IDNO);
-			Map<String, Object>map=new HashMap<>();
-			map.put("ShopID", midIdno.getIdno());
-			map.put("CustomerName", Customer.getStr("CustomerName"));
-			map.put("CustomerCode", midIdno.getIdno()+"");
-			map.put("LinkMan", Customer.getStr("LinkMan"));
-			map.put("LinkMobile", Customer.getStr("LinkMobile"));
-			map.put("ResponsableMan", Customer.getStr("ResponsableMan"));
-			map.put("CustomerAddress", Customer.getStr("CustomerAddress"));
-//			map.put("ChannelName", Customer.getStr("ChannelName"));
-			map.put("ProvinceName", Customer.getStr("ProvinceName"));
-			map.put("CityName", Customer.getStr("CityName"));
-			map.put("CountyName", Customer.getStr("CountyName"));
-			map.put("PersonName", Customer.getStr("PersonName"));
-//			map.put("ChannelID", Customer.getInt("PersonName"));
-//			map.put("ProvinceID",);
-//			map.put("CityID",);
-//			map.put("CountyID",);
-//			map.put("PersonID", Customer.getInt("PersonID"));
-			map.put("CreateTime", Customer.getStr("CreateTime"));
-			map.put("ModifyTime", Customer.getStr("ModifyTime"));
-			map.put("Flag", 1);
+			Map<String, Object> map = ActivityMaps.customerMap(midIdno.getIdno().toString(), Customer);
 			try {
 				HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ShopInfo", map);
 				midIdno.setIdno(midIdno.getIdno()+1);
 				midIdno.update();
-				Customer1.setMidIdno(midIdno.getIdno());
-				Customer1.update();
+				CustomerInfo.setMidIdno(midIdno.getIdno());
+				CustomerInfo.update();
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
@@ -1110,17 +1196,9 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				JSONObject obj = picList.getJSONObject(a);
 				String domain = OptionQuery.me().findValue("cdn_domain");
 				String savePath = obj.getString("savePath");
+//				String photoId = StrKit.getRandomUUID();
 				list.add(savePath);
-				Map<String, Object>map=new HashMap<>();
-				map.put("PhotoID", savePath);
-				map.put("PhotoSource", "七牛云");
-//				map.put("PhotoSize", "");
-				map.put("PhotoUrl", domain + "/" +savePath);
-//				map.put("Remark", "");
-				map.put("PhotoTime", record.getStr("create_date"));
-				map.put("ApplyTime", new Date());
-				map.put("ModifyTime", new Date());
-				map.put("PhotoType", 1);
+				Map<String, Object> map = ActivityMaps.photoMap(savePath, domain, record.getStr("create_date"));
 				try {
 					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/PhotoInfo", map);
 				} catch (Exception e) {
@@ -1130,185 +1208,5 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			}
 		}
 		return list.toString();
-	}
-	
-	//拼接核销map
-	public Map<String, Object> jointMap(Record YxActivity) {
-		Map<String, Object>map=new HashMap<>();
-		String[] FlowIDNO = YxActivity.getStr("FlowIDNO").split("\\.");
-		map.put("FlowIDNO",Integer.parseInt(FlowIDNO[FlowIDNO.length-1]) );
-//		map.put("ResourceID", "");
-		if (YxActivity.getStr("invest_type").equals(Consts.INVES_PUBLICK)) {
-			//公关赞助
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
-			map.put("Telephone",YxActivity.getStr("Telephone"));
-			map.put("Position",YxActivity.getStr("Position"));
-			map.put("ResourceFlag",1);
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-//			map.put("SignPhoto","");		
-			map.put("Telephone",YxActivity.getStr("Telephone"));
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));
-			map.put("Flag",1);
-//			map.put("ShopOrderID",);
-//			map.put("GiftPhoto","");
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CONSUMPTION_CULTIVATION)) {
-			//消费培育
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("ActivityTime",YxActivity.getStr("ActivityTime"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ActivityAddress",YxActivity.getStr("ActivityAddress"));
-//			map.put("TableNum",);
-//			map.put("DinnerType",);
-			map.put("Telephone",YxActivity.getStr("Telephone"));
-			map.put("Position",YxActivity.getStr("Position"));
-			map.put("ResourceFlag",1);
-			map.put("InvestState",2);
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-//			map.put("ShopOrderID",);
-//			map.put("IntroducerOrderID",);
-//			map.put("IntroducerName","");
-//			map.put("IntroducerTel","");
-//			map.put("SignPhotos","");
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
-			map.put("Flag",1);
-//			map.put("GiftPhoto","");
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_ADVERTISWMENT)) {
-			//终端广告
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-//			map.put("ChannelID",);
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("Num",Integer.parseInt(YxActivity.getStr("Num")));
-			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("InvestState",2);
-			map.put("ResourceFlag",1);
-			map.put("ExecuteManName",YxActivity.getStr("ExecuteManName"));
-			map.put("ExecuteTime",YxActivity.getStr("ExecuteTime"));		
-			map.put("ExecuteState",1);
-//			map.put("ExecuteNum",);
-//			map.put("ExecuteSize","");
-//			map.put("ExecuteRemark","");
-			map.put("WriteOffNum",Integer.parseInt(YxActivity.getStr("Num")));
-//			map.put("WriteOffSize","");
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_TERMINSL_DISPLAY)) {
-			//终端陈列 
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-//			map.put("ChannelID",);
-			map.put("ShopVisitCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
-			map.put("ShopXCJHCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
-			map.put("ResourceFlag",1);
-//			map.put("SignPhotoId","");
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("ShowType",Integer.parseInt(YxActivity.getStr("ShowType")));
-			map.put("BeginTime",YxActivity.getStr("BeginTime"));
-			map.put("EndTime",YxActivity.getStr("EndTime"));
-			map.put("InvestDay",Integer.parseInt(YxActivity.getStr("InvestDay")));
-			map.put("InvestType",1);
-//			map.put("Remark","");
-			map.put("GrantAmount",YxActivity.getBigDecimal("GrantAmount"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
-			map.put("Flag",1);
-			map.put("InvestState",2);
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-			map.put("GrantTime",YxActivity.getStr("CreateTime"));
-			map.put("AuditResult",1);
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CUSTOMER_VISITE)) {
-			//终端客情
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ChannelID",Integer.parseInt(YxActivity.getStr("ChannelID")));
-			map.put("InvestState",2);
-//			map.put("CancleReason","");
-			map.put("ResourceFlag",1);
-//			map.put("CreateManID",);
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-//			map.put("ShopOrderID",111);
-//			map.put("SignPhotos","");
-//			map.put("ModifyManID",);
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));
-			map.put("Flag",1);
-			map.put("ChannelTypeID",1);
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-			map.put("ShopVisitCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
-			map.put("ShopXCJHCount",Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
-//			map.put("OrderMan",);
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-		}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_SUPERMARKET_GIFT)) {
-			//商超赠品
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-//			map.put("ChannelID",);
-			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("InvestState",2);
-			map.put("ResourceFlag",1);
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
-			map.put("Flag",1);
-		}else {
-			//进场费
-			map.put("ProvinceName",YxActivity.getStr("ProvinceName"));
-			map.put("CityName",YxActivity.getStr("CityName"));
-			map.put("CountyName",YxActivity.getStr("CountyName"));
-			map.put("CustomerName",YxActivity.getStr("CustomerName"));
-			map.put("ShopCreateTime",YxActivity.getStr("ShopCreateTime"));
-			map.put("ShopLinkMan",YxActivity.getStr("ShopLinkMan"));
-			map.put("ShopPhone",YxActivity.getStr("ShopPhone"));
-//			map.put("ChannelID",);
-//			map.put("InvestType",);
-			map.put("InvestAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("InvestState",2);
-			map.put("ResourceFlag",1);
-//			map.put("CommodityID",);
-			map.put("CostType",Integer.parseInt(YxActivity.getStr("CostType")));
-//			map.put("ExecuteRemark","");
-			map.put("WriteOffAmount",YxActivity.getBigDecimal("WriteOffAmount"));
-			map.put("CreateManName",YxActivity.getStr("CreateManName"));
-			map.put("CreateTime",YxActivity.getStr("CreateTime"));
-			map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
-			map.put("ModifyTime",YxActivity.getStr("ModifyTime"));		
-			map.put("Flag",1);
-			map.put("ExecuteManName",YxActivity.getStr("ExecuteManName"));
-			map.put("ExecuteTime",YxActivity.getStr("ExecuteTime"));		
-			map.put("ExecuteState",1);
-		}
-		return map;
-		
 	}
 }

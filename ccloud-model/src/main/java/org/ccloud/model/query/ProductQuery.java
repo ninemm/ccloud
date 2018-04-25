@@ -471,5 +471,15 @@ public class ProductQuery extends JBaseQuery {
 	public Product findbyProductSn(String productSn) {
 		return DAO.doFindFirst("product_sn",productSn);
 	}
+
+	public String findCodeBySellerProductId(String id) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT cp.product_sn from cc_product cp LEFT JOIN cc_seller_product cs ON cs.product_id = cp.id ");
+		fromBuilder.append("WHERE cs.id = ? ");
+		Record record = Db.findFirst(fromBuilder.toString(), id);
+		if (record != null) {
+			return record.getStr("product_sn");
+		}
+		return null;
+	}
   	
 }

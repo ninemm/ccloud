@@ -251,7 +251,7 @@ public class ActivityQuery extends JBaseQuery {
 	}
 
 	public Record findYxActivity(String activityApplyId) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT cc.id customerId,ced.item1 ChannelID , ced.item2 ShowType , ca.invest_type , ca.proc_code 'FlowIDNO' ,( SELECT qb.YX_FeeTypeID FROM dict d LEFT JOIN qy_basicfeetype qb ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT cc.id customerId,ced.item1 ChannelID , ced.item2 ShowType , ca.invest_type , ca.proc_code 'FlowIDNO', ca.proc_id 'FlowID',( SELECT qb.FeeTypeID FROM dict d LEFT JOIN qy_basicfeetype qb ");
 		fromBuilder.append("ON d.`name` = qb.FeeTypeName WHERE d.`key` = ced.item1 AND qb.IsEnable = 1) CostType , caa.create_date ActivityTime , cc.customer_name CustomerName , ");
 		fromBuilder.append("CONCAT( cc.prov_name , cc.city_name , cc.country_name , cc.address) ActivityAddress , cc.mobile Telephone , ccv.review_address Position , caa.apply_amount WriteOffAmount ,");
 		fromBuilder.append("u.realname CreateManName , caa.create_date CreateTime , u.realname ModifyManName , caa.create_date ModifyTime , cc.prov_name ProvinceName , cc.city_name CityName ,");
@@ -286,7 +286,7 @@ public class ActivityQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_activity ca on ca.id = a.activity_id ");
 		fromBuilder.append(" LEFT JOIN cc_expense_detail cea on a.expense_detail_id = cea.id ");
 		fromBuilder.append(" LEFT JOIN dict d on d.type=cea.flow_dict_type and d.`value` = cea.item1 ");
-		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` = '"+Consts.ACTIVITY_APPLY_STATUS_PASS+"'");
+		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` in ( '"+Consts.ACTIVITY_APPLY_STATUS_PASS+"','"+Consts.ACTIVITY_APPLY_STATUS_VERIFICATION+"')");
 		fromBuilder.append(" GROUP BY a.id");
 		return Db.find(fromBuilder.toString());
 	}

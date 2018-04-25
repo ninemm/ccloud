@@ -217,7 +217,7 @@
             return false;
         }
 
-        /*if($("#question_desc").val().length==0) {
+        if($("#question_desc").val().length==0) {
             $.toptip('备注描述不能为空', 3000, 'error'); 
             return false;
         }
@@ -225,7 +225,13 @@
         if($("#location").val().length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
-        }*/
+        }
+        
+        var has_size = '${has_size!}';
+        if(has_size == '1' && $("#check_size").val().length==0) {
+            $.toptip('验收尺寸不能为空', 1000, 'error');
+            return false;
+        }
 
         if(imageArr.length == 0){
         	 $.toptip('照片不能为空', 3000, 'error'); 
@@ -404,6 +410,13 @@
                         <input id="address" type="text" name="address" placeholder="联系地址" class="weui-input" readonly="readonly" />
                     </div>
                 </div>
+                
+                <div class="weui-cell" <#if has_size == '0'>style="display:none;"</#if>>
+                    <div class="weui-cell__bd">
+                        <div class="order-customer-info-title">验收尺寸<span class="require">*</span></div>
+                        <input id="check_size" type="text" name="customerVisit.check_size" placeholder="验收尺寸" class="weui-input" value="${check_size!}" <#if check_size??>readonly="readonly"</#if>/>
+                    </div>
+                </div>                
 
                 <div class="weui-cell weui-cell_access select-area">
                     <div class="weui-cell__bd">

@@ -208,6 +208,14 @@ public abstract class BaseActivity<M extends BaseActivity<M>> extends JModel<M> 
 	public String getProcCode() {
 		return getStr("proc_code");
 	}
+	
+	public void setProcId(String procId) {
+		set("proc_id", procId);
+	}
+
+	public String getProcId() {
+		return getStr("proc_id");
+	}
 
 	public void setPlanCode(String planCode) {
 		set("plan_code", planCode);
