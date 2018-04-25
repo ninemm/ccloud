@@ -9,6 +9,10 @@
 
 	$(function(){
 		var index;
+		var activity = "${activity!}";
+		if(activity == ""){
+			$(".activity").hide();
+		}
 		$(document).on("click", ".uploaderFiles li", function() {
 			index = $(this).index();
 			$galleryImg.attr("style", this.getAttribute("style"));
@@ -99,8 +103,7 @@
 		                <input type="text" placeholder="请选择" class="weui-input" value="${DICT_NAME(visit.question_type)!}">
 		            </div>
 		        </div>
-		        
-		        <div class="weui-cell weui-cell_access">
+		        <div class="weui-cell weui-cell_access activity">
 		            <div class="weui-cell__bd">
 		                <div class="order-customer-info-title">
 		                    活动&nbsp;&nbsp;&nbsp;
