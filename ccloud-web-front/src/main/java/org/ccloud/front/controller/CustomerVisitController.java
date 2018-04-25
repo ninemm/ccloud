@@ -3,6 +3,7 @@ package org.ccloud.front.controller;
 import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -275,25 +276,9 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
 		String imageListStore = customerVisit.getPhoto();
-		ExpenseDetail expenseDetail = new ExpenseDetail();
-		if(StrKit.notBlank(customerVisit.getActiveApplyId())) {
-			if(StrKit.notBlank(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId())) {
-				expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId());
-				setAttr("expenseDetail",expenseDetail);
-			}
-		}
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
-		List<Record> findByActivity = CustomerVisitQuery.me().findByActivity(id);
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
-		String activity="";
-		for (Record record : findByActivity) {
-			activity=activity+record.getStr("title")+",";
-		}
-		if (StrKit.notBlank(activity)) {
-			activity = activity.substring(0, activity.length() - 1);  
-		}
-		setAttr("activity", activity);
 		setAttr("visit", visit);
 		setAttr("list",list);
 		setAttr("activityExecutes",activityExecutes);
@@ -426,6 +411,7 @@ public class CustomerVisitController extends BaseFrontController {
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
 		
 		customerVisit.setUserId(user.getId());
+		customerVisit.setVisitUser(user.getRealname());
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
@@ -501,7 +487,7 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	public void complete() {
-		
+		Calendar calendar = Calendar.getInstance();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
@@ -536,7 +522,7 @@ public class CustomerVisitController extends BaseFrontController {
 				String originalPath = qiniuUpload(pic);
 
 				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
-				String waterFont2 = user.getRealname() + "审核" + comment + "    " + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+				String waterFont2 = user.getRealname() + "审核" + comment + "    " + DateUtils.dateToStr(calendar.getTime(), "yyyy-MM-dd HH:mm:ss" );
 				String waterFont3 = location;
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
@@ -563,7 +549,8 @@ public class CustomerVisitController extends BaseFrontController {
 			customerVisit.setReviewLng(new BigDecimal(lng));
 
 		customerVisit.setReviewId(user.getId());
-		customerVisit.setReviewDate(new Date());
+		customerVisit.setReviewUser(user.getRealname());
+		customerVisit.setReviewDate(calendar.getTime());
 		
 		if (StrKit.notBlank(commentDesc))
 			customerVisit.setComment(commentDesc);
@@ -774,6 +761,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		customerVisit.setStatus(Customer.CUSTOMER_BULU);
 		customerVisit.setUserId(user.getId());
+		customerVisit.setVisitUser(user.getRealname());
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
@@ -902,7 +890,7 @@ public class CustomerVisitController extends BaseFrontController {
 				renderAjaxResultForError("操作失败");
 		}
 	}
-
+	@Before(WechatJSSDKInterceptor.class)
 	public void customerVisitWaiting() {
 		
 		keepPara();
@@ -959,6 +947,7 @@ public class CustomerVisitController extends BaseFrontController {
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
 		
 		customerVisit.setUserId(user.getId());
+		customerVisit.setVisitUser(user.getRealname());
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
@@ -1046,6 +1035,19 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		Map<String, Object> map = new HashMap<>();
 		map.put("message", message);
+		renderJson(map);
+	}
+	
+	public void showActivity() {
+		String activityApplyId = getPara("activityApplyId");
+		Record activity = ActivityQuery.me().findByActivityApplyId(activityApplyId);
+		ExpenseDetail expenseDetail = new ExpenseDetail();
+		if(StrKit.notBlank(ActivityApplyQuery.me().findById(activityApplyId).getExpenseDetailId())) {
+			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(activityApplyId).getExpenseDetailId());
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("activity", activity);
+		map.put("expenseDetail", expenseDetail);
 		renderJson(map);
 	}
 	

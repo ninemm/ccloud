@@ -314,4 +314,20 @@ public abstract class BaseCustomerVisit<M extends BaseCustomerVisit<M>> extends 
 	public java.lang.String getActivityExecuteId() {
 		return getStr("activity_execute_id");
 	}
+	
+	public void setVisitUser(java.lang.String visitUser) {
+		set("visit_user", visitUser);
+	}
+
+	public java.lang.String getVisitUser() {
+		return getStr("visit_user");
+	}
+	
+	public void setReviewUser(java.lang.String reviewUser) {
+		set("review_user", reviewUser);
+	}
+
+	public java.lang.String getReviewUser() {
+		return getStr("review_user");
+	}
 }
