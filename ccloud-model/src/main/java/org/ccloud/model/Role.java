@@ -15,6 +15,8 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 
 import org.ccloud.model.base.BaseRole;
@@ -24,8 +26,49 @@ import org.ccloud.model.base.BaseRole;
  */
 @Table(tableName="role",primaryKey="id")
 public class Role extends BaseRole<Role> {
-
 	private static final long serialVersionUID = 1L;
 
-	
+	@Override
+	public boolean save() {
+
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+		return super.save();
+	}
+
+	@Override
+	public boolean saveOrUpdate() {
+
+		removeCache(getId());
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+
+		return super.saveOrUpdate();
+	}
+
+	@Override
+	public boolean update() {
+
+		removeCache(getId());
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+
+		return super.update();
+	}
+
+	@Override
+	public boolean delete() {
+
+		removeCache(getId());
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+
+		return super.delete();
+	}
+
+	@Override
+	public boolean deleteById(Object idValue) {
+
+		removeCache(idValue);
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+
+		return super.deleteById(idValue);
+	}
+
 }

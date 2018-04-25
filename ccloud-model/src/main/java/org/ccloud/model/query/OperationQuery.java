@@ -164,10 +164,13 @@ public class OperationQuery extends JBaseQuery {
 	
 	public List<Record> queryRoleOperation(String id, List<Role> list) {
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder("select m.id, m.module_name, s.name as sys_name,me.module_name as parent_name,o.operation_code,o.operation_name,o.station_id ");
+		StringBuilder sqlBuilder = new StringBuilder("select m.id, m.module_name, s.name as sys_name, ");
+		sqlBuilder.append("me.module_name as parent_name, GROUP_CONCAT(o.id) as operation_code, GROUP_CONCAT(o.operation_name) ");
+		sqlBuilder.append("as operation_name,GROUP_CONCAT(IFNULL(b.role_id,'0')) as station_id ");
 		sqlBuilder.append("from `module` m join `systems` s on s.id = m.system_id join `module` me on me.id = m.parent_id ");
-		sqlBuilder.append("LEFT JOIN( SELECT GROUP_CONCAT(o.id) AS operation_code , GROUP_CONCAT(o.operation_name) AS operation_name , o.module_id , o.id , GROUP_CONCAT(IFNULL(b.role_id , '0')) AS station_id FROM `operation` o ");
-		sqlBuilder.append("LEFT JOIN( SELECT sr.role_id , sr.operation_id FROM role_operation_rel sr WHERE sr.role_id = ?) b ON b.operation_id = o.id GROUP BY o.module_id) o ON o.module_id = m.id ");
+		sqlBuilder.append("left join `operation` o on o.module_id = m.id ");
+		sqlBuilder.append("left join (SELECT sr.role_id,sr.operation_id FROM role_operation_rel sr WHERE sr.role_id = ?) ");
+		sqlBuilder.append("b ON b.operation_id = o.id ");
 		params.add(id);
 		if (list != null && list.size() > 0) { 
 			sqlBuilder.append("LEFT JOIN (SELECT * FROM role_operation_rel ro ");

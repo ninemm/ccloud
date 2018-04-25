@@ -15,6 +15,8 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 
 import com.jfinal.kit.StrKit;
@@ -31,11 +33,45 @@ public class UserGroupRel extends BaseUserGroupRel<UserGroupRel> {
 
 	@Override
     public boolean saveOrUpdate() {
-
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(getUserId()));
         if (null == get(getPrimaryKey())) {
             set("id", StrKit.getRandomUUID());
             return super.save();
         }
         return super.update();
     }
+
+	@Override
+	public boolean save() {
+
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(getUserId()));
+		return super.save();
+	}
+
+	@Override
+	public boolean update() {
+
+		//removeCache(getId());
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(getUserId()));
+
+		return super.update();
+	}
+
+	@Override
+	public boolean delete() {
+
+		//removeCache(getId());
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(getUserId()));
+
+		return super.delete();
+	}
+
+	@Override
+	public boolean deleteById(Object idValue) {
+
+		//removeCache(idValue);
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+
+		return super.deleteById(idValue);
+	}
 }

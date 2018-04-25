@@ -17,12 +17,11 @@ package org.ccloud.model.query;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.ccloud.Consts;
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.Customer;
 import org.ccloud.model.Product;
 import org.ccloud.model.SalesOutstock;
@@ -279,17 +278,29 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	public String getNewSn(String sellerId) {
-		String sql = "SELECT s.outstock_sn FROM cc_sales_outstock s WHERE date(s.create_date) = curdate() AND s.seller_id = ? ORDER BY s.create_date desc";
-		SalesOutstock sales = DAO.findFirst(sql, sellerId);
-		String SN = "";
-		if (sales == null || StringUtils.isBlank(sales.getOutstockSn())) {
-			SN = Consts.SALES_OUT_STOCK_SN;
-		} else {
-			String outstockSn = sales.getOutstockSn();
-			String endSN = StringUtils.substringSN(Consts.SALES_OUT_STOCK_SN,outstockSn );
-			SN = StringUtils.addIntStrAndFillZeros(endSN, 1, 4);
-//			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+		String todayString = DateUtils.dateString();
+		Map<String, String> snMap = (Map<String, String>)JCacheKit.get(SalesOutstock.CACHE_NAME, RedisConsts.REDIS_KEY_SELLER_SALES_OUT_STOCK_SN + sellerId) == null ? new HashMap<String, String>() : (Map<String, String>)JCacheKit.get(SalesOutstock.CACHE_NAME, RedisConsts.REDIS_KEY_SELLER_SALES_OUT_STOCK_SN + sellerId);
+
+		String today = snMap.get(RedisConsts.REDIS_KEY_TODAY);
+		String SN = snMap.get(RedisConsts.REDIS_KEY_SALES_OUT_STOCK_SN);
+
+		if(StrKit.notBlank(SN)){
+			SN = StringUtils.addIntStrAndFillZeros(SN, 1, 4);
 		}
+
+		if(!todayString.equals(today)) {
+			String sql = "SELECT s.outstock_sn FROM cc_sales_outstock s WHERE date(s.create_date) = curdate() AND s.seller_id = ? ORDER BY s.create_date desc";
+			SalesOutstock sales = DAO.findFirst(sql, sellerId);
+			if (sales == null || StringUtils.isBlank(sales.getOutstockSn())) {
+				SN = Consts.SALES_OUT_STOCK_SN;
+			} else {
+				String endSN = StringUtils.substringSN(Consts.SALES_OUT_STOCK_SN, sales.getOutstockSn());
+				SN = StringUtils.addIntStrAndFillZeros(endSN, 1, 4);
+			}
+			snMap.put(RedisConsts.REDIS_KEY_TODAY, todayString);
+		}
+		snMap.put(RedisConsts.REDIS_KEY_SALES_OUT_STOCK_SN, SN);
+		JCacheKit.put(SalesOutstock.CACHE_NAME, RedisConsts.REDIS_KEY_SELLER_SALES_OUT_STOCK_SN + sellerId, snMap);
 		return SN;
 	}
 
@@ -749,5 +760,5 @@ public class SalesOutstockQuery extends JBaseQuery {
 		params.add(endDate);
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
-	
+
 }

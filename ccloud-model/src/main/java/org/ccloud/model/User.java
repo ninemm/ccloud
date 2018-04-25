@@ -15,6 +15,7 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.RedisConsts;
 import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 import org.ccloud.model.query.DepartmentQuery;
@@ -45,6 +46,7 @@ public class User extends BaseUser<User> {
 		removeCache(getMobile());
 		removeCache(getWechatOpenId());
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(User.CACHE_NAME, RedisConsts.REDIS_KEY_USER_LIST + getMobile());
 		return super.save();
 	}
 
@@ -56,6 +58,7 @@ public class User extends BaseUser<User> {
 		removeCache(getMobile());
 		removeCache(getWechatOpenId());
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(User.CACHE_NAME, RedisConsts.REDIS_KEY_USER_LIST + getMobile());
 		
 		return super.saveOrUpdate();
 	}
@@ -68,6 +71,7 @@ public class User extends BaseUser<User> {
 		removeCache(getMobile());
 		removeCache(getWechatOpenId());
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(User.CACHE_NAME, RedisConsts.REDIS_KEY_USER_LIST + getMobile());
 		
 		return super.update();
 	}
@@ -79,6 +83,7 @@ public class User extends BaseUser<User> {
 		removeCache(getMobile());
 		removeCache(getWechatOpenId());
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(User.CACHE_NAME, RedisConsts.REDIS_KEY_USER_LIST + getMobile());
 		
 		return super.delete();
 	}
@@ -88,6 +93,7 @@ public class User extends BaseUser<User> {
 		
 		removeCache(idValue);
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(User.CACHE_NAME, RedisConsts.REDIS_KEY_USER_LIST + getMobile());
 		
 		return super.deleteById(idValue);
 	}

@@ -24,7 +24,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -34,20 +33,16 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.ccloud.Consts;
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.menu.MenuManager;
-import org.ccloud.model.Department;
-import org.ccloud.model.Group;
-import org.ccloud.model.Seller;
-import org.ccloud.model.Station;
-import org.ccloud.model.User;
-import org.ccloud.model.UserGroupRel;
-import org.ccloud.model.UserHistory;
+
+import org.ccloud.model.*;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GroupQuery;
-import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserGroupRelQuery;
@@ -237,6 +232,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 	    	Db.batchSave(userGroupRelList, userGroupRelList.size());
 	    	clearUserCache(user);
+			JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(user.getId()));
 			renderAjaxResultForSuccess("ok");
 		} else {
 			renderAjaxResultForError("false");
@@ -409,6 +405,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		user.setStationId(stationIds);
 		if (user.saveOrUpdate()) {
 			MenuManager.clearListByKey(id);
+			clearUserCache(UserQuery.me().findById(id));
 			renderAjaxResultForSuccess("保存成功");
 		} else {
 			renderAjaxResultForError("保存失败");
@@ -477,6 +474,8 @@ public class _UserController extends JBaseCRUDController<User> {
 				userGroupRelList.add(userGroupRel);
 			}
 	    	Db.batchSave(userGroupRelList, userGroupRelList.size());
+		    clearUserCache(UserQuery.me().findById(id));
+		    JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(id));
 			renderAjaxResultForSuccess("保存成功");
 		}else {
 			  for (UserGroupRel userGroupRel : userGroupRels) {
@@ -490,6 +489,8 @@ public class _UserController extends JBaseCRUDController<User> {
 				  userGroupRelList.add(userGroupRel);
 			}
 		    Db.batchSave(userGroupRelList, userGroupRelList.size());
+		    clearUserCache(UserQuery.me().findById(id));
+		    JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(id));
 			renderAjaxResultForSuccess("保存成功");
 		}
 	}
@@ -535,23 +536,37 @@ public class _UserController extends JBaseCRUDController<User> {
 				if(excel.getMobile()==null) {
 					break;
 				}
+				
+				User user00 = new User();
+				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
+				for(User user01:uss) {
+					if(!user01.getWechatOpenId().equals("")) {
+						user00 = user01;
+						break;
+					}
+				}
 				// 检查用户是否存在
 				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 				if (us == null) {
 					us = new User();
 					userId = StrKit.getRandomUUID();
-					us.set("id", userId);
+					us.setId(userId);
 					this.setUser(us, excel);
-					us.set("create_date", new Date());
-					us.set("group_name",excel.getUserGroup());
-					us.set("username", excel.getUsername());
+					us.setCreateDate(new Date());
+					us.setGroupName(excel.getUserGroup());
+					us.setUsername(excel.getUsername());
 					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
-					us.set("data_area", dataArea);
-					us.set("salt", EncryptUtils.salt());
-					us.set("password", EncryptUtils.encryptPassword("123456", us.getSalt()));
-					us.set("department_id", deptId);
-					us.set("department_name", dept.getDeptName());
+					us.setDataArea(dataArea);
+					if(user00 != null) {
+						us.setWechatOpenId(user00.getWechatOpenId());
+						us.setAvatar(user00.getAvatar());
+						us.setNickname(user00.getNickname());
+					}
+					us.setSalt(EncryptUtils.salt());
+					us.setPassword(EncryptUtils.encryptPassword("123456", us.getSalt()));
+					us.setDepartmentId(deptId);
+					us.setDepartmentName(dept.getDeptName());
 					us.save();
 					
 					userGroupRel = new UserGroupRel();

@@ -41,7 +41,7 @@ import org.ccloud.model.ReceivablesDetail;
 import org.ccloud.model.query.ReceivablesDetailQuery;
 import org.ccloud.model.Receiving;
 import org.ccloud.model.query.ReceivingQuery;
-import org.ccloud.model.query.SalesOutstockQuery;
+//import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.receivablesExcel;
 import org.ccloud.model.User;
@@ -122,7 +122,8 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		String ref_type = getPara("ref_type");
 		String object_id = getPara("object_id");
 		String balance_amount = getPara("balance_amount");
-		Record salesOutstock = SalesOutstockQuery.me().findMoreBySn(ref_sn);
+		String receive_amount = getPara("receive_amount");
+//		Record salesOutstock = SalesOutstockQuery.me().findMoreBySn(ref_sn);
 		Receivables receivables = new Receivables();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
@@ -131,7 +132,7 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		for(int i = 0; i < page.getList().size(); i++) {
 			actAmount = actAmount.add(page.getList().get(i).getActAmount());
 		}
-		balance_amount = (new BigDecimal(salesOutstock.getStr("total_amount")).subtract(actAmount)).toString();
+		balance_amount = (new BigDecimal(receive_amount).subtract(actAmount)).toString();
 		//通过客户Id找到应收账款主表ID
 //		if("1".equals(type)) {
 		receivables = ReceivablesQuery.me().findByObjId(object_id, Consts.RECEIVABLES_OBJECT_TYPE_CUSTOMER);

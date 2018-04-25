@@ -176,12 +176,14 @@ public class SellerQuery extends JBaseQuery {
 		String sql="SELECT s.* from cc_seller s join department d on s.dept_id = d.id where data_area = ?";
 		return DAO.findFirst(sql,dataArea);
 	}
-	
+
 	public List<Record> findDeptByLevel(){
 		StringBuilder sql = new StringBuilder("SELECT d.data_area id,d.dept_name text from department d LEFT JOIN cc_seller cs ON cs.dept_id = d.id WHERE d.dept_level IN(1 , 2) AND d.qywx_deptid is NOT NULL  AND cs.id IS NOT NULL ");
 		return Db.find(sql.toString());
 	}
-	
-	
-	
+
+	public Record _findByOrderId(String orderId) {
+		String sql="SELECT s.id FROM cc_sales_order so LEFT JOIN cc_customer_type ct ON ct.id = so.customer_type_id LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id LEFT JOIN cc_seller s ON s.customer_id = sc.customer_id WHERE so.id =?";
+		return Db.findFirst(sql,orderId);
+	}
 }

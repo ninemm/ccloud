@@ -582,5 +582,49 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			sqlBuilder.append(" ORDER BY cso.biz_user_id");
 			return Db.find(sqlBuilder.toString(), params.toArray());
 		}
+
+		public List<Record> findSellerOutStockByDataArea(String dataArea, String keyword, String startDate,
+				String endDate, String isGift) {
+			LinkedList<Object> params = new LinkedList<Object>();
+			StringBuilder sqlBuilder = new StringBuilder("SELECT o.sell_product_id, csp.custom_name,s.id sellerId,s.seller_name,FORMAT((o.product_count - IFNULL(t1.product_count,0))/cp.convert_relate,2) as count,o.is_gift ");
+			sqlBuilder.append(" FROM cc_sales_outstock_detail o");
+			sqlBuilder.append(" LEFT JOIN cc_sales_outstock cs ON o.outstock_id = cs.id");
+			sqlBuilder.append(" LEFT JOIN cc_sales_order_join_outstock cj ON cj.outstock_id = cs.id");
+			sqlBuilder.append(" LEFT JOIN cc_sales_order cso ON cso.id = cj.order_id");
+			sqlBuilder.append(" LEFT JOIN cc_seller_product csp ON o.sell_product_id = csp.id");
+			sqlBuilder.append(" LEFT JOIN cc_product cp ON csp.product_id = cp.id");
+			sqlBuilder.append(" LEFT JOIN cc_seller s ON s.id = csp.seller_id");
+			sqlBuilder.append(" LEFT JOIN ( SELECT cs.seller_id,o.sell_product_id,o.product_count,o.is_gift FROM cc_sales_refund_instock_detail o");
+			sqlBuilder.append(" LEFT JOIN cc_sales_refund_instock cs ON cs.id = o.refund_instock_id");
+			sqlBuilder.append(" WHERE cs.status in (?, ?) AND o.data_area LIKE ?");
+			sqlBuilder.append(" AND cs.biz_date >= ? AND cs.biz_date <= ?");
+			if (isGift.equals("0")) {
+				sqlBuilder.append(" AND o.is_gift = 0");
+			} else {
+				sqlBuilder.append(" AND o.is_gift = 1");
+			}
+			params.add(startDate);
+			params.add(endDate);			
+			params.add(Consts.SALES_REFUND_INSTOCK_PART_OUT);
+			params.add(Consts.SALES_REFUND_INSTOCK_ALL_OUT);
+			params.add(dataArea);
+			sqlBuilder.append(" GROUP BY o.sell_product_id, cs.seller_id,o.is_gift");
+			sqlBuilder.append(" ) t1 on t1.seller_id = cso.seller_id AND t1.sell_product_id = o.sell_product_id AND t1.is_gift = o.is_gift");
+			sqlBuilder.append(" WHERE o.data_area LIKE ?");
+			params.add(dataArea);
+			sqlBuilder.append(" AND cs.biz_date >= ? AND cs.biz_date <= ?");
+			params.add(startDate);
+			params.add(endDate);
+			if (isGift.equals("0")) {
+				sqlBuilder.append(" AND o.is_gift = 0");
+			} else {
+				sqlBuilder.append(" AND o.is_gift = 1");
+			}		
+			sqlBuilder.append(" AND cs.status != ?");
+			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+			sqlBuilder.append(" GROUP BY o.sell_product_id, cso.seller_id,o.is_gift");
+			sqlBuilder.append(" ORDER BY cso.biz_user_id");
+			return Db.find(sqlBuilder.toString(), params.toArray());
+		}
 	
 }

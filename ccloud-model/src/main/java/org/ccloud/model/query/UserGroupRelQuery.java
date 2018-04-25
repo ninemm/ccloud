@@ -15,9 +15,15 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
+import org.ccloud.model.Role;
+import org.ccloud.model.User;
 import org.ccloud.model.UserGroupRel;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -73,6 +79,15 @@ public class UserGroupRelQuery extends JBaseQuery {
 	
 	public int deleteByGroupId(String groupId) {
 
+		// 删除组下的所有用户的角色redis
+		List<User> groupUsers = UserQuery.me().findByGroupId(groupId);
+		if(!CollectionUtils.isEmpty(groupUsers)) {
+			User groupUser = null;
+			for (Iterator<User> iterator = groupUsers.iterator(); iterator.hasNext();) {
+				groupUser = iterator.next();
+				JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(groupUser.getId()));
+			}
+		}
         return DAO.doDelete(" group_id = ?", groupId);
     }
 

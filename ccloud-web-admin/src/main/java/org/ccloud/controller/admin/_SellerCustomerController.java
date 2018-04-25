@@ -925,8 +925,14 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", status);
-		workFlowService.completeTask(taskId, comment, var);
-
+		
+		int completeTask = workFlowService.completeTask(taskId, comment, var);
+		if (completeTask==1) {
+			renderAjaxResultForError("已审核");
+			return;
+		}
+		
+		
 		Message message = new Message();
 		message.setSellerId(sellerId);
 		message.setContent(comment);
