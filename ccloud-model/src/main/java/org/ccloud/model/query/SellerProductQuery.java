@@ -243,8 +243,8 @@ public class SellerProductQuery extends JBaseQuery {
 		stringBuilder.append(" FROM cc_seller s  ");
 		stringBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.seller_id=s.id ");
 		stringBuilder.append(" LEFT JOIN cc_product p ON sp.product_id =p.id ");
-		stringBuilder.append(" WHERE s.id='"+sellerId+"'");
-		return  Db.find(stringBuilder.toString());
+		stringBuilder.append(" WHERE s.id = ?");
+		return  Db.find(stringBuilder.toString(), sellerId);
 		
 	}
 	
