@@ -21,7 +21,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.plugin.redis.Redis;
 import org.ccloud.Consts;
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.Department;
@@ -564,21 +567,26 @@ public class DepartmentQuery extends JBaseQuery {
 	}
 
 	public List<Department> findAllParentDepartmentsBySubDeptId(String subDeptId) {
-		StringBuilder sql = new StringBuilder("SELECT d2.id, d2.dept_name, d2.dept_level, d2.parent_id, d2.data_area, s.id as seller_id, s.seller_name, s.seller_code, s.has_store, s.seller_type");
-		sql.append(" FROM (");
-		sql.append(" SELECT @r as _id,");
-		sql.append(" 	(SELECT @r := parent_id FROM department WHERE id = _id) AS p_id,");
-		sql.append(" 	@l := @l + 1 AS lvl ");
-		sql.append(" FROM");
-		sql.append(" 	(SELECT @r := ?, @l := 0) vars, department h");
-		sql.append(" WHERE @r > '0' ");
-		sql.append(" ) d1");
-		sql.append(" JOIN department d2 ON d1._id = d2.id");
-		sql.append(" JOIN cc_seller s on d2.id = s.dept_id");
+
+		List<Department> deptList = JCacheKit.get(Department.CACHE_NAME, RedisConsts.REDIS_KEY_ALL_PARENT_DEPTS + subDeptId);
+		if(deptList == null) {
+			StringBuilder sql = new StringBuilder("SELECT d2.id, d2.dept_name, d2.dept_level, d2.parent_id, d2.data_area, s.id as seller_id, s.seller_name, s.seller_code, s.has_store, s.seller_type");
+			sql.append(" FROM (");
+			sql.append(" SELECT @r as _id,");
+			sql.append(" 	(SELECT @r := parent_id FROM department WHERE id = _id) AS p_id,");
+			sql.append(" 	@l := @l + 1 AS lvl ");
+			sql.append(" FROM");
+			sql.append(" 	(SELECT @r := ?, @l := 0) vars, department h");
+			sql.append(" WHERE @r > '0' ");
+			sql.append(" ) d1");
+			sql.append(" JOIN department d2 ON d1._id = d2.id");
+			sql.append(" JOIN cc_seller s on d2.id = s.dept_id");
 //		sql.append(" WHERE d2.parent_id > '0'");
-		sql.append(" ORDER BY d2.dept_level desc");
-		
-		return DAO.find(sql.toString(), subDeptId);
+			sql.append(" ORDER BY d2.dept_level desc");
+			deptList = DAO.find(sql.toString(), subDeptId);
+			JCacheKit.put(Department.CACHE_NAME, RedisConsts.REDIS_KEY_ALL_PARENT_DEPTS + subDeptId, deptList);
+		}
+		return deptList;
 	}
 
 	public List<Map<String, Object>> findUserTree(String id) {

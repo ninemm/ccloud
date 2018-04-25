@@ -22,6 +22,8 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 
 import org.ccloud.Consts;
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.User;
 import org.ccloud.utils.EncryptUtils;
 
@@ -123,10 +125,16 @@ public class UserQuery extends JBaseQuery {
 	}
 	
 	public List<User> findByMobile(String mobile) {
-		StringBuilder sqlBuilder = new StringBuilder("select * ");
-		sqlBuilder.append("from `user` ");
-		sqlBuilder.append("where mobile = ? AND status = 1");
-		return DAO.find(sqlBuilder.toString(), mobile);
+		List<User> userList = JCacheKit.get(User.CACHE_NAME,RedisConsts.REDIS_KEY_USER_LIST + mobile);
+		if(userList == null) {
+			StringBuilder sqlBuilder = new StringBuilder("select * ");
+			sqlBuilder.append("from `user` ");
+			sqlBuilder.append("where mobile = ? AND status = 1");
+			userList = DAO.find(sqlBuilder.toString(), mobile);
+			JCacheKit.put(User.CACHE_NAME,RedisConsts.REDIS_KEY_USER_LIST + mobile, userList);
+		}
+
+		return userList;
 	}
 	
 //	public List<User> findByMobile(final String mobile) {
@@ -357,7 +365,7 @@ public class UserQuery extends JBaseQuery {
 	public boolean resetPasswordById(String id) {
 		User user = findById(id);
 		user.setPassword(EncryptUtils.encryptPassword(Consts.USER_DEFAULT_PASSWORD, user.getSalt()));
-		return user.update(); 
+		return user.update();
 	}
 	
 	public List<User> _findByMobile(String mobile) {

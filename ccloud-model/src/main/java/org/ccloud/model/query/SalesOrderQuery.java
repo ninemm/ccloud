@@ -16,15 +16,16 @@
 package org.ccloud.model.query;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.jfinal.plugin.redis.Redis;
 import org.ccloud.Consts;
+import org.ccloud.RedisConsts;
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.Receivables;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SalesOrderDetail;
+import org.ccloud.model.SalesOutstock;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
@@ -338,15 +339,30 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public String getNewSn(String sellerId) {
-		String sql = "SELECT s.order_sn FROM cc_sales_order s WHERE date(s.create_date) = curdate() AND s.seller_id = ? ORDER BY s.create_date desc";
-		SalesOrder sales = DAO.findFirst(sql, sellerId);
-		String SN = "";
-		if (sales == null || StringUtils.isBlank(sales.getOrderSn())) {
-			SN = Consts.SALES_ORDER_SN;
-		} else {
-			String endSN = StringUtils.substringSN(Consts.SALES_ORDER_SN, sales.getOrderSn());
-			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+		String todayString = DateUtils.dateString();
+		Map<String, String> snMap = (Map<String, String>) JCacheKit.get(SalesOrder.CACHE_NAME, RedisConsts.REDIS_KEY_SELLER_SALES_ORDER_SN + sellerId) == null ? new HashMap<String, String>() : (Map<String, String>)JCacheKit.get(SalesOrder.CACHE_NAME, RedisConsts.REDIS_KEY_SELLER_SALES_ORDER_SN + sellerId);
+
+		String today = snMap.get(RedisConsts.REDIS_KEY_TODAY);
+		String SN = snMap.get(RedisConsts.REDIS_KEY_SALES_ORDER_SN);
+
+		if(StrKit.notBlank(SN)){
+			SN = new BigDecimal(SN).add(new BigDecimal(1)).toString();
 		}
+
+		if(!todayString.equals(today)) {
+			String sql = "SELECT s.order_sn FROM cc_sales_order s WHERE date(s.create_date) = curdate() AND s.seller_id = ? ORDER BY s.create_date desc";
+			SalesOrder sales = DAO.findFirst(sql, sellerId);
+			if (sales == null || StringUtils.isBlank(sales.getOrderSn())) {
+				SN = Consts.SALES_ORDER_SN;
+			} else {
+				String endSN = StringUtils.substringSN(Consts.SALES_ORDER_SN, sales.getOrderSn());
+				SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
+			}
+			snMap.put(RedisConsts.REDIS_KEY_TODAY, todayString);
+		}
+		snMap.put(RedisConsts.REDIS_KEY_SALES_ORDER_SN, SN);
+		JCacheKit.put(SalesOrder.CACHE_NAME, RedisConsts.REDIS_KEY_SELLER_SALES_ORDER_SN + sellerId, snMap);
+
 		return SN;
 	}
 

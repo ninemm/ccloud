@@ -529,6 +529,37 @@
            memoryStoreEvictionPolicy="LFU"
            transactionalMode="off"
     />
+
+    <cache name="cc_sales_order"
+           maxEntriesLocalHeap="10000"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+    />
+
+    <cache name="cc_sales_outstock"
+           maxEntriesLocalHeap="10000"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+    />
+
+    <cache name="cc_sales_refund_instock"
+           maxEntriesLocalHeap="10000"
+           eternal="false"
+           overflowToDisk="true"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off"
+    />
+
 	<cache name="cc_inventory"
 		   maxEntriesLocalHeap="10000"
 		   eternal="false"

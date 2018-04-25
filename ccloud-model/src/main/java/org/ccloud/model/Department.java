@@ -15,6 +15,7 @@
  */
 package org.ccloud.model;
 
+import org.ccloud.RedisConsts;
 import org.ccloud.cache.JCacheKit;
 import org.ccloud.model.core.Table;
 
@@ -48,6 +49,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		clearList();
 		
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, RedisConsts.REDIS_KEY_ALL_PARENT_DEPTS + getId());
 		return super.save();
 	}
 
@@ -58,6 +60,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		
 		removeCache(getId());
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, RedisConsts.REDIS_KEY_ALL_PARENT_DEPTS + getId());
 		
 		return super.saveOrUpdate();
 	}
@@ -69,6 +72,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		
 		removeCache(getId());
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, RedisConsts.REDIS_KEY_ALL_PARENT_DEPTS + getId());
 		
 		return super.update();
 	}
@@ -80,6 +84,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		
 		removeCache(getId());
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, RedisConsts.REDIS_KEY_ALL_PARENT_DEPTS + getId());
 		
 		return super.delete();
 	}
@@ -91,6 +96,7 @@ public class Department extends BaseDepartment<Department> implements ISortModel
 		
 		removeCache(idValue);
 		JCacheKit.remove(Department.CACHE_NAME, CACHE_KEY);
+		JCacheKit.remove(Department.CACHE_NAME, RedisConsts.REDIS_KEY_ALL_PARENT_DEPTS + getId());
 		
 		return super.deleteById(idValue);
 	}
