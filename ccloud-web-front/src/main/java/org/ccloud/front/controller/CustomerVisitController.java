@@ -3,6 +3,7 @@ package org.ccloud.front.controller;
 import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -426,6 +427,7 @@ public class CustomerVisitController extends BaseFrontController {
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
 		
 		customerVisit.setUserId(user.getId());
+		customerVisit.setVisitUser(user.getRealname());
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
@@ -501,7 +503,7 @@ public class CustomerVisitController extends BaseFrontController {
 	}
 
 	public void complete() {
-		
+		Calendar calendar = Calendar.getInstance();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
@@ -536,7 +538,7 @@ public class CustomerVisitController extends BaseFrontController {
 				String originalPath = qiniuUpload(pic);
 
 				String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
-				String waterFont2 = user.getRealname() + "审核" + comment + "    " + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+				String waterFont2 = user.getRealname() + "审核" + comment + "    " + DateUtils.dateToStr(calendar.getTime(), "yyyy-MM-dd HH:mm:ss" );
 				String waterFont3 = location;
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
@@ -563,7 +565,8 @@ public class CustomerVisitController extends BaseFrontController {
 			customerVisit.setReviewLng(new BigDecimal(lng));
 
 		customerVisit.setReviewId(user.getId());
-		customerVisit.setReviewDate(new Date());
+		customerVisit.setReviewUser(user.getRealname());
+		customerVisit.setReviewDate(calendar.getTime());
 		
 		if (StrKit.notBlank(commentDesc))
 			customerVisit.setComment(commentDesc);
@@ -769,6 +772,7 @@ public class CustomerVisitController extends BaseFrontController {
 		
 		customerVisit.setStatus(Customer.CUSTOMER_BULU);
 		customerVisit.setUserId(user.getId());
+		customerVisit.setVisitUser(user.getRealname());
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);
@@ -954,6 +958,7 @@ public class CustomerVisitController extends BaseFrontController {
 		else customerVisit.setStatus(Customer.CUSTOMER_NORMAL);
 		
 		customerVisit.setUserId(user.getId());
+		customerVisit.setVisitUser(user.getRealname());
 		customerVisit.setDataArea(user.getDataArea());
 		customerVisit.setDeptId(user.getDepartmentId());
 		customerVisit.setActiveApplyId(activityApplyId);

@@ -59,10 +59,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 	public Page<CustomerVisit> paginate(int pageNumber, int pageSize, String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status,String bizUserId) {
 		
-		String select = "select cc_v.*,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId ";
+		String select = "select cc_v.*,cc.customer_name,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId ";
 		boolean needWhere = true;
 		StringBuilder fromBuilder = new StringBuilder("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id ");
-		fromBuilder.append("left join `user` u on u.id = cc_v.review_id left join cc_customer_join_customer_type cc_ct on cc_ct.seller_customer_id = cc_s.id left join cc_customer_type cc_t on cc_t.id = cc_ct.customer_type_id ");
+		fromBuilder.append("left join cc_customer_join_customer_type cc_ct on cc_ct.seller_customer_id = cc_s.id left join cc_customer_type cc_t on cc_t.id = cc_ct.customer_type_id ");
 		fromBuilder.append("left join dict d on d.value = cc_v.question_type ");
 		fromBuilder.append("left JOIN act_ru_task art on cc_v.proc_inst_id = art.PROC_INST_ID_ ");
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -162,9 +162,11 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 
 	public CustomerVisit findMoreById(String id) {
-		StringBuilder sql = new StringBuilder("SELECT ccv.*,cc.prov_name,cc.city_name,cc.country_name,cc.address ,cc.customer_name, cc.contact, cc.mobile, u.realname, u.mobile as userMobile, d.name as typeName, t1.title, t1.name as expenseDetailName,t1.activitApplyId ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.id,ccv.user_id,ccv.visit_user realname,ccv.seller_customer_id,ccv.question_type,ccv.question_desc,ccv.advice,ccv.photo,ccv.vedio,ccv.lng,ccv.lat,ccv.location,ccv.review_id,");
+		sql.append("ccv.review_user,ccv.solution,ccv.comment,ccv.review_lng,ccv.review_lat,ccv.review_address,ccv.review_date,ccv.image_list_store,ccv.status,ccv.proc_def_key,ccv.proc_inst_id,ccv.dept_id,ccv.data_area,");
+		sql.append("ccv.create_date,ccv.modify_date,ccv.active_apply_id,ccv.activity_execute_id,");
+		sql.append("cc.prov_name,cc.city_name,cc.country_name,cc.address ,cc.customer_name, cc.contact, cc.mobile, d.name as typeName, t1.title, t1.name as expenseDetailName,t1.activitApplyId ");
 		sql.append("FROM cc_customer_visit ccv ");
-		sql.append("LEFT JOIN user u ON ccv.user_id = u.id ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
 		sql.append("LEFT JOIN dict d ON ccv.question_type = d.value ");
@@ -271,9 +273,9 @@ public class CustomerVisitQuery extends JBaseQuery {
 	
 	public List<Record> exportVisit(String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status,String bizUserId){
 
-		StringBuilder fromBuilder = new StringBuilder("select cc_v.*,(select `name` from dict where type='customer_audit' and `value`=cc_v.`status`) visitStatus,cc.customer_name,(select realname from `user` where id = cc_v.user_id) visit_user,u.realname review_user,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId,cc.mobile customerMobile ");
+		StringBuilder fromBuilder = new StringBuilder("select cc_v.*,(select `name` from dict where type='customer_audit' and `value`=cc_v.`status`) visitStatus,cc.customer_name,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId,cc.mobile customerMobile ");
 		fromBuilder.append("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id ");
-		fromBuilder.append("left join `user` u on u.id = cc_v.review_id left join cc_customer_join_customer_type cc_ct on cc_ct.seller_customer_id = cc_s.id left join cc_customer_type cc_t on cc_t.id = cc_ct.customer_type_id ");
+		fromBuilder.append("left join cc_customer_join_customer_type cc_ct on cc_ct.seller_customer_id = cc_s.id left join cc_customer_type cc_t on cc_t.id = cc_ct.customer_type_id ");
 		fromBuilder.append("left join dict d on d.value = cc_v.question_type ");
 		fromBuilder.append("left JOIN act_ru_task art on cc_v.proc_inst_id = art.PROC_INST_ID_ ");
 		fromBuilder.append("where cc_v.data_area like '"+dataArea+"' ");
@@ -308,7 +310,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 	public List<Record> findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea){
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sql = new StringBuilder("SELECT ccv.id, u.realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.visit_user realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
 
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = ccv.seller_customer_id ");
@@ -321,7 +323,6 @@ public class CustomerVisitQuery extends JBaseQuery {
 		appendIfNotEmptyWithLike(sql, "c1.data_area", dealerDataArea, params, true);
 		sql.append("GROUP BY c1.id) t1 ON t1.id = csc.id ");
 
-		sql.append("LEFT JOIN `user` u ON u.id = ccv.user_id ");
 		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
 
 		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
@@ -329,7 +330,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		appendIfNotEmptyWithLike(sql,"t1.customerTypeNames", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
 
-		sql.append("GROUP BY u.realname, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
+		sql.append("GROUP BY ccv.visit_user, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
 		sql.append("ORDER BY ccv.create_date ");
 
 		return Db.find(sql.toString(), params.toArray());
@@ -338,7 +339,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 	public List<Record> _findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea){
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sql = new StringBuilder("SELECT ccv.id, u.realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.visit_user realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
 
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = ccv.seller_customer_id ");
@@ -347,7 +348,6 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_customer_join_customer_type cjct ON csc.id = cjct.seller_customer_id ");
 		sql.append("LEFT JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
 
-		sql.append("LEFT JOIN `user` u ON u.id = ccv.user_id ");
 		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
 
 		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
@@ -355,7 +355,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		appendIfNotEmptyWithLike(sql,"ct.id", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
 
-		sql.append("GROUP BY u.realname, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
+		sql.append("GROUP BY ccv.visit_user, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
 		sql.append("ORDER BY ccv.create_date ");
 
 		return Db.find(sql.toString(), params.toArray());
@@ -363,13 +363,17 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 	public List<Record> findLngLat(String userId, String startDate, String endDate, String status) {
 
-		StringBuilder sql = new StringBuilder("SELECT ccv.*, cc.customer_name ,u.realname, " +
-				"GROUP_CONCAT(cct.`name`) as customerTypeName, d.name ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.id,ccv.user_id,ccv.visit_user realname,");
+		sql.append("ccv.seller_customer_id,ccv.question_type,ccv.question_desc,ccv.advice,");
+		sql.append("ccv.photo,ccv.vedio,ccv.lng,ccv.lat,ccv.location,ccv.review_id,ccv.review_user,");
+		sql.append("ccv.solution,ccv.comment,ccv.review_lng,ccv.review_lat,ccv.review_address,ccv.review_date,");
+		sql.append("ccv.image_list_store,ccv.status,ccv.proc_def_key,ccv.proc_inst_id,ccv.dept_id,ccv.data_area,");
+		sql.append("ccv.create_date,ccv.modify_date,ccv.active_apply_id,ccv.activity_execute_id, ");
+		sql.append("cc.customer_name ,GROUP_CONCAT(cct.`name`) as customerTypeName, d.name ");
 		sql.append("FROM cc_customer_visit ccv ");
 
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
-		sql.append("LEFT JOIN `user` u ON ccv.user_id = u.id ");
 		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON ccjct.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer_type cct ON cct.id = ccjct.customer_type_id ");
 		sql.append("LEFT JOIN dict d ON d.`value` = ccv.question_type ");
@@ -387,8 +391,14 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 	
 	public List<CustomerVisit> findByDataArea(String dataArea){
-		String sql = "select v.* ,u.realname from cc_customer_visit v LEFT JOIN `user` u on u.id = v.user_id where v.data_area like '"+dataArea+"' GROUP BY v.user_id";
-		return DAO.find(sql);
+		StringBuilder sql = new StringBuilder("SELECT ccv.id,ccv.user_id,ccv.visit_user realname,");
+		sql.append("ccv.seller_customer_id,ccv.question_type,ccv.question_desc,ccv.advice,");
+		sql.append("ccv.photo,ccv.vedio,ccv.lng,ccv.lat,ccv.location,ccv.review_id,ccv.review_user,");
+		sql.append("ccv.solution,ccv.comment,ccv.review_lng,ccv.review_lat,ccv.review_address,ccv.review_date,");
+		sql.append("ccv.image_list_store,ccv.status,ccv.proc_def_key,ccv.proc_inst_id,ccv.dept_id,ccv.data_area,");
+		sql.append("ccv.create_date,ccv.modify_date,ccv.active_apply_id,ccv.activity_execute_id ");
+		sql.append("from cc_customer_visit ccv where ccv.data_area like ? GROUP BY ccv.user_id");
+		return DAO.find(sql.toString(), dataArea);
 	}
 	
 	//查询被拜访的客户数
