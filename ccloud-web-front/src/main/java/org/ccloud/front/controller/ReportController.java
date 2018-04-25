@@ -57,7 +57,7 @@ public class ReportController extends BaseFrontController {
 		String endDate =  date + " 23:59:59";
 
 		int orderCount = SalesOrderQuery.me().findOrderCount(selectDataArea, startDate, endDate);
-		int customerCount = SellerCustomerQuery.me().getMySellerNum(selectDataArea);
+		long customerCount = SellerCustomerQuery.me().findCustomerCount(selectDataArea);
 		setAttr("orderNum", orderCount);
 		setAttr("customerNum", customerCount);	
 		render("report.html");
