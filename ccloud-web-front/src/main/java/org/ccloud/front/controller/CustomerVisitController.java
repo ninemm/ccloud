@@ -276,25 +276,9 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
 		String imageListStore = customerVisit.getPhoto();
-		ExpenseDetail expenseDetail = new ExpenseDetail();
-		if(StrKit.notBlank(customerVisit.getActiveApplyId())) {
-			if(StrKit.notBlank(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId())) {
-				expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(customerVisit.getActiveApplyId()).getExpenseDetailId());
-				setAttr("expenseDetail",expenseDetail);
-			}
-		}
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
-		List<Record> findByActivity = CustomerVisitQuery.me().findByActivity(id);
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
-		String activity="";
-		for (Record record : findByActivity) {
-			activity=activity+record.getStr("title")+",";
-		}
-		if (StrKit.notBlank(activity)) {
-			activity = activity.substring(0, activity.length() - 1);  
-		}
-		setAttr("activity", activity);
 		setAttr("visit", visit);
 		setAttr("list",list);
 		setAttr("activityExecutes",activityExecutes);
@@ -906,7 +890,7 @@ public class CustomerVisitController extends BaseFrontController {
 				renderAjaxResultForError("操作失败");
 		}
 	}
-
+	@Before(WechatJSSDKInterceptor.class)
 	public void customerVisitWaiting() {
 		
 		keepPara();
@@ -1051,6 +1035,19 @@ public class CustomerVisitController extends BaseFrontController {
 		}
 		Map<String, Object> map = new HashMap<>();
 		map.put("message", message);
+		renderJson(map);
+	}
+	
+	public void showActivity() {
+		String activityApplyId = getPara("activityApplyId");
+		Record activity = ActivityQuery.me().findByActivityApplyId(activityApplyId);
+		ExpenseDetail expenseDetail = new ExpenseDetail();
+		if(StrKit.notBlank(ActivityApplyQuery.me().findById(activityApplyId).getExpenseDetailId())) {
+			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(activityApplyId).getExpenseDetailId());
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("activity", activity);
+		map.put("expenseDetail", expenseDetail);
 		renderJson(map);
 	}
 	
