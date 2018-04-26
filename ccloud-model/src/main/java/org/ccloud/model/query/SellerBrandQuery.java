@@ -75,7 +75,11 @@ public class SellerBrandQuery extends JBaseQuery {
 		return 0;
 	}
 
-		public int deleteBySellertId(String id){
-			return DAO.doDelete("seller_id = ?", id);
-		}
+	public int deleteBySellertId(String id){
+		return DAO.doDelete("seller_id = ?", id);
+	}
+		
+	public List<SellerBrand> findSellersByBrandId(String brandId) {
+		return DAO.doFind("brand_id = ?", brandId);
+	}
 }

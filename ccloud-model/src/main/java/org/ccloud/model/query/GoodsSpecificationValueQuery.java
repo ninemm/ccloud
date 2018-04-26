@@ -133,4 +133,7 @@ public class GoodsSpecificationValueQuery extends JBaseQuery {
 		return sInfoList;
 	}	
 	
+	public GoodsSpecificationValue findByName(String goodsSpecificationId, String name) {
+		return DAO.doFindFirst("goods_specification_id = ? and name = ?", goodsSpecificationId, name);
+	}
 }

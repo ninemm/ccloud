@@ -15,7 +15,6 @@
  */
 package org.ccloud.controller.admin;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -154,11 +153,7 @@ public class _MenuController extends JBaseCRUDController<Menu> {
     public void permission() {
         String id = getPara("id");
         setAttr("id", getPara("id"));
-        try {
-			setAttr("menu_name", new String(getPara("menuName").getBytes("ISO-8859-1"),"UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+        setAttr("menu_name", new String(getPara("menuName")));
         List<Record> list = OperationQuery.me().queryMenuOperation(id);
         List<ModuleInfo> moduleList = new ArrayList<>();
         List<String> system = new ArrayList<>();
