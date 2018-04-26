@@ -120,9 +120,12 @@
 				    	$("#save").attr("disabled",true);
 				    }
 				} else {
-					l.stop();
 					toastr.error(data.message,'操作失败');
 				}
+				setTimeout( function(){
+						l.stop();
+						location.reload();
+								}, 2 * 1000 );
 			},
 			error : function() {
 				l.stop();

@@ -225,11 +225,7 @@ public class _StationController extends JBaseCRUDController<Station> {
     public void permission() {
         String stationId = getPara("id");
         setAttr("id", getPara("id"));
-        try {
-			setAttr("station_name", new String(getPara("stationName").getBytes("ISO-8859-1"),"UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+        setAttr("station_name", new String(getPara("stationName")));
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
 		List<Role> ownRoleList = null;
 		if (!isSuperAdmin) {

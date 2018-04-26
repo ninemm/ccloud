@@ -741,5 +741,12 @@ public class SellerCustomerQuery extends JBaseQuery {
 		}
 		return count;
 	}
-
+	public long findCustomerCount(String dataArea){
+		StringBuilder sql = new StringBuilder("SELECT count( DISTINCT sc.id ) ");
+		sql.append("FROM cc_user_join_customer ujc ");
+		sql.append("LEFT JOIN cc_seller_customer sc ON ujc.seller_customer_id = sc.id ");
+		sql.append("WHERE ujc.data_area LIKE ? AND sc.is_enabled = ? ");
+		return Db.queryLong(sql.toString(), dataArea, 1);
+	}
+	
 }

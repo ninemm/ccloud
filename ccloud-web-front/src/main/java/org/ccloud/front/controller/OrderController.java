@@ -205,7 +205,7 @@ public class OrderController extends BaseFrontController {
 		setAttr("images", images);
 		setAttr("orderDetailList", orderDetailList);
 
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","");
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","",null,null);
 
 		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
@@ -319,7 +319,7 @@ public class OrderController extends BaseFrontController {
 		return stringBuilder.toString();
 	}
 	
-	private String modifyPrice2(String orderId) {
+	private String priceChange(String orderId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
 		Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
 		String salesOrderName="";
@@ -337,6 +337,7 @@ public class OrderController extends BaseFrontController {
 				"	        <p>操作人："+salesOrderName+"</p>\n" + 
 				"	         <p>");
 		
+		boolean priceChange=false;
 		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
 			if (!record.getInt("price").equals(record.getInt("product_price"))) {
 				double conver_relate = Double.parseDouble(record.getStr("convert_relate"));
@@ -349,11 +350,16 @@ public class OrderController extends BaseFrontController {
 				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
 				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ product_price+ "(" + price+ ")<br>");
 				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallproductPrice+ "(" +  smallprice + ")<br>");
+				priceChange=true;
 			}
 		}
 		stringBuilder.append("</p>\n" + 
 				"	      </div>");
-		return stringBuilder.toString();
+		if (priceChange) {
+			return stringBuilder.toString();
+		}else {
+			return "";
+		}
 	}
 	
 	
@@ -620,13 +626,21 @@ public class OrderController extends BaseFrontController {
 					comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
 							          + (refuseReson == "undefined" ? "" : refuseReson);
 					var.put("comment", comment);
-					stringBuilder.append( modifyPrice2(orderId));
+					String priceChange = priceChange(orderId);
+					if (null!=priceChange) {
+						stringBuilder.append(priceChange);
+					}
 				}
 				String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 				stringBuilder.append(comments);
 				WorkFlowService workflowService = new WorkFlowService();
-				workflowService.completeTask(taskId, stringBuilder.toString(), var);
-
+				
+				int completeTask = workflowService.completeTask(taskId, stringBuilder.toString(), var);
+				if (completeTask==1) {
+					renderAjaxResultForError("已审核");
+					return false;
+				}
+				
 				//审核订单后将message中是否阅读改为是
 				Message message = MessageQuery.me().findByObjectIdAndToUserId(orderId, user.getId());
 				if (null != message) {

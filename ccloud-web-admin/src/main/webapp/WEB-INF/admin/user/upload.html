@@ -4,11 +4,16 @@
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
 	<!-- bootstrapvalidator -->
+	
+	<script src="${CPATH}/static/ladda/spin.min.js"></script>
+	<script src="${CPATH}/static/ladda/ladda.min.js"></script>
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
+	
+    <link rel="stylesheet" href="${CPATH}/static/ladda/ladda-themeless.min.css">
 </#macro>
 
 <#macro script>
@@ -44,10 +49,14 @@
 	};
 
 	function doSubmit(){
+		var l = Ladda.create( document.querySelector( '.ladda-button' ) );
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
 				var validate = $form.data('bootstrapValidator');
 				validate.validate();
+				if (validate.isValid()) {
+					l.start();
+				}
 				return validate.isValid()
 			},
 			type : "post", 
@@ -55,15 +64,18 @@
 			success : function(data) { 
 				if(data.errorCnt > 0) {
 					setTimeout( function(){
-							alert("成功导入用户" + data.inCnt + "个,已存在用户" + data.existCnt + "个,导入失败"+data.errorCnt+"个"+"\n"+data.usName+"用户名已存在")
+							l.stop();
+							toastr.success("成功导入用户" + data.inCnt + "个,已存在用户" + data.errorCnt + "个,"+"\n"+data.usName+"用户名已存在")
 									}, 2 * 1000 );
 				}else{
+					l.stop();
 					toastr.success(data.message, "成功导入用户" + data.inCnt + "个,已存在用户" + data.existCnt + "个,导入失败"+data.errorCnt+"个");
 				}
 
 			},
 			error : function() {
-				alert("信息提交错误");
+				l.stop();
+				toastr.error("文件内容有误，请检查后重新导入！");
 			}
 		});
 	}
@@ -120,7 +132,7 @@
 			</div>
 		</form>
 		<div class="box-footer"> 
-			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat">导入</button>
+			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat ladda-button" data-style="expand-right">导入</button>
 			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
 	</div>

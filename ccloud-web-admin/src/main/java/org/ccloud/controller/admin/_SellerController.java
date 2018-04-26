@@ -376,7 +376,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
         			sPIds += "'"+sellerP.getId()+"',";
         		}
         	}
-        	sellerProductIds = sPIds.substring(0, sPIds.length()-1);
+        	if(!sPIds.equals("")) {
+        		sellerProductIds = sPIds.substring(0, sPIds.length()-1);
+        	}
         }
         Page<SellerProduct> page = SellerProductQuery.me().paginate_sel(getPageNumber(), getPageSize(),keyword,user.getId(),sta,sellerProductIds);
         Map<String, Object> map = new HashMap<String, Object>();
@@ -616,6 +618,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 		seller.setModifyUserId(user.getId());
 		seller.setIsInited(0);
 		seller.setDeptId(department.getId());
+		seller.setDataArea(department.getDataArea());
 	}
 	
 	@Before(Tx.class)

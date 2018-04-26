@@ -68,8 +68,8 @@
         });
 	});
 
-	function doSubmit(value){
-	var l = Ladda.create( document.querySelector( '#do_submit' ) );	
+	function doSubmit(value,obj){
+	var l = Ladda.create( document.querySelector('#' + $(obj).attr('id'))  );	
 	$('#status').val(value);
 		$form.ajaxSubmit({
 			beforeSubmit: function() {
@@ -247,8 +247,8 @@
 			</div>
 		</form>
 		<div class="box-footer"> 
-			<button onclick="doSubmit(1)" id="do_submit" class="btn btn-primary btn-flat btn_review ladda-button" data-style="expand-right">确认</button>
-			<button onclick="doSubmit(0)" id="do_submit" class="btn btn-primary btn-flat btn_review ladda-button" data-style="expand-right">拒绝</button>
+			<button onclick="doSubmit(1,this)" id="agree" class="btn btn-primary btn-flat btn_review ladda-button" data-style="expand-right">确认</button>
+			<button onclick="doSubmit(0,this)" id="reject" class="btn btn-primary btn-flat btn_review ladda-button" data-style="expand-right">拒绝</button>
 			<!--<a href="${CPATH}/admin" class="btn btn-primary btn-flat">返回</a>-->
 			<input type="button" class="btn btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>

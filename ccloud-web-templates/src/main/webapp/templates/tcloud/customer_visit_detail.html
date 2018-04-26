@@ -9,6 +9,12 @@
 
 	$(function(){
 		var index;
+		var activity = "${(visit.active_apply_id)!}";
+		$(".expenseDetailName").hide();
+		$(".activity").hide();
+		if(activity == ""){
+			$(".activityShow").hide();
+		}
 		$(document).on("click", ".uploaderFiles li", function() {
 			index = $(this).index();
 			$galleryImg.attr("style", this.getAttribute("style"));
@@ -47,6 +53,38 @@
 		window.location.href = url + '?history=1';
 	</#if>
 	} 
+	
+	function showActivity(){
+		var activityApplyId = $("#activityApplyId").val();
+		if($("#activity").is(":hidden") && $("#activity").val() != ""){
+			$(".activity").show();
+			if($("#expenseDetailName").val() != ""){
+				$(".expenseDetailName").show();
+			}
+		}else if($("#activity").is(":visible") && $("#activity").val() != ""){
+			$(".activity").hide();
+			if($("#expenseDetailName").val() != ""){
+				$(".expenseDetailName").hide();
+			}
+		}else{
+			$.ajax({
+				url:"${CPATH}/customerVisit/showActivity",
+				type:"post",
+				dataType:"json",
+				data:{"activityApplyId":activityApplyId},
+				success:function(data)
+				{	
+					$("#activity").val(data.activity.title);
+					$(".activity").show();
+					if(data.expenseDetail != null){
+						$(".expenseDetailName").show();
+						$("#expenseDetailName").val(data.expenseDetail.expenseDetailName);
+					}
+					
+				}
+			});
+		}
+	}
 </#macro>
 <@layout>
 <div class="weui-content">
@@ -99,25 +137,29 @@
 		                <input type="text" placeholder="请选择" class="weui-input" value="${DICT_NAME(visit.question_type)!}">
 		            </div>
 		        </div>
-		        
-		        <div class="weui-cell weui-cell_access">
+		        <div class="weui-cell weui-cell_access activityShow">
+		            <div class="weui-cell__bd"  style = "height: 25px;">
+		                <a href="javascript:" onclick = "showActivity()" id = "showActivity" class="weui-btn weui-btn_primary" style = "height:30px; line-height:30px;background-color:#fff;color: #000;font-size:16px;text-align:left;"> 展开活动</a>
+		           		<input type="hidden" class="weui-input" id = "activityApplyId" value="${(visit.active_apply_id)!}">
+		           		<i class="icon-sort-desc" style = " position: relative;left: 94%;top:-29px;"></i>
+		            </div>
+		        </div>
+		        <div class="weui-cell weui-cell_access activity">
 		            <div class="weui-cell__bd">
 		                <div class="order-customer-info-title">
 		                    活动&nbsp;&nbsp;&nbsp;
 		                </div>
-		                <input type="text" placeholder="" class="weui-input" value="${activity!}">
+		                <input type="text" id = "activity" class="weui-input" value="">
 		            </div>
 		        </div>
-		        <#if expenseDetail??>
-			        <div class="weui-cell weui-cell_access">
+			        <div class="weui-cell weui-cell_access expenseDetailName">
 			            <div class="weui-cell__bd">
 			                <div class="order-customer-info-title">
 			                 	   费用类型&nbsp;&nbsp;&nbsp;
 			                </div>
-			                <input type="text" placeholder="" class="weui-input" value="${expenseDetail.expenseDetailName!}">
+			                <input type="text" id = "expenseDetailName" class="weui-input" value="">
 			            </div>
 			        </div>
-		        </#if>
 		        <div class="weui-cell weui-cell_access">
 		            <div class="weui-cell__bd">
 		            <!-- <div class="order-customer-info-title">问题类型
@@ -139,8 +181,8 @@
 		                    </div>
                             <#if activityExecutes?size gt 0>
                                 <#list activityExecutes as list>
-                                    <span class="weui-uploader__info">${list.remark}</span>
-                                    <hr style="height:1px;border:none;border-top:1px solid #DFDFDF;"/>
+									<span class="weui-uploader__info">${list.remark}</span>
+									<div class="hr"></div>
 		                    <div class="weui-uploader__bd">
 		                        <ul class="weui-uploader__files uploaderFiles" id="uploaderFilesReview">
 		                            <#if (visit.photoList) ??>
@@ -152,8 +194,8 @@
 		                            </#if>
 		                        </ul>
 		                    </div>
-                            <hr style="height:1px;border:none;border-top:1px solid #DFDFDF;"/>
-                            </#list>
+							<div class="hr"></div>
+							</#list>
                         <#else>
                             <div class="weui-uploader__bd">
                                 <ul class="weui-uploader__files uploaderFiles" id="uploaderFilesReview">

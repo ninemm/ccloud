@@ -925,8 +925,12 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", status);
-		workFlowService.completeTask(taskId, comment, var);
-
+		
+		int completeTask = workFlowService.completeTask(taskId, comment, var);
+		if (completeTask==1) {
+			renderAjaxResultForError("已审核");
+			return;
+		}
 		Message message = new Message();
 		message.setSellerId(sellerId);
 		message.setContent(comment);
@@ -987,6 +991,8 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				message.setDeptId(user.getDepartmentId());
 				message.setDataArea(user.getDataArea());
 				message.setSellerId(sellerId);
+				message.setObjectId(customerId);
+				message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
 				message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
 				message.setTitle(sellerCustomer.getCustomer().getCustomerName());
 				
@@ -1028,6 +1034,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	}
 	
 	//批量启用
+	@Before(Tx.class)
 	public void upIsenable() {
 		String ds = getPara("sellerCustomerItems");
 		boolean flang = true;
@@ -1069,6 +1076,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		renderJson(flang);
 	}
 	//批量停用
+	@Before(Tx.class)
 	public void downIsenable() {
 		String ds = getPara("sellerCustomerItems");
 		boolean flang = true;
@@ -1105,6 +1113,81 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			}else {
 				flang = false ;
 				break;
+			}
+		}
+		renderJson(flang);
+	}
+
+	public void getCustomerType() {
+		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
+				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+		renderJson(customerTypeList);
+	}
+	
+	//批量保存客户类型
+	@Before(Tx.class)
+	public void saveCustomerTypes () {
+		String ds = getPara("sellerCustomerItems");
+		JSONArray jsonArray = JSONArray.parseArray(ds);
+		List<SellerCustomer> imageList = jsonArray.toJavaList(SellerCustomer.class);
+		String customerTypes = getPara("customerTypes");
+		String[] types = customerTypes.split(",");
+		boolean flang = true;
+		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/all");
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
+		List<String> custTypeNameList = new ArrayList<>();
+		for(String customerType : types) {
+			custTypeNameList.add(CustomerTypeQuery.me().findById(customerType).getStr("name"));
+		}
+		for(SellerCustomer sellerCustomer:imageList) {
+			Map<String, Object> map = Maps.newHashMap();
+			SellerCustomer sC = SellerCustomerQuery.me().findById(sellerCustomer.getId());
+			if(isChecked == null || !isChecked || isSuperAdmin || isDealerAdmin) {
+				sC.setCustomerTypeIds(customerTypes);
+				if (sC.saveOrUpdate()) flang = true;
+				else {flang = false;break;}
+				CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomer.getId());
+				for(String type:types) {
+					CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
+					ccType.setSellerCustomerId(sellerCustomer.getId());
+					ccType.setCustomerTypeId(type);
+					if(!ccType.save()) {
+						flang = false;
+						break;
+					}
+				}
+			}else {
+				if (sC != null && StrKit.notBlank(sellerCustomer.getId())) {
+					Customer customer = CustomerQuery.me().findById(sC.getCustomerId());
+					CustomerVO temp = new CustomerVO();
+					temp.setAreaCode(customer.getProvCode() + "," + customer.getCityCode() + "," + customer.getCountryCode());
+					if(temp.getAreaCode().equals(",,")) temp.setAreaCode("");
+					temp.setAreaName(customer.getProvName() + "," + customer.getCityName() + "," + customer.getCountryName());
+					temp.setCustTypeList(Arrays.asList(types));
+					
+					temp.setCustTypeNameList(custTypeNameList);
+					temp.setContact(customer.getContact());
+					
+					temp.setSubType(sC.getSubType());
+					temp.setCustomerKind(sC.getCustomerKind());
+					
+					temp.setMobile(customer.getMobile());
+					temp.setAddress(customer.getAddress());
+					temp.setNickname(sC.getNickname());
+					temp.setCustomerName(customer.getCustomerName());
+					
+					map.put("customerVO", temp);
+					if(isChecked) {
+						String updated = startProcess(sellerCustomer.getId(), map, 0);
+						if (StrKit.isBlank(updated)) {
+							flang = true;
+						} else {
+							flang = false ;
+							break;
+						}
+					}
+				}	
 			}
 		}
 		renderJson(flang);

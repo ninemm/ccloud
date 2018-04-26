@@ -206,4 +206,9 @@ public class ActivityApplyQuery extends JBaseQuery {
 	public List<Record> findBySellerCustomerId(String sellerCustomerId) {
 		return Db.find(" select ap.id, a.title from cc_activity_apply ap join cc_activity a on ap.activity_id = a.id where ap.seller_customer_id = ? and ap.status in ("+Consts.ACTIVITY_APPLY_STATUS_PASS+","+Consts.ACTIVITY_APPLY_STATUS_END+") order by ap.status, ap.create_date desc", sellerCustomerId);
 	}
+	
+	public List<ActivityApply> getByACtivityId(String activityId){
+		String sql = "select * from cc_activity_apply where activity_id = ? and status = ?";
+		return DAO.find(sql, activityId,Consts.ACTIVITY_APPLY_STATUS_PASS);
+	}
 }
