@@ -86,8 +86,10 @@ public class _StationController extends JBaseCRUDController<Station> {
     @RequiresPermissions(value={"/admin/station/edit","/admin/all"},logical=Logical.OR)
     public void edit() {
         String id = getPara("id");
-        Station station = StationQuery.me().findById(id);
-        setAttr("station", station);
+        if(StrKit.notBlank(id)) {
+	        Station station = StationQuery.me().findById(id);
+	        setAttr("station", station);
+        }
     }
 
     @Override

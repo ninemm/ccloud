@@ -33,7 +33,7 @@ public class UserGroupRel extends BaseUserGroupRel<UserGroupRel> {
 
 	@Override
     public boolean saveOrUpdate() {
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(getUserId()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST + getUserId());
         if (null == get(getPrimaryKey())) {
             set("id", StrKit.getRandomUUID());
             return super.save();
@@ -44,7 +44,7 @@ public class UserGroupRel extends BaseUserGroupRel<UserGroupRel> {
 	@Override
 	public boolean save() {
 
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(getUserId()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST + getUserId());
 		return super.save();
 	}
 
@@ -52,7 +52,7 @@ public class UserGroupRel extends BaseUserGroupRel<UserGroupRel> {
 	public boolean update() {
 
 		//removeCache(getId());
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(getUserId()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST + getUserId());
 
 		return super.update();
 	}
@@ -61,7 +61,7 @@ public class UserGroupRel extends BaseUserGroupRel<UserGroupRel> {
 	public boolean delete() {
 
 		//removeCache(getId());
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST.concat(getUserId()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_USER_ROLE_LIST + getUserId());
 
 		return super.delete();
 	}
@@ -70,7 +70,7 @@ public class UserGroupRel extends BaseUserGroupRel<UserGroupRel> {
 	public boolean deleteById(Object idValue) {
 
 		//removeCache(idValue);
-		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD  + getGroupId());
 
 		return super.deleteById(idValue);
 	}

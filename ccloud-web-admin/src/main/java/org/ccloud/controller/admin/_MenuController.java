@@ -81,8 +81,10 @@ public class _MenuController extends JBaseCRUDController<Menu> {
 		setAttr("list", list);
 		
 		String id = getPara("id");
-		Menu menu = MenuQuery.me().findById(id);
-		setAttr("menu", menu);
+		if(StrKit.notBlank(id)) {
+			Menu menu = MenuQuery.me().findById(id);
+			setAttr("menu", menu);
+		}
 	}
 	
 	@Override

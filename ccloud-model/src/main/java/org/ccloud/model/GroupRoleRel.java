@@ -32,7 +32,7 @@ public class GroupRoleRel extends BaseGroupRoleRel<GroupRoleRel> {
 
 	@Override
     public boolean saveOrUpdate() {
-		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD  + getGroupId());
         if (null == get(getPrimaryKey())) {
             set("id", StrKit.getRandomUUID());
             return super.save();
@@ -43,7 +43,7 @@ public class GroupRoleRel extends BaseGroupRoleRel<GroupRoleRel> {
 	@Override
 	public boolean save() {
 
-		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD  + getGroupId());
 		return super.save();
 	}
 
@@ -51,7 +51,7 @@ public class GroupRoleRel extends BaseGroupRoleRel<GroupRoleRel> {
 	public boolean update() {
 
 		//removeCache(getId());
-		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD  + getGroupId());
 
 		return super.update();
 	}
@@ -60,7 +60,7 @@ public class GroupRoleRel extends BaseGroupRoleRel<GroupRoleRel> {
 	public boolean delete() {
 
 		//removeCache(getId());
-		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD  + getGroupId());
 
 		return super.delete();
 	}
@@ -69,7 +69,7 @@ public class GroupRoleRel extends BaseGroupRoleRel<GroupRoleRel> {
 	public boolean deleteById(Object idValue) {
 
 		//removeCache(idValue);
-		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD .concat(getGroupId()));
+		JCacheKit.remove(GroupRoleRel.CACHE_NAME, RedisConsts.REDIS_KEY_GROUP_ROLE_RELS_RECORD  + getGroupId());
 
 		return super.deleteById(idValue);
 	}
