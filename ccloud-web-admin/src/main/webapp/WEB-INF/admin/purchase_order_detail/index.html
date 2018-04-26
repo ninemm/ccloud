@@ -244,12 +244,24 @@
 			type : "post", 
 			dataType : "json", 
 			success : function(data) { 
-				if (data.errorCode == 0) {
+				console.log('${(orderId)!}');
+				if (data.result == true) {
 					//location.reload();
-					toastr.success(data.message, '操作成功');
+					toastr.success('操作成功');
 					setTimeout( function(){
 						l.stop();
-						location.href="${CPATH}/admin/purchaseOrder/index";
+						$.ajax({
+							url:"${CPATH}/admin/purchaseOrderDetail/sendMessage",
+							type:"post",
+							dataType:"json",
+							data:{"orderId":data.orderId},
+							success:function(data)
+							{
+								if (data == true){
+									location.href="${CPATH}/admin/purchaseOrder/index";
+								}
+							}
+						});
 								}, 2 * 1000 );
 				} else {
 					toastr.error(data.message,'操作失败');
