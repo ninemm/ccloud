@@ -210,6 +210,10 @@
 	
 	function addProduct(){
 		 var supplierId=$("#supplierId").find("option:selected").val();
+		 if(supplierId == ""){
+		 	toastr.error('请选择供应商!');
+			return;
+		 }
 		 location.href="${CPATH}/admin/purchaseOrderDetail/index?supplierId="+supplierId;
 	}
 	
@@ -223,6 +227,10 @@
 		var id = $("#purchaseOrderId").val();
 		var butStatus = $("#buttonStatus").val();
 		var warehouseId=$("#warehouseId").find("option:selected").val();
+		if(warehouseId == ""){
+			toastr.error('请选择入货仓库!');
+			return;
+		}
 		if(butStatus == 0){
 			layer.open({
 					title:"采购订单详细",
