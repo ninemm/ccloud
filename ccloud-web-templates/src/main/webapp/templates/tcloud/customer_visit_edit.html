@@ -84,10 +84,8 @@
 			       },{
 			       	title: "验收照片", value: "ExecutePhoto"
 			       }],
-	        onClose: function(obj) {
-				console.log(obj.$input[0].parentNode.querySelector('#uploaderInput'));
-				var input = obj.$input[0].parentNode.querySelector('#uploaderInput');
-				$(input).trigger('click');
+	        onChange: function(obj) {
+                $('#uploaderInput').click();
 	        }
 	    });
 
