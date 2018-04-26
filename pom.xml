@@ -33,6 +33,7 @@
 		<module>ccloud-web-bi</module>
 		
 		<module>ccloud-business</module>
+		<module>ccloud-web-activitys</module>
 	</modules>
 	
 	<properties>
