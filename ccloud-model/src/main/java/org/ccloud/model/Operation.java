@@ -31,15 +31,13 @@ import com.jfinal.plugin.ehcache.IDataLoader;
 public class Operation extends BaseOperation<Operation> {
 
 	private static final long serialVersionUID = 1L;
-	
-	public static final String CACHE_KEY = "permission_list";
 
 	@SuppressWarnings("unchecked")
 	public List<String> getFromListCache(Object key, IDataLoader dataloader) {
-		Object data = JCacheKit.get(CACHE_KEY, key);
+		Object data = JCacheKit.get(Operation.ALL_USER_PERMISSION, key);
 		if (data == null) {
 			data = dataloader.load();
-			JCacheKit.put(CACHE_KEY, key, data);
+			JCacheKit.put(Operation.ALL_USER_PERMISSION, key, data);
 		}
 		return (List<String>)data;
 	}
