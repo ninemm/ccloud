@@ -379,9 +379,9 @@ public class _JpController extends JBaseCRUDController<Goods> {
 						storedProduct.setCost(responseEntity.getCurrentPrice());
 						storedProduct.setPrice(responseEntity.getCurrentPrice());
 						storedProduct.setFreezeStore(0);
-						storedProduct.setIsMarketable(responseEntity.getIstate() == 1 ? Boolean.TRUE.booleanValue() : Boolean.FALSE.booleanValue());
+						storedProduct.setIsMarketable(responseEntity.getIstate() != null && responseEntity.getIstate() == 1 ? Boolean.TRUE.booleanValue() : Boolean.FALSE.booleanValue());
 						storedProduct.setMarketPrice(responseEntity.getCurrentPrice());
-						storedProduct.setWeight(responseEntity.getiInvWeight() == 0 ? null : responseEntity.getiInvWeight());
+						storedProduct.setWeight(responseEntity.getiInvWeight() == null || responseEntity.getiInvWeight() == 0 ? null : responseEntity.getiInvWeight());
 						storedProduct.setCreateDate(calendar.getTime());
 						products.add(storedProduct);
 					}
