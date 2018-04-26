@@ -367,6 +367,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					storedProduct = ProductQuery.me().findbyProductSn(responseEntity.getcInvCode());
 					if(storedProduct == null) {
 						storedProduct = new Product();
+						storedProduct.setId(StrKit.getRandomUUID());
 						storedProduct.setProductSn(responseEntity.getcInvCode());
 						storedProduct.setName(responseEntity.getcInvName());
 						goods = GoodsQuery.me().findByCode(goodsCategory.getCode());
