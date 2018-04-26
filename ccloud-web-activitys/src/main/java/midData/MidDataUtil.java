@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.ccloud.Consts;
-import org.ccloud.model.QyBasicfeetype;
-import org.ccloud.model.QyBasicflowtype;
-import org.ccloud.model.QyBasicshowtype;
-import org.ccloud.model.QyExpensedetail;
-import org.ccloud.model.YxBasicchannelinfo;
-import org.ccloud.model.YxBasicchanneltypeinfo;
+import model.QyBasicfeetype;
+import model.QyBasicflowtype;
+import model.QyBasicshowtype;
+import model.QyExpensedetail;
+import model.YxBasicchannelinfo;
+import model.YxBasicchanneltypeinfo;
 import org.ccloud.model.vo.Expense;
 import org.ccloud.model.vo.ExpensesDetail;
 import org.ccloud.model.vo.Mid_ActivityInfo;

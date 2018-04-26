@@ -16,7 +16,7 @@
 package model.query;
 
 import java.util.LinkedList;
-import org.ccloud.model.MidIdno;
+import model.MidIdno;
 
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;

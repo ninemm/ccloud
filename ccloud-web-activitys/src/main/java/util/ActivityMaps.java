@@ -2,14 +2,15 @@ package util;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.SalesOrderDetail;
-import org.ccloud.model.YxBasicchannelinfo;
+import model.YxBasicchannelinfo;
 import org.ccloud.model.query.ProductQuery;
-import org.ccloud.model.query.QyBasicshowtypeQuery;
-import org.ccloud.model.query.YxBasicchannelinfoQuery;
+import model.query.QyBasicshowtypeQuery;
+import model.query.YxBasicchannelinfoQuery;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
@@ -17,71 +18,74 @@ import com.jfinal.plugin.activerecord.Record;
 public class ActivityMaps {
 
 	// 公关赞助
-	public static Map<String, Object> INVES_PUBLICK_MAP(Record YxActivity, String SYN_ID, String ScenePhoto,
-			String orderId) {
+	public static Map<String, Object> INVES_PUBLICK_MAP(Record YxActivity, String SYN_ID,
+			Map<String, List<String>> ScenePhoto, String orderId) {
 		Map<String, Object> map = new HashMap<>();
+		Map<String, String> photo = getPhotoResult(ScenePhoto);
 		map.put("FlowID", YxActivity.getStr("FlowID"));
 		map.put("OrderID", orderId);
 		map.put("IDNO", SYN_ID);
-		map.put("ScenePhoto", ScenePhoto);
+		map.put("ScenePhoto", photo.get("ScenePhoto"));
 		map.put("FeeTypeID", YxActivity.getStr("CostType"));
 		map.put("ActivityTime", YxActivity.getStr("ActivityTime"));
 		map.put("CustomerName", YxActivity.getStr("CustomerName"));
 		map.put("ActivityAddress", YxActivity.getStr("ActivityAddress"));
 		map.put("Telephone", YxActivity.getStr("Telephone"));
-//		map.put("Position", YxActivity.getStr("Position"));
-		map.put("Position", YxActivity.getStr("ActivityAddress"));
+		map.put("Position", YxActivity.getStr("Position"));
+//		map.put("Position", YxActivity.getStr("ActivityAddress"));
 		map.put("ResourceFlag", 1);
 		map.put("WriteOffAmount", YxActivity.getBigDecimal("WriteOffAmount"));
-		 map.put("SignPhoto",ScenePhoto);
+		map.put("SignPhoto", photo.get("SignPhoto"));
 		map.put("Telephone", YxActivity.getStr("Telephone"));
 		map.put("CreateManName", YxActivity.getStr("CreateManName"));
 		map.put("CreateTime", YxActivity.getStr("CreateTime"));
 		map.put("ModifyManName", YxActivity.getStr("ModifyManName"));
 		map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 		map.put("Flag", 1);
-		 map.put("GiftPhoto",ScenePhoto);
+		map.put("GiftPhoto", photo.get("GiftPhoto"));
 		return map;
 	}
 
 	// 消费培育
-	public static Map<String, Object> INVEST_CONSUMPTION_CULTIVATION_MAP(Record YxActivity, String SYN_ID, String photo,
-			String orderId) {
+	public static Map<String, Object> INVEST_CONSUMPTION_CULTIVATION_MAP(Record YxActivity,
+			String SYN_ID, Map<String, List<String>> ScenePhoto, String orderId) {
 		Map<String, Object> map = new HashMap<>();
+		Map<String, String> photo = getPhotoResult(ScenePhoto);
 		map.put("FlowID", YxActivity.getStr("FlowID"));
 		map.put("IDNO", SYN_ID);
-		map.put("ScenePhoto", photo);
+		map.put("ScenePhoto", photo.get("ScenePhoto"));
 		map.put("FeeTypeID", YxActivity.getStr("CostType"));
 		map.put("ActivityTime", YxActivity.getStr("ActivityTime"));
 		map.put("CustomerName", YxActivity.getStr("CustomerName"));
 		map.put("ActivityAddress", YxActivity.getStr("ActivityAddress"));
 		map.put("Telephone", YxActivity.getStr("Telephone"));
-//		map.put("Position", YxActivity.getStr("Position"));
-		map.put("Position", YxActivity.getStr("ActivityAddress"));
+		map.put("Position", YxActivity.getStr("Position"));
+//		map.put("Position", YxActivity.getStr("ActivityAddress"));
 		map.put("ResourceFlag", 1);
 		map.put("InvestState", 2);
 		map.put("WriteOffAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 		map.put("OrderID", orderId);
-		 map.put("SignPhoto",photo);
+		map.put("SignPhoto", photo.get("SignPhoto"));
 		map.put("CreateManName", YxActivity.getStr("CreateManName"));
 		map.put("CreateTime", YxActivity.getStr("CreateTime"));
 		map.put("ModifyManName", YxActivity.getStr("ModifyManName"));
 		map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 		map.put("Flag", 1);
-		 map.put("GiftPhoto",photo);
+		map.put("GiftPhoto", photo.get("GiftPhoto"));
 		return map;
 	}
 
 	// 终端广告
-	public static Map<String, Object> INVEST_TERMINSL_ADVERTISWMENT_MAP(Record YxActivity, String SYN_ID, String photo,
-			Long shopId) {
+	public static Map<String, Object> INVEST_TERMINSL_ADVERTISWMENT_MAP(Record YxActivity,
+			String SYN_ID, Map<String, List<String>> ScenePhoto, Long shopId) {
 		Map<String, Object> map = new HashMap<>();
+		Map<String, String> photo = getPhotoResult(ScenePhoto);
 		map.put("FlowID", YxActivity.getStr("FlowID"));
 		map.put("IDNO", SYN_ID);
 		map.put("CustomerCode", shopId.toString());
 		map.put("CustomerAddress", YxActivity.getStr("ActivityAddress"));
 		map.put("ShopID", shopId);
-		map.put("ExecutePhotoIds", photo);
+		map.put("ExecutePhotoIds", photo.get("AllPhoto"));
 		map.put("ProvinceName", YxActivity.getStr("ProvinceName"));
 		map.put("CityName", YxActivity.getStr("CityName"));
 		map.put("CountyName", YxActivity.getStr("CountyName"));
@@ -98,10 +102,10 @@ public class ActivityMaps {
 		map.put("ExecuteManName", YxActivity.getStr("ExecuteManName"));
 		map.put("ExecuteTime", YxActivity.getStr("ExecuteTime"));
 		map.put("ExecuteState", 1);
-		 map.put("ExecuteNum", Integer.parseInt(YxActivity.getStr("Num")));
-		 map.put("ExecuteSize", "3*8*9");
+		map.put("ExecuteNum", YxActivity.getBigDecimal("WriteOffAmount"));
+		map.put("ExecuteSize", YxActivity.getBigDecimal("ExecuteSize"));
 		map.put("WriteOffNum", Integer.parseInt(YxActivity.getStr("Num")));
-		 map.put("WriteOffSize","3*8*9");
+		map.put("WriteOffSize", YxActivity.getBigDecimal("WriteOffSize"));
 		map.put("WriteOffAmount", YxActivity.getBigDecimal("WriteOffAmount"));
 		map.put("CreateManName", YxActivity.getStr("CreateManName"));
 		map.put("CreateTime", YxActivity.getStr("CreateTime"));
@@ -109,15 +113,16 @@ public class ActivityMaps {
 	}
 
 	// 终端陈列
-	public static Map<String, Object> INVEST_TERMINSL_DISPLAY_MAP(Record YxActivity, String SYN_ID, String photo,
-			Long shopId) {
+	public static Map<String, Object> INVEST_TERMINSL_DISPLAY_MAP(Record YxActivity,
+			String SYN_ID, Map<String, List<String>> ScenePhoto, Long shopId) {
 		Map<String, Object> map = new HashMap<>();
+		Map<String, String> photo = getPhotoResult(ScenePhoto);
 		map.put("FlowID", YxActivity.getStr("FlowID"));
 		map.put("IDNO", SYN_ID);
 		map.put("CustomerCode", shopId.toString());
 		map.put("CustomerAddress", YxActivity.getStr("ActivityAddress"));
 		map.put("ShopID", shopId);
-		map.put("GiftPhotoId", photo);
+		map.put("GiftPhotoId", photo.get("GiftPhoto"));
 		map.put("ProvinceName", YxActivity.getStr("ProvinceName"));
 		map.put("CityName", YxActivity.getStr("CityName"));
 		map.put("CountyName", YxActivity.getStr("CountyName"));
@@ -126,7 +131,7 @@ public class ActivityMaps {
 		map.put("ShopVisitCount", Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
 		map.put("ShopXCJHCount", Integer.parseInt(YxActivity.getStr("ShopVisitCount")));
 		map.put("ResourceFlag", 1);
-		 map.put("SignPhotoId",photo);
+		map.put("SignPhotoId", photo.get("SignPhoto"));
 		map.put("FeeTypeID", YxActivity.getStr("CostType"));
 		String shopTypeID = QyBasicshowtypeQuery.me().findIdByDict(YxActivity.getStr("ShowType"));
 		map.put("ShowTypeID", shopTypeID);
@@ -150,8 +155,8 @@ public class ActivityMaps {
 	}
 	
 	//终端陈列明细
-	public static Map<String, Object> INVEST_TERMINSL_ADVERTISWMENT_DETAIL_MAP(CustomerVisit customerVisit, String SYN_ID,
-			String scenePhoto, Long shopId, String orderID) {
+	public static Map<String, Object> INVEST_TERMINSL_ADVERTISWMENT_DETAIL_MAP(CustomerVisit customerVisit,
+			String SYN_ID, String scenePhoto, Long shopId, String orderID) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("IDNO", StrKit.getRandomUUID());
 		map.put("ShopShowID", SYN_ID);
@@ -171,23 +176,24 @@ public class ActivityMaps {
 	}	
 
 	// 终端客情
-	public static Map<String, Object> INVEST_CUSTOMER_VISITE_MAP(Record YxActivity, String SYN_ID, String photo,
-			Long shopId, String orderId) {
+	public static Map<String, Object> INVEST_CUSTOMER_VISITE_MAP(Record YxActivity,
+			String SYN_ID, Map<String, List<String>> ScenePhoto, Long shopId, String orderId) {
 		Map<String, Object> map = new HashMap<>();
+		Map<String, String> photo = getPhotoResult(ScenePhoto);
 		map.put("FlowID", YxActivity.getStr("FlowID"));
 		map.put("OrderID", orderId);
 		map.put("IDNO", SYN_ID);
 		map.put("CustomerCode", shopId.toString());
 		map.put("CustomerAddress", YxActivity.getStr("ActivityAddress"));
 		map.put("ShopID", shopId);
-		map.put("ActivityPhotos", photo);
+		map.put("ActivityPhotos", photo.get("ScenePhoto"));
 		map.put("CustomerName", YxActivity.getStr("CustomerName"));
 		map.put("ChannelID", Integer.parseInt(YxActivity.getStr("ChannelID")));
 		map.put("InvestState", 2);
 		map.put("ResourceFlag", 0);
 		map.put("CreateManName", YxActivity.getStr("CreateManName"));
 		map.put("CreateTime", YxActivity.getStr("CreateTime"));
-		 map.put("SignPhotos",photo);
+		map.put("SignPhotos", photo.get("SignPhoto"));
 		map.put("ModifyManName", YxActivity.getStr("CreateManName"));
 		map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 		map.put("Flag", 1);
@@ -207,8 +213,8 @@ public class ActivityMaps {
 	}
 
 	// 商超赠品
-	public static Map<String, Object> INVEST_SUPERMARKET_GIFT_MAP(Record YxActivity, String SYN_ID, String photo,
-			Long shopId, String orderID) {
+	public static Map<String, Object> INVEST_SUPERMARKET_GIFT_MAP(Record YxActivity,
+			String SYN_ID, Long shopId, String orderID) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("OrderID", orderID);
 		map.put("FlowID", YxActivity.getStr("FlowID"));
@@ -254,15 +260,16 @@ public class ActivityMaps {
 	}	
 
 	// 进场费
-	public static Map<String, Object> INVEST_SLOTTING_FEE_MAP(Record YxActivity, String SYN_ID, String photo,
-			Long shopId, String orderId) {
+	public static Map<String, Object> INVEST_SLOTTING_FEE_MAP(Record YxActivity,
+			String SYN_ID, Map<String, List<String>> ScenePhoto, Long shopId, String orderId) {
 		Map<String, Object> map = new HashMap<>();
+		Map<String, String> photo = getPhotoResult(ScenePhoto);
 		map.put("FlowID", YxActivity.getStr("FlowID"));
 		map.put("IDNO", SYN_ID);
 		map.put("CustomerCode", shopId.toString());
 		map.put("CustomerAddress", YxActivity.getStr("ActivityAddress"));
 		map.put("ShopID", shopId);
-		map.put("ExecutePhotoIds", photo);
+		map.put("ExecutePhotoIds", photo.get("AllPhoto"));
 		map.put("ProvinceName", YxActivity.getStr("ProvinceName"));
 		map.put("CityName", YxActivity.getStr("CityName"));
 		map.put("CountyName", YxActivity.getStr("CountyName"));
@@ -297,9 +304,10 @@ public class ActivityMaps {
 	}
 	
 	// 进场费赠品信息
-	public static Map<String, Object> INVEST_SLOTTING_FEE_GIFT_MAP(Record YxActivity, String photo,
-			Long shopId, String orderId) {
+	public static Map<String, Object> INVEST_SLOTTING_FEE_GIFT_MAP(Record YxActivity,
+			Map<String, List<String>> ScenePhoto, Long shopId, String orderId) {
 		Map<String, Object> map = new HashMap<>();
+		Map<String, String> photo = getPhotoResult(ScenePhoto);
 		map.put("IDNO", StrKit.getRandomUUID());
 		map.put("FlowID", YxActivity.getStr("FlowID"));
 		map.put("CustomerCode", shopId.toString());
@@ -311,12 +319,13 @@ public class ActivityMaps {
 		map.put("ModifyTime", YxActivity.getStr("ModifyTime"));
 		map.put("ModifyManName",YxActivity.getStr("ModifyManName"));
 		map.put("Flag", 1);
-		 map.put("SignPhotoId", photo);
+		map.put("SignPhotoId", photo.get("SignPhoto"));
 		return map;
 	}	
 
 	// 订单
-	public static Map<String, Object> orderMap(String orderId, Record YxActivity, String shopId, String createDate) {
+	public static Map<String, Object> orderMap(String orderId, Record YxActivity,
+			String shopId, String createDate) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("OrderID", orderId);
 		map.put("FlowNo", YxActivity.getStr("FlowIDNO"));
@@ -378,5 +387,35 @@ public class ActivityMaps {
 		map.put("PhotoType", 1);
 		return map;
 	}
-
+	
+	private static Map<String, String> getPhotoResult(Map<String, List<String>> map) {
+		Map<String, String> result = new HashMap<>();
+		List<String> ScenePhotoList = map.get("ScenePhoto");
+		List<String> SignPhotoList = map.get("SignPhoto");
+		List<String> GiftPhotoList = map.get("GiftPhoto");
+		List<String> ExecutePhotoList = map.get("ExecutePhoto");
+		List<String> AllPhotoList = map.get("AllPhoto");
+		if (ScenePhotoList.size() > 0) {
+			String scenePhoto = ScenePhotoList.toString();
+			result.put("ScenePhoto", scenePhoto.substring(1, scenePhoto.length() - 1));
+		}
+		if (SignPhotoList.size() > 0) {
+			String signPhoto = SignPhotoList.toString();
+			result.put("SignPhoto", signPhoto.substring(1, signPhoto.length() - 1));
+		}
+		if (GiftPhotoList.size() > 0) {
+			String giftPhoto = GiftPhotoList.toString();
+			result.put("GiftPhoto", giftPhoto.substring(1, giftPhoto.length() - 1));
+		}
+		if (ExecutePhotoList.size() > 0) {
+			String executePhoto = ExecutePhotoList.toString();
+			result.put("ExecutePhoto", executePhoto.substring(1, executePhoto.length() - 1));
+		}
+		if (AllPhotoList.size() > 0) {
+			String allPhoto = AllPhotoList.toString();
+			result.put("AllPhoto", allPhoto.substring(1, allPhoto.length() - 1));
+		}		
+		return result;
+	}
+	
 }

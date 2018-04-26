@@ -18,7 +18,7 @@ package model.query;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ccloud.model.ActivityExecute;
+import model.ActivityExecute;
 
 import com.jfinal.plugin.activerecord.Page;
 

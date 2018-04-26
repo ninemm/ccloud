@@ -18,7 +18,7 @@ package model.query;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ccloud.model.QyExpense;
+import model.QyExpense;
 
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;

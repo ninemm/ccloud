@@ -19,7 +19,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.model.ActivityApply;
+import model.ActivityApply;
 
 import com.jfinal.aop.Before;
 /**

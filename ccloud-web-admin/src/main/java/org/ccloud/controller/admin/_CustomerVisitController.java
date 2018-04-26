@@ -75,6 +75,10 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
+import model.ActivityExecute;
+import model.query.ActivityApplyQuery;
+import model.query.ActivityExecuteQuery;
+
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
 

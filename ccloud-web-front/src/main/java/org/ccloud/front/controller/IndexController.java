@@ -24,7 +24,7 @@ import org.ccloud.core.cache.ActionCache;
 import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.model.Dict;
 import org.ccloud.model.User;
-import org.ccloud.model.query.ActivityApplyQuery;
+import model.query.ActivityApplyQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.MessageQuery;

@@ -21,7 +21,7 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Activity;
+import model.Activity;
 import org.ccloud.model.query.CustomerTypeQuery;
 
 import java.util.LinkedList;

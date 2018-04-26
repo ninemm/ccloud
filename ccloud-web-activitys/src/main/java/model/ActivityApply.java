@@ -17,7 +17,7 @@ package model;
 
 import com.jfinal.kit.StrKit;
 import org.ccloud.model.core.Table;
-import org.ccloud.model.base.BaseActivityApply;
+import model.base.BaseActivityApply;
 
 import java.util.Date;
 

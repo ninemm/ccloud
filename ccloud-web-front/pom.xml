@@ -53,6 +53,14 @@
 		  	<type>jar</type>
 		  	<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.ccloud</groupId>
+			<artifactId>ccloud-web-activitys</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>		
     
         <dependency>
             <groupId>org.ccloud</groupId>

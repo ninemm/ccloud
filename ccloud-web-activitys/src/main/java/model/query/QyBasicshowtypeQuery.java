@@ -17,7 +17,7 @@ package model.query;
 
 import java.util.LinkedList;
 
-import org.ccloud.model.QyBasicshowtype;
+import model.QyBasicshowtype;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;

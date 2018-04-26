@@ -37,6 +37,8 @@ import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.weixin.sdk.api.ApiResult;
 import com.jfinal.weixin.sdk.api.UserApi;
 
+import model.query.ActivityApplyQuery;
+
 /**
  * Created by WT on 2017/11/30.
  */

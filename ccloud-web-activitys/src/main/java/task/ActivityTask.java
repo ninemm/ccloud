@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ccloud.task;
+package task;
 
 import java.util.Date;
 import java.util.List;
 
 import org.ccloud.Consts;
-import org.ccloud.model.Activity;
-import org.ccloud.model.ActivityApply;
-import org.ccloud.model.query.ActivityApplyQuery;
-import org.ccloud.model.query.ActivityQuery;
+import model.Activity;
+import model.ActivityApply;
+import model.query.ActivityApplyQuery;
+import model.query.ActivityQuery;
 
 import com.jfinal.kit.LogKit;
 import com.jfinal.plugin.cron4j.ITask;
