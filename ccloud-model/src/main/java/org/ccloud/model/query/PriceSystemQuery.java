@@ -18,6 +18,7 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.jfinal.plugin.ehcache.IDataLoader;
 import org.ccloud.model.PriceSystem;
 
 import com.jfinal.plugin.activerecord.Db;
@@ -37,7 +38,12 @@ public class PriceSystemQuery extends JBaseQuery {
 	}
 
 	public PriceSystem findById(final String id) {
-		return DAO.findById(id);
+		return DAO.getCache(id, new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.findById(id);
+			}
+		});
 	}
 
 	public Record findMoreById(final String id) {

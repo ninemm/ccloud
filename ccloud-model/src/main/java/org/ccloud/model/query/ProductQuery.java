@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.jfinal.plugin.ehcache.IDataLoader;
 import org.ccloud.model.Product;
 import org.ccloud.model.vo.ProductInfo;
 
@@ -39,7 +40,12 @@ public class ProductQuery extends JBaseQuery {
 	}
 
 	public Product findById(final String id) {
+		return DAO.getCache(id, new IDataLoader() {
+			@Override
+			public Object load() {
 				return DAO.findById(id);
+			}
+		});
 	}
 	
 	public Page<Product> paginate(int pageNumber, int pageSize, String orderby) {

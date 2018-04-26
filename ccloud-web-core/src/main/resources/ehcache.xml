@@ -668,7 +668,36 @@
 	       memoryStoreEvictionPolicy="LFU"
 	       transactionalMode="off"
 	/>
-    
+
+	<cache name="cc_product"
+	       maxEntriesLocalHeap="10000"
+	       eternal="false"
+	       overflowToDisk="true"
+	       timeToIdleSeconds="300"
+	       timeToLiveSeconds="300"
+	       memoryStoreEvictionPolicy="LFU"
+	       transactionalMode="off"
+	/>
+
+	<cache name="cc_price_system"
+	       maxEntriesLocalHeap="10000"
+	       eternal="false"
+	       overflowToDisk="true"
+	       timeToIdleSeconds="300"
+	       timeToLiveSeconds="300"
+	       memoryStoreEvictionPolicy="LFU"
+	       transactionalMode="off"
+	/>
+
+	<cache name="group"
+	       maxEntriesLocalHeap="10000"
+	       eternal="false"
+	       overflowToDisk="true"
+	       timeToIdleSeconds="300"
+	       timeToLiveSeconds="300"
+	       memoryStoreEvictionPolicy="LFU"
+	       transactionalMode="off"
+	/>
 
 </ehcache>
 
