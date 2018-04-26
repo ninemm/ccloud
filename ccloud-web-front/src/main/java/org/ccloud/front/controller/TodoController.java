@@ -13,7 +13,7 @@ import org.ccloud.model.CustomerVisit;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
-import model.query.ActivityApplyQuery;
+import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;

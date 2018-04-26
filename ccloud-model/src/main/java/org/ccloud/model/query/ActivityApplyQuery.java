@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package model.query;
+package org.ccloud.model.query;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +23,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 
 import org.ccloud.Consts;
-import model.ActivityApply;
+import org.ccloud.model.ActivityApply;
 
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;

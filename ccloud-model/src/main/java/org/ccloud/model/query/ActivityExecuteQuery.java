@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package model.query;
+package org.ccloud.model.query;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import model.ActivityExecute;
+import org.ccloud.model.ActivityExecute;
 
 import com.jfinal.plugin.activerecord.Page;
 

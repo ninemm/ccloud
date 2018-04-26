@@ -14,9 +14,9 @@ import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
-import model.ActivityApply;
-import model.ActivityExecute;
-import org.ccloud.model.ActivityExecuteTemplate;
+import org.ccloud.model.ActivityApply;
+import org.ccloud.model.ActivityExecute;
+import model.ActivityExecuteTemplate;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
@@ -26,10 +26,10 @@ import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.Message;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
-import model.query.ActivityApplyQuery;
-import model.query.ActivityExecuteQuery;
-import org.ccloud.model.query.ActivityExecuteTemplateQuery;
-import model.query.ActivityQuery;
+import org.ccloud.model.query.ActivityApplyQuery;
+import org.ccloud.model.query.ActivityExecuteQuery;
+import model.query.ActivityExecuteTemplateQuery;
+import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
@@ -410,7 +410,7 @@ public class CustomerVisitController extends BaseFrontController {
 		String activityExceuteId = getPara("activity_execute_id");
 		if(!activityApplyId.equals("")) {
 			List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
-			List<model.ActivityExecute> executeList = ActivityExecuteQuery.me().findbyActivityApplyId(activityApplyId);
+			List<ActivityExecute> executeList = ActivityExecuteQuery.me().findbyActivityApplyId(activityApplyId);
 			if(customerVisits.size() > 0 && executeList.size() > 0) {
 				for(CustomerVisit visit:customerVisits) {
 					if(!visit.getStatus() .equals(Consts.CUSTOMER_VISIT_STATUS_PASS)) {

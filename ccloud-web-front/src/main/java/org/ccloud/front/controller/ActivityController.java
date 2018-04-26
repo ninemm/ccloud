@@ -17,12 +17,12 @@ import com.jfinal.aop.Before;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
-import model.Activity;
-import model.ActivityApply;
-import model.ActivityExecute;
-import model.query.ActivityApplyQuery;
-import model.query.ActivityExecuteQuery;
-import model.query.ActivityQuery;
+import org.ccloud.model.Activity;
+import org.ccloud.model.ActivityApply;
+import org.ccloud.model.ActivityExecute;
+import org.ccloud.model.query.ActivityApplyQuery;
+import org.ccloud.model.query.ActivityExecuteQuery;
+import org.ccloud.model.query.ActivityQuery;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;

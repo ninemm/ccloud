@@ -28,7 +28,7 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 
-import model.query.ActivityApplyQuery;
+import org.ccloud.model.query.ActivityApplyQuery;
 
 /**
  * Created by WT on 2017/11/30.

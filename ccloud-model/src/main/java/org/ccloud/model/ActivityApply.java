@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package model;
+package org.ccloud.model;
 
 import com.jfinal.kit.StrKit;
 import org.ccloud.model.core.Table;
-import model.base.BaseActivityApply;
+import org.ccloud.model.base.BaseActivityApply;
 
 import java.util.Date;
 
