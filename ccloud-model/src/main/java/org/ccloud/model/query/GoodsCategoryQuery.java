@@ -273,13 +273,13 @@ public class GoodsCategoryQuery extends JBaseQuery {
 		return DAO.find(fromBuilder.toString(), sellerId);
 	}
 	
-	public GoodsCategory findByCode(String code) {
+	public GoodsCategory findByCode(String code, String brandId) {
 		StringBuilder sqlBuilder = new StringBuilder();
 		sqlBuilder.append("SELECT g.id, g.brand_id, g.supplier_id, ");
 		sqlBuilder.append("g.name, g.code, g.grade, g.state, ");
 		sqlBuilder.append("g.is_parent, g.create_date, g.modify_date ");
-		sqlBuilder.append("FROM cc_goods_category g where g.code = ?");
-		List<GoodsCategory> list = DAO.find(sqlBuilder.toString(), code);
+		sqlBuilder.append("FROM cc_goods_category g where g.code = ? and g.brand_id = ?");
+		List<GoodsCategory> list = DAO.find(sqlBuilder.toString(), code, brandId);
 		return CollectionUtils.isNotEmpty(list) ? list.get(0) : null;
 	}
 }

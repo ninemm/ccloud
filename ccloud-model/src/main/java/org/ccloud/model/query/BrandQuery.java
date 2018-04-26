@@ -87,4 +87,12 @@ public class BrandQuery extends JBaseQuery {
 		return DAO.find(sql, sellerId);
 	}
 
+	public Brand findByCode(final String code) {
+		return DAO.getCache(code, new IDataLoader() {
+			@Override
+			public Object load() {
+				return DAO.doFindFirst("code = ?", code);
+			}
+		});		
+	}
 }

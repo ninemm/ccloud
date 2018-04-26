@@ -113,6 +113,14 @@ public abstract class BaseSellerSynchronize<M extends BaseSellerSynchronize<M>> 
 	public java.lang.String getSellerName() {
 		return getStr("seller_name");
 	}
+	
+	public void setParentCode(java.lang.String parentCode) {
+		set("parent_code", parentCode);
+	}
+
+	public java.lang.String getParentCode() {
+		return getStr("parent_code");
+	}
 
 	public void setSellerCode(java.lang.String sellerCode) {
 		set("seller_code", sellerCode);
@@ -120,6 +128,14 @@ public abstract class BaseSellerSynchronize<M extends BaseSellerSynchronize<M>> 
 
 	public java.lang.String getSellerCode() {
 		return getStr("seller_code");
+	}
+	
+	public void setBrandCode(java.lang.String brandCode) {
+		set("brand_code", brandCode);
+	}
+
+	public java.lang.String getBrandCode() {
+		return getStr("brand_code");
 	}
 
 	public void setCustomerId(java.lang.String customerId) {

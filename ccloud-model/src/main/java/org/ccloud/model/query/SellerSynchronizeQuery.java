@@ -16,6 +16,7 @@
 package org.ccloud.model.query;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.model.SellerSynchronize;
 
@@ -84,6 +85,16 @@ public class SellerSynchronizeQuery extends JBaseQuery {
 		}
 		return 0;
 	}
-
 	
+	public List<SellerSynchronize> findParentSellersByBrandCode(String brandCode) {
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("select s.id, s.seller_code, s.seller_name, s.brand_code ");
+		sqlBuilder.append("from cc_seller_synchronize s ");
+		sqlBuilder.append("where s.brand_code = ? and s.parent_code is null");
+		return DAO.find(sqlBuilder.toString(), brandCode);
+	}
+
+	public List<SellerSynchronize> findByParentCode(String parentCode) {
+		return DAO.doFind("parent_code = ?", parentCode);
+	}
 }
