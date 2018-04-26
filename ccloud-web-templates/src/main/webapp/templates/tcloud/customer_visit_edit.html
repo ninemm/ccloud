@@ -13,6 +13,9 @@
         top: 0;
         bottom: 2.25rem;
     }
+    .weui-uploader__input_hid{
+    
+    }
 </#macro>
 <#macro script>
     var customerList = [];
@@ -68,10 +71,29 @@
         $(document).on("input", "#question_desc", function() {
             $("#length").text($("#question_desc").val().length + '/' + 70);
         });
+        
+        $(".photoType").select({
+	        title: "请选择照片类型",
+	        multi: false,
+	        items: [{
+			       	title: "现场照片", value: "ScenePhoto"
+			       },{
+			       	title: "签名照片", value: "SignPhoto"
+			       },{
+			       	title: "赠品照片", value: "GiftPhoto"
+			       },{
+			       	title: "验收照片", value: "ExecutePhoto"
+			       }],
+	        onClose: function(obj) {
+				console.log(obj.$input[0].parentNode.querySelector('#uploaderInput'));
+				var input = obj.$input[0].parentNode.querySelector('#uploaderInput');
+				$(input).trigger('click');
+	        }
+	    });
 
         $(document).on("click", "#customer_name", function () {
 	        window.location.href = '${CPATH}/customerVisit/visitCustomerChoose';
-    }).on("change", ".uploaderInput", function () {
+    	}).on("change", ".uploaderInput", function () {
         var $this = $(this);
         var files = this.files;
         var arrNum = imageArr.length;
@@ -426,7 +448,7 @@
                     <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
                 </div>
             </section>
-            <section class="weui-cells weui-cells_form">
+            <section class="weui-cells weui-cells_form select-area">
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
                         <div class="weui-uploader imgeActivity">
@@ -438,6 +460,7 @@
                                 <div class="weui-uploader__input-box">
                                     <input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">
                                     <input type="hidden" name="pic" id="pic" class="pic">
+                                    <input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">
                                 </div>
                             </div>
                         </div>
