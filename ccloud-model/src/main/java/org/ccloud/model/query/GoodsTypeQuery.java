@@ -78,5 +78,8 @@ public class GoodsTypeQuery extends JBaseQuery {
 		return DAO.find(sqlBuilder.toString());
 	}
 
-	
+	public GoodsType findByName(String name) {
+		List<GoodsType> goodsTypes = DAO.doFind("name = ?", name);
+		return goodsTypes != null && goodsTypes.size() > 0 ? goodsTypes.get(0) : null;
+	}
 }
