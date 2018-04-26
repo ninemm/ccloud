@@ -25,6 +25,7 @@ import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseOrder;
 import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.Seller;
+import org.ccloud.model.SellerProduct;
 import org.ccloud.model.SellerSynchronize;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DepartmentQuery;
@@ -32,14 +33,15 @@ import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.GoodsQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.ProductQuery;
-import org.ccloud.model.query.PurchaseOrderQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SellerSynchronizeQuery;
 import org.ccloud.model.vo.remote.jp.pull.JpGoodsCategoryResponseEntity;
 import org.ccloud.model.vo.remote.jp.pull.JpProductResponseEntity;
+import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInDetailResponse;
+import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInMainResponse;
 import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInRequestBody;
 import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInResponseBody;
-import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInResponseEntity;
 import org.ccloud.model.vo.remote.jp.pull.JpSellerAccountResponseEntity;
 import org.ccloud.model.vo.remote.jp.pull.JpSellerResponseEntity;
 import org.ccloud.model.vo.remote.jp.pull.TypeConst;
@@ -426,21 +428,28 @@ public class _JpController extends JBaseCRUDController<Goods> {
 			!CollectionUtils.isEmpty(responseBody.getData())) {
 			final List<PurchaseOrder> purchaseOrders = new ArrayList<PurchaseOrder>();
 			final List<PurchaseOrderDetail> purchaseOrderDetails = new ArrayList<PurchaseOrderDetail>();
-			JpPurchaseStockInResponseEntity purchaseStockInResponseEntity = null;
+			JpPurchaseStockInMainResponse mainStockIn = null;
+			List<JpPurchaseStockInDetailResponse> purchaseStockInDetails = null;
+			JpPurchaseStockInDetailResponse purchaseStockInDetail = null;
 			PurchaseOrder purchaseOrder = null;
 			PurchaseOrderDetail purchaseOrderDetail = null;
 			Department department = null;
 			String porderSn = null;
 			Seller seller = null;
 			Product product = null;
-			for (Iterator<JpPurchaseStockInResponseEntity> iterator = responseBody.getData().iterator(); iterator.hasNext();) {
-				purchaseStockInResponseEntity = iterator.next();
+			SellerProduct sellerProduct = null;
+			String sellerCode = null;
+			for (Iterator<JpPurchaseStockInMainResponse> iterator = responseBody.getData().iterator(); iterator.hasNext();) {
+				/**************添加采购单主单信息********************/
+				mainStockIn = iterator.next();
+				purchaseStockInDetails = mainStockIn.getOrderDetails();
+				sellerCode = purchaseStockInDetails.get(0).getDealerMarketCode();
 				purchaseOrder = new PurchaseOrder();
 				purchaseOrder.setId(StrKit.getRandomUUID());
-				seller = SellerQuery.me().findbyCode(purchaseStockInResponseEntity.getDealerMarketCode());
+				seller = SellerQuery.me().findbyCode(sellerCode);
 				if(seller == null)
 					continue;
-				porderSn = "PO" + purchaseStockInResponseEntity.getDealerMarketCode() + nowDateTimeStr.substring(0,8)+PurchaseOrderQuery.me().getNewSn(seller.getId());
+				porderSn = mainStockIn.getOrderNum();
 				purchaseOrder.setPorderSn(porderSn);
 				purchaseOrder.setSupplierId(brand.getSupplierId());
 				purchaseOrder.setBizDate(calendar.getTime());
@@ -448,22 +457,35 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				purchaseOrder.setDeptId(seller.getDeptId());
 				department = DepartmentQuery.me().findById(seller.getDeptId());
 				purchaseOrder.setDataArea(department.getDataArea());
-				purchaseOrder.setDealDate(purchaseStockInResponseEntity.getBusinessDate());
 				purchaseOrder.setCreateDate(calendar.getTime());
 				purchaseOrders.add(purchaseOrder);
 				
-				purchaseOrderDetail = new PurchaseOrderDetail();
-				purchaseOrderDetail.setId(StrKit.getRandomUUID());
-				purchaseOrderDetail.setDeptId(purchaseOrder.getDeptId());
-				purchaseOrderDetail.setDataArea(purchaseOrder.getDataArea());
-				purchaseOrderDetail.setCreateDate(calendar.getTime());
-				purchaseOrderDetail.setOrderList(0);
-				purchaseOrderDetail.setPurchaseOrderId(purchaseOrder.getId());
-				product = ProductQuery.me().findbyProductSn(purchaseStockInResponseEntity.getcInvCode());
-				// 小数量
-				purchaseOrderDetail.setProductCount(Integer.valueOf(purchaseStockInResponseEntity.getSaleNum()) * product.getConvertRelate());
-				purchaseOrderDetail.setProductAmount(product == null ? new BigDecimal(0) : product.getPrice().multiply(new BigDecimal(purchaseOrderDetail.getProductCount())));
-				purchaseOrderDetails.add(purchaseOrderDetail);
+				/********************添加采购单明细**************************/
+				purchaseStockInDetails = mainStockIn.getOrderDetails();
+				int index = 0;
+				for (Iterator<JpPurchaseStockInDetailResponse> detailIterator = purchaseStockInDetails.iterator(); detailIterator.hasNext();) {
+					purchaseStockInDetail = detailIterator.next();
+					purchaseOrderDetail = new PurchaseOrderDetail();
+					purchaseOrderDetail.setId(StrKit.getRandomUUID());
+					purchaseOrderDetail.setDeptId(purchaseOrder.getDeptId());
+					purchaseOrderDetail.setDataArea(purchaseOrder.getDataArea());
+					purchaseOrderDetail.setCreateDate(calendar.getTime());
+					purchaseOrderDetail.setOrderList(index);
+					purchaseOrderDetail.setPurchaseOrderId(purchaseOrder.getId());
+					product = ProductQuery.me().findbyProductSn(purchaseStockInDetail.getcInvCode());
+					if(product == null)
+						continue;
+					purchaseOrderDetail.setProductId(product.getId());
+					sellerProduct = SellerProductQuery.me().findByProductId(product.getId());
+					if(sellerProduct == null)
+						continue;
+					// 小数量
+					purchaseOrderDetail.setProductCount(Integer.valueOf(purchaseStockInDetail.getSaleNum()) * product.getConvertRelate());
+					purchaseOrderDetail.setProductAmount(sellerProduct.getPrice().multiply(new BigDecimal(purchaseOrderDetail.getProductCount())));
+					purchaseOrderDetail.setProductPrice(product.getPrice());
+					purchaseOrderDetails.add(purchaseOrderDetail);
+					index++;
+				}
 			}
 			result = Db.tx(new IAtom() {
 				@Override
