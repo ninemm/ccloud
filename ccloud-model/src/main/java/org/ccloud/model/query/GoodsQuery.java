@@ -119,5 +119,13 @@ public class GoodsQuery extends JBaseQuery {
 		return DAO.doFind("brand_id = ?", id);
 	}
 
-	
+	public Goods findByCode(final String code) {
+		return DAO.getCache(code, new IDataLoader() {
+			@Override
+			public Object load() {
+				List<Goods> goodsList = DAO.doFind("code = ?", code);
+				return goodsList != null && goodsList.size() > 0 ? goodsList.get(0) : null;
+			}
+		});		
+	}
 }

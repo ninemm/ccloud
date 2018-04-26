@@ -94,5 +94,7 @@ public class GoodsSpecificationQuery extends JBaseQuery {
 		return DAO.doFind();
 	}
 
-	
+	public GoodsSpecification findByName(String name) {
+		return DAO.doFindFirst("name = ?", name);
+	}
 }
