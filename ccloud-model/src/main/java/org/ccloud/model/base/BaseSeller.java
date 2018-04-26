@@ -306,4 +306,11 @@ public abstract class BaseSeller<M extends BaseSeller<M>> extends JModel<M> impl
 		return get("modify_date");
 	}
 
+	public void setDataArea(java.lang.String dataArea) {
+		set("data_area", dataArea);
+	}
+
+	public java.lang.String getDataArea() {
+		return get("data_area");
+	} 
 }

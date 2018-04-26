@@ -87,41 +87,42 @@
        	var imgeList = ${(imgeLists)!'1'};
        	numImage = imgeList.length ;
         for(var i = 0 ; i < activityExecutesList.length ; i++){
-              		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
-                     +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
-	                     for(var j = 0 ; j < imgeList.length ; j++){
-	                       	if(imgeList[j].orderList == activityExecutesList[i].orderList){
-			                        html +='<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
-			                        imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":imgeList[i].orderList,"savepath":imgeList[j].savePath});
-	                        }
-	                        if(imgeList[j].orderList == _orderList){
-	                        	$("#question_type").val("${(customerVisit.typeName)!}");
-						        $("#question_desc").val("${(customerVisit.question_desc)!}")
-						        //$("#location").val("${(customerVisit.location)!}");
-						        $("#problem_id").val("${(customerVisit.question_type)!}");
-	        					$('._submit_btn').hide();
-	        					flang = true;
-	                        }
-		                }
-	                     if(flang == false && i == (activityExecutesList.length-1)){
-	                		html +='</ul><div class="weui-uploader__input-box">'
-	                        	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
-	                        	+'</div></div></div>';
-					        $("#question_type").select({
-						        title: "请选择问题类型",
-						        multi: false,
-						        items: JSON.parse('${problem}'),
-						        onClose: function(obj) {
-						            var problemId = obj.data.values;
-						            if(problemId){
-						                $("#problem_id").val(problemId);
-						            }
-						        }
-						    });
-	                     }else{
-	                     	html +='</ul></div>'
-	                          	 +'</div>';
-	                     }
+          		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
+                 +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
+                  for(var j = 0 ; j < imgeList.length ; j++){
+                    	if(imgeList[j].orderList == activityExecutesList[i].orderList){
+                       html +='<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
+                       imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":activityExecutesList[i].orderList,"savepath":imgeList[j].savePath});
+                     }
+                     if(imgeList[j].orderList == _orderList){
+                     	$("#question_type").val("${(customerVisit.typeName)!}");
+		        $("#question_desc").val("${(customerVisit.question_desc)!}")
+		        //$("#location").val("${(customerVisit.location)!}");
+		        $("#problem_id").val("${(customerVisit.question_type)!}");
+     					$('._submit_btn').hide();
+     					flang = true;
+                     }
+              }
+                  if(flang == false && i == (activityExecutesList.length-1)){
+             		html +='</ul><div class="weui-uploader__input-box">'
+                     	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
+                     	+'</div></div></div>';
+			        $("#question_type").select({
+				        title: "请选择问题类型",
+				        multi: false,
+				        items: JSON.parse('${problem}'),
+				        onClose: function(obj) {
+				            var problemId = obj.data.values;
+				            if(problemId){
+				                $("#problem_id").val(problemId);
+				            }
+				        }
+				    });
+	                  }else{
+	                  	html +='</ul></div>'
+	                       	 +'</div>';
+	                  }
+                  console.log(imageArr);
 	        $(".imgeActivity").html("");
 			$(".imgeActivity").append(html);
     	}
@@ -180,7 +181,9 @@
     
 
     function doSubmit() {
+    	
     	$(".pic").val(JSON.stringify(imageArr));
+        console.log(imageArr);
         $.ajax({
             url: '${CPATH}/customerVisit/saveActivityVisit',
             method: 'post',

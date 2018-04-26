@@ -166,4 +166,15 @@ public class StockTakingDetailQuery extends JBaseQuery {
 				+ "where st.stock_taking_id='"+stockTakingId+"' GROUP BY st.id";
 		return Db.find(sql);
 	}
+
+	public List<Record> _findByStockTakingDetailId(String id, String warehouse_id) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT cstd.seller_product_id sellerProductId , csp.custom_name customName , t1.valueName specificationValue , cp.big_unit bigUnit , IFNULL(t2.balance_count, '未盘点') ");
+	 	fromBuilder.append(" balanceCount , cstd.product_count  productCount , cstd.remark remark FROM cc_stock_taking cst LEFT JOIN cc_stock_taking_detail cstd ON cstd.stock_taking_id = cst.id");
+	 	fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csp.id = cstd.seller_product_id LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName ");
+	 	fromBuilder.append(" FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1");
+	 	fromBuilder.append(" ON t1.product_set_id = csp.product_id LEFT JOIN cc_product cp ON cp.id = csp.product_id LEFT JOIN( SELECT * FROM cc_inventory_detail t WHERE t.create_date =");
+	 	fromBuilder.append(" (SELECT max(create_date) FROM cc_inventory_detail WHERE t.sell_product_id = sell_product_id and warehouse_id=?) GROUP BY t.sell_product_id) t2 ON t2.sell_product_id = csp.id ");
+	 	fromBuilder.append(" AND t2.warehouse_id = cst.warehouse_id WHERE cst.id = ?");
+	 	return Db.find(fromBuilder.toString(),warehouse_id, id);
+	}
 }

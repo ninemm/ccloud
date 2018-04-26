@@ -1,43 +1,5 @@
 package org.ccloud.front.controller;
 
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.activiti.engine.task.Comment;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
-import org.ccloud.Consts;
-import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Message;
-import org.ccloud.model.SalesOrder;
-import org.ccloud.model.SellerProduct;
-import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.MessageQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.OutstockPrintQuery;
-import org.ccloud.model.query.SalesOrderDetailQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SalesOutstockQuery;
-import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.vo.ImageJson;
-import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DateUtils;
-import org.ccloud.utils.StringUtils;
-import org.ccloud.wechat.WechatJSSDKInterceptor;
-import org.ccloud.workflow.listener.order.OrderReviewUtil;
-import org.ccloud.workflow.service.WorkFlowService;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Maps;
@@ -48,6 +10,27 @@ import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import org.activiti.engine.task.Comment;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
+import org.ccloud.Consts;
+import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.*;
+import org.ccloud.model.query.*;
+import org.ccloud.model.vo.ImageJson;
+import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.listener.order.OrderReviewUtil;
+import org.ccloud.workflow.service.WorkFlowService;
+import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
+
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.*;
 
 
 /**
@@ -56,7 +39,6 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/order")
 @RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 public class OrderController extends BaseFrontController {
-
 	//我的订单
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
@@ -205,7 +187,7 @@ public class OrderController extends BaseFrontController {
 		setAttr("images", images);
 		setAttr("orderDetailList", orderDetailList);
 
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","");
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","",null,null);
 
 		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
@@ -319,7 +301,7 @@ public class OrderController extends BaseFrontController {
 		return stringBuilder.toString();
 	}
 	
-	private String modifyPrice2(String orderId) {
+	private String priceChange(String orderId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
 		Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
 		String salesOrderName="";
@@ -337,6 +319,7 @@ public class OrderController extends BaseFrontController {
 				"	        <p>操作人："+salesOrderName+"</p>\n" + 
 				"	         <p>");
 		
+		boolean priceChange=false;
 		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
 			if (!record.getInt("price").equals(record.getInt("product_price"))) {
 				double conver_relate = Double.parseDouble(record.getStr("convert_relate"));
@@ -349,11 +332,16 @@ public class OrderController extends BaseFrontController {
 				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
 				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ product_price+ "(" + price+ ")<br>");
 				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallproductPrice+ "(" +  smallprice + ")<br>");
+				priceChange=true;
 			}
 		}
 		stringBuilder.append("</p>\n" + 
 				"	      </div>");
-		return stringBuilder.toString();
+		if (priceChange) {
+			return stringBuilder.toString();
+		}else {
+			return "";
+		}
 	}
 	
 	
@@ -543,6 +531,9 @@ public class OrderController extends BaseFrontController {
 		param.put("customerName", customerName);
 		param.put("orderId", orderId);
 
+
+		String toUserId = "";
+
 		if(Consts.PROC_ORDER_REVIEW_ONE.equals(proc_def_key)) {
 
 			List<User> orderReviewers = UserQuery.me().findOrderReviewerByDeptId(user.getDepartmentId());
@@ -617,28 +608,33 @@ public class OrderController extends BaseFrontController {
 					comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
 							          + (refuseReson == "undefined" ? "" : refuseReson);
 					var.put("comment", comment);
-					stringBuilder.append( modifyPrice2(orderId));
+					String priceChange = priceChange(orderId);
+					if (null!=priceChange) {
+						stringBuilder.append(priceChange);
+					}
 				}
 				String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 				stringBuilder.append(comments);
 				WorkFlowService workflowService = new WorkFlowService();
-				workflowService.completeTask(taskId, stringBuilder.toString(), var);
-
+				
+				int completeTask = workflowService.completeTask(taskId, stringBuilder.toString(), var);
+				if (completeTask==1) {
+					renderAjaxResultForError("已审核");
+					return false;
+				}
+				
 				//审核订单后将message中是否阅读改为是
 				Message message = MessageQuery.me().findByObjectIdAndToUserId(orderId, user.getId());
 				if (null != message) {
 					message.setIsRead(Consts.IS_READ);
 					message.update();
 				}
-				
+
+				renderAjaxResultForSuccess("订单审核成功");
 				return true;
 			}
 		});
-		
-		if (isSave)
-			renderAjaxResultForSuccess("订单审核成功");
-		else
-			renderAjaxResultForError("订单审核失败");
+
 	}
 
 	private String editOrder(Map<String, String[]> paraMap, User user) {
@@ -808,7 +804,7 @@ public class OrderController extends BaseFrontController {
 		renderAjaxResultForSuccess("订单撤销成功");
 	}
 
-	@Before(WechatJSSDKInterceptor.class)
+	@Before(WorkWechatJSSDKInterceptor.class)
 	public void getOldOrder() {
 		String orderId = getPara("orderId");
 

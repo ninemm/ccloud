@@ -266,9 +266,12 @@ public class WorkFlowService {
 	}
 
 	@Before(Tx.class)
-	public void completeTask(String taskid, String comment, Map<String, Object> var) {
+	public int completeTask(String taskid, String comment, Map<String, Object> var) {
 		TaskService service = ActivitiPlugin.buildProcessEngine().getTaskService();
 		Record task = getTaskRecord(taskid);
+		if (null==task.getStr("INSID")) {
+			return 1;
+		}
 		String insid = task.getStr("INSID");
 		if (StrKit.notBlank(insid) && StrKit.notBlank(comment)) {
 			service.addComment(taskid, insid, comment);
@@ -277,6 +280,7 @@ public class WorkFlowService {
 			var = new HashMap<String, Object>();
 		}
 		service.complete(taskid, var);
+		return 0;
 	}
 
 	@Before(Tx.class)

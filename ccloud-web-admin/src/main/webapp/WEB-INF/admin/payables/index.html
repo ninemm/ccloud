@@ -56,7 +56,7 @@ function updateOptions(){
 		url: "${CPATH}/admin/payables/getOptions",
 		async: false,
 		success: function(data){
-			var optionsHtml = '<option value="0" >全部</option>';
+			var optionsHtml = '<option value="0" >客户</option>';
 			optionsHtml += '<option value="1" >供应商</option>';
 			if(data.length && data.length>=1){
 				for(var i in data){
@@ -136,7 +136,7 @@ var initpayableDetailTable = function(){
 		{field: "create_date",title:"创建时间",align:"center",edit:false},
 		{field: "action", title: "付款详情", align: "center",
 			 formatter: function(value, row, rowIndex){
-			 	var url = '${CPATH}/admin/payables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount;
+			 	var url = '${CPATH}/admin/payables/renderlist?ref_sn='+row.ref_sn+'&&ref_type='+row.ref_type+'&&object_id='+row.object_id+'&&balance_amount='+row.balance_amount+"&&pay_amount="+row.pay_amount;
 			 	return '<a href="' + url + '" class="btn btn-sm" >付款详情</a>';
 			 },
 			 edit:false}

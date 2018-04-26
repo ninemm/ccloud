@@ -15,6 +15,8 @@
  */
 package org.ccloud;
 
+import com.jfinal.qyweixin.sdk.api.ApiConfig;
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import org.ccloud.core.CCloud;
 import org.ccloud.core.CCloudConfig;
 import org.ccloud.message.Actions;
@@ -31,11 +33,10 @@ import org.ccloud.ui.freemarker.function.TaxonomyBox;
 import org.ccloud.ui.freemarker.tag.ContentTag;
 import org.ccloud.ui.freemarker.tag.ContentsTag;
 import org.ccloud.ui.freemarker.tag.DictTag;
-import org.ccloud.wechat.WechatApi;
 
 import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.template.Engine;
-import com.jfinal.weixin.sdk.api.ApiConfigKit;
+import org.ccloud.wwechat.WorkWechatApi;
 
 public class Config extends CCloudConfig {
 
@@ -59,7 +60,7 @@ public class Config extends CCloudConfig {
 		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
 		
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
-		ApiConfigKit.putApiConfig(WechatApi.getApiConfig());
+		ApiConfigKit.putApiConfig(WorkWechatApi.getApiConfig());
 	}
 
 	@Override

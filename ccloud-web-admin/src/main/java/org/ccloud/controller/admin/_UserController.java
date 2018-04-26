@@ -20,14 +20,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.google.common.collect.ImmutableMap;
+import com.jfinal.qyweixin.sdk.api.ApiResult;
+import com.jfinal.qyweixin.sdk.api.ConUserApi;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
@@ -38,21 +41,8 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
 import org.ccloud.menu.MenuManager;
-import org.ccloud.model.Department;
-import org.ccloud.model.Group;
-import org.ccloud.model.Seller;
-import org.ccloud.model.Station;
-import org.ccloud.model.User;
-import org.ccloud.model.UserGroupRel;
-import org.ccloud.model.UserHistory;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.GroupQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.StationQuery;
-import org.ccloud.model.query.UserGroupRelQuery;
-import org.ccloud.model.query.UserHistoryQuery;
-import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.*;
+import org.ccloud.model.query.*;
 import org.ccloud.model.vo.UserExecel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -61,9 +51,6 @@ import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -71,8 +58,6 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
-import com.jfinal.qyweixin.sdk.api.ApiResult;
-import com.jfinal.qyweixin.sdk.api.ConUserApi;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
@@ -103,7 +88,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			userId = user.getId();
 		}
 
-		Page<User> page = UserQuery.me().paginateUser(getPageNumber(), getPageSize(), keyword, dataArea, "u.create_date",
+		Page<User> page = org.ccloud.model.query.UserQuery.me().paginateUser(getPageNumber(), getPageSize(), keyword, dataArea, "u.create_date",
 				userId);
 		List<User> list = page.getList();
 		for (User user : list) {
@@ -136,15 +121,15 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 		final User user = getModel(User.class);
-		try {
-			if (StrKit.notBlank(user.getNickname())) {
-				String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
-				user.setNickname(nickname);
-			}
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	/*	try {
+		if (StrKit.notBlank(user.getNickname())) {
+			String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
+			user.setNickname(nickname);
 		}
+	} catch (UnsupportedEncodingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}*/
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
@@ -535,23 +520,36 @@ public class _UserController extends JBaseCRUDController<User> {
 				if(excel.getMobile()==null) {
 					break;
 				}
+				User user00 = new User();
+				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
+				for(User user01:uss) {
+					if(!user01.getWechatOpenId().equals("")) {
+						user00 = user01;
+						break;
+					}
+				}
 				// 检查用户是否存在
 				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 				if (us == null) {
 					us = new User();
 					userId = StrKit.getRandomUUID();
-					us.set("id", userId);
+					us.setId(userId);
 					this.setUser(us, excel);
-					us.set("create_date", new Date());
-					us.set("group_name",excel.getUserGroup());
-					us.set("username", excel.getUsername());
+					us.setCreateDate(new Date());
+					us.setGroupName(excel.getUserGroup());
+					us.setUsername(excel.getUsername());
 					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
-					us.set("data_area", dataArea);
-					us.set("salt", EncryptUtils.salt());
-					us.set("password", EncryptUtils.encryptPassword("123456", us.getSalt()));
-					us.set("department_id", deptId);
-					us.set("department_name", dept.getDeptName());
+					us.setDataArea(dataArea);
+					if(user00 != null) {
+						us.setWechatOpenId(user00.getWechatOpenId());
+						us.setAvatar(user00.getAvatar());
+						us.setNickname(user00.getNickname());
+					}
+					us.setSalt(EncryptUtils.salt());
+					us.setPassword(EncryptUtils.encryptPassword("123456", us.getSalt()));
+					us.setDepartmentId(deptId);
+					us.setDepartmentName(dept.getDeptName());
 					us.save();
 					
 					userGroupRel = new UserGroupRel();
@@ -771,8 +769,8 @@ public class _UserController extends JBaseCRUDController<User> {
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
 	}
-	
-//	@Before(WorkWechatContactApiConfigInterceptor.class)
+
+	//	@Before(WorkWechatContactApiConfigInterceptor.class)
 	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
 	public void synUser(){
 		String userIds = getPara("userIds");
@@ -800,16 +798,16 @@ public class _UserController extends JBaseCRUDController<User> {
 					}
 					ArrayList<Integer>list=  (ArrayList<Integer>) item.get("department");
 					String array = "[";
-					    // List转换成数组
-				    for (int i = 0; i < list.size(); i++) {
-				    		array=array+list.get(i).toString()+",";
-				    }
-				    array=array+department.getQywxDeptid()+"]";
+					// List转换成数组
+					for (int i = 0; i < list.size(); i++) {
+						array=array+list.get(i).toString()+",";
+					}
+					array=array+department.getQywxDeptid()+"]";
 					String json = "{\"userid\": \"" + item.get("userid").toString() +
-							"\", \"name\": \"" + user.getRealname().toLowerCase() +
-							"\", \"mobile\": \"" + user.getMobile()+
-							"\", \"department\": " + array +
-							"\", \"enable\":1, \"to_invite\": false," + "}";
+							              "\", \"name\": \"" + user.getRealname().toLowerCase() +
+							              "\", \"mobile\": \"" + user.getMobile()+
+							              "\", \"department\": " + array +
+							              "\", \"enable\":1, \"to_invite\": false," + "}";
 					ApiResult apiResult1 = ConUserApi.updateUser(json);
 					if (apiResult1.getInt("errcode")!=0) {
 						renderAjaxResultForError("同步失败");
@@ -818,16 +816,16 @@ public class _UserController extends JBaseCRUDController<User> {
 				}
 			}
 			if(!isExist){
-	
+
 				String json = "{\"userid\": \"" + user.getId() +
-						"\", \"name\": \"" + user.getRealname() +
-						"\", \"mobile\": \"" + user.getMobile();
-	
+						              "\", \"name\": \"" + user.getRealname() +
+						              "\", \"mobile\": \"" + user.getMobile();
+
 				if(user.getAvatar() != null && user.getAvatar().length() != 0) json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
-	
+
 				json = json + "\", \"department\": [" + department.getQywxDeptid() + "]," +
-						"\"position\": \"" + user.getStationId() +
-						"\", \"enable\":1, \"to_invite\": false," + "}";
+						       "\"position\": \"" + user.getStationId() +
+						       "\", \"enable\":1, \"to_invite\": false," + "}";
 				ApiResult apiResult1 = ConUserApi.createUser(json);
 				if (apiResult1.getInt("errcode")!=0) {
 					user.setWechatUseriId(user.getId());
@@ -835,7 +833,7 @@ public class _UserController extends JBaseCRUDController<User> {
 						renderAjaxResultForError("同步失败");
 						return;
 					}
-					
+
 				}
 			}
 		}
@@ -874,14 +872,14 @@ public class _UserController extends JBaseCRUDController<User> {
 					}
 
 					String json = "{\"userid\": \"" + user.getId() +
-							"\", \"name\": \"" + user.getRealname() +
-							"\", \"mobile\": \"" + user.getMobile();
+							              "\", \"name\": \"" + user.getRealname() +
+							              "\", \"mobile\": \"" + user.getMobile();
 
 					if(user.getAvatar() != null && user.getAvatar().length() != 0) json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
 
 					json = json + "\", \"department\": [" + seller.getJpwxOpenId() + "]," +
-							"\"position\": \"" + user.getStationId() +
-							"\", \"enable\":1, \"to_invite\": false," + "}";
+							       "\"position\": \"" + user.getStationId() +
+							       "\", \"enable\":1, \"to_invite\": false," + "}";
 
 					ApiResult apiResult1 = ConUserApi.updateUser(json);
 
@@ -894,7 +892,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			if(!isExist){
 
 				String json = "{\"userid\": \"" + user.getId() + "\", \"name\": \"" + user.getRealname() + "\", \"mobile\": \"" + user.getMobile() + "\", \"department\": [" + seller.getJpwxOpenId() + "],"
-						+ "\"position\": \"" + user.getStationId() + "\", \"enable\":1, \"to_invite\": false," + "}";
+						              + "\"position\": \"" + user.getStationId() + "\", \"enable\":1, \"to_invite\": false," + "}";
 				ApiResult apiResult1 = ConUserApi.createUser(json);
 
 				if(apiResult1.getErrorCode().equals(0)){
@@ -910,4 +908,6 @@ public class _UserController extends JBaseCRUDController<User> {
 		}
 		renderAjaxResultForSuccess();
 	}
+
 }
+

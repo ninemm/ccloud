@@ -309,8 +309,8 @@
 		                </div>
                            	<#if activityExecutes?size gt 0>
                            		<#list activityExecutes as list>
-                           			<span class="weui-uploader__info">${list.remark}</span>
-                           			<hr style="border:1px dashed #0000fff"/>
+                                       <span class="weui-uploader__info">${list.remark}</span>
+                                       <div class="hr"></div>
                   						 <div class="weui-uploader__bd">
                        					<ul class="weui-uploader__files uploaderFiles1" id="uploaderFiles1">
 				                            <#if (customerVisit.photoList) ??>
@@ -321,8 +321,8 @@
 			                                </#list>
 				                            </#if>
                       					</ul>
-                  						 </div>
-                  						 <hr style="border:1px dashed #0000fff"/>
+                                           </div>
+                                           <div class="hr"></div>
                            		</#list>
                           		<#else>
                          				<div class="weui-uploader__bd">

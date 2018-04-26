@@ -175,7 +175,13 @@ public class UserController extends BaseFrontController {
 		keepPara();
 		String action = getPara(0, "index");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		
+//		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+//		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+
+//		Long totalOrderCount = SalesOrderQuery.me().findTotalOrdersCountByDataArea(dataArea);
+//		Long totalCustomerCount = SellerCustomerQuery.me().findTotalCountByDataArea(dataArea);
+//		setAttr("totalOrderCount", totalOrderCount.intValue());
+//		setAttr("totalCustomerCount", totalCustomerCount.intValue());
 		setAttr("orderTotal", SalesOrderQuery.me().findToDoOrderReviewCount(user.getUsername()));
 		setAttr("customerVisitTotal", CustomerVisitQuery.me().findToDoCustomerVisitReviewCount(user.getUsername()));
 		setAttr("customerTotal", SellerCustomerQuery.me().findToDoCustomerReviewCount(user.getUsername()));
