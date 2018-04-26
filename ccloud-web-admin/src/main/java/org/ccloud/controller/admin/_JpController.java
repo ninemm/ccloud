@@ -376,8 +376,8 @@ public class _JpController extends JBaseCRUDController<Goods> {
 						storedProduct.setSmallUnit("瓶");
 						storedProduct.setBigUnit("件");
 						storedProduct.setConvertRelate(responseEntity.getcInvMNum());
-						storedProduct.setCost(responseEntity.getCurrentPrice());
-						storedProduct.setPrice(responseEntity.getCurrentPrice());
+						storedProduct.setCost(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
+						storedProduct.setPrice(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
 						storedProduct.setFreezeStore(0);
 						storedProduct.setIsMarketable(responseEntity.getIstate() != null && responseEntity.getIstate() == 1 ? Boolean.TRUE.booleanValue() : Boolean.FALSE.booleanValue());
 						storedProduct.setMarketPrice(responseEntity.getCurrentPrice());
