@@ -61,6 +61,8 @@ public class SellerSynchronizeQuery extends JBaseQuery {
 		
 		if(needWhere) {
 			fromBuilder.append("where cs.dept_id is null ");
+		} else {
+			fromBuilder.append(" and cs.dept_id is null ");
 		}
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
