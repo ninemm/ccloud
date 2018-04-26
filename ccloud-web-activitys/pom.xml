@@ -7,6 +7,7 @@
   </parent>
   <artifactId>ccloud-web-activitys</artifactId>
   <name>ccloud-web-activitys</name>
+  <packaging>jar</packaging>
   <description>活动费用核销</description>
   
 	<properties>

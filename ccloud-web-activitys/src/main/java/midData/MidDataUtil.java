@@ -41,14 +41,30 @@ public class MidDataUtil {
 	
 //	private static String userName = PropKit.use("midData.properties").get("middata_soap_username");
 //	private static String passWord = PropKit.use("midData.properties").get("middata_soap_password");
-    private static final String GET_JINGPAI_ACTIVITYS = PropKit.use("midData.properties").get("GET_JINGPAI_ACTIVITYS");
-    private static final String GET_JINGPAI_FLOWTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_FLOWTYPE");
-    private static final String GET_JINGPAI_FEETYPE = PropKit.use("midData.properties").get("GET_JINGPAI_FEETYPE");
-    private static final String GET_JINGPAI_SHOWTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_SHOWTYPE");
-    private static final String GET_JINGPAI_EXPENSES = PropKit.use("midData.properties").get("GET_JINGPAI_EXPENSES");
-    private static final String GET_JINGPAI_EXPENSEDETAILS = PropKit.use("midData.properties").get("GET_JINGPAI_EXPENSEDETAILS");
-    private static final String GET_JINGPAI_BASICCHANNELTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_BASICCHANNELTYPE");
-    private static final String GET_JINGPAI_BASICCHANNEL= PropKit.use("midData.properties").get("GET_JINGPAI_BASICCHANNEL");
+	
+    public static final String GET_JINGPAI_ACTIVITYS = PropKit.use("midData.properties").get("GET_JINGPAI_ACTIVITYS");
+    public static final String GET_JINGPAI_FLOWTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_FLOWTYPE");
+    public static final String GET_JINGPAI_FEETYPE = PropKit.use("midData.properties").get("GET_JINGPAI_FEETYPE");
+    public static final String GET_JINGPAI_SHOWTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_SHOWTYPE");
+    public static final String GET_JINGPAI_EXPENSES = PropKit.use("midData.properties").get("GET_JINGPAI_EXPENSES");
+    public static final String GET_JINGPAI_EXPENSEDETAILS = PropKit.use("midData.properties").get("GET_JINGPAI_EXPENSEDETAILS");
+    public static final String GET_JINGPAI_BASICCHANNELTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_BASICCHANNELTYPE");
+    public static final String GET_JINGPAI_BASICCHANNEL = PropKit.use("midData.properties").get("GET_JINGPAI_BASICCHANNEL");
+    public static final String POST_JINGPAI_ACTIVITY_BRAND_INFO= PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_BRAND_INFO");
+    public static final String POST_JINGPAI_ACTIVITY_PRODUCT_JUDGE = PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_PRODUCT_JUDGE");
+    public static final String POST_JINGPAI_ACTIVITY_SHOPAD_INFO = PropKit.use("midData.properties").get("GET_JINGPAI_ACTIVITY_SHOPAD_INFO");
+    public static final String POST_JINGPAI_ACTIVITY_SHOPSHOW_INFO = PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_SHOPSHOW_INFO");
+    public static final String POST_JINGPAI_ACTIVITY_SHOPSHOW_INFO_DETAIL = PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_SHOPSHOW_INFO_DETAIL");
+    public static final String POST_JINGPAI_ACTIVITY_DISPLAY_INFO = PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_DISPLAY_INFO");
+    public static final String POST_JINGPAI_ACTIVITY_MARKET_GIFT_INFO = PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_MARKET_GIFT_INFO");
+    public static final String POST_JINGPAI_ACTIVITY_MARKET_GIFT_EXECUTEINFO = PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_MARKET_GIFT_EXECUTEINFO");
+    public static final String POST_JINGPAI_ACTIVITY_ENTRY_COSTINFO = PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_ENTRY_COSTINFO");
+    public static final String POST_JINGPAI_ACTIVITY_ENTRY_COSTGIFTINFO = PropKit.use("midData.properties").get("POST_JINGPAI_ACTIVITY_ENTRY_COSTGIFTINFO");
+    public static final String POST_JINGPAI_ORDER = PropKit.use("midData.properties").get("POST_JINGPAI_ORDER");
+    public static final String POST_JINGPAI_ORDERDETAIL = PropKit.use("midData.properties").get("POST_JINGPAI_ORDERDETAIL");
+    public static final String POST_JINGPAI_SHOPINFO = PropKit.use("midData.properties").get("POST_JINGPAI_SHOPINFO");
+    public static final String POST_JINGPAI_PHOTOINFO = PropKit.use("midData.properties").get("POST_JINGPAI_PHOTOINFO");
+    
 
 	public static void main(String[] args) throws RemoteException {
 //		List<Expense> list = getExpensesInfo("2018-02-01", "2018-03-01", "1", "100");
@@ -80,7 +96,7 @@ public class MidDataUtil {
         map.put("EndTime", endTime);
         map.put("PageIndex", pageIndex);
         map.put("PageSize", pageSize);
-        List<QyBasicflowtype > list = new ArrayList<>();
+        List<QyBasicflowtype> list = new ArrayList<>();
 		try {
 			String result = HttpUtils.post(GET_JINGPAI_FLOWTYPE, map);
 			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray("BasicFlowTypes");
