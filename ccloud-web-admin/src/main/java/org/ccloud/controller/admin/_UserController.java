@@ -124,15 +124,15 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 		final User user = getModel(User.class);
-		try {
-			if (StrKit.notBlank(user.getNickname())) {
-				String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
-				user.setNickname(nickname);
-			}
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	/*	try {
+		if (StrKit.notBlank(user.getNickname())) {
+			String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
+			user.setNickname(nickname);
 		}
+	} catch (UnsupportedEncodingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}*/
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
@@ -523,23 +523,36 @@ public class _UserController extends JBaseCRUDController<User> {
 				if(excel.getMobile()==null) {
 					break;
 				}
+				User user00 = new User();
+				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
+				for(User user01:uss) {
+					if(!user01.getWechatOpenId().equals("")) {
+						user00 = user01;
+						break;
+					}
+				}
 				// 检查用户是否存在
 				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 				if (us == null) {
 					us = new User();
 					userId = StrKit.getRandomUUID();
-					us.set("id", userId);
+					us.setId(userId);
 					this.setUser(us, excel);
-					us.set("create_date", new Date());
-					us.set("group_name",excel.getUserGroup());
-					us.set("username", excel.getUsername());
+					us.setCreateDate(new Date());
+					us.setGroupName(excel.getUserGroup());
+					us.setUsername(excel.getUsername());
 					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
-					us.set("data_area", dataArea);
-					us.set("salt", EncryptUtils.salt());
-					us.set("password", EncryptUtils.encryptPassword("123456", us.getSalt()));
-					us.set("department_id", deptId);
-					us.set("department_name", dept.getDeptName());
+					us.setDataArea(dataArea);
+					if(user00 != null) {
+						us.setWechatOpenId(user00.getWechatOpenId());
+						us.setAvatar(user00.getAvatar());
+						us.setNickname(user00.getNickname());
+					}
+					us.setSalt(EncryptUtils.salt());
+					us.setPassword(EncryptUtils.encryptPassword("123456", us.getSalt()));
+					us.setDepartmentId(deptId);
+					us.setDepartmentName(dept.getDeptName());
 					us.save();
 					
 					userGroupRel = new UserGroupRel();

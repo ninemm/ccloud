@@ -15,6 +15,7 @@
  */
 package org.ccloud.model.query;
 
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -66,12 +67,16 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 	}
 	
 	public List<Record> orderAgainDetail(String orderId) {
-
+		Record record =SellerQuery.me()._findByOrderId(orderId);
+		String sellerId=record.getStr("id");
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT sod.*,g.goods_category_id as categoryId, sp.custom_name,sp.tax_price,sp.account_price, sp.price,sp.bar_code, sp.cost, ");
 		sqlBuilder.append(" p.big_unit, p.small_unit, p.convert_relate, p.id as productId, p.product_sn, g.product_image_list_store, ");
 		sqlBuilder.append(" w.code as warehouseCode, t1.valueName,w.name as warehouseName, IFNULL(cpc1.seller_product_id,cpc.seller_product_id) as sub_id, IFNULL(cpc.name,cpc1.name) as comName, ");
 		sqlBuilder.append(" IFNULL(cpc.main_product_count,cpc1.sub_product_count) as comCount, IFNULL(cpc.price,cpc1.price) as comPrice ");
+		if (null != sellerId) {
+			sqlBuilder.append(" ,IFNULL(t3.count,0) store_count");
+		}
 		sqlBuilder.append(" from `cc_sales_order_detail` sod ");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product sp ON sod.sell_product_id = sp.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
@@ -81,6 +86,10 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_product_composition cpc1 ON cpc1.parent_id = sod.composite_id AND cpc1.sub_seller_product_id = sod.sell_product_id ");
 		sqlBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		sqlBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = p.id ");
+		if (null != sellerId) {
+			sqlBuilder.append(" LEFT JOIN(SELECT SUM(sp.store_count) count,p.id FROM cc_seller_product sp LEFT JOIN cc_product p ON p.id=sp.product_id WHERE sp.seller_id='");
+			sqlBuilder.append(sellerId+"' GROUP BY p.id) t3 ON t3.id=p.id");
+		}
 		sqlBuilder.append(" WHERE order_id = ? ");
 		sqlBuilder.append(" ORDER BY sod.composite_id, sod.is_gift asc ");
 

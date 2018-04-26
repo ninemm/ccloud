@@ -292,7 +292,12 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 		}
 
-		workFlowService.completeTask(taskId, comment, var);
+		
+		int completeTask = workFlowService.completeTask(taskId, comment, var);
+		if (completeTask==1) {
+			renderAjaxResultForError("已审核");
+			return;
+		}
 
 		sendMessage(sellerId, comment, user.getId(), toUser.getId(), user.getDepartmentId(), user.getDataArea()
 				, Message.CUSTOMER_VISIT_REVIEW_TYPE_CODE, customerVisit.getSellerCustomer().getCustomer().getCustomerName());

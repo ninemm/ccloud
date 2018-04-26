@@ -108,10 +108,17 @@ $(function() {
 	if (!flg) {
 		return;
 	}
-	if ($("#sellerCustomerId").val() == "") {
-		$.toptip("请选择客户", 'warning'); 
-		return;
-	}
+	if ($("#sellerCustomerId").val() == "") {$.toptip("请选择客户", 'warning'); return;}
+
+	if($.trim($("#contact").val()).length==0) {$.toptip('联系人不能为空', 'warning'); return;}
+	if($.trim($("#contact").val()).length > 30) {$.toptip('联系人长度不能超过30', 'warning'); return;}
+	if($.trim($("#mobile").val()).length==0) {$.toptip('手机号不能为空', 'warning'); return;}
+	if($.trim($("#mobile").val()).length > 30) {$.toptip('手机号长度不能超过30', 'warning'); return;}
+	if($.trim($("#address").val()).length==0) {$.toptip('地址不能为空', 'warning'); return;}
+	if($.trim($("#address").val()).length > 200) {$.toptip('地址长度不能超过200', 'warning'); return;}
+
+	if ($("#customerType").val() == "") {$.toptip("客户类型不能为空", 'warning'); return;}
+
 	<#if !isMix>
 		var productList = getItemBykey("productList");
 		var compositionList = getItemBykey("compositionList");
@@ -832,7 +839,7 @@ $(function() {
 							<input type="number" class="street-value" value="0" id="smallPrice" name="smallPrice" readonly>
 						</div>
 						<input type="hidden" id="rowTotal" name="rowTotal" value="">
-						<hr />
+						<div class="hr"></div>
 						<div class="gift" id="gift">
 							<input type="hidden" name="giftSellProductId" id="giftSellProductId" value="">
 							<input type="hidden" name="giftProductId" id="giftProductId" value="">

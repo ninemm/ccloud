@@ -322,22 +322,20 @@
 							    <td class="center">
 							<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
 							</td>
-							<#list (list.productInfos)! as plist>
 							<td class="text-left">
 								<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].seller_product_id"  value="${list.sellerProductId}" />
-								<input type="text" id="goodsName" name="goodsName"  value="${plist.customName}" disabled="disabled"/>
+								<input type="text" id="goodsName" name="goodsName"  value="${list.customName}" disabled="disabled"/>
 							   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
 							</td>
 							<td>
-								<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
+								<input name="specification" id="specification" value="${list.specificationValue!}" disabled="disabled"></input>
 							</td>
 							<td>
-								<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
+								<input name="big_unit" id="big_unit" value="${list.bigUnit!}" disabled="disabled"></input>
 							</td>
 							<td>
-								<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
+								<input name="balanceCount" id="balanceCount" value="${list.balanceCount!}" disabled="disabled"></input>
 							</td>
-							</#list>
 							<td>
 							<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount}" />
 							</td>

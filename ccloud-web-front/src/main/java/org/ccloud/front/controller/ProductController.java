@@ -54,9 +54,9 @@ public class ProductController extends BaseFrontController {
 		List<Record> productRecords = new ArrayList<>();
 		if (goodsCategoryList.size()>0) {
 			if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
-				productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),goodsCategoryList.get(0).getStr("categoryId"));
+				productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),goodsCategoryList.get(0).getStr("categoryId"),0,10);
 			} else {
-				productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",goodsCategoryList.get(0).getStr("categoryId"));
+				productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",goodsCategoryList.get(0).getStr("categoryId"),0,10);
 			}
 		}
 		
@@ -78,6 +78,7 @@ public class ProductController extends BaseFrontController {
 		setAttr("compositionList", JSON.toJSON(compositionList));
 		setAttr("tags", JSON.toJSON(tagSet));
 		render("product.html");
+		
 	}
 
 	public void productList() {
@@ -86,13 +87,14 @@ public class ProductController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		String tag = getPara("tag");
 		String categoryId = getPara("categoryId");
+		
 		List<Record> goodsCategory=GoodsCategoryQuery.me().findBySellerId(sellerId,tag);
 		
 		List<Record> productList = new ArrayList<>();
 		if (!StrKit.notBlank(categoryId)) {
 			categoryId=goodsCategory.get(0).getStr("categoryId");
 		}
-		productList=	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId);
+		productList=	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,0,10);
 		List<Record> compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword, tag);
 		Set<String> tagSet = new LinkedHashSet<String>();
 		for (Record record : productList) {
@@ -108,12 +110,23 @@ public class ProductController extends BaseFrontController {
 		Map<String, Collection<? extends Serializable>> map = ImmutableMap.of("productList", productList, "compositionList", compositionList, "tags", tagSet,"goodsCategory",goodsCategory);
 		renderJson(map);
 	}
+	
+	public void pageProduct() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String keyword = getPara("keyword");
+		String tag = getPara("tag");
+		String categoryId = getPara("categoryId");
+		Integer pageNumber = Integer.parseInt(getPara("pageNumber"))*Integer.parseInt(getPara("pageSize"));
+		Integer pageSize = Integer.parseInt(getPara("pageSize"));
+		List<Record> productList = 	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,pageNumber,pageSize );
+		renderJson(productList);
+	}
 
 	public void shoppingCart() {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
-		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","");
+		List<Record> productList = SellerProductQuery.me().findProductListForApp(sellerId, "", "","",null,null);
 
 		Map<String, Object> sellerProductInfoMap = new HashMap<String, Object>();
 		List<Map<String, Object>> sellerProductItems = new ArrayList<>();
