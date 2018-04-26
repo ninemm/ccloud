@@ -13,19 +13,20 @@ import com.google.gson.annotations.SerializedName;
  */
 public class JpPurchaseStockInResponseBody extends JpBaseResponseBody {
 	@SerializedName("Data") 
-	private List<JpPurchaseStockInResponseEntity> data;
+	private List<JpPurchaseStockInMainResponse> data;
 	@SerializedName("Flsg") 
 	private String flsg;
 	@SerializedName("Remark") 
 	private String remark;
 
-	public List<JpPurchaseStockInResponseEntity> getData() {
+	public List<JpPurchaseStockInMainResponse> getData() {
 		return data;
 	}
 
-	public void setData(List<JpPurchaseStockInResponseEntity> data) {
+	public void setData(List<JpPurchaseStockInMainResponse> data) {
 		this.data = data;
 	}
+
 	public String getFlsg() {
 		return flsg;
 	}

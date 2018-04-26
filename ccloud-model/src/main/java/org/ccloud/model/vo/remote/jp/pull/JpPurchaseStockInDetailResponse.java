@@ -11,9 +11,7 @@ import com.google.gson.annotations.SerializedName;
  * @author wally
  *
  */
-public class JpPurchaseStockInResponseEntity {
-	@SerializedName("OrderNum") 
-	private String orderNum;
+public class JpPurchaseStockInDetailResponse {
 	@SerializedName("DealerMarketCode") 
 	private String dealerMarketCode;
 	@SerializedName("DealerMarketName") 
@@ -32,12 +30,6 @@ public class JpPurchaseStockInResponseEntity {
 	private String cComUnitName;
 	@SerializedName("BusinessDate") 
 	private Date businessDate;
-	public String getOrderNum() {
-		return orderNum;
-	}
-	public void setOrderNum(String orderNum) {
-		this.orderNum = orderNum;
-	}
 	public String getDealerMarketCode() {
 		return dealerMarketCode;
 	}
