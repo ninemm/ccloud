@@ -432,7 +432,10 @@ public class OrderController extends BaseFrontController {
 				// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
 				String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
 						                 + DateUtils.format("yyMMdd", date) + OrderSO;
-
+				if (null==StringUtils.getArrayFirst(paraMap.get("customerType"))) {
+					result[0] = "客户类型不能为空";
+					return false;
+				}
 				if (!SalesOrderQuery.me().insertForApp(paraMap, orderId, orderSn, sellerId, user.getId(), date,
 						user.getDepartmentId(), user.getDataArea())) {
 					result[0] = "下单失败";
