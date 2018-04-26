@@ -441,7 +441,9 @@ public class CustomerVisitController extends BaseFrontController {
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
 				String orderList = obj.getString("orderList");
+				String photoType = obj.getString("photoType");
 				ImageJson image = new ImageJson();
+				image.setPhotoType(photoType);
 				image.setOrderList(orderList);
 				image.setImgName(picname);
 				if(pic.length() == 32) {
@@ -453,8 +455,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-					String waterFont3 =  customerVisit.getLocation();
-//					String waterFont3 = "湖北省-武汉市-洪山区";
+//					String waterFont3 =  customerVisit.getLocation();
+					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					

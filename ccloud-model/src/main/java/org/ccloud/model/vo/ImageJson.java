@@ -5,8 +5,15 @@ public class ImageJson {
 	private String imgName;
 	private String savePath;
 	private String originalPath;
+	private String photoType; //照片类型
 	private String orderList; // 判断活动执行步骤
 	
+	public String getPhotoType() {
+		return photoType;
+	}
+	public void setPhotoType(String photoType) {
+		this.photoType = photoType;
+	}
 	public String getImgName() {
 		return imgName;
 	}

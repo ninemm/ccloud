@@ -331,4 +331,9 @@ public class Consts {
 	
 	public static final String GET_MID_DATA_TOTALROW = "100";//一次同步数据条数
 	
+	public static final String CUSTOMER_VISIT_PHOTO_TYPE_SCENEPHOTO = "ScenePhoto"; //拜访现场照片
+	public static final String CUSTOMER_VISIT_PHOTO_TYPE_SIGNPHOTO = "SignPhoto"; //拜访签名照片
+	public static final String CUSTOMER_VISIT_PHOTO_TYPE_GIFTPHOTO = "GiftPhoto"; //拜访赠品照片
+	public static final String CUSTOMER_VISIT_PHOTO_TYPE_EXECUTEPHOTO = "ExecutePhoto";	//拜访验收照片
+	
 }

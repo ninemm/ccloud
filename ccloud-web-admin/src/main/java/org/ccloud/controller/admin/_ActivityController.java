@@ -916,15 +916,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		for (String activityApplyId : activityApplyIds) {
 			Record YxActivity = ActivityQuery.me().findYxActivity(activityApplyId);
 			List<Record> list= ActivityQuery.me().findPhoto(activityApplyId);
-			String ScenePhoto="";
-			if (list!=null) {
-				ScenePhoto=addPhoto(list);
-				if (ScenePhoto==null) {
-					ScenePhoto="";
+			Map<String, List<String>> ScenePhoto = new HashMap<>();
+			if (list != null) {
+				ScenePhoto = addPhoto(list);
+				if (ScenePhoto == null) {
 					renderAjaxResultForError("同步图片失败!");
 					return;
-				}else {
-					ScenePhoto = ScenePhoto.substring(1, ScenePhoto.length() - 1);
 				}
 			}
 			ActivityApply activityApply = ActivityApplyQuery.me().findById(activityApplyId);
@@ -945,7 +942,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_CUSTOMER_VISITE)) {
 				message = SYN_INVEST_CUSTOMER_VISITE(activityApply, ScenePhoto, YxActivity, shopId);
 			}else if(YxActivity.getStr("invest_type").equals(Consts.INVEST_SUPERMARKET_GIFT)) {
-				message = SYN_INVEST_SUPERMARKET_GIFT(activityApply, ScenePhoto, YxActivity, shopId);
+				message = SYN_INVEST_SUPERMARKET_GIFT(activityApply, YxActivity, shopId);
 			}else {
 				message = SYN_INVEST_SLOTTING_FEE(activityApply, ScenePhoto, YxActivity, shopId);
 			}
@@ -958,7 +955,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderAjaxResultForSuccess("加入核销成功");
 	}
 	
-	private String SYN_INVES_PUBLICK(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+	private String SYN_INVES_PUBLICK(ActivityApply activityApply, Map<String, List<String>> ScenePhoto, 
+			Record YxActivity, Long shopId) {
 		//公关赞助
 		String SYN_ID = StrKit.getRandomUUID();
 		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
@@ -979,7 +977,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return "true";
 	}
 	
-	private String SYN_INVEST_CONSUMPTION_CULTIVATION(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+	private String SYN_INVEST_CONSUMPTION_CULTIVATION(ActivityApply activityApply, Map<String, List<String>> ScenePhoto,
+			Record YxActivity, Long shopId) {
 		//消费培育
 		String SYN_ID = StrKit.getRandomUUID();
 		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
@@ -1000,7 +999,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return "true";
 	}
 	
-	private String SYN_INVEST_TERMINSL_ADVERTISWMENT(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+	private String SYN_INVEST_TERMINSL_ADVERTISWMENT(ActivityApply activityApply, Map<String, List<String>> ScenePhoto,
+			Record YxActivity, Long shopId) {
 		//终端广告
 		String SYN_ID = StrKit.getRandomUUID();
 		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
@@ -1021,7 +1021,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return "true";
 	}
 	
-	private String SYN_INVEST_TERMINSL_DISPLAY(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+	private String SYN_INVEST_TERMINSL_DISPLAY(ActivityApply activityApply, Map<String, List<String>> ScenePhoto,
+			Record YxActivity, Long shopId) {
 		//终端陈列 
 		String SYN_ID = StrKit.getRandomUUID();
 		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
@@ -1058,7 +1059,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return "true";
 	}
 	
-	private String SYN_INVEST_CUSTOMER_VISITE(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+	private String SYN_INVEST_CUSTOMER_VISITE(ActivityApply activityApply, Map<String, List<String>> ScenePhoto,
+			Record YxActivity, Long shopId) {
 		//终端客情
 		String SYN_ID = StrKit.getRandomUUID();
 		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
@@ -1079,7 +1081,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return "true";
 	}
 	
-	private String SYN_INVEST_SUPERMARKET_GIFT(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+	private String SYN_INVEST_SUPERMARKET_GIFT(ActivityApply activityApply,
+			Record YxActivity, Long shopId) {
 		//商超赠品
 		String SYN_ID = StrKit.getRandomUUID();
 		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
@@ -1087,7 +1090,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			renderAjaxResultForError("同步订单失败!");
 			return null;
 		}
-		Map<String, Object> map = ActivityMaps.INVEST_SUPERMARKET_GIFT_MAP(YxActivity, SYN_ID, ScenePhoto, shopId, orderID);
+		Map<String, Object> map = ActivityMaps.INVEST_SUPERMARKET_GIFT_MAP(YxActivity, SYN_ID, shopId, orderID);
 		Map<String, Object> executeMap = ActivityMaps.INVEST_SUPERMARKET_GIFT_EXECUTE_MAP(YxActivity, SYN_ID, orderID);
 		try {
 			HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/ActivityMarketGiftInfo", map);
@@ -1102,7 +1105,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		return "true";
 	}
 	
-	private String SYN_INVEST_SLOTTING_FEE(ActivityApply activityApply, String ScenePhoto, Record YxActivity, Long shopId) {
+	private String SYN_INVEST_SLOTTING_FEE(ActivityApply activityApply, Map<String, List<String>> ScenePhoto,
+			Record YxActivity, Long shopId) {
 		//进场费
 		String SYN_ID = StrKit.getRandomUUID();
 		String orderID = synOrder(activityApply.getId(), YxActivity, shopId.toString());
@@ -1188,16 +1192,30 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	}
 	
 	//保存照片
-	public String addPhoto(List<Record> listRecord) {
-		List<String> list = Lists.newArrayList();
+	public Map<String, List<String>> addPhoto(List<Record> listRecord) {
+		Map<String, List<String>> resultMap = new HashMap<>();
+		List<String> ScenePhotoList = Lists.newArrayList();
+		List<String> SignPhotoList = Lists.newArrayList();
+		List<String> GiftPhotoList = Lists.newArrayList();
+		List<String> ExecutePhotoList = Lists.newArrayList();
+		List<String> AllPhotoList = Lists.newArrayList();
 		for (Record record : listRecord) {
 			JSONArray picList = JSON.parseArray(record.getStr("photo"));
 			for (int  a= 0; a <picList.size(); a++) {
 				JSONObject obj = picList.getJSONObject(a);
 				String domain = OptionQuery.me().findValue("cdn_domain");
 				String savePath = obj.getString("savePath");
-//				String photoId = StrKit.getRandomUUID();
-				list.add(savePath);
+				String photoType = obj.getString("photoType");
+				if (photoType.equals(Consts.CUSTOMER_VISIT_PHOTO_TYPE_EXECUTEPHOTO)) {
+					ExecutePhotoList.add(savePath);
+				} else if(photoType.equals(Consts.CUSTOMER_VISIT_PHOTO_TYPE_SIGNPHOTO)) {
+					SignPhotoList.add(savePath);
+				} else if(photoType.equals(Consts.CUSTOMER_VISIT_PHOTO_TYPE_GIFTPHOTO)) {
+					GiftPhotoList.add(savePath);
+				} else {
+					ScenePhotoList.add(savePath);
+				}
+				AllPhotoList.add(savePath);
 				Map<String, Object> map = ActivityMaps.photoMap(savePath, domain, record.getStr("create_date"));
 				try {
 					HttpUtils.post("http://yxmiddb.jingpai.com/WebAPI/api/PhotoInfo", map);
@@ -1207,6 +1225,11 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				}
 			}
 		}
-		return list.toString();
+		resultMap.put("AllPhoto", AllPhotoList);
+		resultMap.put("ScenePhoto", ScenePhotoList);
+		resultMap.put("SignPhoto", SignPhotoList);
+		resultMap.put("GiftPhoto", GiftPhotoList);
+		resultMap.put("ExecutePhoto", ExecutePhotoList);
+		return resultMap;
 	}
 }

@@ -103,10 +103,11 @@
                     $.alert("最多上传三张图片");
                     return false;
                 }
+                var photoType = $("#photoType").data("values");
                 if($("#activity_title").val()!=null){
-                    imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":$this.parent().parent().parent().find("#orderList").val()});
+                    imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":$this.parent().parent().parent().find("#orderList").val(),"photoType":photoType});
                 }else{
-                    imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":"0"});
+                    imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":"0","photoType":photoType});
                 }
                 $("#pic").val(JSON.stringify(imageArr));
                 var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
@@ -253,20 +254,21 @@
             return false;
         }
         
-        if(has_size == 1 && $.trim($("#size").val()).length == 0) {
+        if(has_size == 1 && $.trim($("#check_size").val()).length == 0) {
             $.toptip('验收尺寸不能为空', 3000, 'error');
             return false;
-        }        
+        }
 
         //if($("#question_desc").val().length==0) {
         //    $.toptip('备注描述不能为空', 3000, 'error');
         //    return false;
         //}
 
-       if($("#location").val().length==0) {
-            $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
-            return false;
-        }
+<!--        if($("#location").val().length==0) { -->
+<!--             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); -->
+<!--             return false; -->
+<!--         } -->
+        
         if(imageArr.length == 0){
         	 $.toptip('照片不能为空', 3000, 'error'); 
             return false;

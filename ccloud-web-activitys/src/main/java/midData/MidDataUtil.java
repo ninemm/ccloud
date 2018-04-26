@@ -39,17 +39,16 @@ import com.jfinal.kit.PropKit;
 
 public class MidDataUtil {
 	
-	private static String userName = PropKit.use("midData.properties").get("middata_soap_username");
-	private static String passWord = PropKit.use("midData.properties").get("middata_soap_password");
-    private static final String GET_JINGPAI_ACTIVITYS = "http://yxmiddb.jingpai.com/WebAPI/api/Activitys";
-    private static final String GET_JINGPAI_FLOWTYPE = "http://yxmiddb.jingpai.com/WebAPI/api/BasicFlowTypes";
-    private static final String GET_JINGPAI_FEETYPE = "http://yxmiddb.jingpai.com/WebAPI/api/BasicFeeTypes";
-    private static final String GET_JINGPAI_SHOWTYPE = "http://yxmiddb.jingpai.com/WebAPI/api/BasicShowTypes";
-    private static final String GET_JINGPAI_EXPENSES = "http://yxmiddb.jingpai.com/WebAPI/api/Expenses";
-    private static final String GET_JINGPAI_EXPENSEDETAILS = "http://yxmiddb.jingpai.com/WebAPI/api/ExpensesDetail";
-    private static final String GET_JINGPAI_BASICCHANNELTYPE = "http://yxmiddb.jingpai.com/WebAPI/api/BasicChannelType";
-    private static final String GET_JINGPAI_BASICCHANNEL= "http://yxmiddb.jingpai.com/WebAPI/api/BasicChannel";
-    private static final String GET_JINGPAI_EXPENSESDETAIL= "http://yxmiddb.jingpai.com/WebAPI/api/ExpensesDetail";
+//	private static String userName = PropKit.use("midData.properties").get("middata_soap_username");
+//	private static String passWord = PropKit.use("midData.properties").get("middata_soap_password");
+    private static final String GET_JINGPAI_ACTIVITYS = PropKit.use("midData.properties").get("GET_JINGPAI_ACTIVITYS");
+    private static final String GET_JINGPAI_FLOWTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_FLOWTYPE");
+    private static final String GET_JINGPAI_FEETYPE = PropKit.use("midData.properties").get("GET_JINGPAI_FEETYPE");
+    private static final String GET_JINGPAI_SHOWTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_SHOWTYPE");
+    private static final String GET_JINGPAI_EXPENSES = PropKit.use("midData.properties").get("GET_JINGPAI_EXPENSES");
+    private static final String GET_JINGPAI_EXPENSEDETAILS = PropKit.use("midData.properties").get("GET_JINGPAI_EXPENSEDETAILS");
+    private static final String GET_JINGPAI_BASICCHANNELTYPE = PropKit.use("midData.properties").get("GET_JINGPAI_BASICCHANNELTYPE");
+    private static final String GET_JINGPAI_BASICCHANNEL= PropKit.use("midData.properties").get("GET_JINGPAI_BASICCHANNEL");
 
 	public static void main(String[] args) throws RemoteException {
 //		List<Expense> list = getExpensesInfo("2018-02-01", "2018-03-01", "1", "100");
@@ -189,7 +188,7 @@ public class MidDataUtil {
         Map<String, String> map = new HashMap<>();
         map.put("strExpenseID", expenseID);
 		try {
-			String result = HttpUtils.get(GET_JINGPAI_EXPENSESDETAIL, map);
+			String result = HttpUtils.get(GET_JINGPAI_EXPENSEDETAILS, map);
 			System.out.println(result);
 			String response = getResponseType(type);
 			JSONArray jsonArray = JSONObject.parseObject(result).getJSONArray(response);
