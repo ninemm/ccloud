@@ -16,6 +16,7 @@
 package org.ccloud.model.base;
 
 
+import org.ccloud.cache.JCacheKit;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
 
