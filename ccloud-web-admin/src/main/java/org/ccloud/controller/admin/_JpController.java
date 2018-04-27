@@ -25,7 +25,6 @@ import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseOrder;
 import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.Seller;
-import org.ccloud.model.SellerProduct;
 import org.ccloud.model.SellerSynchronize;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DepartmentQuery;
@@ -33,7 +32,6 @@ import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.GoodsQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.ProductQuery;
-import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SellerSynchronizeQuery;
 import org.ccloud.model.vo.remote.jp.pull.JpGoodsCategoryResponseEntity;
@@ -437,8 +435,8 @@ public class _JpController extends JBaseCRUDController<Goods> {
 			String porderSn = null;
 			Seller seller = null;
 			Product product = null;
-			SellerProduct sellerProduct = null;
 			String sellerCode = null;
+			BigDecimal mainPurchaseTotalAmount = null;
 			for (Iterator<JpPurchaseStockInMainResponse> iterator = responseBody.getData().iterator(); iterator.hasNext();) {
 				/**************添加采购单主单信息********************/
 				mainStockIn = iterator.next();
@@ -458,7 +456,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				department = DepartmentQuery.me().findById(seller.getDeptId());
 				purchaseOrder.setDataArea(department.getDataArea());
 				purchaseOrder.setCreateDate(calendar.getTime());
-				purchaseOrders.add(purchaseOrder);
+				mainPurchaseTotalAmount = new BigDecimal(0);
 				
 				/********************添加采购单明细**************************/
 				purchaseStockInDetails = mainStockIn.getOrderDetails();
@@ -476,16 +474,16 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					if(product == null)
 						continue;
 					purchaseOrderDetail.setProductId(product.getId());
-					sellerProduct = SellerProductQuery.me().findByProductId(product.getId());
-					if(sellerProduct == null)
-						continue;
 					// 小数量
 					purchaseOrderDetail.setProductCount(Integer.valueOf(purchaseStockInDetail.getSaleNum()) * product.getConvertRelate());
-					purchaseOrderDetail.setProductAmount(sellerProduct.getPrice().multiply(new BigDecimal(purchaseOrderDetail.getProductCount())));
+					purchaseOrderDetail.setProductAmount(product.getPrice().multiply(new BigDecimal(purchaseOrderDetail.getProductCount())));
 					purchaseOrderDetail.setProductPrice(product.getPrice());
+					mainPurchaseTotalAmount.add(purchaseOrderDetail.getProductAmount());
 					purchaseOrderDetails.add(purchaseOrderDetail);
 					index++;
 				}
+				purchaseOrder.setTotalAmount(mainPurchaseTotalAmount);
+				purchaseOrders.add(purchaseOrder);
 			}
 			result = Db.tx(new IAtom() {
 				@Override
