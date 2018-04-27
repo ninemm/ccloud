@@ -176,7 +176,7 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 				+ StringUtils.getArrayFirst(paraMap.get("warehouseCode")) + DateUtils.format("yyMMdd", date) + OrderSO;
 
 		SalesRefundInstockQuery.me().insert(paraMap, instockId, instockSn, sellerId, user.getId(), date, deptId,
-				dataArea, outStockId);
+				dataArea, outStockId, sellerCode);
 
 		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
 		Integer productNum = Integer.valueOf(productNumStr);
