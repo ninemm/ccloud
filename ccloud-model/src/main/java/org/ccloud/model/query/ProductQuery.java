@@ -475,7 +475,7 @@ public class ProductQuery extends JBaseQuery {
 	}	
 	
 	public Product findbyProductSn(String productSn) {
-		return DAO.doFindFirst("product_sn",productSn);
+		return DAO.doFindFirst("product_sn = ?",productSn);
 	}
   	
 }

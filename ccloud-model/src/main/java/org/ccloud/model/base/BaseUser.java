@@ -15,14 +15,10 @@
  */
 package org.ccloud.model.base;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
-import org.ccloud.cache.JCacheKit;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.core.JModel;
 
-import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.IBean;
 
 import com.jfinal.plugin.ehcache.IDataLoader;

@@ -657,7 +657,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		boolean priceChange=false;
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
 		for (int i = 0; i < productNames.length; i++) {
-			if (!orderDetails.get(i).getInt("price").equals(orderDetails.get(i).getInt("product_price"))) {
+			if (Double.parseDouble(orderDetails.get(i).getStr("price"))!=Double.parseDouble(bigPriceSpans[i])) {
 				double conver_relate = Double.parseDouble(orderDetails.get(i).getStr("convert_relate"));
 				double price = Double.parseDouble(orderDetails.get(i).getStr("price"));
 				double smallprice=price/conver_relate;

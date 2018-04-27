@@ -17,7 +17,9 @@ package org.ccloud.controller.admin;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
+import org.ccloud.model.PrintTemplate;
 import org.ccloud.model.Product;
 import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.PurchaseInstockDetail;
@@ -41,6 +44,7 @@ import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.PayablesQuery;
+import org.ccloud.model.query.PrintTemplateQuery;
 import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.PurchaseOrderDetailQuery;
@@ -48,11 +52,14 @@ import org.ccloud.model.query.PurchaseOrderQuery;
 import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.model.vo.orderProductInfo;
+import org.ccloud.model.vo.printAllNeedInfo;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
@@ -394,5 +401,39 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Warehouse> wares = WarehouseQuery.me()._findByUserId(user.getId());
 		renderJson(wares);
+	}
+	
+	public void renderPrintPage() {
+		setAttr("purchaseOrderId", getPara("purchaseOrderId"));
+		//是否是打印打印，财务打印的是成本价
+		setAttr("isFinancePrint", getPara("isFinancePrint"));
+		// 获取销售商的配置模板地址
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<PrintTemplate> printTemplates = PrintTemplateQuery.me().findPrintTemplateBySellerId(sellerId);
+		if (printTemplates.size() == 0) {
+			renderAjaxResultForError("请配置一个打印模板");
+		} else {
+			String url = printTemplates.get(0).getUrl();
+			render(url+".html");
+		}
+
+	}
+	// 获取出库单打印的信息
+	public void getPrintInfo() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String purchaseOrderId = getPara("purchaseOrderId");
+		String[] outId = purchaseOrderId.split(",");
+//				Integer isFinancePrint = getParaToInt("isFinancePrint");
+		List<printAllNeedInfo> printAllNeedInfos = new ArrayList<>();
+		List<orderProductInfo> orderProductInfos = new ArrayList<>();
+		for (String s : outId) {
+			printAllNeedInfo printAllNeedInfo = PurchaseOrderQuery.me().findStockOutForPrint(s);
+			orderProductInfos = PurchaseOrderQuery.me().findPrintProductInfo(s,user.getDataArea());	
+			printAllNeedInfo.setOrderProductInfos(orderProductInfos);
+			printAllNeedInfos.add(printAllNeedInfo);
+		}
+		HashMap<String, Object> result = Maps.newHashMap();
+		result.put("rows", printAllNeedInfos);
+		renderJson(result);
 	}
 }

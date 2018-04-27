@@ -323,7 +323,7 @@ function initProduct(productList,goodsCategory,compositionList){
 	});
 	$menuRight.append("<div class='weui-loadmore'><span class='weui-loadmore__tips'>正在加载</span></div>");
 	if(productList.length < pageSize){
-    		$(".weui-loadmore__tips").html("暂无数据")
+    		$(".weui-loadmore__tips").html("已加载全部")
     }
 }
 
@@ -632,7 +632,7 @@ function order(){
 
  	//监听滚动
     $(".infinite").infinite().on("infinite", function() {
-    		if($(".weui-loadmore__tips").text()=='暂无数据'){
+    		if($(".weui-loadmore__tips").text()=='已加载全部'){
     			return;
     		}
     		var self = this;
@@ -648,7 +648,7 @@ function order(){
             dataType: "json",
             success:function(data) {
                	if(data.length < pageSize){
-               		$(".weui-loadmore__tips").html("暂无数据")
+               		$(".weui-loadmore__tips").html("已加载全部")
                	}
                 if ($loadmore) $loadmore.show();
                 if (data.length >= pageNumber) {
