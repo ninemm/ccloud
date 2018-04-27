@@ -48,12 +48,13 @@ public class PurchaseInstockQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String deptId,String dataArea) {
-		String select = "select i.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName ";
+		String select = "select i.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName,cpo.porder_sn ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_purchase_instock` i ");
 		fromBuilder.append(" left join cc_supplier cs on i.supplier_id = cs.id ");
 		fromBuilder.append(" LEFT JOIN cc_seller s ON i.supplier_id = s.id ");
 		fromBuilder.append(" left join user u on i.input_user_id = u.id ");
-
+		fromBuilder.append(" LEFT JOIN cc_purchase_order_join_instock cpoji on cpoji.purchase_instock_id = i.id ");
+		fromBuilder.append(" LEFT JOIN cc_purchase_order cpo on cpo.id = cpoji.purchase_order_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
 		boolean needWhere = true;
 
