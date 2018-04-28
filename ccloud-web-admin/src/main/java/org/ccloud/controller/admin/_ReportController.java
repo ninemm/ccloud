@@ -469,7 +469,7 @@ public class _ReportController extends JBaseController {
 			if (i == findBySellerId.size() - 1) {
 				productNames = productNames + customName;
 			} else {
-				productNames = productNames + customName + ",";
+				productNames = productNames + customName + ";";
 			}			
 		}
 		setAttr("productNames", productNames);
@@ -583,7 +583,7 @@ public class _ReportController extends JBaseController {
 			if (i == findBySellerId.size() - 1) {
 				productNames = productNames + customName;
 			} else {
-				productNames = productNames + customName + ",";
+				productNames = productNames + customName + ";";
 			}			
 		}
 		setAttr("productNames", productNames);
@@ -672,7 +672,7 @@ public class _ReportController extends JBaseController {
 			if (i == findBySellerId.size() - 1) {
 				productNames = productNames + customName;
 			} else {
-				productNames = productNames + customName + ",";
+				productNames = productNames + customName + ";";
 			}			
 		}
 		setAttr("productNames", productNames);
@@ -766,7 +766,7 @@ public class _ReportController extends JBaseController {
 	private Map<String, String> getProductMap(String productNames) {
 		Map<String, String> map = new HashMap<>();
 		if (StrKit.notBlank(productNames)) {
-			String[] productName = productNames.split(",");
+			String[] productName = productNames.split(";");
 			for (String string : productName) {
 				map.put(string, "0");
 			}
