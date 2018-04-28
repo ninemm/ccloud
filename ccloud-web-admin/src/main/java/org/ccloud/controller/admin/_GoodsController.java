@@ -205,6 +205,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
     				Product product = getModel(Product.class);
     				String productId = StringUtils.getArrayFirst(map.get("productList[" + i + "].id"));
     				String productSn = StringUtils.getArrayFirst(map.get("productList[" + i + "].productSn"));
+    				String productName = map.get("productList[" + i + "].name") != null && map.get("productList[" + i + "].name").length > 0 ? StringUtils.getArrayFirst(map.get("productList[" + i + "].name")) : null;
     				if (StringUtils.isBlank(productSn)) {
     					continue;
     				}
@@ -234,7 +235,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
     					market++;
     				}
     				product.setGoodsId(goods.getId());
-    				product.setName(goods.getName());
+    				product.setName(StrKit.isBlank(productName) ? goods.getName() : productName);
     				product.setFreezeStore(0);
     				
     				if (StringUtils.isBlank(productId)) {

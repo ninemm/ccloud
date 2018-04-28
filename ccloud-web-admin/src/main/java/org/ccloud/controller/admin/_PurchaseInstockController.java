@@ -170,8 +170,13 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 	public void refund() {
 		String orderId = getPara("orderId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Record order = PurchaseOrderQuery.me().findMoreById(orderId,user.getDataArea());
-		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId,user.getDataArea());
+		PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(orderId);
+		String dataArea = user.getDataArea();
+		if(StrKit.notBlank(purchaseOrder.getStockOutSn()))
+			dataArea = new String(dataArea.substring(0, dataArea.length() - 4));
+		Record order = PurchaseOrderQuery.me().findMoreById(orderId,dataArea);
+			
+		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId, dataArea);
 
 		HashMap<String, Object> result = Maps.newHashMap();
 		result.put("order", order);
