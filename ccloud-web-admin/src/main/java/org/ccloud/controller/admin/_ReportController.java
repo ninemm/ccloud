@@ -663,6 +663,7 @@ public class _ReportController extends JBaseController {
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("客户名称");
+		watchHead.add("客户地址");
 		watchHead.add("销售额(元)");
 		String productNames = "";
 		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameBySellerId(sellerId);
@@ -720,6 +721,7 @@ public class _ReportController extends JBaseController {
 				userOrderMap.putAll(map);
 				customerId = list.get(i).getStr("customer_id");
 				userOrderMap.put("客户名称", list.get(i).getStr("customer_name"));
+				userOrderMap.put("客户地址", list.get(i).getStr("address"));
 				userOrderMap.put("销售额(元)", "0");
 				userOrderMap.put("customerId", list.get(i).getStr("customer_id"));
 			}
