@@ -32,11 +32,10 @@ import com.jfinal.aop.Before;
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.LogKit;
 import com.jfinal.kit.StrKit;
-import com.jfinal.qyweixin.sdk.api.AccessTokenApi;
-import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.qyweixin.sdk.api.ApiResult;
 import com.jfinal.qyweixin.sdk.api.ConUserApi;
 import com.jfinal.qyweixin.sdk.api.OAuthApi;
+import com.jfinal.qyweixin.sdk.api.ReturnCode;
 
 @RouterMapping(url = "/woauth")
 public class WWxOauthController extends BaseFrontController {
@@ -49,7 +48,7 @@ public class WWxOauthController extends BaseFrontController {
 		String gotoUrl = getPara("goto", Consts.INDEX_URL);
 		String wechatUserJson = getSessionAttr(Consts.SESSION_WECHAT_USER);
 		String code = getPara("code");
-		wechatUserJson  = null;
+//		wechatUserJson  = null;
 		if (StrKit.isBlank(wechatUserJson)) {
 			String userJsonText = getUserInfoByCode(code);
 			if (StrKit.notBlank(userJsonText)) {
@@ -59,12 +58,17 @@ public class WWxOauthController extends BaseFrontController {
 		}
 		
 		JSONObject userJson = JSON.parseObject(wechatUserJson);
-		String errorCode = userJson.getString("errcode");
-		if (!StrKit.equals(errorCode, "0")) {
+		int errcode = userJson.getIntValue("errcode");
+		if (errcode != 0) {
 			String userJsonText = getUserInfoByCode(code);
 			if (StrKit.notBlank(userJsonText)) {
 				setSessionAttr(Consts.SESSION_WECHAT_USER, userJsonText);
 				userJson = JSON.parseObject(userJsonText);
+				errcode = userJson.getIntValue("errcode");
+				if (errcode != 0) {
+					renderText(ReturnCode.get(errcode) + "\n" + ", 配置错误，请联系管理员!");
+					return ;
+				}
 			}
 		}
 		
@@ -190,7 +194,7 @@ public class WWxOauthController extends BaseFrontController {
 	}
 	
 	private String getUserInfoByCode(String code) {
-		AccessTokenApi.refreshAccessToken(ApiConfigKit.getApiConfig());
+//		AccessTokenApi.refreshAccessToken(ApiConfigKit.getApiConfig());
 		ApiResult result = OAuthApi.getUserInfoByCode(code);
 //		System.out.println(result.toString());
 		if (result != null) {

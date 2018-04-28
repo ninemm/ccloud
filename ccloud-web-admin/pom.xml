@@ -71,6 +71,14 @@
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+            <groupId>org.ccloud</groupId>
+            <artifactId>ccloud-web-qyfront</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+            <scope>compile</scope>
+        </dependency>
 
 		<dependency>
 			<groupId>org.ccloud</groupId>
@@ -141,6 +149,11 @@
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-core</artifactId>
 						</overlay>
+						
+						<overlay>
+                            <groupId>org.ccloud</groupId>
+                            <artifactId>ccloud-web-qyfront</artifactId>
+                        </overlay>
 
 						<overlay>
 							<groupId>org.ccloud</groupId>

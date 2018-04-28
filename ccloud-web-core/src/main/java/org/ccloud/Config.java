@@ -15,8 +15,6 @@
  */
 package org.ccloud;
 
-import com.jfinal.qyweixin.sdk.api.ApiConfig;
-import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import org.ccloud.core.CCloud;
 import org.ccloud.core.CCloudConfig;
 import org.ccloud.message.Actions;
@@ -33,10 +31,11 @@ import org.ccloud.ui.freemarker.function.TaxonomyBox;
 import org.ccloud.ui.freemarker.tag.ContentTag;
 import org.ccloud.ui.freemarker.tag.ContentsTag;
 import org.ccloud.ui.freemarker.tag.DictTag;
+import org.ccloud.wwechat.WorkWechatApi;
 
+import com.jfinal.qyweixin.sdk.api.ApiConfigKit;
 import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.template.Engine;
-import org.ccloud.wwechat.WorkWechatApi;
 
 public class Config extends CCloudConfig {
 
