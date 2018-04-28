@@ -25,6 +25,7 @@
     var Orientation = null;
     var MAX_HEIGHT = 1000;
 	var newImage = 0;
+	var numI = 0;
     $(function() {
     	$("#customerVisitId").val("${(customerVisit.id)!}");
         $("#customer_name").val("${(customerVisit.customer_name)!}");
@@ -71,16 +72,17 @@
 
 
 
-    var orderListNum = parseInt(${(orderListNum)!});
-        var activityApplyId = "${(customerVisit.activitApplyId)!}";
+    	var orderListNum = parseInt(${(orderListNum)!});
+        var activityApplyId = "${(customerVisit.active_apply_id)!}";
         var listI = ${(list)!'1'};
        	var html = "";
        	var _domain = "${(domain)!}";
+       	console.log(activityApplyId);
        	if(activityApplyId!=""){
 			$.ajax({
 		        url: "${CPATH}/customerVisit/getActivityExecute",
 		        data: {
-		            "activityApplyId": "${(customerVisit.activitApplyId)!}"
+		            "activityApplyId": "${(customerVisit.active_apply_id)!}"
 		        },
 		        dataType: "json",
 		        success: function(data) {
@@ -111,6 +113,7 @@
 			                               	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
 			                               	+'</div></div></div>';
 			                          }else{
+			                          	numI++;
 			                          	html +='</ul></div></div>';
 			                          }
 			        			}
@@ -163,12 +166,19 @@
 
         var index; //第几张图片
         var $uploaderFiles ;
+        var uploadIndex;
         $(document).on("click", ".uploaderFiles li", function() {
             _index = $(this).index()+numImage;
             index = $(this).index();
+            uploadIndex = $(this).parent().parent().parent().index();
             $uploaderFiles = $(this).parent();
             $galleryImg.attr("style", this.getAttribute("style"));
             $gallery.fadeIn(100);
+            if(uploadIndex < numI){
+	            $(".weui-gallery__del").hide();
+            }else{
+            	$(".weui-gallery__del").show();
+            }
         });
 
         $gallery.on("click", function() {

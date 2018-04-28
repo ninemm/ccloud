@@ -28,11 +28,11 @@
     var $picNum = $('.weui-uploader__info');
     var $uploaderFiles = $(".uploaderFiles");
     var $gallery = $("#gallery"), $galleryImg = $("#galleryImg");
-	var numImage = 0;
+	var numI = 0;
     var Orientation = null;
     var MAX_HEIGHT = 1000;
     var has_size = 0;
-
+	var numImage = 0;
     initCustomer();
 
     function initCustomer(){
@@ -187,8 +187,8 @@
 								        				var html = "";
 								        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
 						                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
+							                          
 							                           for(var j = 0 ; j < numImage ; j++){
-							                           		console.log(imageLists[j].orderList +"--"+ activityExecute[i].orderList)
 							                            	if(imageLists[j].orderList == activityExecute[i].orderList){
 								                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imageLists[j].savePath+')"></li>';
 							                           			imageArr.push({"pic":imageLists[j].originalPath, "picname":imageLists[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imageLists[j].savePath});
@@ -202,6 +202,7 @@
 							                                	+'</div></div></div>';
 							                                	$("#activity_execute_id").val(activityExecute[i].id);
 								                          }else{
+								                          	numI++;
 								                          	html +='</ul></div></div>';
 								                          }
 														 $(".imgeActivity").append(html);
@@ -225,13 +226,20 @@
 		}
 
         var index; //第几张图片
+        var uploadIndex;
         var $uploaderFiles ;
         $(document).on("click", ".uploaderFiles li", function() {
             _index = $(this).index()+numImage;
             index = $(this).index();
+            uploadIndex = $(this).parent().parent().parent().index();
             $uploaderFiles = $(this).parent();
             $galleryImg.attr("style", this.getAttribute("style"));
             $gallery.fadeIn(100);
+            if(uploadIndex < numI){
+	            $(".weui-gallery__del").hide();
+            }else{
+            	$(".weui-gallery__del").show();
+            }
         });
 
         $gallery.on("click", function() {
@@ -264,10 +272,10 @@
         //    return false;
         //}
 
-<!--        if($("#location").val().length==0) { -->
-<!--             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); -->
-<!--             return false; -->
-<!--         } -->
+        if($("#location").val().length==0) { -->
+             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); 
+             return false;
+         } 
         
         if(imageArr.length == 0){
         	 $.toptip('照片不能为空', 3000, 'error'); 

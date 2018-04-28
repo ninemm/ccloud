@@ -38,6 +38,7 @@
     var Orientation = null;
     var MAX_HEIGHT = 1000;
 	var html = "";
+	var numI = 0;
     $(function() {
     	var activityExecutesList = ${(activityExecutes)!};
         var imgeList = ${(list)!'1'};
@@ -125,7 +126,9 @@
 	        					flang = true;
 	                        }
 		                }
+		                numI++;
 	                     if(flang == false && i == (activityExecutesList.length-1)){
+	                     	numI--;
 	                		html +='</ul><div class="weui-uploader__input-box">'
 	                        	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
 	                        	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType"></div></div></div>';
@@ -156,7 +159,6 @@
 						        		$("#completeNum").val(data.length);
 						        		for(var m = 0 ; m < data.length ; m++){
 							        		var Html = "";
-						        			console.log(data);
 						        			//输入框
 						        			if(data[m].template_value_type == "103016"){
 						        				Html += '<div class="weui-cell weui-cell_access select-area"><span>'+data[m].template_value+'<span class="require"></span></span><div class="weui-cell__bd"><input type="tel" class="weui-input fr" id="activityTemplete'+m+'" name="activityTemplete'+m+'" value="0" placeholder="请填写规格" required><input type="hidden" id="activityTempleteName'+m+'" name="activityTempleteName'+m+'" value="'+data[m].template_value+'"></div></div>'
@@ -204,13 +206,19 @@
     	}
 
         var index; //第几张图片
+        var uploadIndex;
         $(document).on("click", ".uploaderFiles li", function() {
             _index = $(this).index()+numImage;
             index = $(this).index();
-            console.log(index);
+            uploadIndex = $(this).parent().parent().parent().index();
             $uploaderFiles = $(this).parent();
             $galleryImg.attr("style", this.getAttribute("style"));
             $gallery.fadeIn(100);
+            if(uploadIndex < numI){
+	            $(".weui-gallery__del").hide();
+            }else{
+            	$(".weui-gallery__del").show();
+            }
         });
 
         $gallery.on("click", function() {
@@ -219,7 +227,6 @@
 
         //删除图片  删除图片的代码也贴出来。
         $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
-           	console.log(imageArr);
             $uploaderFiles.find("li").eq(index).remove();
             $uploaderFiles.parent().parent().find('.weui-uploader__info').text($uploaderFiles.children.length + '/' + count);
             imageArr.splice(_index, 1);
@@ -235,10 +242,10 @@
             return false;
         }
 
-        if($("#question_desc").val().length==0) {
+        /*if($("#question_desc").val().length==0) {
             $.toptip('备注描述不能为空', 3000, 'error'); 
             return false;
-        }
+        }*/
         
         if($("#location").val().length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
@@ -265,7 +272,6 @@
     function doSubmit() {
     	
     	$(".pic").val(JSON.stringify(imageArr));
-        console.log(imageArr);
         $.ajax({
             url: '${CPATH}/customerVisit/saveActivityVisit',
             method: 'post',
