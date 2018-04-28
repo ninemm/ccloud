@@ -78,13 +78,6 @@
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.ccloud</groupId>
-			<artifactId>ccloud-web-member</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-			<scope>compile</scope>
-		</dependency>
 
         <dependency>
             <groupId>org.ccloud</groupId>
@@ -159,10 +152,6 @@
                         <overlay>
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-bi</artifactId>
-						</overlay>
-						<overlay>
-							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-member</artifactId>
 						</overlay>
                         <overlay>
                             <groupId>org.ccloud</groupId>
