@@ -28,8 +28,10 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.qyweixin.sdk.api.ApiResult;
+import com.jfinal.qyweixin.sdk.api.ConDepartmentApi;
 import com.jfinal.qyweixin.sdk.api.ConUserApi;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -849,6 +851,101 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 		}
 		renderAjaxResultForSuccess();
+	}
+	
+	@Before(WorkWechatApiConfigInterceptor.class)
+	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
+	public void synUser2(){
+		String userIds = getPara("userIds");
+		String[] user_Ids = userIds.split(",");
+		String departmentWxId = null;
+		for (String userId : user_Ids) {
+			User user = UserQuery.me().findById(userId);
+			Department department = DepartmentQuery.me().findById(user.getDepartmentId());
+			if (StrKit.isBlank(department.getQywxDeptid())) {
+				String result = this.createWxDepartment(department);
+				if (StrKit.isBlank(result)) {
+					renderAjaxResultForError("同步用户部门失败");
+					return;					
+				}
+				departmentWxId = result;
+			} else {
+				departmentWxId = department.getQywxDeptid();
+			}
+			String userResult = this.createWxUser(departmentWxId, user);
+			if (StrKit.notBlank(userResult)) {
+				renderAjaxResultForError("同步用户失败");
+				return;
+			} else {
+				renderAjaxResultForError("同步用户成功");
+				return;
+			}			
+		}
+			
+	}	
+
+	@SuppressWarnings("unchecked")
+	private String createWxUser(String result, User user) {
+        JSONObject json = new JSONObject();
+        json.put("userid", user.getId());
+        json.put("name", user.getRealname());
+        json.put("mobile", user.getMobile());
+        if (StrKit.notBlank(user.getAvatar())) {
+        	json.put("avatar_mediaid", user.getAvatar());
+        }
+        int[] d = new int[]{Integer.parseInt(result)};
+        json.put("department", d);
+        ApiResult apiResult = ConUserApi.createUser(json.toJSONString());
+        if (apiResult.getInt("errcode") == 60104) { //用户已存在
+        	String msg = apiResult.getStr("errmsg");
+        	String msgSplit[] = msg.split(":");
+        	String userCode = msgSplit[1];
+        	UserQuery.me().updateQywxId(user.getMobile(), userCode);
+        	ApiResult userInfo = ConUserApi.getUser(userCode);
+			ArrayList<Integer> list = (ArrayList<Integer>) userInfo.get("department");
+			list.add(Integer.parseInt(result));
+			Integer[] depts = new Integer[list.size()];//当泛型为Integer时，需要
+			depts = (Integer[])list.toArray(depts); 			
+			JSONObject updateJson = new JSONObject();
+			updateJson.put("userid", user.getId());
+			updateJson.put("name", user.getRealname());
+			updateJson.put("mobile", user.getMobile());
+			updateJson.put("department", depts);
+	        if (StrKit.notBlank(user.getAvatar())) {
+	        	json.put("avatar_mediaid", user.getAvatar());
+	        }			
+	        ApiResult updateResult = ConUserApi.updateUser(updateJson.toJSONString());
+	        if (updateResult.getInt("errcode") != 0) {
+	        	return "失败";
+	        }
+        }
+
+        if(apiResult.getInt("errcode") != 0){
+        	return "失败";
+        } else {
+        	UserQuery.me().updateQywxId(user.getMobile(), user.getId());
+        }
+		return null;
+	}
+
+	private String createWxDepartment(Department department) {
+		String result = null;
+		Department parent = DepartmentQuery.me().findById(department.getParentId());
+		if (StrKit.isBlank(parent.getQywxDeptid())) {
+			return result;
+		} else {
+	        JSONObject json = new JSONObject();
+	        json.put("name", department.getDeptName());
+	        json.put("parentid", parent.getQywxDeptid());
+			ApiResult createDepartment = ConDepartmentApi.createDepartment(json.toJSONString());
+			if (createDepartment.getInt("errcode") != 0) {
+				return result;
+			}
+			result = createDepartment.getInt("id").toString();
+			department.setQywxDeptid(result);
+			department.update();
+		}
+		return result;
 	}
 
 	@Before(WorkWechatApiConfigInterceptor.class)

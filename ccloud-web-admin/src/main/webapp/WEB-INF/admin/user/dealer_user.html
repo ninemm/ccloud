@@ -92,7 +92,7 @@
     
     function syn(id) {
      	var departmentType = $('#department_type').val();
-        $.get('${CPATH}/admin/user/synUser?userIds=' + id +'&departmentType='+departmentType,
+        $.get('${CPATH}/admin/user/synUser2?userIds=' + id +'&departmentType='+departmentType,
             function(result){
                 if (result.errorCode > 0) {
                     toastr.error(result.message, '操作失败');
@@ -114,7 +114,7 @@
 			}
 		});
 		var departmentType = $('#department_type').val();
-        $.get('${CPATH}/admin/user/synUser?userIds=' + userIds +'&departmentType='+departmentType,
+        $.get('${CPATH}/admin/user/synUser2?userIds=' + userIds +'&departmentType='+departmentType,
             function(result){
                 if (result.errorCode > 0) {
                     toastr.error(result.message, '操作失败');

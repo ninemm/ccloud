@@ -419,4 +419,9 @@ public class UserQuery extends JBaseQuery {
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
+
+	public void updateQywxId(String mobile, String userCode) {
+		StringBuilder fromBuilder = new StringBuilder("UPDATE `user` SET wechat_userid = ? WHERE mobile = ?");
+		Db.update(fromBuilder.toString(), userCode, mobile);
+	}
 }
