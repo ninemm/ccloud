@@ -265,5 +265,12 @@ public abstract class BasePurchaseOrder<M extends BasePurchaseOrder<M>> extends 
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setStockOutSn(java.lang.String stockOutSn) {
+		set("stock_out_sn", stockOutSn);
+	}
 
+	public java.lang.String getStockOutSn() {
+		return get("stock_out_sn");
+	}
 }

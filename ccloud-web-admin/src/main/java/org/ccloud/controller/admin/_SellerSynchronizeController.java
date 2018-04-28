@@ -16,6 +16,7 @@
 package org.ccloud.controller.admin;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -36,6 +37,8 @@ import org.ccloud.utils.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.tx.Tx;
 /**
@@ -56,8 +59,10 @@ public class _SellerSynchronizeController extends JBaseCRUDController<SellerSync
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
+        
+        String parentId = getPara("parentId");
 
-        Page<SellerSynchronize> page = SellerSynchronizeQuery.me().paginateSynchronize(getPageNumber(), getPageSize(),keyword);
+        Page<SellerSynchronize> page = SellerSynchronizeQuery.me().paginateSynchronize(getPageNumber(), getPageSize(),keyword, parentId);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -77,31 +82,40 @@ public class _SellerSynchronizeController extends JBaseCRUDController<SellerSync
 	 */
 	@Before(Tx.class)
 	public void save() {
-		Department department = DepartmentQuery.me().findById(getPara("dept_id"));
+		final Department department = DepartmentQuery.me().findById(getPara("dept_id"));
 		if(department == null) {
 			renderAjaxResultForError("部门不能为空");
 			return;
 		}
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		final User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		final SellerSynchronize sellerSynchronize = getModel(SellerSynchronize.class);
-		String sellerCode = sellerSynchronize.getSellerCode();
+		String id = sellerSynchronize.getId();
 
-		SellerSynchronize dbSeller = SellerSynchronizeQuery.me().findByCode(sellerCode);
+		final SellerSynchronize dbSeller = SellerSynchronizeQuery.me().findById(id);
 		if(StrKit.notBlank(dbSeller.getDeptId())){
 			renderAjaxResultForError("该经销商已有部门");
 			return;
 		}
-		this.updateSeller(dbSeller, department, user);
-		Seller seller = new Seller();
-		try {
-			BeanUtils.copyProperties(seller, dbSeller);
-			seller.setId(StrKit.getRandomUUID());
-			seller.save();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
+		
+		Db.tx(new IAtom() {
+			@Override
+			public boolean run() throws SQLException {
+				Seller seller = new Seller();
+				boolean success = false;
+				try {
+					_SellerSynchronizeController.this.updateSeller(dbSeller, department, user);
+					BeanUtils.copyProperties(seller, dbSeller);
+					seller.setId(StrKit.getRandomUUID());
+					seller.save();
+					success = true;
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
+				return success;
+			}
+		});
 		renderAjaxResultForSuccess();
 	}
 	
