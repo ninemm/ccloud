@@ -349,7 +349,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	public void productManage(){
-		String id = getPara("id");
+		String id =getSessionAttr(Consts.SESSION_SELLER_ID);
 		setAttr("sellerId", id);
 		render("show_product.html");
 	}	
