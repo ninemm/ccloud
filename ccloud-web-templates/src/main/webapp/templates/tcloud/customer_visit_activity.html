@@ -128,7 +128,7 @@
 	                     if(flang == false && i == (activityExecutesList.length-1)){
 	                		html +='</ul><div class="weui-uploader__input-box">'
 	                        	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
-	                        	+'</div></div></div>';
+	                        	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType"></div></div></div>';
 					        $("#question_type").select({
 						        title: "请选择问题类型",
 						        multi: false,
@@ -476,7 +476,7 @@
                     <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
                 </div>
             </section>
-            <section class="weui-cells weui-cells_form">
+            <section class="weui-cells weui-cells_form select-area">
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
                         <div class="weui-uploader imgeActivity">
