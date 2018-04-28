@@ -61,8 +61,9 @@ public class _SellerSynchronizeController extends JBaseCRUDController<SellerSync
         }
         
         String parentId = getPara("parentId");
+        String deptFlag = getPara("hasModifyDept");
 
-        Page<SellerSynchronize> page = SellerSynchronizeQuery.me().paginateSynchronize(getPageNumber(), getPageSize(),keyword, parentId);
+        Page<SellerSynchronize> page = SellerSynchronizeQuery.me().paginateSynchronize(getPageNumber(), getPageSize(),keyword, parentId, deptFlag);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -106,6 +107,7 @@ public class _SellerSynchronizeController extends JBaseCRUDController<SellerSync
 					_SellerSynchronizeController.this.updateSeller(dbSeller, department, user);
 					BeanUtils.copyProperties(seller, dbSeller);
 					seller.setId(StrKit.getRandomUUID());
+					seller.setDataArea(department.getDataArea());
 					seller.save();
 					success = true;
 				} catch (IllegalAccessException e) {
