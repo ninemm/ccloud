@@ -146,7 +146,6 @@
 							<groupId>org.ccloud</groupId>
 							<artifactId>ccloud-web-templates</artifactId>
 						</overlay>
-
 					</overlays>
 				</configuration>
 			</plugin>

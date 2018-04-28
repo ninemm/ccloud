@@ -86,6 +86,11 @@ public class UserQuery extends JBaseQuery {
 		}
 		return 0;
 	}
+	
+	public int batchUpdateByMobile(String wechatUserId, String mobile) {
+		String sql = "update user set wechat_userid = ? where mobile = ?";
+		return Db.update(sql, wechatUserId, mobile);
+	}
 
 	public User findUserByUsername(final String username) {
 		return DAO.getCache(username, new IDataLoader() {

@@ -109,6 +109,7 @@ public class WWxOauthController extends BaseFrontController {
 				} else {
 					LogKit.warn("user info get failure");
 				}
+				
 			} else {
 				List<Map<String, String>> sellerList = Lists.newArrayList();
 				List<Department> deptList = Lists.newArrayList();

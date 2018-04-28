@@ -31,6 +31,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.qyweixin.sdk.api.ApiResult;
 import com.jfinal.qyweixin.sdk.api.ConUserApi;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
@@ -50,6 +52,7 @@ import org.ccloud.shiro.ShiroDbRealm;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.EncryptUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.wwechat.WorkWechatApiConfigInterceptor;
 
 import com.google.common.collect.Lists;
 import com.jfinal.aop.Before;
@@ -770,7 +773,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		renderJson(map);
 	}
 
-	//	@Before(WorkWechatContactApiConfigInterceptor.class)
+	@Before(WorkWechatApiConfigInterceptor.class)
 	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
 	public void synUser(){
 		String userIds = getPara("userIds");
@@ -780,7 +783,8 @@ public class _UserController extends JBaseCRUDController<User> {
 			User user = UserQuery.me().findById(userId);
 			Department department = DepartmentQuery.me().findByDataArea(departmentType);
 			//获取部门下成员信息
-			ApiResult apiResult = ConUserApi.getDepartmentUserList("1", "1", "");
+			String defaultDeptId = OptionQuery.me().findValue("");
+			ApiResult apiResult = ConUserApi.getDepartmentUserList(defaultDeptId, "1", "");
 			boolean isExist = false;
 			if(!apiResult.getErrorCode().equals(0)) {
 				renderAjaxResultForError();
@@ -796,19 +800,26 @@ public class _UserController extends JBaseCRUDController<User> {
 						renderAjaxResultForError();
 						return;
 					}
-					ArrayList<Integer>list=  (ArrayList<Integer>) item.get("department");
+					ArrayList<Integer> list=  (ArrayList<Integer>) item.get("department");
+					
 					String array = "[";
 					// List转换成数组
 					for (int i = 0; i < list.size(); i++) {
-						array=array+list.get(i).toString()+",";
+						array = array + list.get(i).toString()+",";
 					}
 					array=array+department.getQywxDeptid()+"]";
-					String json = "{\"userid\": \"" + item.get("userid").toString() +
-							              "\", \"name\": \"" + user.getRealname().toLowerCase() +
-							              "\", \"mobile\": \"" + user.getMobile()+
-							              "\", \"department\": " + array +
-							              "\", \"enable\":1, \"to_invite\": false," + "}";
-					ApiResult apiResult1 = ConUserApi.updateUser(json);
+					StringBuilder json = new StringBuilder();
+					json.append("{");
+					json.append("\"userid\": \"" + item.get("userid").toString() + "\",");
+					json.append("\"name\": \"" + user.getRealname().toLowerCase() + "\",");
+					json.append("\"mobile\": \"" + user.getMobile()+ "\",");
+					json.append("\"department\": " + array + "\",");
+					json.append("\"enable\":1,");
+					json.append("\"to_invite\": false");
+					json.append("}");
+					/*String json = "{\"userid\": \"" + item.get("userid").toString() + "\", \"name\": \"" + user.getRealname().toLowerCase() +
+		              "\", \"mobile\": \"" + user.getMobile()+ "\", \"department\": " + array + "\", \"enable\":1, \"to_invite\": false," + "}";*/
+					ApiResult apiResult1 = ConUserApi.updateUser(json.toString());
 					if (apiResult1.getInt("errcode")!=0) {
 						renderAjaxResultForError("同步失败");
 						return;
@@ -840,6 +851,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		renderAjaxResultForSuccess();
 	}
 
+	@Before(WorkWechatApiConfigInterceptor.class)
 	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
 	public void batchSynUser(){
 		String userIds = getPara("userIds");

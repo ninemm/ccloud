@@ -37,6 +37,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 //import org.ccloud.wwechat.WorkWechatContactApiConfigInterceptor;
+import org.ccloud.wwechat.WorkWechatApiConfigInterceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
@@ -229,7 +230,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	    renderJson(map);	
 	}
 	
-	//@Before(WorkWechatContactApiConfigInterceptor.class)
+	@Before(WorkWechatApiConfigInterceptor.class)
 	public void synchronous() {
 		String departmentIds = getPara("departmentIds");
 		String[] departmentId = departmentIds.split(",");
