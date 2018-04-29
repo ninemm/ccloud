@@ -322,4 +322,11 @@ public abstract class BaseSellerSynchronize<M extends BaseSellerSynchronize<M>> 
 		return get("modify_date");
 	}
 
+	public void setParentId(java.lang.String parentId) {
+		set("parent_id", parentId);
+	}
+
+	public java.lang.String getParentId() {
+		return getStr("parent_id");
+	}
 }

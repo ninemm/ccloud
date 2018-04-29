@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.GoodsQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.PurchaseOrderQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SellerSynchronizeQuery;
 import org.ccloud.model.vo.remote.jp.pull.JpGoodsCategoryResponseEntity;
@@ -54,6 +56,8 @@ import com.jfinal.kit.PropKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
+
+import comparator.SellerDeptComparator;
 
 /**
  * 劲牌
@@ -274,6 +278,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 						goods.setName(goodsCategory.getcInvCName());
 						goods.setGoodsTypeId(goodsType.getId());
 						goods.setState(1);
+						goods.setProductImageListStore("[]");
 						goodsList.add(goods);
 					}
 					parentCode = goodsCategory.getParent();
@@ -437,6 +442,8 @@ public class _JpController extends JBaseCRUDController<Goods> {
 			Product product = null;
 			String sellerCode = null;
 			BigDecimal mainPurchaseTotalAmount = null;
+			String stockOutSn = null;
+			Integer mainIndex = 0;
 			for (Iterator<JpPurchaseStockInMainResponse> iterator = responseBody.getData().iterator(); iterator.hasNext();) {
 				/**************添加采购单主单信息********************/
 				mainStockIn = iterator.next();
@@ -444,17 +451,24 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				sellerCode = purchaseStockInDetails.get(0).getDealerMarketCode();
 				purchaseOrder = new PurchaseOrder();
 				purchaseOrder.setId(StrKit.getRandomUUID());
-				seller = SellerQuery.me().findbyCode(sellerCode);
-				if(seller == null)
+				List<Seller> sellers = SellerQuery.me().findListByCode(sellerCode);
+				if(CollectionUtils.isEmpty(sellers))
 					continue;
-				porderSn = mainStockIn.getOrderNum();
+				if(sellers.size() > 1)
+					Collections.sort(sellers, new SellerDeptComparator());
+				seller = sellers.get(0);
+				mainIndex++;
+				porderSn = "PO" + sellerCode + nowDateTimeStr.substring(0,8)+(Integer.valueOf(PurchaseOrderQuery.me().getNewSn(seller.getId()) + mainIndex));
+				stockOutSn = mainStockIn.getOrderNum();
 				purchaseOrder.setPorderSn(porderSn);
+				purchaseOrder.setStockOutSn(stockOutSn);
 				purchaseOrder.setSupplierId(brand.getSupplierId());
 				purchaseOrder.setBizDate(calendar.getTime());
 				purchaseOrder.setStatus(0);
 				purchaseOrder.setDeptId(seller.getDeptId());
 				department = DepartmentQuery.me().findById(seller.getDeptId());
 				purchaseOrder.setDataArea(department.getDataArea());
+				purchaseOrder.setSupplierId(brand.getSupplierId());
 				purchaseOrder.setCreateDate(calendar.getTime());
 				mainPurchaseTotalAmount = new BigDecimal(0);
 				
@@ -471,6 +485,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					purchaseOrderDetail.setOrderList(index);
 					purchaseOrderDetail.setPurchaseOrderId(purchaseOrder.getId());
 					product = ProductQuery.me().findbyProductSn(purchaseStockInDetail.getcInvCode());
+					
 					if(product == null)
 						continue;
 					purchaseOrderDetail.setProductId(product.getId());
@@ -500,6 +515,9 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					}
 				}
 			});
+		} else {
+			renderAjaxResultForSuccess("没有数据");
+			return;
 		}
 		if(result) {
 			renderAjaxResultForSuccess();
@@ -521,6 +539,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		subSellerSynchronize.setSellerCode(responseEntity.getDealerMarketCode());
 		subSellerSynchronize.setSellerName(responseEntity.getDealerMarketName().trim());
 		subSellerSynchronize.setParentCode(parentSeller.getSellerCode());
+		subSellerSynchronize.setParentId(parentSeller.getId());
 		subSellerSynchronize.setProvName(StrKit.isBlank(parentSeller.getProvName()) ? null : parentSeller.getProvName().trim());
 		subSellerSynchronize.setCityName(StrKit.isBlank(parentSeller.getCityName()) ? null : parentSeller.getCityName().trim());
 		subSellerSynchronize.setSellerType(0);

@@ -71,7 +71,6 @@ public class JpHttpClientExecute {
 		}
 		if(StrKit.isBlank(result))
 			return null;
-		System.out.println(result);
 		
 		return HttpParser.parseResult(requestBody, result);
 	}

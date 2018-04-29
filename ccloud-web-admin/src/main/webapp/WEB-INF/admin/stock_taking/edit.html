@@ -59,7 +59,7 @@
 					toastr.error(data.message,'操作失败');
 				}
 				setTimeout( function(){
-							window.history.back(-1);
+							l.stop();
 									}, 1 * 1000 );
 			},
 			error : function() {
@@ -74,25 +74,24 @@
          var productOptionArr = new Array();
          var productMap = new Map();
          $.ajax({
-			url: "${CPATH}/admin/goods/getProductInfo",
+			url: "${CPATH}/admin/stockTaking/getProductInfo",
 			data:{"warehouse_id":warehouse_id},
 			dataType: "json",
 			async: false,
 			success: function(data) {
 				productList = data;
 				pList = productList;
-				
 			}
 		});
 		if(productList) {
 			$.each(productList, function(idx, item) {
 				var option = {
-					id: item.productList.sellerProductId,
-					text: item.productList.customName
+					id: item.sellerProductId,
+					text: item.name+item.specificationValue
 				}
 				productOptionArr.push(option);
 		        pOptionArr = productOptionArr;
-				productMap[item.productList.sellerProductId] = item;
+				productMap[item.sellerProductId] = item;
 				pMap = productMap;
 			});
 		}
@@ -131,12 +130,11 @@
 	var index = 1;
 	
 	function addTr(tid, productList, optionArr) {
-		var firstProduct = productList[0].productList;
-		var goodsCode = firstProduct.sellerProductId;
-		var goodsName = firstProduct.name;
-		var specification = firstProduct.specificationValue;
-		var big_unit = firstProduct.bigUnit;
-	    var balanceCount = firstProduct.balanceCount == null ? "暂未盘点": firstProduct.balanceCount;	
+		var goodsCode = productList[0].sellerProductId;
+		var goodsName = productList[0].name;
+		var specification = productList[0].specificationValue;
+		var big_unit = productList[0].bigUnit;
+	    var balance_count = productList[0].balance_count == null ? "暂未盘点": productList[0].balance_count;	
 	
 		var $tbody = $(tid + " tbody"),
 		$tr = $tbody.find("tr:eq(0)"),
@@ -151,7 +149,7 @@
 	    $tbody.find("tr:last>td>#goodsCode").val(goodsCode);
 	    $tbody.find("tr:last>td>#specification").text(specification);
 	    $tbody.find("tr:last>td>#big_unit").text(big_unit);
-	    $tbody.find("tr:last>td>#balanceCount").text(balanceCount);
+	    $tbody.find("tr:last>td>#balance_count").text(balance_count);
 	    $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
 	    $tbody.find("tr:last").find(":input").attr("disabled",false);
 	    var productCount = 'stockTakingList['+ lastTrIdx +'].product_coun';
@@ -176,19 +174,19 @@
 	};
 	
 	function productChange(obj,key){
-		 var result = pMap[key].productList;   
+		 var result = pMap[key];   
 	     var cgoodsCode = result.sellerProductId;
 	     var cgoodsName = result.name;
 	     var cspecification = result.specificationValue;
 	     var cbig_unit = result.bigUnit;
-	     var balanceCount = result.balanceCount == null ? "暂未盘点":result.balanceCount;
+	     var balance_count = result.balance_count == null ? "暂未盘点":result.balance_count;
 	     var $tr = obj.parent().parent();
 	     
 	     $tr.find("td>#goodsCode").val(cgoodsCode);
 	     $tr.find("td>#goodsName").html(cgoodsName); 
 	     $tr.find("td>#specification").text(cspecification);
 	     $tr.find("td>#big_unit").text(cbig_unit);
-	     $tr.find("td>#balanceCount").text(balanceCount); 
+	     $tr.find("td>#balance_count").text(balance_count); 
 	     $tr.find("td>#stock").val(0); 
 	
 	}
@@ -308,7 +306,7 @@
 							</td>
 							</td>
 							<td>
-								<span class="balanceCount" id="balanceCount"></span>
+								<span class="balance_count" id="balance_count"></span>
 							</td>
 								<td>
 									<input type="text" id="stock" class="stock" name="stockTakingList[-1].product_count" disabled="true" />
@@ -334,7 +332,7 @@
 								<input name="big_unit" id="big_unit" value="${list.bigUnit!}" disabled="disabled"></input>
 							</td>
 							<td>
-								<input name="balanceCount" id="balanceCount" value="${list.balanceCount!}" disabled="disabled"></input>
+								<input name="balance_count" id="balance_count" value="${list.balance_count!}" disabled="disabled"></input>
 							</td>
 							<td>
 							<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount}" />

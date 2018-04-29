@@ -2697,7 +2697,7 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	public List<Record> findCustomerOrderByUserId(String startDate, String endDate, String keyword, String userId , String isGift) {
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sqlBuilder = new StringBuilder("SELECT o.sell_product_id, csp.custom_name,cc.customer_name, cs.customer_id ,FORMAT((o.product_count - IFNULL(t1.product_count,0))/cp.convert_relate,2) as count,o.is_gift ");
+		StringBuilder sqlBuilder = new StringBuilder("SELECT o.sell_product_id, csp.custom_name,cc.customer_name,cc.address, cs.customer_id ,FORMAT((o.product_count - IFNULL(t1.product_count,0))/cp.convert_relate,2) as count,o.is_gift ");
 		sqlBuilder.append(" FROM cc_sales_order_detail o");
 		sqlBuilder.append(" LEFT JOIN cc_sales_order cs ON o.order_id = cs.id");
 		sqlBuilder.append(" LEFT JOIN cc_seller_product csp ON o.sell_product_id = csp.id");
