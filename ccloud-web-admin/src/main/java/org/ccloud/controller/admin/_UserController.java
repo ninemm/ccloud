@@ -874,7 +874,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 			String userResult = this.createWxUser(departmentWxId, user);
 			if (StrKit.notBlank(userResult)) {
-				renderAjaxResultForError("同步用户失败");
+				renderAjaxResultForError("同步用户失败!错误代码:"+userResult);
 				return;
 			} else {
 				renderAjaxResultForError("同步用户成功");
@@ -916,12 +916,14 @@ public class _UserController extends JBaseCRUDController<User> {
 	        }			
 	        ApiResult updateResult = ConUserApi.updateUser(updateJson.toJSONString());
 	        if (updateResult.getInt("errcode") != 0) {
-	        	return "失败";
+	        	String code = updateResult.getInt("errcode").toString();
+	        	return code;
 	        }
         }
 
         if(apiResult.getInt("errcode") != 0){
-        	return "失败";
+        	String code = apiResult.getInt("errcode").toString();
+        	return code;
         } else {
         	UserQuery.me().updateQywxId(user.getMobile(), user.getId());
         }
