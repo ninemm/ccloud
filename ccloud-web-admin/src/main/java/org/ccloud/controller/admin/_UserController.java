@@ -907,7 +907,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			Integer[] depts = new Integer[list.size()];//当泛型为Integer时，需要
 			depts = (Integer[])list.toArray(depts);
 			JSONObject updateJson = new JSONObject();
-			updateJson.put("userid", user.getId());
+			updateJson.put("userid", userCode);
 			updateJson.put("name", user.getRealname());
 			updateJson.put("mobile", user.getMobile());
 			updateJson.put("department", depts);
