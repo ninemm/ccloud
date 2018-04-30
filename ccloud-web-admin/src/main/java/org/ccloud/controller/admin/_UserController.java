@@ -921,7 +921,7 @@ public class _UserController extends JBaseCRUDController<User> {
 	        }
         }
 
-        if(apiResult.getInt("errcode") != 0){
+        if(apiResult.getInt("errcode") != 0 && apiResult.getInt("errcode") != 60104){
         	String code = apiResult.getInt("errcode").toString();
         	return code;
         } else {
