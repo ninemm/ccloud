@@ -877,7 +877,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				renderAjaxResultForError("同步用户失败!错误代码:"+userResult);
 				return;
 			} else {
-				renderAjaxResultForError("同步用户成功");
+				renderAjaxResultForSuccess("同步用户成功");
 				return;
 			}			
 		}
