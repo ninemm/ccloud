@@ -890,9 +890,6 @@ public class _UserController extends JBaseCRUDController<User> {
         json.put("userid", user.getId());
         json.put("name", user.getRealname());
         json.put("mobile", user.getMobile());
-        if (StrKit.notBlank(user.getAvatar())) {
-        	json.put("avatar_mediaid", user.getAvatar());
-        }
         int[] d = new int[]{Integer.parseInt(result)};
         json.put("department", d);
         ApiResult apiResult = ConUserApi.createUser(json.toJSONString());
@@ -911,9 +908,6 @@ public class _UserController extends JBaseCRUDController<User> {
 			updateJson.put("name", user.getRealname());
 			updateJson.put("mobile", user.getMobile());
 			updateJson.put("department", depts);
-	        if (StrKit.notBlank(user.getAvatar())) {
-	        	json.put("avatar_mediaid", user.getAvatar());
-	        }			
 	        ApiResult updateResult = ConUserApi.updateUser(updateJson.toJSONString());
 	        if (updateResult.getInt("errcode") != 0) {
 	        	String code = updateResult.getInt("errcode").toString();
