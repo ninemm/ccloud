@@ -23,7 +23,7 @@ $(function() {
 	jQuery.mm.initDatetimepicker(null, '#purchaseTime', 'purchaseTime', 'yyyy-MM-dd', 2, 4, 2);
 
 	$("#synchronize_category").on("click", function() {
-		$form.attr("action", "/admin/jp/info/synchronize/pullGoodsCategories");
+		$form.attr("action", "${CPATH}/admin/jp/info/synchronize/pullGoodsCategories");
 		$form.ajaxSubmit({
 			type : "post", 
 			dataType : "json", 
@@ -41,7 +41,7 @@ $(function() {
 	});
 	
 	$("#synchronize_product").on("click", function() {
-		$form.attr("action", "/admin/jp/info/synchronize/pullProducts");
+		$form.attr("action", "${CPATH}/admin/jp/info/synchronize/pullProducts");
 		$form.ajaxSubmit({
 			type : "post", 
 			dataType : "json", 
@@ -59,7 +59,7 @@ $(function() {
 	});
 	
 	$("#synchronize_seller").on("click", function() {
-		$form.attr("action", "/admin/jp/info/synchronize/pullSellers");
+		$form.attr("action", "${CPATH}/admin/jp/info/synchronize/pullSellers");
 		$form.ajaxSubmit({
 			type : "post", 
 			dataType : "json", 
@@ -77,7 +77,7 @@ $(function() {
 	});
 	
 	$("#synchronize_seller_account").on("click", function() {
-		$form.attr("action", "/admin/jp/info/synchronize/pullSellerAccounts");
+		$form.attr("action", "${CPATH}/admin/jp/info/synchronize/pullSellerAccounts");
 		$form.ajaxSubmit({
 			type : "post", 
 			dataType : "json", 
@@ -95,7 +95,7 @@ $(function() {
 	});
 	
 	$("#synchronize_purchase_stockIn").on("click", function() {
-		$form.attr("action", "/admin/jp/info/synchronize/pullPurchaseStockIns");
+		$form.attr("action", "${CPATH}/admin/jp/info/synchronize/pullPurchaseStockIns");
 		$form.ajaxSubmit({
 			type : "post", 
 			dataType : "json", 

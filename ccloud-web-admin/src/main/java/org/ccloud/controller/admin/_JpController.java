@@ -254,7 +254,6 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				goodsType.setCreateDate(calendar.getTime());
 				needAddGoodType = true;
 			}
-			final List<GoodsCategory> goodsCategories = new ArrayList<GoodsCategory>();
 			for (Iterator<JpGoodsCategoryResponseEntity> iterator = responseGoodsCategories.iterator(); iterator.hasNext();) {
 				goodsCategory = iterator.next();
 				storedGoodsCategory = GoodsCategoryQuery.me().findByCode(goodsCategory.getcInvCCode(), brand.getId());
@@ -286,13 +285,13 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					if(parentCategory != null)
 						parentId = parentCategory.getId();
 					else {
-						continue;
+						parentId = "0";
 					}
 					
 					storedGoodsCategory.setParentId(parentId);
 					storedGoodsCategory.setState(1);
 					storedGoodsCategory.setSupplierId(brand.getSupplierId());
-					goodsCategories.add(storedGoodsCategory);
+					storedGoodsCategory.save();
 				}
 				storedGoodsCategory = null;
 				parentCode = null;
@@ -306,8 +305,6 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				@Override
 				public boolean run() throws SQLException {
 					try {
-						if(goodsCategories.size() > 0)
-							Db.batchSave(goodsCategories, goodsCategories.size());
 						if(goodsList.size() > 0)
 							Db.batchSave(goodsList, goodsList.size());
 						if(needAdd)
@@ -379,8 +376,12 @@ public class _JpController extends JBaseCRUDController<Goods> {
 						if(goods == null)
 							continue;
 						storedProduct.setGoodsId(goods.getId());
-						storedProduct.setSmallUnit("瓶");
-						storedProduct.setBigUnit("件");
+						if (StrKit.notBlank(responseEntity.getmComUnitName())) {
+							storedProduct.setSmallUnit(responseEntity.getmComUnitName());
+						} else {
+							storedProduct.setSmallUnit("瓶");
+						}
+						storedProduct.setBigUnit(responseEntity.getcComUnitName());
 						storedProduct.setConvertRelate(responseEntity.getcInvMNum());
 						storedProduct.setCost(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
 						storedProduct.setPrice(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
@@ -426,8 +427,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		params.put("BusinessDate", purchaseTime);
 		
 		JpPurchaseStockInResponseBody responseBody = JpHttpClientExecute.executeGet(requestUrl, requestBody, params, headers);
-		if(responseBody != null && 
-			responseBody.getFlsg().equals("success") &&
+		if(responseBody != null && responseBody.getFlsg() != null && responseBody.getFlsg().equals("success") &&
 			!CollectionUtils.isEmpty(responseBody.getData())) {
 			final List<PurchaseOrder> purchaseOrders = new ArrayList<PurchaseOrder>();
 			final List<PurchaseOrderDetail> purchaseOrderDetails = new ArrayList<PurchaseOrderDetail>();
