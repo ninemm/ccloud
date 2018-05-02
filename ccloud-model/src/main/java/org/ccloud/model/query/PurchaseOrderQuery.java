@@ -110,7 +110,7 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return DAO.find(sql, userId).size();
 	}
 	
-	public Record findMoreById(final String id) {
+	public Record findMoreById(String id) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT cpo.*,cs.`name` as supplier_name,cs.contact,u.mobile as userMobile,cs.mobile as supplierMobile,cs.`name` as supplier_name, cs.code,u.realname as biz_user  ");
 		fromBuilder.append(" FROM cc_purchase_order cpo ");
