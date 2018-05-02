@@ -1,0 +1,1031 @@
+<#include "_inc/_pc_layout.html"/>
+<#macro script_import>
+    <script type="text/javascript" src="${CTPATH}/json/china-city-map.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
+    <script type="text/javascript" src="${CTPATH}/js/heatmap.min.js"></script>
+</#macro>
+<#macro css_import>
+</#macro>
+<#macro css>
+    #customer_rank{
+        width: 33%;
+        height: 11.5rem;
+        margin-top: .5rem;
+    }
+
+    #area_rank,{
+      width: 100%;
+      height: 14rem;
+    }
+
+    #hot_map{
+        width:33%;
+        height: 18rem;
+    }
+    
+    .map-nav {
+        height: 1.5rem;
+        line-height: 1.5rem;
+        padding-left: .5rem;
+        font-size: .8rem;
+        color: #999;
+    }
+
+    .divide-line {
+        height: .5rem;
+        width: 100%;
+        background: #f3f3f3;
+    }
+    
+    .table {
+        with
+      margin-bottom: 0;
+    }
+
+     th {
+        text-align: center;
+     }
+     
+     #prTrOpen, #prTrClose {
+        display:none;
+     }
+
+    
+</#macro>
+<#macro script>
+
+    var hotMapType = 0 ;
+    var prov_data = [];
+    var city_data = [];
+    var country_data = [];
+    
+    var color = ['#a6c84c', '#ffa022', '#46bee9'];
+    
+    $(function() {
+
+        if(cityName.length != 0) {
+            renderCityMap({"name": cityName}, curProvName);
+        } else if(provName.length != 0){
+            renderProvMap({"name": curProvName}, true);
+        } else {
+            renderChinaMap(true);
+        }
+        
+        //做地图类型的切换选择
+        $(".mapType").click(function(e) {
+            var $a = $(e.currentTarget);
+            $a.parent().find(".mapType").removeClass("active-mapType");
+            $a.addClass("active-mapType");
+        });
+
+
+        var ITEM_ON = "weui-bar__item--on";
+
+        var showTab = function(tabId) {
+            var $tabItem = $(tabId);
+            if ($tabItem.hasClass(ITEM_ON)) 
+                return;
+            var href = $tabItem.attr("href");
+
+            if (!/^#/.test(href)) 
+                return;
+            $tabItem.parent().find("." + ITEM_ON).removeClass(ITEM_ON);
+            $tabItem.addClass(ITEM_ON);
+
+            if (href == "#tab2") {
+                $(".weui-tab__bd").addClass("active").height($("#tab2").height());
+            } else {
+                $(".weui-tab__bd").removeClass("active").height($("#tab1").height());
+            }
+        }
+
+        // $.showTab = showTab;
+
+        $(".weui-navbar__item").click(function(e) {
+            var $a = $(e.currentTarget);
+            var href = $a.attr("href");
+            if ($a.hasClass(ITEM_ON)) 
+                return;
+                
+            if (!/^#/.test(href)) 
+                return;
+            e.preventDefault();
+            showTab($a);
+        });
+        
+        $('#goback').on('click', function() {
+            historyUtils.back();
+        });
+
+    });
+
+    //回到中国地图界面
+    function goBackChinaMap() {
+
+        $('#prov').css('visibility','hidden');
+        $('#city').css('visibility','hidden');
+        
+        renderChinaMap(true);
+      
+        provName = '';
+        cityName = '';
+        countryName = '';
+        $.cookie(Utils.provCacheName, provName, { expires: 7 });
+        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+        
+        initData();
+    }
+
+    //回到省界面
+    function goBackProvMap() {
+        
+        cityName = '';
+        countryName = '';
+        $.cookie(Utils.provCacheName, provName, { expires: 7 });
+        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+
+        curProvName = strKit.convertProvName(provName);
+        renderProvMap({"name": curProvName}, true);
+        $('#city').css('visibility','hidden');
+      
+        initData();
+    }
+
+    //做时间的切换选择
+    function setDateType(type) {
+        setFilter(type);
+        
+        if (document.getElementById('china_map').style.display == 'block') 
+            renderChinaMap(false);
+        if (document.getElementById('prov_map').style.display == 'block') 
+            renderProvMap({"name": strKit.convertProvName(provName)}, false);
+        if (document.getElementById('city_map').style.display == 'block') 
+            renderCityMap({"name": cityName}, provName.substring(0, provName.length - 1));
+
+    }
+
+    $(document).on("click", ".confirm-search-btn", function () { //点击确定按钮
+        setFilter(3);
+        if (document.getElementById('china_map').style.display == 'block')
+            renderChinaMap(false);
+        if (document.getElementById('prov_map').style.display == 'block')
+            renderProvMap({"name": strKit.convertProvName(provName)}, false);
+        if (document.getElementById('city_map').style.display == 'block')
+            renderCityMap({"name": cityName}, provName.substring(0, provName.length - 1));
+
+        closeCombinSearch();
+    })
+
+    function setHotMapType(type){
+        hotMapType = type;
+        hMap();
+    }
+
+    //点击地图上的省
+    function renderProvMap (result, isRender) {
+        
+        cityName = '';
+        countryName = '';
+        var maxData = 0;
+        
+        if(result.name == '北京' || result.name == '上海' || result.name == '天津' || result.name == '台湾' || result.name == '重庆'){
+            provName = result.name + '市';
+        } else {
+            provName = result.name + '省';
+        }
+
+        $.cookie(Utils.provCacheName, provName, { expires: 7 });
+        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+        
+        $.ajax({
+            url:"${CPATH}/biSales/queryMapData",
+            type:"post",
+            data:{"provName": provName, "cityName": '', countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data) {
+            city_data = [];
+            for(var i = 0; i < data.length; i++) {
+                city_data.push({"name": data[i].city_name, "value": data[i].realAmount});
+                if(data[i].realAmount > maxData) maxData = data[i].realAmount;
+            }
+            
+            //setTimeout(function () {
+            $('#prov_view').text(result.name);
+            $('#prov').css('visibility', 'visible');
+
+            if (isRender) {
+                $('#china_map').css('display','none');
+                $('#prov_map').css('display','block');
+                $('#city_map').css('display','none');
+            }
+            //}, 500);
+            
+            var _provMap = document.getElementById('prov_map');
+            var provChart = echarts.init(_provMap);
+            $(_provMap).width(400);
+            // 选择省的单击事件
+            var selectProv = result.name.toString();
+            
+            provChart.showLoading({
+                text: '加载中...',
+                effect: 'whirling'
+            });
+            
+            // 从json获取地图数据
+            $.get('${CTPATH}/json/' + cityMap[selectProv] + '/'+cityMap[selectProv] + '.json', function (data) {
+                echarts.registerMap(selectProv, data);
+                
+                provChart.hideLoading();
+                provChart.resize();
+                
+                provChart.setOption({
+                    tooltip: {
+                        trigger: 'item',
+                        textStyle: {fontSize: 9},
+                        formatter: function loadData(result){
+                            if(isNaN(result.value)) return result.name + '<br />总金额: 0';
+                            else return result.name+'<br />总金额:'+result.value + '万元';
+                        }
+                    },
+                    visualMap:{
+                        min: 0,
+                        max: maxData+1,
+                        splitNumber: 0,
+                        text: ['高','低'],
+                        realtime: false,
+                        selectedMode: false,
+                        realtime: false,
+                        show: true,
+                        itemWidth: 20,
+                        itemHeight: 120
+                    },
+                    series: [{
+                        type: 'map',
+                        map: selectProv,                  // 要和echarts.registerMap（）中第一个参数一致
+                        roam: true,
+                        scaleLimit: { min: 1, max: 4 },   // 缩放
+                        mapLocation:{
+                            y:60
+                        },
+                        itemSytle:{
+                            emphasis:{label:{show:false}}
+                        },
+                        label: {
+                            normal: {
+                                show: true
+                            },
+                            emphasis: {
+                                show: true
+                            }
+                        },
+                        data : city_data.reverse()
+                    }]
+                });
+                
+                provChart.on('click', function(rel){
+                    renderCityMap(rel, selectProv);
+                });
+            });
+        });
+        
+        initData();
+    }
+
+    //点击地图上的市
+    function renderCityMap(rel, selectProv) {
+        var maxData = 0;
+        cityName = rel.name;
+
+        $.cookie(Utils.provCacheName, provName, { expires: 7 });
+        $.cookie(Utils.cityCacheName, cityName, { expires: 7 });
+        $.cookie(Utils.countryCacheName, countryName, { expires: 7 });
+
+        $.ajax({
+            url:"${CPATH}/biSales/queryMapData",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, "countryName": '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data) {
+            country_data = [];
+            for(var i = 0; i < data.length; i++)
+            {
+                country_data.push({"name": data[i].country_name, "value": data[i].realAmount});
+                if (data[i].realAmount > maxData) maxData = data[i].realAmount;
+            }
+            
+            setTimeout(function () {
+                function contains(arr, obj) {
+                    var i = arr.length;
+                    while (i--) {
+                        if (arr[i] === obj) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                
+                var arr = new Array('北京','上海','天津','台湾','重庆');
+                
+                if(contains(arr, selectProv) == false) {
+                
+                    $('#prov_view').text(selectProv);
+                    $('#prov').css('visibility','visible');
+                    $('#city_view').text(rel.name);
+                    $('#city').css('visibility','visible');
+
+                    $('#china_map').css('display','none');
+                    $('#prov_map').css('display','none');
+                    $('#city_map').css('display','block');
+                    
+                } else {
+                    $('#china_map').css('display','none');
+                    $('#prov_map').css('display','block');
+                    $('#city_map').css('display','none');
+                }
+            }, 500);
+        
+            // 选择市的单击事件
+            var selectCity = rel.name;
+
+            // 调取后台数据
+            countryMapRender(selectProv, selectCity, maxData);
+        });
+      
+        initData();
+        refreshStockData();
+    }
+
+    // 城市地图(市)
+    function countryMapRender(selectProv, selectCity, maxData) {
+        var _cityMap = document.getElementById('city_map');
+        var cityChart = echarts.init(_cityMap);
+        $(_cityMap).width(400);
+        
+        cityChart.showLoading({
+            text: '加载中...',
+            effect: 'whirling'
+        });
+    
+        $.get('${CTPATH}/json/'+cityMap[selectProv]+'/'+cityMap[selectCity]+'.json', function (data) {
+            
+            echarts.registerMap(selectCity, data);
+            cityChart.hideLoading();
+            cityChart.resize();
+            
+            cityChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    textStyle: {fontSize: 9},
+                    formatter: function loadData(result) {
+                        if(isNaN(result.value)) return result.name + '<br />总金额: 0';
+                        else return result.name+'<br />总金额:'+result.value + '万元';
+                    }
+                },
+                visualMap:{
+                    min: 0,
+                    max: maxData+1,
+                    splitNumber: 0,
+                    text: ['高','低'],
+                    realtime: false,
+                    selectedMode: false,
+                    realtime: false,
+                    show: true,
+                    itemWidth: 20,
+                    itemHeight: 120
+                },
+                series: [{
+                    type: 'map',
+                    map: selectCity ,//要和echarts.registerMap（）中第一个参数一致
+                    roam: true,
+                    scaleLimit: { min: 1, max: 4 },//缩放
+                    mapLocation: {
+                       y:60
+                    },
+                    itemSytle: {
+                       emphasis: {label: {show: false} }
+                    },
+                    label: {
+                       normal: {
+                           show: true
+                       },
+                       emphasis: {
+                           show: true
+                       }
+                    },
+                    data: country_data.reverse()
+                }]
+            });
+            
+            /*cityChart.on('click', function(rel) {
+                setTimeout(function () {
+                }, 500);
+            });*/
+        });
+    }
+    
+    //中国地图渲染
+    function renderChinaMap(isRender) {
+    
+        var maxData = 0;
+        
+        $.ajax({
+            url: "${CPATH}/biSales/queryMapData",
+            type: "post",
+            data: {startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data) {
+            prov_data = [];
+            for(var i = 0; i < data.length; i++) {
+                prov_data.push({
+                    "name": data[i].prov_name.substring(0, data[i].prov_name.length -1),
+                    "value": data[i].realAmount
+                });
+                
+                if (data[i].realAmount > maxData)
+                    maxData = data[i].realAmount;
+            }
+            
+            if (isRender) {
+                //setTimeout(function () {
+                    $('#china_map').css('display','block');
+                    $('#city_map').css('display','none');
+                    $('#prov_map').css('display','none');
+                //}, 100);
+            }
+            
+            var _chinaMap = document.getElementById('china_map');
+            $(_chinaMap).width(400);
+            var chart = echarts.init(_chinaMap);                     // 在id为china_map的dom元素中显示地图
+            chart.showLoading({
+                text: '加载中...',
+                effect: 'whirling'
+            });
+            
+            $.get('${CTPATH}/json/china.json', function (mapJson) {
+                
+                echarts.registerMap('china', mapJson);
+                chart.hideLoading();
+                chart.resize();
+                
+                chart.setOption({
+                    tooltip: {
+                        trigger: 'item',
+                        textStyle: {fontSize: 9},
+                        formatter: function (result){
+                            if(isNaN(result.value)) 
+                                return result.name + '<br />总金额: 0';
+                            else 
+                                return result.name + '<br />总金额:' + result.value + '万元';
+                        }
+                    },
+                    visualMap: {
+                        min: 0,
+                        max: maxData + 1,
+                        splitNumber: 0,
+                        text: ['高','低'],
+                        realtime: false,
+                        selectedMode: false,
+                        realtime: false,
+                        show: true,
+                        itemWidth: 20,
+                        itemHeight: 120
+                    },
+                    series: [{
+                        type: 'map',
+                        map: 'china',                   // 要和echarts.registerMap（）中第一个参数一致
+                        roam: true,
+                        scaleLimit: { min: 1, max: 4},  // 缩放
+                        mapLocation:{
+                            y:60
+                        },
+                        itemSytle: {
+                            emphasis: {label: {show: false}}
+                        },
+                        label: {
+                            normal: {
+                                show: true,
+                                textStyle: {fontSize: 9},
+                            },
+                            emphasis: {
+                                show: true,
+                                textStyle: {fontSize: 9},
+                            }
+                        },
+                        data: prov_data.reverse()
+                    }]
+                });
+
+                chart.on('click', function(result) {
+                    renderProvMap(result, true);
+                });
+            });
+            initData();
+        });
+    }
+
+
+    //热力图
+    var hotMap = new BMap.Map("hot_map");
+    var redIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20));
+    var orangeIcon = new BMap.Icon("${CTPATH}/images/marker_orange.png", new BMap.Size(20, 20));
+    var grayIcon = new BMap.Icon("${CTPATH}/images/marker_gray.png", new BMap.Size(20, 20));
+    function hMap(){
+        Utils.loading();
+        
+        var hmTitle = '热力图';
+        if((provName + cityName).trim() != '' ){
+            hmTitle = provName + cityName  + hmTitle;
+        } else {
+            hmTitle = '全国' + hmTitle;
+        }
+        $("#p_hot_map").text(hmTitle);
+        
+        var longitude = $.cookie(Utils.longitudeCache);
+        var latitude = $.cookie(Utils.latitudeCache);
+        var point = new BMap.Point(longitude,latitude);
+        hotMap.centerAndZoom(point, 11);             // 初始化地图，设置中心点坐标和地图级别
+        
+        if(cityName.trim() != '' ){
+            hotMap.centerAndZoom(cityName,11);
+        } else if(provName.trim() != '' ) {
+            hotMap.centerAndZoom(provName,7);
+        } else {
+            hotMap.centerAndZoom("兰州",4);
+        }
+        
+        hotMap.enableScrollWheelZoom(true);
+        hotMap.clearOverlays();
+        if(hotMapType == 0){
+            hotMapData("${CPATH}/biSales/salesHotMap");
+        } else {
+            hotMapData("${CPATH}/biSales/customerHotMap");
+        }
+        
+    }
+    
+    function hotMapData(url){
+    
+        $.ajax({
+            url:url,
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+            
+            if(!isSupportCanvas()){
+            alert('热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~')
+            }
+            
+            heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
+            hotMap.addOverlay(heatmapOverlay);
+            heatmapOverlay.setDataSet({data:data,max:100});
+        
+        });
+    }
+    
+    //判断浏览区是否支持canvas
+    function isSupportCanvas(){
+        var elem = document.createElement('canvas');
+        return !!(elem.getContext && elem.getContext('2d'));
+    }
+
+    // 客户
+    function customer_rank() {
+        $.ajax({
+            url:"${CPATH}/biSales/customerType",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var crSeriesData = [];
+            var length = data.length > 5 ? 5 : data.length;
+
+            for(var i = 0; i < length; i++){
+                crSeriesData.push({
+                    name: data[i].name + '(' + data[i].realAmount + ')',
+                    value: data[i].realAmount
+                });
+            }
+            var crTitle = '客户销售统计排行Top5(金额/万元)';
+            if((provName + cityName).trim() != '' ){
+                crTitle = provName + cityName + crTitle;
+            } else {
+                crTitle = '全国' + crTitle
+            }
+
+            var customer_rank = document.getElementById('customer_rank');
+            //var $customer_rank = $(customer_rank);
+
+            var customerRankChart = echarts.init(customer_rank);
+            var crOption = {
+                title: [{
+                    text: crTitle,
+                    textStyle: {
+                        fontWeight: 'normal',
+                        fontSize: 16
+                    }
+                }],
+                color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
+                series: [
+                    {
+                        name:crTitle,
+                        type:'pie',
+                        radius: ['25%', '45%'],
+                        center: ['50%', '60%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                textStyle: {
+                                    fontSize: 10
+                                }
+                            }
+                        },
+                        data:crSeriesData
+                    }
+                ]
+            };
+            customerRankChart.resize();
+            customerRankChart.setOption(crOption,true);
+            customerRankChart.on('click', customerClick);
+        });
+    }
+    function customerClick(param) {
+        //post('${CPATH}/biSales/productByCustomerTypeList', {"provName" : provName, "cityName" : cityName, "countryName" : '', startDate: startDate, endDate: endDate});
+    }
+
+    //区域
+    function area_rank(){
+        $.ajax({
+            url:"${CPATH}/biSales/area",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+            var areaYData = [];
+            var areaSeriesData = [];
+            var length = data.length > 5 ? 5 : data.length;
+
+            for(var i = 0; i < length; i++){
+                areaYData.push(data[i][0]) ;
+                areaSeriesData.push(data[i][1]);
+            }
+
+            var areaTitle = '区域销售统计Top5(金额/万元)';
+            if((provName + cityName).trim() != '' ){
+                areaTitle = provName + cityName + areaTitle;
+            } else {
+                areaTitle = '全国' + areaTitle
+            }
+
+            var area_rank = document.getElementById('area_rank');
+            var $area_rank = $(area_rank);
+
+            var areaRankChart = echarts.init(area_rank);
+            var option = {
+                title: [{
+                    text: areaTitle,
+                    textStyle: {
+                        fontWeight: 'normal',
+                        fontSize: 16
+                    }
+                }],
+                color: ['#4ac7f5'],
+                grid: {
+                    left: '2%',
+                    right: '15%',
+                    bottom: 15,
+                    top: 60,
+                    containLabel: true
+                },
+                calculable : true,
+                xAxis : [{
+                    show : false,
+                    name : '金额/万元',
+                    type : 'value',
+                    boundaryGap: [0, 0.01]
+                }],
+                yAxis : [{
+                    type : 'category',
+                    data : areaYData.reverse()
+                }],
+                series : [{
+                    type: 'bar',
+                    barWidth: 20,
+                    data: areaSeriesData.reverse(),
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'right'
+                        }
+                    }
+                }]
+           };
+           
+           areaRankChart.resize();
+           areaRankChart.setOption(option, true);
+           areaRankChart.on('click', areaClick);
+       });
+    }
+    
+    function areaClick(param) {
+        //post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : '', startDate: startDate, endDate: endDate});
+    }
+    
+    //产品
+    function product_rank(){
+        $.ajax({
+            url:"${CPATH}/biSales/product",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+
+            var prTitle = '产品销售排行Top5';
+            if((provName + cityName).trim() != '' ){
+                prTitle = provName + cityName + prTitle;
+            } else {
+                prTitle = '全国' + prTitle
+            }
+            var $thead = $("#product_rank thead th");
+            $thead.empty();
+            $thead.text(prTitle);
+
+            var $tbody = $("#product_rank tbody");
+            $tbody.empty();
+            $tbody.append('<tr><th>产品</th><th width="20%">数量(件)</th><th width="25%">金额(万元)</th></tr>');
+            for(var i = 0; i < data.length; i++){
+                $tbody.append('<tr><td>' + data[i].custom_name + '</td><td class="t-r">' + Math.round(data[i].productCount*100)/100 + '</td><td class="t-r">' + data[i].totalAmount + '</td></tr>');
+            }
+            var $tr = $("#product_rank tbody tr:gt(5)");
+            if($tr.length > 0){
+                $tr.hide();
+                $(".trOpen").show();
+                $(".trClose").hide();
+                $("#product_rank tfoot").show();
+            }else {
+                $("#product_rank tfoot").hide();
+            }
+            $(".weui-tab__bd").height($("#tab1").height());
+       });
+    }
+
+    $(".trOpen").click(function() {
+        $(".weui-tab__bd").height($("#tab1").height())
+    });
+    $(".trClose").click(function() {
+        $(".weui-tab__bd").height($("#tab1").height())
+    });
+    
+/*    $("#prTrOpen").click(function() {
+        $prTR.show();
+        $("#prTrOpen").hide();
+        $("#prTrClose").show();
+        $(".weui-tab__bd").height($("#tab1").height());
+    });
+    
+    $("#prTrClose").click(function() {
+        $prTR.hide();
+        $("#prTrOpen").show();
+        $("#prTrClose").hide();
+        $(".weui-tab__bd").height($("#tab1").height());
+    });*/
+
+    var $sTR;
+    //库存
+    function stock_rank(){
+        $.ajax({
+            url:"${CPATH}/stock/area",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: ''},
+            dataType:"json"
+        }).done(function(data){
+            var srTitle = '库存情况';
+            if((provName + cityName).trim() != '' ){
+                srTitle = provName + cityName + srTitle;
+            } else {
+                srTitle = '全国' + srTitle
+            }
+            
+            var $thead = $("#stock_rank thead th");
+            $thead.empty();
+            $thead.text(srTitle);
+
+            var $tbody = $("#stock_rank tbody");
+            $tbody.empty();
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
+            for(var i = 0; i < data.length; i++){
+                $tbody.append('<tr><td>' + data[i].custom_name + '</td><td class="t-r">' + data[i].balance_count + '</td></tr>');
+            }
+            $sTR = $("#stock_rank tbody tr:gt(5)");
+            if($sTR.length > 0){
+                $sTR.hide();
+                $("#sTrOpen").show();
+                $("#sTrClose").hide();
+                $("#stock_rank tfoot").show();
+            }else {
+                $("#sTrOpen").hide();
+                $("#sTrClose").hide();
+                 $("#stock_rank tfoot").hide();
+            }
+        });
+    }
+    
+    $("#sTrOpen").click(function() {
+        $sTR.show();
+        $("#sTrOpen").hide();
+        $("#sTrClose").show();
+        $(".weui-tab__bd").height($("#tab2").height());
+    });
+    
+    $("#sTrClose").click(function() {
+        $sTR.hide();
+        $("#sTrOpen").show();
+        $("#sTrClose").hide();
+        $(".weui-tab__bd").height($("#tab2").height());
+    });
+
+    //库存趋势
+    function stock(name, tn, color){
+        $.ajax({
+            url:"${CPATH}/stock/date",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: '', custom_name: tn},
+            dataType:"json"
+        }).done(function(data){
+
+            var sTitle = '库存趋势';
+            if((provName + cityName).trim() != '' ){
+                sTitle = provName + cityName + sTitle;
+            } else {
+                sTitle = '全国' + sTitle
+            }
+            
+            var $title = $(".title");
+            $title.empty();
+            $title.text(sTitle);
+
+            var xData = [];
+            var seriesData = [];
+            var length = data.length > 5 ? 5 : data.length;
+
+            for(var i = 0; i < data.length; i++){
+                xData.push(data[i].create_date) ;
+                seriesData.push(data[i].balance_count);
+            }
+
+            var title = tn + '库存趋势(单位/件)';
+
+            var stock = document.getElementById('stock'+'_'+name);
+            //var $stock = $(stock);
+
+            var stockChart = echarts.init(stock);
+            var option = {
+                title: {
+                    left: 'center',
+                    top: 'top',
+                    text: title,
+                    textStyle: {
+                        fontWeight: 'normal',
+                        color: '#ea6f5a',
+                        fontSize: '.7rem'
+                    }
+                },
+                tooltip : {
+                },
+                grid: {
+                    left: '20%',
+                    right: '15%',
+                    top: '25%'
+                },
+                xAxis: {
+                    data: xData
+                },
+                yAxis: {},
+                series: [{
+                    name: title,
+                    type: 'line',
+                    itemStyle: {
+                        normal: {color: color}
+                    },
+                    lineStyle: {
+                        normal: {color: color}
+                    },
+                    markPoint: {
+                        label: {
+                            normal: {
+                                textStyle: {
+                                    color: '#000',
+                                }
+                            }
+                        },
+                        data : [
+                            {type: 'max', name: '最大值'},
+                            {type: 'min', name: '最小值'}
+                        ]
+                    },
+                    data:seriesData
+                }]
+            };
+            stockChart.resize();
+            stockChart.setOption(option, true);
+        });
+    }
+    
+    //共通post
+    function post(URL, PARAMS)
+    { 
+        var temp = document.createElement("form"); 
+        temp.action = URL; 
+        temp.method = "post"; 
+        temp.style.display = "none"; 
+        for (var x in PARAMS)
+        { 
+            var opt = document.createElement("textarea"); 
+            opt.name = x; 
+            opt.value = PARAMS[x]; 
+            temp.appendChild(opt); 
+        } 
+        document.body.appendChild(temp); 
+        temp.submit(); 
+        return temp; 
+    }
+    
+    // 更新库存数据
+    function refreshStockData() {
+
+        
+    }
+    
+    function initData() {
+        Utils.loading();
+        //热力图
+        hMap();
+        // 客户类型
+        customer_rank();
+        // 客户区域
+        area_rank();
+        // 产品
+        product_rank();
+    }
+    
+</#macro>
+<@layout>
+
+<section>
+    
+    <div class="bi-body">
+        <#include "_inc/_pc_search_box.html"/>
+        
+        <div class="map">
+            <div class="map-nav">
+                <span id="china" style="visibility:visible;"> <a href="javascript:void(0);" onclick="goBackChinaMap()"> 全国</a></span>
+                <span id="prov" style="visibility:hidden;"> > <a href="javascript:void(0);" onclick="goBackProvMap()" id="prov_view"></a></span>
+                <span id="city" style="visibility:hidden;"> > <a herf="javascript:void(0);" id="city_view"></a></span>
+            </div>
+            <div id="china_map" style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+            <div id="prov_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+            <div id="city_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+        </div>
+        
+        <div class="mapType-div">
+            <p class="title" id="p_hot_map"></p>
+            <a class="mapType active-mapType" onclick="setHotMapType(0)">销售分布</a>
+            <a class="mapType" onclick="setHotMapType(1)">开发分布</a>
+        </div>
+        <div id="hot_map"></div>
+        
+          <div id="customer_rank"></div>
+          <div id="area_rank"></div>
+          <div>
+              <table id="product_rank" class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th colspan="3" class="font-16 t-l pro-title"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>产品</th>
+                    <th>数量(件)</th>
+                    <th>金额</th>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="3">
+                      <span id="prTrOpen" class="fr txt-color-red trOpen"><i class="icon-arrow-down2"></i> 查看更多</span>
+                      <span id="prTrClose" class="fr txt-color-red trClose" style="display: none"><i class="icon-arrow-up2"></i> 收起</span>
+                    </th>
+                  </tr>
+                </tfoot>
+              </table>
+          </div>
+    </div>
+</section>
+</@layout>
