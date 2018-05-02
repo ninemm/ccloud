@@ -925,13 +925,14 @@ public class SalesOrderQuery extends JBaseQuery {
                 fromBuilder.append("SELECT SUM(sok.total_amount) totalAmount  FROM cc_sales_outstock sok ");
                 fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id=sok.id ");
                 fromBuilder.append("LEFT JOIN cc_sales_order so ON so.id=sojo.order_id ");
+                fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
                 needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", userId, params, needWhere);
-                fromBuilder.append(" and sok.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") " );
+                fromBuilder.append(" and sok.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
             }else {
                 fromBuilder.append("SELECT SUM(so.total_amount) totalAmount  FROM cc_sales_order so ");
+                fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
                 needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", userId, params, needWhere);
-                fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") ");
-                
+                fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
             }
             if (StrKit.notBlank(startDate)) {
                 fromBuilder.append(" and "+keyword+" >= ? ");
