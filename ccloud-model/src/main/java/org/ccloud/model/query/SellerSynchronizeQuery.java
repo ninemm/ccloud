@@ -71,7 +71,7 @@ public class SellerSynchronizeQuery extends JBaseQuery {
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
-	public Page<SellerSynchronize> paginateSynchronize(int pageNumber, int pageSize,String keyword, String parentId) {
+	public Page<SellerSynchronize> paginateSynchronize(int pageNumber, int pageSize,String keyword, String parentId, String deptFlag) {
 		String select = "select cs.* ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_seller_synchronize` cs  ");
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -84,7 +84,13 @@ public class SellerSynchronizeQuery extends JBaseQuery {
 			params.add(parentId);
 		}
 		needWhere = false;
-			
+		if(StrKit.notBlank(deptFlag)) {
+			if("0".equals(deptFlag)) {
+				fromBuilder.append("and cs.dept_id is null ");
+			} else if("1".equals(deptFlag)) {
+				fromBuilder.append("and cs.dept_id is not null ");
+			}
+		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cs.seller_name", keyword, params, needWhere);
 
 		if (params.isEmpty())
