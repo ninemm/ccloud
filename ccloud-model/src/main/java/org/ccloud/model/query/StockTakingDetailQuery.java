@@ -152,9 +152,9 @@ public class StockTakingDetailQuery extends JBaseQuery {
 	 	fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 	 	fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 	 	fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 ON t1.product_set_id = sp.product_id ");
-	 	fromBuilder.append(" LEFT JOIN( SELECT i.balance_count , i.sell_product_id FROM cc_inventory_detail i WHERE i.warehouse_id = ? GROUP BY i.sell_product_id ORDER BY i.create_date DESC) t2 ON t2.sell_product_id = sp.id ");
+	 	fromBuilder.append(" LEFT JOIN (SELECT * FROM cc_inventory_detail t WHERE  warehouse_id =? and t.create_date = (SELECT max(create_date) FROM cc_inventory_detail WHERE t.sell_product_id = sell_product_id AND warehouse_id =?)  GROUP BY t.sell_product_id ) t2 ON t2.sell_product_id = sp.id ");
 	 	fromBuilder.append(" WHERE sp.is_enable=1 and sp.seller_id =? ORDER BY sp.order_list");
-	 	return Db.find(fromBuilder.toString(), warehouseId,seller_id);
+	 	return Db.find(fromBuilder.toString(), warehouseId,warehouseId,seller_id);
 	}
 	
 	public List<Record> findByStockTakingId (String stockTakingId){
