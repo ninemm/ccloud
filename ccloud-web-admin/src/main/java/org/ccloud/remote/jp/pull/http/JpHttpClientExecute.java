@@ -57,7 +57,7 @@ public class JpHttpClientExecute {
 	/**
 	 * 整理传输数据
 	 * @param requestUrl：请求地址
-	 * @param request：请求主体
+	 * @param requestBody：请求主体
 	 * @param params：请求参数
 	 * @param headers：请求头信息
 	 * @return
@@ -71,7 +71,6 @@ public class JpHttpClientExecute {
 		}
 		if(StrKit.isBlank(result))
 			return null;
-		System.out.println(result);
 		
 		return HttpParser.parseResult(requestBody, result);
 	}
@@ -79,7 +78,7 @@ public class JpHttpClientExecute {
 	/**
 	 * 整理传输数据
 	 * @param requestUrl：请求地址
-	 * @param request：请求主体
+	 * @param requestBody：请求主体
 	 * @param params：请求参数
 	 * @param headers：请求头信息
 	 * @return

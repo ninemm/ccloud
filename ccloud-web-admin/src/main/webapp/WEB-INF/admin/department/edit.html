@@ -178,7 +178,15 @@ function doSubmit(){
 						<div class="input-group col-md-4 col-sm-10">
 		                 	<input class="form-control input-sm" type="text" name="department.description" value="${(dept.description)!}" placeholder="2-20个任意字母数字">
 		               	</div>
-					</div>													
+					</div>
+					<@shiro.hasPermission name="/admin/all">
+					<div class="form-group col-sm-12">
+						<label class="control-label col-sm-2">数据域:</label>
+						<div class="input-group col-md-4 col-sm-10">
+		                 	<input class="form-control input-sm" type="text" name="department.data_area" value="${(dept.data_area)!}" disabled>
+		               	</div>
+					</div>
+					</@shiro.hasPermission>														
 					<div class="form-group col-sm-12">
 						<label class="control-label col-sm-2">排序:</label>
 						<div class="input-group col-md-4 col-sm-10">

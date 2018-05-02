@@ -541,7 +541,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		public List<Record> findCustomerOutStockByUserId(String userId, String startDate, String endDate,
 				String isGift) {
 			LinkedList<Object> params = new LinkedList<Object>();
-			StringBuilder sqlBuilder = new StringBuilder("SELECT o.sell_product_id, csp.custom_name,cc.customer_name, cs.customer_id ,FORMAT((o.product_count - IFNULL(t1.product_count,0))/cp.convert_relate,2) as count,o.is_gift ");
+			StringBuilder sqlBuilder = new StringBuilder("SELECT o.sell_product_id, csp.custom_name,cc.customer_name,cc.address, cs.customer_id ,FORMAT((o.product_count - IFNULL(t1.product_count,0))/cp.convert_relate,2) as count,o.is_gift ");
 			sqlBuilder.append(" FROM cc_sales_outstock_detail o");
 			sqlBuilder.append(" LEFT JOIN cc_sales_outstock cs ON o.outstock_id = cs.id");
 			sqlBuilder.append(" LEFT JOIN cc_sales_order_join_outstock cj ON cj.outstock_id = cs.id");

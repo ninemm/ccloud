@@ -24,7 +24,7 @@
 
 		var url = '${CPATH}/admin/seller_synchronize/list';
 		var urlPro = '';
-		jQuery.mm.initEditTable('#_seller_table', url, initParams, initFields(), null);
+		jQuery.mm.initParentTable('#_seller_table', url, initParams, initFields(), null);
 		$("#search-submit").click(function() {
 			$table.bootstrapTable('refresh');
 		});
@@ -38,7 +38,8 @@
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
-			k: keyword
+			k: keyword,
+			hasModifyDept: $("#hasModifyDept").val()
 		};
 		return param;
 	};
@@ -47,20 +48,28 @@
 		var fields =
 			[
       			{field: "id", title: "ID", align: "center", visible:false, edit:false},
-      			{field: "dept_id", title: "组织结构ID", align: "center", visible:false, edit:false},
+      			{field: "dept_id", title: "是否已维护部门", align: "center", visible:true, 
+      				formatter: function(value, row, rowIndex) {
+						if (value == null) return '否';
+   						else return '是';
+   					},
+      				edit:false
+      			},
       			{field: "seller_name", title: "销售商名称", align: "center", width: '10%', edit:false},
       			{field: "seller_code", title: "销售商编码", align: "center", width: '3%', edit:false},
       			{field: "contact", title: "联系人", align: "center", width: '7%', edit:false},
       			{field: "phone", title: "电话", align: "center", width: '10%', edit:false},
-      			{field: "seller_type", title: "销售商类型", align: "center", width: '10%',
+      			{field: "parent_code", title: "是否父节点", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
-   						if (value == 0) return '经销商';
-   						else return '直营商';
+   						if (value == null) return '是';
+   						else return '否';
    					},
       				edit:false
       			},
       			{field: "prov_name", title: "区域", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
+      					if(value == null && row.city_name == null && row.country_name == null)
+      						return "";
 						var str = value +"-"+ row.city_name;
 						if(row.country_name!=""){
 							str += "-"+row.country_name;
@@ -73,7 +82,6 @@
       			{field: "prov_code", title: "省编码", align: "center", visible:false, edit:false},
       			{field: "city_code", title: "市编码", align: "center", visible:false, edit:false},
       			{field: "county_code", title: "区编码", align: "center", visible:false, edit:false},
-      			{field: "market_name", title: "市场名称", align: "center", width: '10%', edit:false},
    				{field: "remark", title: "备注", align: "center", visible:false, edit:false},   			
 				{field: "modify_user_id", title: "修改人", align: "center", visible:false, edit:false},
 				{field: "create_date", title: "创建时间", align: "center", visible:false, edit:false},
@@ -106,8 +114,16 @@
 	<div class="row content-row">
 		<form class="form-horizontal" action="${CPATH}/admin/seller_synchronize/list?c=${c!}&p=${p!}" method="post">
 			<div class="form-group">
-				<div class="col-sm-4">
-				</div>
+				<div class="col-sm-5">
+                	<label class="control-label col-sm-4">是否已维护部门:</label>
+                	<div class="input-group col-sm-2">
+                        <select class="form-control input-sm" id="hasModifyDept" name="hasModifyDept"">
+                			<option value="">--全部--</option>
+                			<option value="0" selected="selected">否</option>
+                			<option value="1">是</option>
+                		</select>
+                    </div>
+                 </div>
 				<div class="col-sm-3">
 					<label class="control-label col-sm-4">名称:</label>
 	                <div class="col-sm-8 input-group input-group-sm">
