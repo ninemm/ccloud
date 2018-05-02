@@ -51,7 +51,7 @@
         if($.trim($("#address").val()).length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
         if($.trim($("#address").val()).length > 200) {$.toptip('地址详情长度不能超过200', 1000, 'error'); return false;}
 
-        //if($.trim($("#lng").val()).length==0) {$.toptip('请刷新定位', 1000, 'error'); return false;}
+        if($.trim($("#lng").val()).length==0) {$.toptip('请刷新定位', 1000, 'error'); return false;}
         return true;
     }
 

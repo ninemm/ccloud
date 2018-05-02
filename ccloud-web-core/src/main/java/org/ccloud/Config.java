@@ -32,10 +32,10 @@ import org.ccloud.ui.freemarker.function.TaxonomyBox;
 import org.ccloud.ui.freemarker.tag.ContentTag;
 import org.ccloud.ui.freemarker.tag.ContentsTag;
 import org.ccloud.ui.freemarker.tag.DictTag;
+import org.ccloud.wwechat.WorkWechatApi;
 
 import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.template.Engine;
-import org.ccloud.wwechat.WorkWechatApi;
 
 public class Config extends CCloudConfig {
 
@@ -60,6 +60,8 @@ public class Config extends CCloudConfig {
 		FreeMarkerRender.getConfiguration().setSharedVariable(ShiroTags.TAG_NAME, new ShiroTags());
 
 		MessageKit.sendMessage(Actions.CCLOUD_STARTED);
+
+		ApiConfigKit.putApiConfig(WorkWechatApi.getApiConfig());
 	}
 
 	@Override

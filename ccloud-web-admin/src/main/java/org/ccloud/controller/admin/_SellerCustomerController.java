@@ -931,8 +931,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			renderAjaxResultForError("已审核");
 			return;
 		}
-		
-		
+
 		Message message = new Message();
 		message.setSellerId(sellerId);
 		message.setContent(comment);

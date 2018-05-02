@@ -225,12 +225,14 @@ public class UserController extends BaseFrontController {
 		User curUser = null;
 		String mobile = getPara("mobile");
 		String openid = getPara("openid");
+		String wechatUserId = getPara("wechatUserId");
 		String sellerId = getPara("sellerId");
 		
 		User tmpUser = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		if (tmpUser != null) {
 			openid = getPara("openid", tmpUser.getWechatOpenId());
 			mobile = getPara("mobile", tmpUser.getMobile());
+			wechatUserId = getPara("wechatUserId", tmpUser.getWechatUseriId());
 		}
 		
 		List<User> userList = Lists.newArrayList();
@@ -238,6 +240,8 @@ public class UserController extends BaseFrontController {
 			userList = UserQuery.me().findByWechatOpenid(openid);
 		else if (StrKit.notBlank(mobile))
 			userList = UserQuery.me().findByMobile(mobile);
+		else if (StrKit.notBlank(wechatUserId))
+			userList = UserQuery.me().findByWechatUserId(wechatUserId);
 		
 		for (User user : userList) {
 			if (curUser != null)

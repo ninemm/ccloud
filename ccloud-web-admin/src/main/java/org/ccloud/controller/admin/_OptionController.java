@@ -15,23 +15,22 @@
  */
 package org.ccloud.controller.admin;
 
-import com.jfinal.aop.Before;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.interceptor.UCodeInterceptor;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.jfinal.aop.Before;
 
 @RouterMapping(url = "/admin/option", viewPath = "/WEB-INF/admin/option")
 @Before(ActionCacheClearInterceptor.class)
@@ -88,7 +87,7 @@ public class _OptionController extends JBaseController {
 			OptionQuery.me().saveOrUpdate(entry.getKey(), entry.getValue());
 		}
 
-		MessageKit.sendMessage(Actions.SETTING_CHANGED, datasMap);
+		// MessageKit.sendMessage(Actions.SETTING_CHANGED, datasMap);
 		renderAjaxResultForSuccess();
 	}
 	

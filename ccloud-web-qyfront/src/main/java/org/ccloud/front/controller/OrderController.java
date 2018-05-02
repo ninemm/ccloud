@@ -39,7 +39,6 @@ import java.util.*;
 @RouterMapping(url = "/order")
 @RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 public class OrderController extends BaseFrontController {
-
 	//我的订单
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {

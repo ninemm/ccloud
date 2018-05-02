@@ -84,7 +84,7 @@
 			<type>war</type>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.ccloud</groupId>
 			<artifactId>ccloud-web-templates</artifactId>

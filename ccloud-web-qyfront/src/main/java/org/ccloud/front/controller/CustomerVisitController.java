@@ -59,6 +59,26 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.ccloud.Consts;
+import org.ccloud.core.BaseFrontController;
+import org.ccloud.message.Actions;
+import org.ccloud.message.MessageKit;
+import org.ccloud.model.*;
+import org.ccloud.model.query.*;
+import org.ccloud.model.vo.ImageJson;
+import org.ccloud.route.RouterMapping;
+import org.ccloud.utils.DateUtils;
+import org.ccloud.utils.ImageUtils;
+import org.ccloud.workflow.service.WorkFlowService;
+import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
+import org.joda.time.DateTime;
+
+import java.awt.*;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.List;
 
 @RouterMapping(url = "/customerVisit")
 @RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)

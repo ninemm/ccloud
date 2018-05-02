@@ -88,6 +88,11 @@ public class UserQuery extends JBaseQuery {
 		}
 		return 0;
 	}
+	
+	public int batchUpdateByMobile(String wechatUserId, String mobile) {
+		String sql = "update user set wechat_userid = ? where mobile = ?";
+		return Db.update(sql, wechatUserId, mobile);
+	}
 
 	public User findUserByUsername(final String username) {
 		return DAO.getCache(username, new IDataLoader() {
@@ -115,12 +120,12 @@ public class UserQuery extends JBaseQuery {
 			}
 		});
 	}
-	
+
 	public List<User> findByWechatUserId(String wechatUserId) {
 		return DAO.doFind("wechat_userid = ? and status = 1", wechatUserId);
 //		return DAO.doFindByCache(User.CACHE_NAME, wechatUserId, "wechat_userid = ? and status = 1", wechatUserId);
 	}
-	
+
 	public List<User> findByWechatOpenid(final String openid) {
 		return DAO.doFind("wechat_open_id = ? AND status = 1", openid);
 //		return DAO.doFindByCache(User.CACHE_NAME, openid, "wechat_open_id = ? AND status = 1", openid);
@@ -138,7 +143,7 @@ public class UserQuery extends JBaseQuery {
 
 		return userList;
 	}
-	
+
 	public List<User> findAllByMobile(String mobile) {
 		StringBuilder sqlBuilder = new StringBuilder("select * ");
 		sqlBuilder.append("from `user` ");
@@ -421,5 +426,10 @@ public class UserQuery extends JBaseQuery {
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public void updateQywxId(String mobile, String userCode) {
+		StringBuilder fromBuilder = new StringBuilder("UPDATE `user` SET wechat_userid = ? WHERE mobile = ?");
+		Db.update(fromBuilder.toString(), userCode, mobile);
 	}
 }

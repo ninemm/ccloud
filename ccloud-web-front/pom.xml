@@ -162,10 +162,6 @@
 							<artifactId>ccloud-web-bi</artifactId>
 						</overlay>
                         <overlay>
-							<groupId>org.ccloud</groupId>
-							<artifactId>ccloud-web-member</artifactId>
-						</overlay>
-                        <overlay>
                             <groupId>org.ccloud</groupId>
                             <artifactId>ccloud-web-templates</artifactId>
                         </overlay>
