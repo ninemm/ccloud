@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.shiro.util.CollectionUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Brand;
@@ -27,6 +28,8 @@ import org.ccloud.model.PurchaseOrder;
 import org.ccloud.model.PurchaseOrderDetail;
 import org.ccloud.model.Seller;
 import org.ccloud.model.SellerSynchronize;
+import org.ccloud.model.Supplier;
+import org.ccloud.model.User;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.GoodsCategoryQuery;
@@ -36,6 +39,7 @@ import org.ccloud.model.query.ProductQuery;
 import org.ccloud.model.query.PurchaseOrderQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.SellerSynchronizeQuery;
+import org.ccloud.model.query.SupplierQuery;
 import org.ccloud.model.vo.remote.jp.pull.JpGoodsCategoryResponseEntity;
 import org.ccloud.model.vo.remote.jp.pull.JpProductResponseEntity;
 import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInDetailResponse;
@@ -74,6 +78,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 	private Map<String, String> params;
 	private static final String BRAND_CODE = "B001";
 	private Brand brand;
+	private Supplier supplier;
 	public _JpController() {
 		PropKit.use("ccloud.properties");
 		httpUrl = PropKit.get("jp.api.httpclient.url");
@@ -89,6 +94,10 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		}
 		if(brand == null) {
 			brand = BrandQuery.me().findByCode(BRAND_CODE);
+		}
+		
+		if (supplier == null) {
+			supplier = SupplierQuery.me().findById(brand.getSupplierId());
 		}
 	}
 	
@@ -409,6 +418,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 	 * 拉取采购单入库信息
 	 */
 	public void pullPurchaseStockIns() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		boolean result = false;
 		Calendar calendar = Calendar.getInstance();
 		FastDateFormat fdf = FastDateFormat.getInstance(DateUtils.DEFAULT_FILE_NAME_FORMATTER);
@@ -469,6 +479,9 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				department = DepartmentQuery.me().findById(seller.getDeptId());
 				purchaseOrder.setDataArea(department.getDataArea());
 				purchaseOrder.setSupplierId(brand.getSupplierId());
+				purchaseOrder.setContact(supplier.getContact());
+				purchaseOrder.setBizUserId(user.getId());
+				purchaseOrder.setMobile(supplier.getMobile());
 				purchaseOrder.setCreateDate(calendar.getTime());
 				mainPurchaseTotalAmount = new BigDecimal(0);
 				
