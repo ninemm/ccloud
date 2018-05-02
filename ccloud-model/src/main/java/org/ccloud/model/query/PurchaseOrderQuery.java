@@ -106,13 +106,13 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return DAO.find(sql, userId).size();
 	}
 	
-	public Record findMoreById(final String id,String dataArea) {
+	public Record findMoreById(String id) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT cpo.*,cs.`name` as supplier_name,cs.contact,u.mobile as userMobile,cs.mobile as supplierMobile,cs.`name` as supplier_name, cs.code,u.realname as biz_user  ");
 		fromBuilder.append(" FROM cc_purchase_order cpo ");
 		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id ");
 		fromBuilder.append(" LEFT JOIN user u on u.id=cpo.biz_user_id ");
-		fromBuilder.append(" where cpo.id = ? and cpo.data_area= '"+dataArea+"' ");
+		fromBuilder.append(" where cpo.id = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
 	}

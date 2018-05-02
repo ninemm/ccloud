@@ -157,9 +157,8 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 	
 	public void orderDetail(){
 		String orderId = getPara(0);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Record order = PurchaseOrderQuery.me().findMoreById(orderId,user.getDataArea());
-		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId,user.getDataArea());
+		Record order = PurchaseOrderQuery.me().findMoreById(orderId);
+		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId);
 
 		setAttr("order", order);
 		setAttr("orderDetail", orderDetail);
@@ -169,14 +168,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 	
 	public void refund() {
 		String orderId = getPara("orderId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		PurchaseOrder purchaseOrder = PurchaseOrderQuery.me().findById(orderId);
-		String dataArea = user.getDataArea();
-		if(StrKit.notBlank(purchaseOrder.getStockOutSn()))
-			dataArea = new String(dataArea.substring(0, dataArea.length() - 4));
-		Record order = PurchaseOrderQuery.me().findMoreById(orderId,dataArea);
+		Record order = PurchaseOrderQuery.me().findMoreById(orderId);
 			
-		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId, dataArea);
+		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId);
 
 		HashMap<String, Object> result = Maps.newHashMap();
 		result.put("order", order);
@@ -399,7 +393,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			sellerProductInfo.setSmallUnit(record.get("small_unit").toString());
 			sellerProductInfo.setProductCount(record.get("product_count").toString());
 			sellerProductInfo.setConvertRelate(record.get("convert_relate").toString());
-			sellerProductInfo.setCpsName(record.get("cps_name").toString());
+			if(record.get("cps_name") != null) {
+				sellerProductInfo.setCpsName(record.get("cps_name").toString());
+			}
 			List<SellerProduct> product = new ArrayList<>();
 			SellerProduct sellerProduct = new SellerProduct();
 			sellerProduct.setId(record.get("seller_product_id").toString());
@@ -453,7 +449,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			purchaseInstockDetailInfo.setSmallUnit(record.get("small_unit").toString());
 			purchaseInstockDetailInfo.setProductCount(record.get("product_count").toString());
 			purchaseInstockDetailInfo.setConvertRelate(record.get("convert_relate").toString());
-			purchaseInstockDetailInfo.setCpsName(record.get("cps_name").toString());
+			if(record.get("cps_name") != null) {
+				purchaseInstockDetailInfo.setCpsName(record.get("cps_name").toString());
+			}
 			List<PurchaseSeller> product = new ArrayList<>();
 			PurchaseSeller purchaseSeller = new PurchaseSeller();
 			purchaseSeller.setSellerProductId(record.get("seller_product_id").toString());

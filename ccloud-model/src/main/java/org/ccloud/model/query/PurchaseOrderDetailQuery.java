@@ -85,7 +85,7 @@ public class PurchaseOrderDetailQuery extends JBaseQuery {
 		return DAO.find(sql, id);
 	}
 	
-	public List<Record> findByOutstockId(String orderId,String dataArea) {
+	public List<Record> findByOutstockId(String orderId) {
 
 		StringBuilder sqlBuilder = new StringBuilder(
 				" SELECT cpod.* ,cp.`name` AS productName,cp.big_unit,cp.small_unit,cp.convert_relate,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name ");
@@ -93,7 +93,7 @@ public class PurchaseOrderDetailQuery extends JBaseQuery {
 		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON cpod.product_id = cpg.product_set_id ");
 		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
 		sqlBuilder.append(" LEFT JOIN cc_product cp ON cp.id = cpod.product_id ");
-		sqlBuilder.append(" where cpod.purchase_order_id=? and cpod.data_area='"+dataArea+"' GROUP BY cpod.id ");
+		sqlBuilder.append(" where cpod.purchase_order_id=? GROUP BY cpod.id ");
 
 		return Db.find(sqlBuilder.toString(), orderId);
 	}
