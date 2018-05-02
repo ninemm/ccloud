@@ -115,7 +115,9 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 
 	public boolean insert(Map<String, String[]> paraMap, String instockId, String instockSn, String sellerId,
-			String userId, Date date, String deptId, String dataArea, String outStockId) {
+			String userId, Date date, String deptId, String dataArea, String outStockId, String sellerCode) {
+		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_REFUND + sellerCode);
+		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
 		SalesRefundInstock salesRefundInstock = new SalesRefundInstock();
 		
 		salesRefundInstock.setId(instockId);
@@ -126,7 +128,11 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setCustomerTypeId(StringUtils.getArrayFirst(paraMap.get("customerType")));
 		salesRefundInstock.setBizUserId(StringUtils.getArrayFirst(paraMap.get("biz_user_id")));
 		salesRefundInstock.setInputUserId(userId);
-		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		if (isCheckStore) {
+			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		} else {
+			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_PASS);
+		}
 		salesRefundInstock.setOutstockId(outStockId);
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("paymentType"));
@@ -322,6 +328,8 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	
 	public SalesRefundInstock insertAppByUser(String instockId, Map<String, String[]> map, User user,
 			String sellerId, String sellerCode, Date date, Warehouse wareHouse) {
+		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_REFUND + sellerCode);
+		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;		
 		String newSn = SalesRefundInstockQuery.me().getNewSn(sellerId);
 		// SR + (机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
 		String instockSn = "SR" + sellerCode +  StringUtils.getArrayFirst(map.get("customerTypeCode"))
@@ -337,7 +345,11 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setCustomerTypeId(StringUtils.getArrayFirst(map.get("customerType")));
 		salesRefundInstock.setBizUserId(user.getId());
 		salesRefundInstock.setInputUserId(user.getId());
-		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		if (isCheckStore) {
+			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		} else {
+			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_PASS);
+		}
 		salesRefundInstock.setOutstockId(null);
 		String paymentType = StringUtils.getArrayFirst(map.get("receiveType"));
 		salesRefundInstock.setPaymentType(StringUtils.isNumeric(paymentType)? Integer.parseInt(paymentType) : 1);
@@ -351,6 +363,8 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 	public SalesRefundInstock insertByApp(String instockId, Record record, String userId,
 			String sellerId, String sellerCode, String paymentType, Date date, String remark) {
+		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_REFUND + sellerCode);
+		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
 		String newSn = SalesRefundInstockQuery.me().getNewSn(record.getStr("seller_id"));
 		// SR + (机构编号或企业编号6位) + A(客户类型) + W(仓库编号) + 171108(时间) + 100001(流水号)
 		String instockSn = "SR" + sellerCode +  record.get("customerTypeCode")
@@ -366,7 +380,11 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setCustomerTypeId(record.getStr("customer_type_id"));
 		salesRefundInstock.setBizUserId(record.getStr("biz_user_id"));
 		salesRefundInstock.setInputUserId(userId);
-		salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		if (isCheckStore) {
+			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
+		} else {
+			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_PASS);
+		}
 		salesRefundInstock.setOutstockId(record.getStr("id"));
 		
 		salesRefundInstock.setPaymentType(StringUtils.isNumeric(paymentType)? Integer.parseInt(paymentType) : 1);

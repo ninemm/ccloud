@@ -499,6 +499,7 @@ public class CustomerController extends BaseFrontController {
 		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 
 		if(isChecked == null || !isChecked) {
+			
 			//如果不走流程直接做操作
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_NORMAL);
 
@@ -533,7 +534,7 @@ public class CustomerController extends BaseFrontController {
 			map.put("customerVO", temp);
 
 		} else {
-
+			
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_AUDIT);
 			if (StrKit.notBlank(updated)) {
 				renderAjaxResultForError(updated);

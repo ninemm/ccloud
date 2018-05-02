@@ -16,10 +16,14 @@
 package org.ccloud.model.query;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ccloud.Consts;
 import org.ccloud.model.PurchaseOrder;
+import org.ccloud.model.vo.orderProductInfo;
+import org.ccloud.model.vo.printAllNeedInfo;
 import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
@@ -106,13 +110,13 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		return DAO.find(sql, userId).size();
 	}
 	
-	public Record findMoreById(final String id,String dataArea) {
+	public Record findMoreById(final String id) {
 		StringBuilder fromBuilder = new StringBuilder(
 				" SELECT cpo.*,cs.`name` as supplier_name,cs.contact,u.mobile as userMobile,cs.mobile as supplierMobile,cs.`name` as supplier_name, cs.code,u.realname as biz_user  ");
 		fromBuilder.append(" FROM cc_purchase_order cpo ");
 		fromBuilder.append(" LEFT JOIN cc_supplier cs on cs.id=cpo.supplier_id ");
 		fromBuilder.append(" LEFT JOIN user u on u.id=cpo.biz_user_id ");
-		fromBuilder.append(" where cpo.id = ? and cpo.data_area= '"+dataArea+"' ");
+		fromBuilder.append(" where cpo.id = ? ");
 
 		return Db.findFirst(fromBuilder.toString(), id);
 	}
@@ -173,5 +177,60 @@ public class PurchaseOrderQuery extends JBaseQuery {
 			SN = new BigDecimal(endSN).add(new BigDecimal(1)).toString();
 		}
 		return SN;
+	}
+	
+	public printAllNeedInfo findStockOutForPrint(final String id) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT cpo.id,cpo.porder_sn,cpo.total_amount,cpo.deal_date,cpo.remark,cpo.payment_type,cpo.create_date,u.realname,u.mobile as umobile,cs.contact,cs.mobile,cs.`name` as supplierName,cs.qq ");
+		fromBuilder.append(" FROM cc_purchase_order cpo ");
+		fromBuilder.append(" LEFT JOIN cc_supplier cs ON cs.id = cpo.supplier_id ");
+		fromBuilder.append(" LEFT JOIN `user` u on u.id = cpo.biz_user_id ");
+		fromBuilder.append(" WHERE cpo.id = ? ");
+		printAllNeedInfo printAllNeedInfo = new printAllNeedInfo();
+		Record record = Db.findFirst(fromBuilder.toString(), id);	
+			printAllNeedInfo.setOutstockSn(record.getStr("porder_sn"));
+			printAllNeedInfo.setCustomerName(record.getStr("supplierName"));
+			printAllNeedInfo.setCustomerContacts(record.getStr("contact"));
+			printAllNeedInfo.setCustomerPhone(record.getStr("mobile"));
+			printAllNeedInfo.setPlaceOrderMan(record.getStr("realname"));
+			printAllNeedInfo.setPlaceOrderPhone(record.getStr("umobile"));
+			printAllNeedInfo.setSalesAmount(record.getBigDecimal("total_amount"));
+			printAllNeedInfo.setRemark(record.getStr("remark"));
+			printAllNeedInfo.setPlaceOrderTime(record.getDate("deal_date"));
+			printAllNeedInfo.setOrderId(record.getStr("id"));
+			printAllNeedInfo.setBizUserId(record.getStr("biz_user_id"));
+			printAllNeedInfo.setReceiveType(record.getInt("payment_type"));
+			printAllNeedInfo.setSellerName(record.getStr("supplierName"));
+			printAllNeedInfo.setTotalCount(record.getBigDecimal("total_amount"));
+			printAllNeedInfo.setPrintDate(record.getDate("create_date"));
+			return printAllNeedInfo;
+	}
+	
+	public List<orderProductInfo> findPrintProductInfo(String orderId,String dataArea) {
+		StringBuilder sqlBuilder = new StringBuilder(
+				" SELECT cpod.*,CONVERT( cpod.product_price/cp.convert_relate,decimal(18,2)) as small_price,floor(cpod.product_count/cp.convert_relate) as bigCount,MOD(cpod.product_count,cp.convert_relate) as smallCount ,cp.`name` AS productName,cp.big_unit,cp.small_unit,cp.convert_relate,GROUP_CONCAT(DISTINCT cgs.`name`) AS cps_name ");
+		sqlBuilder.append(" from cc_purchase_order_detail cpod  ");
+		sqlBuilder.append(" LEFT JOIN cc_product_goods_specification_value cpg ON cpod.product_id = cpg.product_set_id ");
+		sqlBuilder.append(" LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id ");
+		sqlBuilder.append(" LEFT JOIN cc_product cp ON cp.id = cpod.product_id ");
+		sqlBuilder.append(" where cpod.purchase_order_id=? and cpod.data_area='"+dataArea+"' GROUP BY cpod.id ");
+		List<Record> records = Db.find(sqlBuilder.toString(), orderId);
+		List<orderProductInfo> orderProductInfos = new ArrayList<>();
+		for (Record record : records) {
+			orderProductInfo orderProductInfo = new orderProductInfo();
+			orderProductInfo.setProductName(record.getStr("productName"));//产品名称		
+			orderProductInfo.setValueName(record.getStr("cps_name"));//产品规格		
+			orderProductInfo.setBigUnit(record.getStr("big_unit"));//产品大单位
+			orderProductInfo.setSmallUnit(record.getStr("small_unit"));//产品小单位
+			orderProductInfo.setConvertRelate(record.getInt("convert_relate"));//换算关系
+			orderProductInfo.setBigPrice(record.getBigDecimal("product_price"));//大单位价格
+			orderProductInfo.setSmallPrice(record.getBigDecimal("small_price"));//小单位价格
+			orderProductInfo.setBigCount(record.getInt("bigCount"));
+			orderProductInfo.setSmallCount(record.getInt("smallCount"));
+			orderProductInfo.setProductAmout(record.getBigDecimal("product_amount"));
+			orderProductInfo.setProductCount(record.getInt("product_count"));
+			orderProductInfo.setSalesOutDetaliId(record.getStr("id"));
+			orderProductInfos.add(orderProductInfo);
+		}
+		 return orderProductInfos;
 	}
 }

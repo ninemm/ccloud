@@ -189,4 +189,9 @@ public class SellerQuery extends JBaseQuery {
 		sql.append("WHERE (d.dept_level = '1' OR d.dept_level = '2') AND cs.jpwx_open_id is not null ");
 		return Db.find(sql.toString());
 	}
+	
+	public List<Seller> findListByCode(String sellerCode) {
+		String sql = "select * from cc_seller where seller_code = ?";
+		return DAO.find(sql, sellerCode);
+	}
 }

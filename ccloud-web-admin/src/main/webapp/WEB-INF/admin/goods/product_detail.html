@@ -49,6 +49,7 @@
 					<thead>
 						<tr>
 							<th>商品货号</th>
+							<th>商品名称</th>
 							<th>商品规格</th>
 							<th>商品单价</th>
 							<th>商品大单位</th>
@@ -62,6 +63,7 @@
 							<#list list as bean>
 							<tr class="jp-onmouse">
 								<td>${bean.product_sn!}</td>
+								<td>${bean.name!}</td>
 								<td>${bean.valueName!}</td>
 								<td>${bean.price!}</td>
 								<td>${bean.big_unit!}</td>

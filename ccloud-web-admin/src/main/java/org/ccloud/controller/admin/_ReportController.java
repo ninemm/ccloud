@@ -469,7 +469,7 @@ public class _ReportController extends JBaseController {
 			if (i == findBySellerId.size() - 1) {
 				productNames = productNames + customName;
 			} else {
-				productNames = productNames + customName + ",";
+				productNames = productNames + customName + ";";
 			}			
 		}
 		setAttr("productNames", productNames);
@@ -583,7 +583,7 @@ public class _ReportController extends JBaseController {
 			if (i == findBySellerId.size() - 1) {
 				productNames = productNames + customName;
 			} else {
-				productNames = productNames + customName + ",";
+				productNames = productNames + customName + ";";
 			}			
 		}
 		setAttr("productNames", productNames);
@@ -663,6 +663,7 @@ public class _ReportController extends JBaseController {
 		//得到表头
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("客户名称");
+		watchHead.add("客户地址");
 		watchHead.add("销售额(元)");
 		String productNames = "";
 		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameBySellerId(sellerId);
@@ -672,7 +673,7 @@ public class _ReportController extends JBaseController {
 			if (i == findBySellerId.size() - 1) {
 				productNames = productNames + customName;
 			} else {
-				productNames = productNames + customName + ",";
+				productNames = productNames + customName + ";";
 			}			
 		}
 		setAttr("productNames", productNames);
@@ -720,6 +721,7 @@ public class _ReportController extends JBaseController {
 				userOrderMap.putAll(map);
 				customerId = list.get(i).getStr("customer_id");
 				userOrderMap.put("客户名称", list.get(i).getStr("customer_name"));
+				userOrderMap.put("客户地址", list.get(i).getStr("address"));
 				userOrderMap.put("销售额(元)", "0");
 				userOrderMap.put("customerId", list.get(i).getStr("customer_id"));
 			}
@@ -766,7 +768,7 @@ public class _ReportController extends JBaseController {
 	private Map<String, String> getProductMap(String productNames) {
 		Map<String, String> map = new HashMap<>();
 		if (StrKit.notBlank(productNames)) {
-			String[] productName = productNames.split(",");
+			String[] productName = productNames.split(";");
 			for (String string : productName) {
 				map.put(string, "0");
 			}

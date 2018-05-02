@@ -42,4 +42,29 @@ public class CustomerStore extends BaseCustomerStore<CustomerStore> {
 		return this.update();
 	}
 
+	@Override
+	public boolean update() {
+
+		removeCache(getId());
+
+		return super.update();
+	}
+
+	@Override
+	public boolean delete() {
+
+		removeCache(getId());
+
+		return super.delete();
+	}
+
+	@Override
+	public boolean deleteById(Object idValue) {
+
+
+		removeCache(idValue);
+
+		return super.deleteById(idValue);
+	}
+
 }

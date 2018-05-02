@@ -31,7 +31,7 @@ public class Role extends BaseRole<Role> {
 	@Override
 	public boolean save() {
 
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD  + getDataArea());
 		return super.save();
 	}
 
@@ -39,7 +39,7 @@ public class Role extends BaseRole<Role> {
 	public boolean saveOrUpdate() {
 
 		removeCache(getId());
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD  + getDataArea());
 
 		return super.saveOrUpdate();
 	}
@@ -48,7 +48,7 @@ public class Role extends BaseRole<Role> {
 	public boolean update() {
 
 		removeCache(getId());
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD  + getDataArea());
 
 		return super.update();
 	}
@@ -57,7 +57,7 @@ public class Role extends BaseRole<Role> {
 	public boolean delete() {
 
 		removeCache(getId());
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD  + getDataArea());
 
 		return super.delete();
 	}
@@ -66,7 +66,7 @@ public class Role extends BaseRole<Role> {
 	public boolean deleteById(Object idValue) {
 
 		removeCache(idValue);
-		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD .concat(getDataArea()));
+		JCacheKit.remove(Role.CACHE_NAME, RedisConsts.REDIS_KEY_AREA_ROLES_RECORD  + getDataArea());
 
 		return super.deleteById(idValue);
 	}

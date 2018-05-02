@@ -192,7 +192,7 @@
 					}
 					
 					$newOrder.find("#salesOrderId").attr('href', '${CPATH}/order/orderDetail?orderId=' + el.id);
-					$newOrder.find("#orderSn").text(el.order_sn);
+					$newOrder.find("#orderSn").text(el.order_sn+"("+el.realname+")");
 					$newOrder.find("#status").text(getStatus(el.status));
 					$newOrder.find("#customerName").text(el.customer_name);
 					$newOrder.find("#oId").val(el.id);
@@ -582,7 +582,7 @@
 		</a>
 	</@shiro.hasPermission>
 	<div class="" style="display: none">
-		<section class="product_detail weui-panel weui-panel_access composition">
+		<section class="composition">
 			<div>
 				<div class="product-top">
 					<img src="" id="compositionImage" style="width:2rem;" onerror="javascript:this.src='${CTPATH}/images/jp.jpg'" onClick="imageClick(this)">
