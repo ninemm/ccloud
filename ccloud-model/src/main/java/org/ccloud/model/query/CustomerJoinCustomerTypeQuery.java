@@ -15,10 +15,12 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.ccloud.model.CustomerJoinCustomerType;
+import org.ccloud.model.UserJoinCustomer;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
@@ -106,5 +108,19 @@ public class CustomerJoinCustomerTypeQuery extends JBaseQuery {
 			return deleteCount;
 		}
 		return 0;
+	}
+	
+	public int[] batchDelete(List<CustomerJoinCustomerType> delCustJoinCustTypes) {
+		String sql = "delete from cc_customer_join_customer_type where seller_customer_id = ?";
+		CustomerJoinCustomerType custJoinCustType = null;
+		Object[][] objArr = new Object[delCustJoinCustTypes.size()][];
+		int i = 0;
+		for (Iterator<CustomerJoinCustomerType> iterator = delCustJoinCustTypes.iterator(); iterator.hasNext();) {
+			custJoinCustType = iterator.next();
+			objArr[i] = new Object[] {custJoinCustType.getSellerCustomerId()};
+			i++;
+		}
+		int[] result = Db.batch(sql, "seller_customer_id", delCustJoinCustTypes, 10000);
+		return result;
 	}
 }

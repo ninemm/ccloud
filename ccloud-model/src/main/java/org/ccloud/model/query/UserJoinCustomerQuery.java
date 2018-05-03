@@ -15,6 +15,7 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -125,5 +126,19 @@ public class UserJoinCustomerQuery extends JBaseQuery {
 
 	public UserJoinCustomer findBySellerCustomerIdAndUserId(String sellerCustomerId, String userId){
 		return DAO.doFindFirst("seller_customer_id = ? AND user_id = ?", sellerCustomerId,userId);
+	}
+	
+	public int[] batchDelete(List<UserJoinCustomer> delUserJoinCustomers) {
+		String sql = "delete from cc_user_join_customer where seller_customer_id = ?";
+		UserJoinCustomer userJoinCustomer = null;
+		Object[][] objArr = new Object[delUserJoinCustomers.size()][];
+		int i = 0;
+		for (Iterator<UserJoinCustomer> iterator = delUserJoinCustomers.iterator(); iterator.hasNext();) {
+			userJoinCustomer = iterator.next();
+			objArr[i] = new Object[] {userJoinCustomer.getSellerCustomerId()};
+			i++;
+		}
+		int[] result = Db.batch(sql, objArr, 10000);
+		return result;
 	}
 }

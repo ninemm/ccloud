@@ -741,5 +741,23 @@ public class SellerCustomerQuery extends JBaseQuery {
 		}
 		return count;
 	}
+	
+	/**
+	 * 通过客户名称和手机号查询sellerCustomerId
+	 * @param customerName
+	 * @param mobile
+	 * @param dataArea
+	 * @return
+	 */
+	public String findSellerCustomerByNameMobile(String customerName, String mobile, String dataArea) {
+		StringBuilder fromBuilder = new StringBuilder(" select sc.id ");
+		fromBuilder.append("from cc_seller_customer sc ");
+		fromBuilder.append("join cc_user_join_customer ujc on sc.id = ujc.seller_customer_id ");
+		fromBuilder.append("where sc.customer_name = ? ");
+		fromBuilder.append("AND sc.mobile = ? ");
+		fromBuilder.append("AND ujc.data_area like ? ");
+
+		return Db.queryStr(fromBuilder.toString(), customerName, mobile, dataArea);
+	}
 
 }

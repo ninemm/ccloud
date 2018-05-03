@@ -273,5 +273,20 @@ public abstract class BaseSellerCustomer<M extends BaseSellerCustomer<M>> extend
 	public java.util.Date getModifyDate() {
 		return get("modify_date");
 	}
+	
+	public void setCustomerName(java.lang.String customerName) {
+		set("customer_name", customerName);
+	}
+
+	public java.lang.String getCustomerName() {
+		return getStr("customer_name");
+	}
+	public void setMobile(java.lang.String mobile) {
+		set("mobile", mobile);
+	}
+
+	public java.lang.String getMobile() {
+		return getStr("mobile");
+	}
 
 }

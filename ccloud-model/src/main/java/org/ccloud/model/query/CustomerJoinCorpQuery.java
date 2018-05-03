@@ -15,9 +15,14 @@
  */
 package org.ccloud.model.query;
 
+import java.util.Iterator;
 import java.util.LinkedList;
-import org.ccloud.model.CustomerJoinCorp;
+import java.util.List;
 
+import org.ccloud.model.CustomerJoinCorp;
+import org.ccloud.model.CustomerJoinCustomerType;
+
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -71,4 +76,17 @@ public class CustomerJoinCorpQuery extends JBaseQuery {
 		return DAO.doDelete("customer_id = ? AND seller_id = ?", CustomerId, SellerId);
 	}
 	
+	public int[] batchDeleteByCustomerIdAndSellerId(List<CustomerJoinCorp> delCustomerCorps) {
+		String sql = "delete from cc_customer_join_corp where customer_id = ? AND seller_id = ?";
+		CustomerJoinCorp custJoinCustType = null;
+		Object[][] objArr = new Object[delCustomerCorps.size()][];
+		int i = 0;
+		for (Iterator<CustomerJoinCorp> iterator = delCustomerCorps.iterator(); iterator.hasNext();) {
+			custJoinCustType = iterator.next();
+			objArr[i] = new Object[] {custJoinCustType.getCustomerId(), custJoinCustType.getSellerId()};
+			i++;
+		}
+		int[] result = Db.batch(sql, objArr, 10000);
+		return result;
+	}
 }

@@ -26,4 +26,28 @@ public class UserJoinCustomer extends BaseUserJoinCustomer<UserJoinCustomer> {
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final UserJoinCustomer other = (UserJoinCustomer) obj;
+		if (getUserId() != null && other.getUserId() != null && 
+				getCustomerId() != null && other.getCustomerId() != null)
+			return getUserId().equals(other.getUserId()) && 
+					getCustomerId().equals(other.getCustomerId());
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((getUserId() == null) ? 0 : getUserId().hashCode()) 
+				+ ((getCustomerId() == null) ? 0 : getCustomerId().hashCode());
+		return result;
+	}
 }

@@ -82,4 +82,26 @@ public class SellerCustomer extends BaseSellerCustomer<SellerCustomer> {
 		return this.update();
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final SellerCustomer other = (SellerCustomer) obj;
+		if (getId() != null && other.getId() != null)
+			return getId().equals(other.getId());
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+		return result;
+	}
+	
 }
