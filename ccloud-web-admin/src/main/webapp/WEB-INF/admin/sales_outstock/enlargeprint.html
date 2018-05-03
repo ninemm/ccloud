@@ -13,21 +13,7 @@
 	<link rel="stylesheet"  href="${CPATH}/static/layer/skin/layer.min.css">
 	<link rel="stylesheet"  href="${CPATH}/static/plugins/jquery/jquery-ui.css">
 </#macro>
-<#macro css>
-	table {
-		width: 100%;
-		border:none;
-		font-size: 15px;
-	}
-	
-	#print-content {
-	    width: 800px;
-	}
-	
-	.signatureArea {
-	   font-size: 15px;
-	}
-</#macro>
+
 <#macro script>
    var $pagesize = $("#pagesize");
 
@@ -52,21 +38,21 @@ var headerStr =
 			'<td class="text-center width8">发货单号</td>' +
 			'<td class="width8">{0}</td>' +
 			'<td class="text-center width8">下单时间</td>' +
-			'<td colspan="2" class="width8">{1}</td>' +
+			'<td colspan="3" class="width8">{1}</td>' +
 			'<td class="text-center width8">制单时间</td>' +
-			'<td colspan="2">{2}</td>' +
+			'<td colspan="3">{2}</td>' +
 		'</tr>' +
 		'<tr>' +
 			'<td class="text-center width8">客户信息</td>' +
-			'<td colspan="3" class="text-left">{3},{6}</td>' +
-			'<td colspan="2" class="text-center width8">客户/电话</td>' +
-			'<td colspan="3" class="text-left">{4},{5}</span></td>' +
+			'<td colspan="5" class="text-left" style="font-size: 15px;">{3},{6}</td>' +
+			'<td class="text-center">配送信息</td>' +
+			'<td colspan="1" class="text-left" style="font-size: 15px;">{9}</td>' +
 		'</tr>' +
 		'<tr>' +
-			'<td class="text-center">配送信息</td>' +
-			'<td colspan="3" class="text-left">{9}</td>' +
+			'<td colspan="1" class="text-center width8">客户/电话</td>' +
+			'<td colspan="3" class="text-left" style="font-size: 15px;">{4},{5}</span></td>' +
 			'<td colspan="2" class="text-center">业务员/电话</td>' +
-			'<td colspan="2" class="text-left"><span>{7}({8})</span></td>' +
+			'<td colspan="3" class="text-left" style="font-size: 15px;"><span>{7}({8})</span></td>' +
 		'</tr>' +
 		'<tr>' +
 			'<td class="center2">序号</td>' +
@@ -75,8 +61,8 @@ var headerStr =
 			'<td>瓶数</td>' +
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
-			'<td style="width:10%">购货价格</td>' +
-			'<td colspan="3" class="center2">条码</td>' +
+			'<td >购货价格</td>' +
+			'<td colspan="2" class="center2">条码</td>' +
 		'</tr>' +
 	'</thead>';
 
@@ -99,7 +85,7 @@ var headerStr =
 				'<div class="stat">' +
 					'<div><span>联系电话：{2}</span><span class="sign" >收货单位签字盖章</span></div>' +
 				'</div>' +
-				'<div style="text-align: left; width: inherit; font-size: 15px; line-height: 12px;">' +
+				'<div style="text-align: left; width: inherit; font-size: 10px; line-height: 12px;">' +
 					'<span class="width200">备注：{3}</span><span style="float: right;">{4}</span>' +
 				'</div>' +
 			'</div>';
