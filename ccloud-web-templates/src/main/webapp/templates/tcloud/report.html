@@ -57,12 +57,13 @@
             	</a>
 		</div>
 		</@shiro.hasPermission>
-		<@shiro.hasPermission name="/report/userCharge">
+		<@shiro.hasPermission name="/report/userCharge,/admin/customerVisit/trajector">
 		<div class="weui-cells__title">
             <div class="weui-flex">
                 <div class="weui-flex__item"><b>业务主管</b></div>
             </div>
         </div>
+        <@shiro.hasPermission name="/report/userCharge">
         <div class="weui-grids">
             <a href="${CPATH}/report/managerReport" class="weui-grid js_grid">
                 <div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
@@ -72,7 +73,9 @@
                 <div class="weui-grid__icon"><i class="icon-bar-chart"></i></div>
                 <p class="weui-grid__label">销售排行</p>
             </a>
-        </div>    
+        </div>
+        </@shiro.hasPermission>
+        <@shiro.hasPermission name="/admin/customerVisit/trajector">
         <div class="weui-cells__title">
             <div class="weui-flex">
                 <div class="weui-flex__item"><b>客户拜访</b></div>
@@ -87,7 +90,8 @@
 				<div class="weui-grid__icon"><i class="icon-line-chart"></i></div>
 				<p class="weui-grid__label">拜访轨迹</p>
 			</a>
-		</div>  
+		</div>
+		</@shiro.hasPermission> 
         </@shiro.hasPermission>
         <@shiro.hasPermission name="/report/userManager">
         <div class="weui-cells__title">
