@@ -35,6 +35,7 @@ import org.ccloud.utils.StringUtils;
 import org.ccloud.workflow.model.ActReProcdef;
 import org.ccloud.workflow.query.ActReProcdefQuery;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
@@ -134,6 +135,9 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
         CustomerType customerType = getModel(CustomerType.class);
         String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
         Department dealerDept = DepartmentQuery.me().findByDataArea(dealerDataArea);
+        if (StrKit.isBlank(customerType.getId())) {
+        	customerType.setIsParent(0);
+        }
 
         if (SecurityUtils.getSubject().isPermitted("/admin/all")) {
             customerType.set("dept_id", getPara("parent_id"));
@@ -144,6 +148,7 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
         }
 
         customerType.saveOrUpdate();
+        CustomerTypeQuery.me().updateParent(customerType);
 
         renderAjaxResultForSuccess();
 
@@ -171,4 +176,11 @@ public class _CustomerTypeController extends JBaseCRUDController<CustomerType> {
     	}
     	renderJson(true);
     }
+    
+    public void type_tree() {
+    	String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+        List<Map<String, Object>> list = CustomerTypeQuery.me().findCustomerTypeListAsTree(1, dataArea);
+        setAttr("treeData", JSON.toJSON(list));
+    }
+    
 }

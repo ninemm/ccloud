@@ -121,6 +121,22 @@ public abstract class BaseCustomerType<M extends BaseCustomerType<M>> extends JM
 	public java.lang.Integer getIsShow() {
 		return get("is_show");
 	}
+	
+	public void setIsParent(java.lang.Integer isParent) {
+		set("is_parent", isParent);
+	}
+
+	public java.lang.Integer getIsParent() {
+		return get("is_parent");
+	}
+	
+	public void setParentId(java.lang.String parentId) {
+		set("parent_id", parentId);
+	}
+
+	public java.lang.String getParentId() {
+		return get("parent_id");
+	}	
 
 	public void setType(java.lang.Integer type) {
 		set("type", type);

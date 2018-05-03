@@ -19,7 +19,15 @@
 	var flang = true;
 	$(function() {
 		jQuery.mm.initValidator('#form', validatorFields)
-
+		$('#_type_tree').click(function() {
+		layer.open({
+		title:'客户类型',
+		type: 2,
+		area: ['580px', '530px'],
+		fix: false, //不固定
+		content: '${CPATH}/admin/customerType/type_tree'
+		});
+		});
 	});
 	
 	var validatorFields = {
@@ -164,6 +172,17 @@
 						<input class="form-control input-sm" type="hidden" name="code" id = "code" value="${(customerType.code)!}">
 					</div>
 				</div>
+				
+				<div class="form-group col-sm-12 validata-box">
+					<label class="control-label col-sm-2">上级客户类型:</label>
+					<div class="input-group col-md-4 col-sm-10">
+						<input type="hidden" name="customerType.parent_id" id="type_parent_id" value="${(customerType.parent_id)!}">
+						<input class="form-control input-sm" type="text" id="type_parent_name" name="type_parent_name" value="${(customerType.parent_name)!}" readonly>
+						<div class="input-group-addon" id="_type_tree" style="cursor:pointer;">
+							<i class="fa fa-search"></i> 选择
+						</div>
+					</div>
+				</div>	
 				
 				<@shiro.hasPermission name="/admin/all"> 
 					<div class="form-group col-sm-12 validata-box">
