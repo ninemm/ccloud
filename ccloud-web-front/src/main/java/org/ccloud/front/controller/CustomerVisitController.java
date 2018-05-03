@@ -256,7 +256,8 @@ public class CustomerVisitController extends BaseFrontController {
 	
 	public void activityChoose(){
 		String customerId = getPara("customerId");
-		List<Record> activityRecords = ActivityQuery.me()._findByCustomerId(customerId);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Record> activityRecords = ActivityQuery.me()._findByCustomerId(customerId,user.getId());
 		List<Map<String, String>> activityList = Lists.newArrayList();
 	    for (Record record : activityRecords) {
 		    	Map<String, String> map = Maps.newHashMap();
@@ -877,8 +878,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-					String waterFont3 =  customerVisit.getLocation();
-//					String waterFont3 = "湖北省-武汉市-洪山区";
+//					String waterFont3 =  customerVisit.getLocation();
+					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -940,20 +941,21 @@ public class CustomerVisitController extends BaseFrontController {
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		if(customerVisits.size()>0) {
 			check_size = customerVisits.get(0).getCheckSize();
-			setAttr("imgeLists",JSON.toJSON(JSON.parseArray(customerVisits.get(0).getPhoto(), ImageJson.class)));
-			setAttr("customerVisit",CustomerVisitQuery.me().findMoreById(customerVisits.get(0).getId()));
 		}
 		if(cv != null) {
-			setAttr("cv",cv);
+			setAttr("customerVisit",JSON.toJSONString(cv));
+			setAttr("imgeLists",JSON.toJSON(JSON.parseArray(cv.getPhoto(), ImageJson.class)));
 		}
 		Record record = ActivityQuery.me().findByApplyId(activityApplyId);
-		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityIdAndOrderList(record.getStr("activity_id"),orderList);
-		ActivityExecute activityExecute = ActivityExecuteQuery.me()._findbyActivityIdAndOrderList(record.getStr("activity_id"), orderList);
+//		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityIdAndOrderList(record.getStr("activity_id"),orderList);
+		
+		//通过申请ID 和 活动执行步骤序号 来确定进入活动拜访的是第几步
+		ActivityExecute activityExecute = ActivityExecuteQuery.me().findActivityApplyIdAndOrderList(activityApplyId,orderList);
 		List<Map<String, String>> list = getVisitTypeList();
 		setAttr("has_size", has_size);
 		setAttr("check_size", check_size);
 		setAttr("problem", JSON.toJSONString(list));
-		setAttr("activityExecutes",JSON.toJSONString(activityExecutes));
+		setAttr("activityExecute",JSON.toJSONString(activityExecute));
 		setAttr("activityExecuteId",activityExecute.getId());
 		setAttr("record",record);
 		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));
@@ -1011,8 +1013,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-					String waterFont3 =  customerVisit.getLocation();
-//					String waterFont3 = "湖北省-武汉市-洪山区";
+//					String waterFont3 =  customerVisit.getLocation();
+					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					

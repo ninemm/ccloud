@@ -39,7 +39,7 @@
     var MAX_HEIGHT = 1000;
 	var html = "";
     $(function() {
-    	var activityExecutesList = ${(activityExecutes)!};
+    	var activityExecutesList = ${(activityExecute)!};
         var imgeList = ${(list)!'1'};
         var domain = "${(domain)!}";
         var flang = false;
@@ -103,29 +103,28 @@
         var _orderList = "${(orderList)!}";
        	var imgeList = ${(imgeLists)!'1'};
        	numImage = imgeList.length ;
-        for(var i = 0 ; i < activityExecutesList.length ; i++){
-              		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList[i].orderList+'"/>'+activityExecutesList[i].remark+'<div class="weui-uploader__bd">'
+       if(activityExecutesList != null){
+              		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList.orderList+'"/>'+activityExecutesList.remark+'<div class="weui-uploader__bd">'
                      +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
 	                     for(var j = 0 ; j < imgeList.length ; j++){
-	                       	if(imgeList[j].orderList == activityExecutesList[i].orderList){
+	                       	if(imgeList[j].orderList == activityExecutesList.orderList){
 			                        html +='<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
-			                        imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":imgeList[i].orderList,"savepath":imgeList[j].savePath});
-	                        }
-	                        if(imgeList[j].orderList == _orderList){
-	                        	$("#question_type").val("${(customerVisit.typeName)!}");
-	                        	var cv = "${(cv.templete_remark)!}";
-	                        	if(cv == ""){
-							        $("#question_desc").val("${(customerVisit.question_desc)!}");
-	                        	}else{
-	                        		$("#question_desc").val(cv);
-	                        	}
-						        //$("#location").val("${(customerVisit.location)!}");
-						        $("#problem_id").val("${(customerVisit.question_type)!}");
-	        					$('._submit_btn').hide();
-	        					flang = true;
 	                        }
 		                }
-	                     if(flang == false && i == (activityExecutesList.length-1)){
+		                console.log(${(customerVisit)!});
+                      	$("#question_type").val("${(customerVisit.typeName)!}");
+                      	var cv = "${(customerVisit.templete_remark)!}";
+                      	console.log(cv);
+                      	if(cv == ""){
+				        $("#question_desc").val("${(customerVisit.question_desc)!}");
+                      	}else{
+                      		$("#question_desc").val(cv);
+                      	}
+				        //$("#location").val("${(customerVisit.location)!}");
+				        $("#problem_id").val("${(customerVisit.question_type)!}");
+	      					$('._submit_btn').hide();
+      						flang = true;
+	                     if(flang == false){
 	                		html +='</ul><div class="weui-uploader__input-box">'
 	                        	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
 	                        	+'</div></div></div>';
@@ -144,7 +143,7 @@
 						    $.ajax({
 						        url: "${CPATH}/customerVisit/getActivityTemplete",
 						        data: {
-						            "activityExecuteId": activityExecutesList[i].id
+						            "activityExecuteId": activityExecutesList.id
 						        },
 						        multi: false,
 						        dataType: "json",
@@ -202,6 +201,7 @@
 	        $(".imgeActivity").html("");
 			$(".imgeActivity").append(html);
     	}
+    	
 
         var index; //第几张图片
         $(document).on("click", ".uploaderFiles li", function() {
@@ -235,15 +235,15 @@
             return false;
         }
 
-        if($("#question_desc").val().length==0) {
+        /*if($("#question_desc").val().length==0) {
             $.toptip('备注描述不能为空', 3000, 'error'); 
             return false;
-        }
+        }*/
         
-        if($("#location").val().length==0) {
+        /*if($("#location").val().length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
-        }
+        }*/
         
         var has_size = '${has_size!}';
         if(has_size == '1' && $("#check_size").val().length==0) {

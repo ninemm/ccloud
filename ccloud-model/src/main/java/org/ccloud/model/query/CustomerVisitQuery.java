@@ -477,11 +477,11 @@ public class CustomerVisitQuery extends JBaseQuery {
 	}
 	
 	public CustomerVisit findByActivityApplyIdAndOrderList(String activityApplyId, String orderList) {
-		String sql = "SELECT * from cc_customer_visit "
+		String sql = "SELECT ccv.*,d.name as typeName from cc_customer_visit ccv LEFT JOIN dict d on d.value = ccv.question_type "
 				+ "where activity_execute_id in ( SELECT e.id from cc_activity_execute e where e.activity_id in "
 				+ "(SELECT activity_id from cc_activity_apply where id = '"+activityApplyId+"') "
 				+ "and e.order_list = '"+orderList+"') "
-				+ "and active_apply_id = '"+activityApplyId+"'";
+				+ "and ccv.active_apply_id = '"+activityApplyId+"'";
 		return DAO.findFirst(sql);
 	}
 	

@@ -90,4 +90,11 @@ public class ActivityExecuteQuery extends JBaseQuery {
 		String sql = "select * from cc_activity_execute cc left join cc_activity_apply ca on cc.activity_id = ca.activity_id where ca.id = ? ";
 		return DAO.find(sql, activityApplyId);
 	}
+	
+	public ActivityExecute findActivityApplyIdAndOrderList(String activityApplyId,String orderList){
+		String sql = "SELECT	ae.* FROM	cc_activity_execute ae "
+				+ "LEFT JOIN cc_activity_apply caa ON caa.activity_id = ae.activity_id "
+				+ "WHERE ae.order_list = ? AND caa.id = ?";
+		return DAO.findFirst(sql, orderList,activityApplyId);
+	}
 }
