@@ -16,7 +16,7 @@
 	#order .gift input::-webkit-input-placeholder {
 		text-align: center;
 	}
-	#deliveryDate, #customerTypeName, #discount, #receiveTypeName, #activityName {
+	#deliveryDate, #customerTypeName,#warehouseName, #discount, #receiveTypeName, #activityName {
 		text-align: right;
 		width: 70%;
 	}
@@ -85,6 +85,23 @@ $(function() {
 	if (refundStatus == '1') {
 		$("#placeOrder").html("确认退货");
 	}
+	
+	<#if wareHouseList??>
+		$("#warehouseName").select({
+			 title: "仓库选择",
+			 items: ${wareHouseList!},
+			 onChange: function(data) {
+				$("#warehouseId").val(data.values);
+			 }
+		});
+		<#list wareHouseListNoJson as middleMap>
+			<#list middleMap?keys as itemKey>
+				$("#warehouseName").val('${middleMap["title"]}');
+				$("#warehouseId").val('${middleMap["value"]}');
+			</#list>
+			<#break>
+		</#list>
+	</#if>
 
 	initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
 
@@ -729,6 +746,19 @@ $(function() {
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
+					<#if wareHouseList??>
+					<div class="weui-cell weui-cell_access">
+						<div class="weui-cell__bd select-area">
+							<div class="order-customer-info-title">
+								仓库
+								<span class="require">*</span>
+							</div>
+							<input type="hidden" id="warehouseId" name="warehouseId" value="">
+							<input type="text" placeholder="请选择仓库" class="weui-input" id="warehouseName" name="warehouseName" value="" readonly>
+							<span class="weui-cell__ft"></span>
+						</div>
+					</div>	
+					</#if>				
 					<div class="weui-cell weui-cell_access" style="display: none" id="pricedis">
 						<div class="weui-cell__bd select-area">
 							<div class="order-customer-info-title">

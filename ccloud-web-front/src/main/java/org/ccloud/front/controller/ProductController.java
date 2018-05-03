@@ -24,6 +24,7 @@ import org.ccloud.wechat.WechatJSSDKInterceptor;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -155,6 +156,7 @@ public class ProductController extends BaseFrontController {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("title", "全部");
@@ -171,6 +173,19 @@ public class ProductController extends BaseFrontController {
 			item.put("title", record.get("realname"));
 			item.put("value", record.get("id"));
 			userIds.add(item);
+		}
+		
+		List<Warehouse> wareHouseList = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		if (wareHouseList.size() > 1) {
+			List<Map<String, Object>> regionList = new ArrayList<>();
+			for(Warehouse wareHouse : wareHouseList) {
+				Map<String, Object> item = new HashMap<>();
+				item.put("title", wareHouse.getName());
+				item.put("value", wareHouse.getId());
+				regionList.add(item);
+			}
+			setAttr("wareHouseList", JsonKit.toJson(regionList));
+			setAttr("wareHouseListNoJson", regionList);
 		}
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
