@@ -201,9 +201,18 @@ public class _WarehouseController extends JBaseCRUDController<Warehouse> {
 				List<Department> Department = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(record.getStr("department_id"));
 				Department dept = Department.get(0);
 				Map<String, Object> map = new HashMap<>();
-				map.put("seller_name", dept.getStr("seller_name"));
-				map.put("sellerId", dept.getStr("seller_id"));
-				list.add(map);
+				boolean a=true;
+				for (Map<String, Object> map2 : list) {
+					if (map2.get("sellerId").equals(dept.getStr("seller_id"))) {
+						a=false;
+						break;
+					}
+				}
+				if (a) {
+					map.put("seller_name", dept.getStr("seller_name"));
+					map.put("sellerId", dept.getStr("seller_id"));
+					list.add(map);
+				}
 			 }
 		}
 		 renderJson(list);
