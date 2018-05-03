@@ -122,7 +122,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 		setAttr("wlist", wlist);
 		List<User> ulist = UserQuery.me().findUserList(userId);
 		setAttr("ulist", ulist);
-		List<transferBillInfo> ilist = TransferBillDetailQuery.me().findByTransferBillDetailId(id);
+		List<Record> ilist = TransferBillDetailQuery.me()._findByTransferBillDetailId(id);
 		setAttr("ilist", ilist);
 	}
 
@@ -465,51 +465,68 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	// 通过数据库查最大的单据号加1返回去
 	public String getBillSn() {
 		String sellerCode = getSessionAttr("sellerCode");
-		int newNo = 0;
-		List<Integer> list = new ArrayList<>();
 		StringBuilder sBuilder = new StringBuilder(BILLTYPE);
 		sBuilder.append(sellerCode);
 		String Number = DateUtils.dateString();
-		// 查询数据库当天最大的单据号，并在此基础上加1
 		SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String today = null;
 		today = sdf.format(new Date());
 		sBuilder.append(Number);
-		List<TransferBill> transferBills = TransferBillQuery.me().findByBillSn(today);
-		// 如果为空说明是每天的第一次插入数据，则后三位的话从1开始，即001开始
-		if (transferBills.size() == 0) {
+		TransferBill transferBill = TransferBillQuery.me().findSellerIdByBillSn(today,sellerId);
+		if (null==transferBill) {
 			sBuilder.append(startNo);
 			return sBuilder.toString();
 		}
-		// 获取当天的所有单据号，并截取后三位来进行比大小，找出最大的那位
-		for (TransferBill transferBill : transferBills) {
-			transferBill.setTransferBillSn(transferBill.getTransferBillSn().substring(16));
-			list.add(Integer.valueOf(transferBill.getTransferBillSn()));
-		}
-		Integer arr[] = new Integer[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			arr[i] = list.get(i);
-		}
-		// 比较找出单据号最大的那位
-		int max = arr[0];
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] > max) {
-				max = arr[i];
-			}
-		}
-		newNo = max + 1;
-		// 如果单据号是个位数，前面要补一个0
-		if (newNo <= 9) {
-			sBuilder.append("00000");
-			sBuilder.append(String.valueOf(newNo));
-		} else if (newNo <= 99) {
-			sBuilder.append("0000");
-			sBuilder.append(String.valueOf(newNo));
-		} else {
-			sBuilder.append(String.valueOf(newNo));
-		}
-
+		String newNo = StringUtils.addIntStrAndFillZeros(transferBill.getTransferBillSn().substring(transferBill.getTransferBillSn().length()-6), 1, 6);
+		sBuilder.append(newNo);
 		return sBuilder.toString();
+//		String sellerCode = getSessionAttr("sellerCode");
+//		int newNo = 0;
+//		List<Integer> list = new ArrayList<>();
+//		StringBuilder sBuilder = new StringBuilder(BILLTYPE);
+//		sBuilder.append(sellerCode);
+//		String Number = DateUtils.dateString();
+//		// 查询数据库当天最大的单据号，并在此基础上加1
+//		SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.DEFAULT_NORMAL_FORMATTER);
+//		String today = null;
+//		today = sdf.format(new Date());
+//		sBuilder.append(Number);
+//		List<TransferBill> transferBills = TransferBillQuery.me().findByBillSn(today);
+//		// 如果为空说明是每天的第一次插入数据，则后三位的话从1开始，即001开始
+//		if (transferBills.size() == 0) {
+//			sBuilder.append(startNo);
+//			return sBuilder.toString();
+//		}
+//		// 获取当天的所有单据号，并截取后三位来进行比大小，找出最大的那位
+//		for (TransferBill transferBill : transferBills) {
+//			transferBill.setTransferBillSn(transferBill.getTransferBillSn().substring(16));
+//			list.add(Integer.valueOf(transferBill.getTransferBillSn()));
+//		}
+//		Integer arr[] = new Integer[list.size()];
+//		for (int i = 0; i < list.size(); i++) {
+//			arr[i] = list.get(i);
+//		}
+//		// 比较找出单据号最大的那位
+//		int max = arr[0];
+//		for (int i = 0; i < arr.length; i++) {
+//			if (arr[i] > max) {
+//				max = arr[i];
+//			}
+//		}
+//		newNo = max + 1;
+//		// 如果单据号是个位数，前面要补一个0
+//		if (newNo <= 9) {
+//			sBuilder.append("00000");
+//			sBuilder.append(String.valueOf(newNo));
+//		} else if (newNo <= 99) {
+//			sBuilder.append("0000");
+//			sBuilder.append(String.valueOf(newNo));
+//		} else {
+//			sBuilder.append(String.valueOf(newNo));
+//		}
+//
+//		return sBuilder.toString();
 	}
 	
 	//调拨单详情
