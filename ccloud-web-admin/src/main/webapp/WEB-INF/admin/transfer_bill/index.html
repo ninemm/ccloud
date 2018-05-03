@@ -51,7 +51,7 @@
       			{field: "from_warehouse_id", title: "调出仓库", align: "center", width: '10%', edit:false},
       			{field: "to_warehouse_id", title: "调入仓库", align: "center", width: '10%', edit:false},
    				{field: "realname", title: "录单人", align: "center", width: '10%', edit:false},
-   				{field: "create_date", title: "制单时间", align: "center", width: '10%', edit:false},
+   				{field: "create_date", title: "制单时间", align: "center", width: '20%', edit:false},
    				{field: "status", title: "状态", align: "center", width: '10%',
    					formatter: function(value, row, rowIndex) {
    						if (value == 1) return '已调拨';
@@ -59,7 +59,7 @@
    					},
    					edit: false
    				},
-				{field: "action", title: "操作", align: "center", width: '20%',
+				{field: "action", title: "操作", align: "center", width: '10%',
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/transferBill/edit?id=' + row.id + '&c=${c}&p=${p}';
 					var strHtml = '<a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a>';

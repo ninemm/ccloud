@@ -461,10 +461,10 @@ public class _ReportController extends JBaseController {
 		List<String> watchHead = new ArrayList<>();
 		watchHead.add("业务员名称");
 		watchHead.add("销售额(元)");
-		List<SellerProduct> findBySellerId = SellerProductQuery.me().findBySellerId(sellerId);
+		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameBySellerId(sellerId);
 		String productNames = "";
 		for (int i = 0; i < findBySellerId.size(); i++) {
-			String customName = findBySellerId.get(i).getCustomName();
+			String customName = findBySellerId.get(i).getStr("custom_name");
 			watchHead.add(customName);
 			if (i == findBySellerId.size() - 1) {
 				productNames = productNames + customName;
