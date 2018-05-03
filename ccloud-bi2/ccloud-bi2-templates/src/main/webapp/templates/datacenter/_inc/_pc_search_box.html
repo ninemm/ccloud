@@ -1,8 +1,24 @@
-<div class="condition">
-    <div class="date-div" id="date-div">
+<div class="col-md-3">
+    <div class="" id="date-div">
         <a class="date" onclick="setDateType(0)">近一天</a>
         <a class="date" onclick="setDateType(1)">近一周</a>
         <a class="date" onclick="setDateType(2)">近一月</a>
-        <a class="date" id="combin-filter-btn" data-target="combin-filter">自定义</a>
+    </div>
+    <div class="filter-item">
+        <h4>日期区间</h4>
+        <div class="relative weui-flex" id="getDate">
+            <input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+            <div style="width:1rem" class="t-c">—</div>
+            <input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
+        </div>
+    </div>
+    <div class="filter-item">
+        <h4>品牌</h4>
+        <div class="relative ft12" id="getBrand">
+            <span  class="red-button" data-id="">全部</span>
+            <#list session['brand_id_array'] as brandId>
+                <span data-id='${brandId!}'">${session['brand_name_array'][brandId_index]!}</span>
+            </#list>
+        </div>
     </div>
 </div>

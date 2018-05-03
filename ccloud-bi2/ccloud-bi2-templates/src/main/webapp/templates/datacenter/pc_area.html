@@ -8,19 +8,15 @@
 </#macro>
 <#macro css>
     #customer_rank{
-        width: 33%;
-        height: 11.5rem;
-        margin-top: .5rem;
+        height: 18rem;
     }
 
-    #area_rank,{
-      width: 100%;
-      height: 14rem;
+    #area_rank{
+      height: 18rem;
     }
 
     #hot_map{
-        width:33%;
-        height: 18rem;
+        height: 12rem;
     }
     
     .map-nav {
@@ -38,8 +34,7 @@
     }
     
     .table {
-        with
-      margin-bottom: 0;
+        margin-bottom: 0;
     }
 
      th {
@@ -225,7 +220,7 @@
             
             var _provMap = document.getElementById('prov_map');
             var provChart = echarts.init(_provMap);
-            $(_provMap).width(400);
+            $(_provMap).width(600);
             // 选择省的单击事件
             var selectProv = result.name.toString();
             
@@ -355,14 +350,13 @@
         });
       
         initData();
-        refreshStockData();
     }
 
     // 城市地图(市)
     function countryMapRender(selectProv, selectCity, maxData) {
         var _cityMap = document.getElementById('city_map');
         var cityChart = echarts.init(_cityMap);
-        $(_cityMap).width(400);
+        $(_cityMap).width(600);
         
         cityChart.showLoading({
             text: '加载中...',
@@ -457,7 +451,7 @@
             }
             
             var _chinaMap = document.getElementById('china_map');
-            $(_chinaMap).width(400);
+            $(_chinaMap).width(600);
             var chart = echarts.init(_chinaMap);                     // 在id为china_map的dom元素中显示地图
             chart.showLoading({
                 text: '加载中...',
@@ -652,7 +646,7 @@
             };
             customerRankChart.resize();
             customerRankChart.setOption(crOption,true);
-            customerRankChart.on('click', customerClick);
+            //customerRankChart.on('click', customerClick);
         });
     }
     function customerClick(param) {
@@ -729,14 +723,10 @@
            
            areaRankChart.resize();
            areaRankChart.setOption(option, true);
-           areaRankChart.on('click', areaClick);
+           //areaRankChart.on('click', areaClick);
        });
     }
-    
-    function areaClick(param) {
-        //post('${CPATH}/biSales/productByAreaList', {"provName" : provName, "cityName" : cityName, "countryName" : '', startDate: startDate, endDate: endDate});
-    }
-    
+
     //产品
     function product_rank(){
         $.ajax({
@@ -762,7 +752,7 @@
             for(var i = 0; i < data.length; i++){
                 $tbody.append('<tr><td>' + data[i].custom_name + '</td><td class="t-r">' + Math.round(data[i].productCount*100)/100 + '</td><td class="t-r">' + data[i].totalAmount + '</td></tr>');
             }
-            var $tr = $("#product_rank tbody tr:gt(5)");
+            var $tr = $("#product_rank tbody tr:gt(20)");
             if($tr.length > 0){
                 $tr.hide();
                 $(".trOpen").show();
@@ -781,187 +771,7 @@
     $(".trClose").click(function() {
         $(".weui-tab__bd").height($("#tab1").height())
     });
-    
-/*    $("#prTrOpen").click(function() {
-        $prTR.show();
-        $("#prTrOpen").hide();
-        $("#prTrClose").show();
-        $(".weui-tab__bd").height($("#tab1").height());
-    });
-    
-    $("#prTrClose").click(function() {
-        $prTR.hide();
-        $("#prTrOpen").show();
-        $("#prTrClose").hide();
-        $(".weui-tab__bd").height($("#tab1").height());
-    });*/
 
-    var $sTR;
-    //库存
-    function stock_rank(){
-        $.ajax({
-            url:"${CPATH}/stock/area",
-            type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: ''},
-            dataType:"json"
-        }).done(function(data){
-            var srTitle = '库存情况';
-            if((provName + cityName).trim() != '' ){
-                srTitle = provName + cityName + srTitle;
-            } else {
-                srTitle = '全国' + srTitle
-            }
-            
-            var $thead = $("#stock_rank thead th");
-            $thead.empty();
-            $thead.text(srTitle);
-
-            var $tbody = $("#stock_rank tbody");
-            $tbody.empty();
-            $tbody.append("<tr><th>产品</th><th>数量(件)</th></tr>");
-            for(var i = 0; i < data.length; i++){
-                $tbody.append('<tr><td>' + data[i].custom_name + '</td><td class="t-r">' + data[i].balance_count + '</td></tr>');
-            }
-            $sTR = $("#stock_rank tbody tr:gt(5)");
-            if($sTR.length > 0){
-                $sTR.hide();
-                $("#sTrOpen").show();
-                $("#sTrClose").hide();
-                $("#stock_rank tfoot").show();
-            }else {
-                $("#sTrOpen").hide();
-                $("#sTrClose").hide();
-                 $("#stock_rank tfoot").hide();
-            }
-        });
-    }
-    
-    $("#sTrOpen").click(function() {
-        $sTR.show();
-        $("#sTrOpen").hide();
-        $("#sTrClose").show();
-        $(".weui-tab__bd").height($("#tab2").height());
-    });
-    
-    $("#sTrClose").click(function() {
-        $sTR.hide();
-        $("#sTrOpen").show();
-        $("#sTrClose").hide();
-        $(".weui-tab__bd").height($("#tab2").height());
-    });
-
-    //库存趋势
-    function stock(name, tn, color){
-        $.ajax({
-            url:"${CPATH}/stock/date",
-            type:"post",
-            data:{"provName": provName, "cityName": cityName, countryName: '', custom_name: tn},
-            dataType:"json"
-        }).done(function(data){
-
-            var sTitle = '库存趋势';
-            if((provName + cityName).trim() != '' ){
-                sTitle = provName + cityName + sTitle;
-            } else {
-                sTitle = '全国' + sTitle
-            }
-            
-            var $title = $(".title");
-            $title.empty();
-            $title.text(sTitle);
-
-            var xData = [];
-            var seriesData = [];
-            var length = data.length > 5 ? 5 : data.length;
-
-            for(var i = 0; i < data.length; i++){
-                xData.push(data[i].create_date) ;
-                seriesData.push(data[i].balance_count);
-            }
-
-            var title = tn + '库存趋势(单位/件)';
-
-            var stock = document.getElementById('stock'+'_'+name);
-            //var $stock = $(stock);
-
-            var stockChart = echarts.init(stock);
-            var option = {
-                title: {
-                    left: 'center',
-                    top: 'top',
-                    text: title,
-                    textStyle: {
-                        fontWeight: 'normal',
-                        color: '#ea6f5a',
-                        fontSize: '.7rem'
-                    }
-                },
-                tooltip : {
-                },
-                grid: {
-                    left: '20%',
-                    right: '15%',
-                    top: '25%'
-                },
-                xAxis: {
-                    data: xData
-                },
-                yAxis: {},
-                series: [{
-                    name: title,
-                    type: 'line',
-                    itemStyle: {
-                        normal: {color: color}
-                    },
-                    lineStyle: {
-                        normal: {color: color}
-                    },
-                    markPoint: {
-                        label: {
-                            normal: {
-                                textStyle: {
-                                    color: '#000',
-                                }
-                            }
-                        },
-                        data : [
-                            {type: 'max', name: '最大值'},
-                            {type: 'min', name: '最小值'}
-                        ]
-                    },
-                    data:seriesData
-                }]
-            };
-            stockChart.resize();
-            stockChart.setOption(option, true);
-        });
-    }
-    
-    //共通post
-    function post(URL, PARAMS)
-    { 
-        var temp = document.createElement("form"); 
-        temp.action = URL; 
-        temp.method = "post"; 
-        temp.style.display = "none"; 
-        for (var x in PARAMS)
-        { 
-            var opt = document.createElement("textarea"); 
-            opt.name = x; 
-            opt.value = PARAMS[x]; 
-            temp.appendChild(opt); 
-        } 
-        document.body.appendChild(temp); 
-        temp.submit(); 
-        return temp; 
-    }
-    
-    // 更新库存数据
-    function refreshStockData() {
-
-        
-    }
-    
     function initData() {
         Utils.loading();
         //热力图
@@ -980,52 +790,66 @@
 <section>
     
     <div class="bi-body">
-        <#include "_inc/_pc_search_box.html"/>
         
-        <div class="map">
-            <div class="map-nav">
-                <span id="china" style="visibility:visible;"> <a href="javascript:void(0);" onclick="goBackChinaMap()"> 全国</a></span>
-                <span id="prov" style="visibility:hidden;"> > <a href="javascript:void(0);" onclick="goBackProvMap()" id="prov_view"></a></span>
-                <span id="city" style="visibility:hidden;"> > <a herf="javascript:void(0);" id="city_view"></a></span>
+        <div class="row">
+            <div class="col-md-9">
+                <div class="row">
+                    <#include "_inc/_pc_search_box.html"/>
+                    <div class="col-md-9">
+                        <div class="map">
+                            <div class="map-nav">
+                                <span id="china" style="visibility:visible;"> <a href="javascript:void(0);" onclick="goBackChinaMap()"> 全国</a></span>
+                                <span id="prov" style="visibility:hidden;"> > <a href="javascript:void(0);" onclick="goBackProvMap()" id="prov_view"></a></span>
+                                <span id="city" style="visibility:hidden;"> > <a herf="javascript:void(0);" id="city_view"></a></span>
+                            </div>
+                            <div id="china_map" style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+                            <div id="prov_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+                            <div id="city_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div id="customer_rank"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <div id="area_rank"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="title" id="p_hot_map"></p>
+                        <div class="mapType-div">
+                            <a class="mapType active-mapType" onclick="setHotMapType(0)">销售分布</a>
+                            <a class="mapType" onclick="setHotMapType(1)">开发分布</a>
+                        </div>
+                        <div id="hot_map"></div>
+                    </div>
+                </div>
             </div>
-            <div id="china_map" style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
-            <div id="prov_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
-            <div id="city_map"  style="width: 100%;height:16rem;margin:0 auto;position: relative;display: none;"></div>
+            <div class="col-md-3">
+                <table id="product_rank" class="table table-striped table-bordered">
+                    <thead>
+                      <tr>
+                        <th colspan="3" class="font-16 t-l pro-title"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th>产品</th>
+                        <th>数量(件)</th>
+                        <th>金额</th>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th colspan="3">
+                          <span id="prTrOpen" class="fr txt-color-red trOpen"><i class="icon-arrow-down2"></i> 查看更多</span>
+                          <span id="prTrClose" class="fr txt-color-red trClose" style="display: none"><i class="icon-arrow-up2"></i> 收起</span>
+                        </th>
+                      </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
-        
-        <div class="mapType-div">
-            <p class="title" id="p_hot_map"></p>
-            <a class="mapType active-mapType" onclick="setHotMapType(0)">销售分布</a>
-            <a class="mapType" onclick="setHotMapType(1)">开发分布</a>
-        </div>
-        <div id="hot_map"></div>
-        
-          <div id="customer_rank"></div>
-          <div id="area_rank"></div>
-          <div>
-              <table id="product_rank" class="table table-striped table-bordered">
-                <thead>
-                  <tr>
-                    <th colspan="3" class="font-16 t-l pro-title"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th>产品</th>
-                    <th>数量(件)</th>
-                    <th>金额</th>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th colspan="3">
-                      <span id="prTrOpen" class="fr txt-color-red trOpen"><i class="icon-arrow-down2"></i> 查看更多</span>
-                      <span id="prTrClose" class="fr txt-color-red trClose" style="display: none"><i class="icon-arrow-up2"></i> 收起</span>
-                    </th>
-                  </tr>
-                </tfoot>
-              </table>
-          </div>
     </div>
 </section>
 </@layout>

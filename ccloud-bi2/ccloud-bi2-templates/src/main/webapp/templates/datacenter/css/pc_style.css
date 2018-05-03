@@ -546,16 +546,15 @@ header {
 * 销售  ***********************************************************
 */
 
-.condition{
-	display: inline;
-	height: 20rem;
-}
-
 
 /*日期*/
 
 .date-div {
-	width: 25%;
+	position: fixed;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	line-height: 2.4rem;
 	height: 2.4rem;
 	background: #fff;
 	z-index: 1900;
@@ -565,8 +564,8 @@ header {
 
 .date-div .date {
 	display: inline;
-	font-size: .6rem;
-	width: 10%;
+	font-size: .7rem;
+	width: 22%;
 	text-align: center;
 	height: 1.4rem;
 	line-height: 1.4rem;
@@ -645,9 +644,9 @@ header {
 /*地图*/
 
 .map {
-	width: 30%;
-	display: inline;
-	height: 20rem;
+	width: 100%;
+	height: 18rem;
+	box-sizing: border-box;
 }
 
 .title {
