@@ -1,5 +1,6 @@
 package org.ccloud.log;
 
+import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -40,7 +41,8 @@ public class SystemLogThread {
 							if (null == systemLog) {
 								Thread.sleep(200);
 							} else {
-								systemLog.saveOrUpdate();
+								systemLog.setCreateDate(new Date());
+								systemLog.save();
 								systemLog = null;
 							}
 						} catch (InterruptedException e) {
