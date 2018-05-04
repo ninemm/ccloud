@@ -1,0 +1,654 @@
+<#include "_inc/_bi_layout.html"/>
+<#macro script_import>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
+</#macro>
+<#macro css_import>
+
+</#macro>
+<#macro css>
+    .weui-cells {
+        margin-top: 0;
+        background: inherit;
+        font-size: 0.6rem;
+    }
+    table {
+        background: #fff;
+        margin-bottom: 0!important;
+    }
+    table a {
+        text-decoration: underline;
+    }
+    th {
+        vertical-align: middle!important;
+        text-align: center!important;
+    }
+    td {
+        vertical-align: middle!important;
+    }
+    tr {
+        line-height: 1.5rem;
+        height: 1.5rem;
+    }
+    .wy-header {
+        background: #f2f2f2;
+        margin-top: 2.4rem;
+    }
+    .relocation{
+        position: absolute;
+        right: 0;
+        top: 12px;
+        width: 50px;
+    }
+    #allmap{
+        width:100%;
+        height: 18rem;
+    }
+    #customer_rank{
+        width: 100%;
+        height:8rem;
+    }
+    #area_rank{
+        width: 100%;
+        height:8rem;
+    }
+
+</#macro>
+<#macro script>
+    $(function() {
+        lMap();
+        customer();
+        
+        $('#goback').on('click', function() {
+            historyUtils.back();
+        });
+    });
+    var CPATH = '${CPATH}';
+    var CTPATH = '${CTPATH}';
+    var mapType = 0 ;
+    var customerTypeName = '';
+
+    function setDateType(type){
+        setFilter(type)
+        lMap();
+        customer();
+    }
+
+    $(document).on("click", ".confirm-search-btn", function () { //点击确定按钮
+        setFilter(3);
+        lMap();
+        customer();
+        closeCombinSearch();
+    })
+
+    //做地图类型的切换选择
+    $(".mapType").click(function(e) {
+        var $a = $(e.currentTarget);
+        $a.parent().find(".mapType").removeClass("active-mapType");
+        $a.addClass("active-mapType");
+    });
+
+    function setMapType(type){
+        mapType = type;
+        lMap();
+    }
+
+    //定位
+    $("#relocation").on('click', function() {
+        Utils.loading();
+        initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
+        
+        wxReadyGetLocation(
+            function(lng, lat, addComp, address) {
+                provName = $.cookie(Utils.provCacheName);
+                cityName = $.cookie(Utils.cityCacheName);
+                countryName = $.cookie(Utils.countryCacheName);
+                lMap()
+                customer();
+            }
+        );
+    });
+
+    var map = new BMap.Map("allmap");
+    var myPosition = new BMap.Icon("${CTPATH}/images/marker_blue.png", new BMap.Size(20, 20));
+    var redIcon = new BMap.Icon("${CTPATH}/images/marker.png", new BMap.Size(20, 20));
+    var orangeIcon = new BMap.Icon("${CTPATH}/images/marker_orange.png", new BMap.Size(20, 20));
+    var grayIcon = new BMap.Icon("${CTPATH}/images/marker_gray.png", new BMap.Size(20, 20));
+
+    //地图
+    function lMap(){
+        Utils.loading();
+
+        var longitude = $.cookie(Utils.longitudeCache);
+        var latitude = $.cookie(Utils.latitudeCache);
+        var position_point = new BMap.Point(longitude,latitude);
+        
+        map.centerAndZoom(position_point,13);
+        map.enableScrollWheelZoom(true);
+        map.clearOverlays();
+        var position = new BMap.Marker(position_point, {icon:myPosition});  //创建标注
+        map.addOverlay(position);              // 将标注添加到地图中
+        
+        if(mapType == 0){
+            salesMap(longitude,latitude);
+        } else {
+            positionMap(longitude,latitude);
+            undevelopedMap(longitude,latitude);
+        }
+    
+    }
+
+    function salesMap(longitude,latitude){
+        
+        $.ajax({
+            url:"${CPATH}/biSales/aroundCustomer",
+            type:"post",
+            data:{ startDate: startDate, endDate: endDate, longitude: longitude, latitude: latitude, dist: 10, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            for(var i = 0; i < data.salesList.length; i++) {
+                var new_point = new BMap.Point(data.salesList[i].longitude,data.salesList[i].latitude);
+                var marker = new BMap.Marker(new_point, {icon:redIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 80,     // 信息窗口高度
+                    title : '客户名称：' + data.salesList[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data.salesList[i].customerId,
+                    customerName: data.salesList[i].customerName
+                };
+                var content = '联系人：' + data.salesList[i].contacts + ' ' + data.salesList[i].phone;
+                content = content + '<br>' + '地址：' + data.salesList[i].address;
+                content = content + '<br>' + '销售金额：' + data.salesList[i].totalAmount + '元';
+                addClickHandler(content,marker,opts, 1);
+            }
+
+            for(var i = 0; i < data.visitList.length; i++) {
+                var new_point = new BMap.Point(data.visitList[i].longitude,data.visitList[i].latitude);
+                var marker = new BMap.Marker(new_point, {icon:grayIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 80,     // 信息窗口高度
+                    title : '客户名称：' + data.visitList[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data.visitList[i].customerId,
+                    customerName: data.visitList[i].customerName
+                };
+                var content = '联系人：' + data.visitList[i].contacts + ' ' + data.visitList[i].phone;
+                content = content + '<br>' + '地址：' + data.visitList[i].address;
+                content = content + '<br>' + '拜访次数：' + data.visitList[i].totalNum + '次';
+                addClickHandler(content,marker,opts, 2);
+            }
+
+            for(var i = 0; i < data.allList.length; i++) {
+                var new_point = new BMap.Point(data.allList[i].longitude,data.allList[i].latitude);
+                var marker = new BMap.Marker(new_point, {icon:redIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 100,     // 信息窗口高度
+                    title : '客户名称：' + data.allList[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data.allList[i].customerId,
+                    customerName: data.allList[i].customerName
+                };
+                var content = '联系人：' + data.allList[i].contacts + ' ' + data.allList[i].phone;
+                content = content + '<br>' + '地址：' + data.allList[i].address;
+                content = content + '<br>' + '销售金额：' + data.allList[i].totalAmount + '元';
+                content = content + '<br>' + '拜访次数：' + data.allList[i].totalNum + '次';
+                addClickHandler(content,marker,opts, 0);
+            }
+        });
+    }
+
+    function positionMap(longitude,latitude){
+    
+        $.ajax({
+            url:"${CPATH}/biSales/aroundCustomerPosition",
+            type:"post",
+            data:{ startDate: startDate, endDate: endDate, longitude: longitude, latitude: latitude, dist: 5, dataArea: dataArea},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+            
+            for(var i = 0; i < data.length; i++) {
+                var new_point = new BMap.Point(data[i].longitude,data[i].latitude);
+                var marker = data[i].baiduDist < 0.5 ? new BMap.Marker(new_point, {icon:redIcon}) : new BMap.Marker(new_point, {icon:orangeIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 240,     // 信息窗口宽度
+                    height: 80,     // 信息窗口高度
+                    title : '客户名称：' + data[i].customerName , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data[i].customerId,
+                    customerName: data[i].customerName
+                };
+                var content = '联系人：' + data[i].contacts + ' ' + data[i].phone;
+                content = content + '<br>' + '开发情况：' + (data[i].baiduDist < 0.5 ? '定位准确' : '定位存疑');
+                content = content + '<br>' + '地址：' + data[i].address;
+                addClickHandler(content,marker,opts);
+            }
+        });
+        
+    }
+
+    function undevelopedMap(longitude,latitude){
+        
+        $.ajax({
+            url:"${CPATH}/biSales/aroundCustomerUndeveloped",
+            type:"post",
+            data:{longitude: longitude, latitude: latitude, dist: 1, dataArea: dataArea},
+            dataType:"json"
+        }).done(function(data){
+            
+            for(var i = 0; i < data.length; i++) {
+                var new_point = new BMap.Point(data[i].lng,data[i].lat);
+                var marker = new BMap.Marker(new_point, {icon:grayIcon});  //创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                var opts = {
+                    width : 250,     // 信息窗口宽度
+                    height: 120,     // 信息窗口高度
+                    title : '客户名称：' + data[i].customer_name , // 信息窗口标题
+                    enableMessage:true,//设置允许信息窗发送短息
+                    customerId: data[i].sellerCustomerId,
+                    customerName: data[i].customer_name
+                };
+                var content = '电话：'  + (data[i].mobile == null ? '无' : data[i].mobile);
+                content = content + '<br>' + '开发情况：' + '未开发客户';
+                content = content + '<br>' + '地址：' + data[i].address;
+                addClickHandler(content,marker,opts);
+             }
+        });
+        
+    }
+    
+    function addClickHandler(content,marker,opts, flg){
+        marker.addEventListener("click",function(e){
+            var p = e.target;
+            var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+            var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象
+            map.openInfoWindow(infoWindow,point); //开启信息窗口
+
+            $("#product_customerId").hide();
+            $("#visit_customerId").hide();
+			if(mapType == 0){
+				if(flg == 0){
+					product_customerId(opts.customerId,opts.customerName);
+					visit_customerId(opts.customerId,opts.customerName);
+				}else if(flg == 1){
+					product_customerId(opts.customerId,opts.customerName);
+				}else if(flg == 2){
+					visit_customerId(opts.customerId,opts.customerName);
+				}
+			}
+
+        });
+    }
+    
+    //终端产品详细
+    function product_customerId(customerId, customerName){
+      Utils.loading();
+      $.ajax({
+            url:"${CPATH}/biSales/productByCustomerId",
+            type:"post",
+            data:{ startDate: startDate, endDate: endDate, customerId: customerId, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var tpTitle = customerName + '销售情况';
+            var $p = $("#p_customerId_product");
+            var $customerName = $("#product_customer-name");
+            $customerName.empty();
+            $customerName.text(tpTitle);
+            $p.attr('class', 'title');
+            $("#product_customerId").show();
+
+            var $tbody = $("#customerId_product tbody");
+            $tbody.empty();
+            for(var i = 0; i < data.length; i++){
+            	if (data[i].idate != null) {
+	                if(i == 0 || data[i].idate != data[i-1].idate) {
+	                    $tbody.append("<tr><th colspan='3'>时间：" + data[i].idate + "</th></tr>");
+	                    $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(元)</th></tr>");
+	                }
+	                $tbody.append("<tr><td>" + data[i].cInvName + "</td><td class='t-r'>" + data[i].totalNum + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");            		
+            	}
+            }
+       });
+    }
+
+    //终端拜访详细
+    function visit_customerId(customerId, customerName){
+        Utils.loading();
+        $.ajax({
+            url:"${CPATH}/biSales/visitByCustomerId",
+            type:"post",
+            data:{ startDate: startDate, endDate: endDate, customerId: customerId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+            
+            var tpTitle = customerName + '拜访情况';
+            var $p = $("#p_customerId_visit");
+            var $customerName = $("#visit_customer-name");
+            $customerName.empty();
+            $customerName.text(tpTitle);
+            $p.attr('class', 'title');
+            $("#visit_customerId").show();
+            
+            var $tbody = $("#customerId_visit tbody");
+            $tbody.empty();
+            for(var i = 0; i < data.length; i++){
+                if(i == 0) {
+                    $tbody.append("<tr><th>拜访类型</th><th>业务员</th><th>时间</th></tr>");
+                 }
+                $tbody.append("<tr><td>" + data[i].typeName + "</td><td>" + data[i].realname + "</td><td>" + data[i].create_date + "</td></tr>");
+             }
+        });
+    }
+    
+
+    //客户
+    var customer_rank = document.getElementById('customer_rank');
+    var $customer_rank = $(customer_rank);
+    var customerRankChart = echarts.init(customer_rank);
+    
+    function customer(){
+        Utils.loading();
+        $.ajax({
+            url:"${CPATH}/biSales/customerType",
+            type:"post",
+            data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+            
+            if(data.length > 6){
+                var height = 160 + (data.length -6) * 40;
+                $customer_rank.height(height);
+            }else{
+                $customer_rank.height(160);
+            }
+
+
+            var crLegendData = [];
+            var crSeriesData = [];
+
+            for(var i = 0; i < data.length; i++){
+                crLegendData.push(data[i].name + '(' + data[i].realAmount + '万元)');
+                crSeriesData.push({
+                    name: data[i].name + '(' + data[i].realAmount + '万元)',
+                    value: data[i].realAmount
+                });
+            }
+            var crTitle = '客户分布';
+            if((provName + cityName).trim() != '' ){
+                crTitle = provName + cityName + crTitle;
+            } else {
+                crTitle = '全国' + crTitle;
+            }
+            var $p = $("#p_customer_rank");
+            $p.empty();
+            $p.text(crTitle);
+
+            var crOption = {
+                 color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2', '#a6c84c', '#ffa022', '#46bee9'],
+                 legend: {
+                     //selectedMode:false,
+                     orient: 'vertical',
+                     x: 'right',
+                     top : '0%',
+                     bottom : '0%',
+                     itemGap : 1,
+                     data:crLegendData
+                 },
+                 series: [
+                     {
+                         name:crTitle,
+                         type:'pie',
+                         selectedMode: 'single',
+                         radius: ['35%', '65%'],
+                         center: ['30%', '50%'],
+                         label: {
+                             normal: {
+                                 show: false
+                             }
+                         },
+                         labelLine: {
+                             normal: {
+                                 show: false
+                             }
+                         },
+                         data:crSeriesData
+                     }
+                 ]
+            };
+            customerRankChart.resize();
+            customerRankChart.setOption(crOption,true);
+            customerRankChart.on('legendselectchanged', customerClick);
+
+            customerTypeName = (data[0] != undefined ? data[0].name : '');
+            //调用其他纬度
+            product_rank();
+            area_rank();
+        });
+    }
+    
+    function customerClick(obj){
+        Utils.loading();
+        var selected = obj.selected;
+        var typeName = obj.name;
+
+        // 消除点击图例会消失
+        // 使用 legendToggleSelect Action 会重新触发 legendselectchanged Event，导致本函数重复运行使得 无 selected 对象
+        if (selected != undefined) {
+            var lt = Object.keys(selected);
+            var legend = [];
+        
+            for (var i = 0; i < lt.length; i++) {
+                var name = lt[i];
+                legend.push({
+                    name : name
+                });
+            }
+        
+            customerRankChart.dispatchAction({
+                type: 'legendSelect',
+                batch: legend
+            });
+        }
+        customerTypeName = typeName.slice(0, typeName.lastIndexOf('('));
+        
+        product_rank();
+        area_rank();
+    }
+    
+    
+    //产品
+    function product_rank(){
+      $.ajax({
+            url:"${CPATH}/biSales/productByCustomerType",
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: '',  startDate: startDate, endDate: endDate, customerTypeName: customerTypeName, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var prTitle = customerTypeName + '产品销售排行';
+            if((provName + cityName).trim() != '' ){
+                prTitle = provName + cityName + prTitle;
+            } else {
+                prTitle = '全国' + prTitle;
+            }
+            var $p = $("#p_product_rank");
+            $p.empty();
+            $p.text(prTitle);
+
+            var $tbody = $("#product_rank tbody");
+            $tbody.empty();
+            $tbody.append("<tr><th>产品</th><th>数量(件)</th><th>金额(万元)</th></tr>");
+            for(var i = 0; i < data.length; i++){
+                $tbody.append("<tr><td>" + data[i].custom_name + "</td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+            }
+            
+       });
+    }
+    
+    //区域
+    function area_rank(){
+      $.ajax({
+            url:"${CPATH}/biSales/areaByCustomerType",
+            type:"post",
+            data:{provName: provName, cityName: cityName, countryName: '', startDate: startDate, endDate: endDate, customerTypeName: customerTypeName, dataArea: dataArea, brandId: brandId},
+            dataType:"json"
+        }).done(function(data){
+            Utils.close();
+
+            var areaYData = [];
+            var areaSeriesData = [];
+            var area_rank = document.getElementById('area_rank');
+            var $area_rank = $(area_rank);
+            
+            $area_rank.height(80);
+            for(var i = 0; i < data.length; i++){
+                var height = $area_rank.height();
+                $area_rank.height(height += 16);
+            
+                if (cityName.trim() != '') {
+                    areaYData.push(data[i].country_name);
+                }else if(provName.trim() != ''){
+                    areaYData.push(data[i].city_name);
+                }else{
+                    areaYData.push(data[i].prov_name);
+                }
+                areaSeriesData.push(data[i].realAmount);
+            }
+
+            var areaTitle = customerTypeName + '销售分布';
+            if((provName + cityName).trim() != '' ){
+                areaTitle = provName + cityName + areaTitle;
+            } else {
+                areaTitle = '全国' + areaTitle;
+            }
+            var $p = $("#p_area_rank");
+            $p.empty();
+            $p.text(areaTitle);
+
+
+            var areaRankChart = echarts.init(area_rank);
+            var option = {
+                color: ['#4ac7f5'],
+                grid: {
+                    left: '2%',
+                    right: '20%',
+                    bottom: 15,
+                    top: 15,
+                    containLabel: true
+                },
+                calculable : true,
+                xAxis : {
+                    show : false,
+                    name : '金额/万元',
+                    type : 'value',
+                    boundaryGap: [0, 0.01]
+                },
+                yAxis : {
+                    type : 'category',
+                    data : areaYData.reverse(),
+                    axisLabel : {
+                        interval : 0,
+                        fontSize : 8
+                    }
+                },
+                series : {
+                    type:'bar',
+                    barWidth:15,
+                    data:areaSeriesData.reverse(),
+                    label:{
+                        normal:{
+                            show:true,
+                            position:'right',
+                            formatter: '{c}万元'
+                        }
+                    }
+                }
+           };
+           areaRankChart.resize();
+           areaRankChart.setOption(option,true);
+           //areaRankChart.on('click', areaClick);
+       });
+    }
+</#macro>
+<@layout>
+<section>
+    
+    <div class="bi-body">
+        
+        <div class="row" >
+            <div class="col-md-9">
+                <#include "_inc/_pc_search_box.html"/>
+                <div class="row">
+                    <div class="col-md-3">
+                         <p class="title" id="p_customer_rank"></p>
+                        <div id="customer_rank" id="customer_rank"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="title" id="p_area_rank"></p>
+                        <div id="area_rank"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="title">我附近的终端分布</p>
+                        <div class="mapType-div">
+                            <a class="mapType active-mapType" onclick="setMapType(0)">销售情况</a>
+                            <a class="mapType" onclick="setMapType(1)">开发情况</a>
+                        </div>
+                        <div id="allmap"></div>
+                        <div id="product_customerId" style="display:none;">
+                            <p id="p_customerId_product"  class="txt-color-red"><span id="product_customer-name"></span></p>
+                            <div class="weui-cells weui-cells_form">
+                                <div class="weui-cell" style="padding: 0">
+                                    <table class="table table-striped table-bordered" id="customerId_product">
+                                        <tbody>
+                        
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="visit_customerId" style="display:none;">
+                            <p id="p_customerId_visit" class="txt-color-red"><span id="visit_customer-name"></span></p>
+                            <div class="weui-cells weui-cells_form">
+                                <div class="weui-cell" style="padding: 0">
+                                    <table class="table table-striped table-bordered" id="customerId_visit">
+                                        <tbody align="center">
+                    
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <p class="title" id="p_product_rank"></p>
+                <div id="product_rank_div">
+                    <table id="product_rank" class="table table-striped table-bordered">
+                        <thead>
+                          <tr>
+                            <tr><th>产品</th><th width="20%">数量(件)</th><th width="25%">金额(万元)</th></tr>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</@layout>
