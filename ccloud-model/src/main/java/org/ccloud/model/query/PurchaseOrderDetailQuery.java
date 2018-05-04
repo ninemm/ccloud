@@ -66,7 +66,7 @@ public class PurchaseOrderDetailQuery extends JBaseQuery {
 	}
 	
 	public List<PurchaseOrderDetail> findByPurchaseOrderId(String purchaseOrderId){
-			String sql = "SELECT cp.id AS product_id,cp. NAME AS NAME,cpod.product_amount,cpod.product_count,cpod.product_price,cpod.id,cpod.remark,cpod.dept_id,cpod.data_area,"
+			String sql = "SELECT cp.id AS product_id,cp. NAME AS NAME,SUM(cpod.product_amount) as product_amount,SUM(cpod.product_count) as product_count,cpod.product_price,cpod.id,cpod.remark,cpod.dept_id,cpod.data_area,"
 					+ " cp.big_unit AS big_unit,cp.small_unit AS small_unit,cp.convert_relate AS convert_relate,cp.price AS price "
 					+ "FROM cc_product cp "
 					+ "LEFT JOIN cc_purchase_order_detail cpod on cpod.product_id=cp.id "

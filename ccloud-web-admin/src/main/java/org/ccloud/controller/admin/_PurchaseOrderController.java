@@ -62,6 +62,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -252,7 +253,6 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	@Before(Tx.class)
 	public void save(){
 		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
-		final PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
 		final PurchaseOrderJoinInstock purchaseOrderJoinInstock = getModel(PurchaseOrderJoinInstock.class);
 		Map<String, String[]> paraMap = getParaMap();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
@@ -304,7 +304,8 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		Integer productNum = Integer.valueOf(productNumStr);
 		
 		Integer index = 0;
-
+		List<PurchaseInstockDetail> details = new ArrayList<>();
+		List<String> productSnList = new ArrayList<>();
 		for ( Integer count = 0;count<productNum;count++) {
 			index++;
 			HttpServletRequest request = getRequest();
@@ -325,8 +326,13 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			purchaseOrderDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
 			purchaseOrderDetail.update();
 			for(int i=0;i<sellerProducts.size();i++){
-				
-				
+				if (productSnList.contains(sellerProducts.get(i).getId())) {
+					this.updateDetailList(sellerProducts.get(i).getId(), details, productCount);
+					continue;
+				} else {
+					productSnList.add(sellerProducts.get(i).getId());
+				}
+				PurchaseInstockDetail purchaseInstockDetail = new PurchaseInstockDetail();
 				purchaseInstockDetail.set("id", StrKit.getRandomUUID());
 				purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
 				purchaseInstockDetail.set("seller_product_id", sellerProducts.get(i).getId());
@@ -338,13 +344,14 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 				purchaseInstockDetail.set("create_date", date);
 				purchaseInstockDetail.set("dept_id", user.getDepartmentId());
 				purchaseInstockDetail.set("data_area", user.getDataArea());
-				purchaseInstockDetail.save();
-				
+//				purchaseInstockDetail.save();
+				details.add(purchaseInstockDetail);
 			}
 
 		}
 		order.update();
 		purchaseInstock.save();
+		Db.batchSave(details, details.size());
 		purchaseOrderJoinInstock.set("id", StrKit.getRandomUUID());
 		purchaseOrderJoinInstock.set("purchase_order_id", StringUtils.getArrayFirst(paraMap.get("purchaseOrderId")));
 		purchaseOrderJoinInstock.set("purchase_instock_id", purchaseInstockId);
@@ -396,6 +403,15 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		renderAjaxResultForSuccess("OK");
 	} 
 	
+	private void updateDetailList(String id, List<PurchaseInstockDetail> details, Integer productCount) {
+		for (PurchaseInstockDetail purchaseInstockDetail : details) {
+			if (purchaseInstockDetail.getSellerProductId().equals(id)) {
+				purchaseInstockDetail.setProductCount(purchaseInstockDetail.getProductCount() + productCount);
+				break;
+			}
+		}
+	}
+
 	public void show_warehouse(){
 		//查询账号所拥有的仓库
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);

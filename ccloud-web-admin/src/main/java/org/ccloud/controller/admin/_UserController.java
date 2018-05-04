@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
@@ -539,8 +541,20 @@ public class _UserController extends JBaseCRUDController<User> {
 					us.setId(userId);
 					this.setUser(us, excel);
 					us.setCreateDate(new Date());
-					us.setGroupName(excel.getUserGroup());
-					us.setUsername(excel.getUsername());
+					String uGdest = "";
+					if (excel.getUserGroup()!=null) {
+						Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+						Matcher m = p.matcher(excel.getUserGroup());
+						uGdest = m.replaceAll("");
+					}
+					us.setGroupName(uGdest);
+					String udest = "";
+					if (excel.getUsername()!=null) {
+						Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+						Matcher m = p.matcher(excel.getUsername());
+						udest = m.replaceAll("");
+					}
+					us.setUsername(udest);
 					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 					us.setDataArea(dataArea);
 					if(user00 != null) {
@@ -580,8 +594,20 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 	
 	private void setUser(User user, UserExecel excel) {
-		user.set("realname", excel.getContact());
-		user.set("mobile", excel.getMobile());
+		String dest = "";
+		if (excel.getContact()!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(excel.getContact());
+			dest = m.replaceAll("");
+		}
+		user.set("realname", dest);
+		String destt = "";
+		if (excel.getMobile()!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(excel.getMobile());
+			destt = m.replaceAll("");
+		}
+		user.set("mobile", destt);
 		user.set("status", 1);
 		user.set("create_date", new Date());
 	}

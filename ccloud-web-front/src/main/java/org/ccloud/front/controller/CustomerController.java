@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.jfinal.kit.Ret;
 import org.apache.shiro.SecurityUtils;
@@ -470,8 +472,8 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-				String waterFont3 = sellerCustomer.getLocation();
-//				String waterFont3 = "湖北省-武汉市-洪山区";
+//				String waterFont3 = sellerCustomer.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
@@ -522,7 +524,13 @@ public class CustomerController extends BaseFrontController {
 			temp.setContact(customer.getContact());
 
 			temp.setMobile(customer.getMobile());
-			temp.setAddress(customer.getAddress());
+			String dest = "";
+			if (customer.getAddress()!=null) {
+				Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+				Matcher m = p.matcher(customer.getAddress());
+				dest = m.replaceAll("");
+			}
+			temp.setAddress(dest);
 			temp.setNickname(sellerCustomer.getNickname());
 			temp.setCustomerName(customer.getCustomerName());
 
@@ -1017,6 +1025,13 @@ public class CustomerController extends BaseFrontController {
 			if(areaCodeList.size() == 3) customer.setCountryCode(areaCodeList.get(2));
 			else customer.setCountryCode("");
 		}
+		String dest = "";
+		if (customer.getAddress()!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(customer.getAddress());
+			dest = m.replaceAll("");
+		}
+		customer.setAddress(dest);
 
 		if (areaNameList.size() != 0) {
 			customer.setProvName(areaNameList.get(0));
