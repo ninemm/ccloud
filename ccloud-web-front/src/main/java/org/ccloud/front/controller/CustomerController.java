@@ -442,10 +442,12 @@ public class CustomerController extends BaseFrontController {
 
 		if(areaName.endsWith(",")) areaName = areaName.substring(0, areaName.length() - 1);
 		if(areaCode.endsWith(",")) areaCode = areaCode.substring(0, areaCode.length() - 1);
-
-		String customerTypeIds = getPara("customerTypeIds", "");
+		String customerTypeIds = getPara("customerTypeIds");
 		String custTypeNames = getPara("customer_type");
-
+		if (null==customerTypeIds) {
+			renderAjaxResultForError("客户类型为空");
+			return;
+		}
 		List<String> custTypeList = Splitter.on(",")
 				.trimResults()
 				.omitEmptyStrings()
@@ -1065,7 +1067,7 @@ public class CustomerController extends BaseFrontController {
 		sellerCustomer.setSubType("100301");
 		sellerCustomer.setCustomerKind("100401");
 		sellerCustomer.setStatus(status);
-
+		
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 		sellerCustomer.setDataArea(deptDataArea);
@@ -1083,7 +1085,10 @@ public class CustomerController extends BaseFrontController {
 			CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 			ccType.setSellerCustomerId(sellerCustomer.getId());
 			ccType.setCustomerTypeId(custTypeId);
-			ccType.save();
+			boolean save = ccType.save();
+			if (!save) {
+				return "操作失败";
+			}
 		}
 
 		UserJoinCustomerQuery.me().deleteBySelerCustomerIdAndUserId(sellerCustomer.getId(), user.getId());

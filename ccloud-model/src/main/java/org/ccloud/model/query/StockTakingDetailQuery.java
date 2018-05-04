@@ -147,7 +147,7 @@ public class StockTakingDetailQuery extends JBaseQuery {
 
 	//盘点 查询出经销商所有商品
 	public List<Record> findByWarehouseIdAndSellerId(String warehouseId, String seller_id) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT sp.id sellerProductId , p.`name` , t1.valueName specificationValue , p.big_unit bigUnit , t2.balance_count ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT sp.id sellerProductId , p.`name` , t1.valueName specificationValue , p.big_unit bigUnit , t2.balance_count ,sp.custom_name");
 		fromBuilder.append(" FROM cc_seller_product sp  ");
 	 	fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 	 	fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");

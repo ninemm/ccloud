@@ -750,4 +750,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
+	public List<SalesOutstock> findListByOrderId(String id) {
+		String sql = "select co.* from cc_sales_outstock co LEFT JOIN cc_sales_order_join_outstock coo on coo.outstock_id = co.id where coo.order_id = ?";
+		return DAO.find(sql, id);
+	}
+
 }

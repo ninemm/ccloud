@@ -517,6 +517,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				String userId = "";
 				User us = null;
 				UserGroupRel userGroupRel = null;
+				//user用来判断同一个部门用户是否存在
 				User user = UserQuery.me()._findUserByUsername(excel.getUsername());
 				if(user !=null) {
 					username +=excel.getUsername()+"、";
@@ -527,16 +528,16 @@ public class _UserController extends JBaseCRUDController<User> {
 				if(excel.getMobile()==null) {
 					break;
 				}
-				
-				User user00 = new User();
+				//user00用来接收存有微信openID的用户信息
+				User user00 = null;
 				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
 				for(User user01:uss) {
-					if(!user01.getWechatOpenId().equals("")) {
+					if(StrKit.notBlank(user01.getWechatOpenId())) {
 						user00 = user01;
 						break;
 					}
 				}
-				// 检查用户是否存在
+				// 检查不同部门用户是否存在
 				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 				if (us == null) {

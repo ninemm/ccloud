@@ -68,6 +68,14 @@
 					},
 					edit: false
 				},
+				{field: "", title: "出库单号", align: "center", width: '10%',
+					formatter: function(value, row, rowIndex) {
+						if(row.stock_out_sn != null || row.stock_out_sn != "") 
+						{return row.stock_out_sn;}
+						else {return "无"};
+					},
+					edit: false
+				},
 				{field: "supplierName", title: "供应商名称", align: "center", width: '8%', edit:false},
 				{field: "payment_type", title: "付款方式", align: "center", width: '5%',
 					formatter: function(value, row, rowIndex) {

@@ -40,6 +40,7 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Activity;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.excel.ExcelUploadUtils;
@@ -819,6 +820,22 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String proc_inst_id = getPara(1);
 		List<Comment> comments = WorkFlowService.me().getProcessComments(proc_inst_id);
 		setAttr("comments", comments);
+		
+		List<SalesOutstock> outList = SalesOutstockQuery.me().findListByOrderId(id);
+		
+		if (outList.size() > 0) {
+			StringBuilder outRemark = new StringBuilder();
+			int num = 1;
+			for (int i = 0; i < outList.size(); i++) {
+				if (StrKit.notBlank(outList.get(i).getRemark())) {
+					outRemark.append(num + "." + outList.get(i).getRemark() + "<br>");
+					num++;
+				}
+			}
+			if (outRemark.length() > 0) {
+				setAttr("outRemark", outRemark.toString());
+			}
+		}		
 		
 		StringBuilder printComments = new StringBuilder();
 		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);

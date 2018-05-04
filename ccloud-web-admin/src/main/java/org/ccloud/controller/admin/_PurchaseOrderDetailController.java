@@ -87,7 +87,11 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 			productInfoMap.put(productId, record);
 			
 			productOptionMap.put("id", productId);
-			productOptionMap.put("text", customName+"/"+productNamePig);
+			if(StrKit.notBlank(productNamePig)) {
+				productOptionMap.put("text", customName+"/"+productNamePig);
+			}else {
+				productOptionMap.put("text", customName);
+			}
 			
 			productOptionList.add(productOptionMap);
 		}
