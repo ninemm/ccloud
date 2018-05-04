@@ -576,17 +576,17 @@ public class _ReportController extends JBaseController {
 		watchHead.add("直营商名称");
 //		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameByDataArea(dataArea);
 		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameBySellerId(sellerId);
-		String productNames = "";
+//		String productNames = "";
 		for (int i = 0; i < findBySellerId.size(); i++) {
 			String customName = findBySellerId.get(i).getStr("custom_name");
 			watchHead.add(customName);
-			if (i == findBySellerId.size() - 1) {
-				productNames = productNames + customName;
-			} else {
-				productNames = productNames + customName + ",";
-			}			
+//			if (i == findBySellerId.size() - 1) {
+//				productNames = productNames + customName;
+//			} else {
+//				productNames = productNames + customName + ",";
+//			}			
 		}
-		setAttr("productNames", productNames);
+//		setAttr("productNames", productNames);
 		setAttr("watchHead", watchHead);
 		render("mSellerDetail.html");
 	}
@@ -595,56 +595,67 @@ public class _ReportController extends JBaseController {
 	public void mSellerDetailReportList() {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
-		Map<String, String> map = getProductMap(getPara("productNames"));
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		String isGift = getPara("isGift");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		List<Record> list = new ArrayList<>();
-		if (keyword.equals("order") || keyword.equals("print")) {
-			list = SalesOrderDetailQuery.me().findSellerOrderByDataArea(dataArea, keyword, startDate, endDate, isGift);
-		} else {
-			list = SalesOutstockDetailQuery.me().findSellerOutStockByDataArea(dataArea, keyword, startDate, endDate, isGift);
-		}
-		List<Map<String, String>> orderResult = new ArrayList<>();
-		String sellerId = "";
-		Map<String, String> userOrderMap = new HashMap<>();
-		for (int i = 0; i < list.size(); i++) {
-			if (!sellerId.equals(list.get(i).getStr("sellerId"))) {
-				if (i != 0) {
-					orderResult.add(userOrderMap);
-					userOrderMap = new HashMap<>();
-				}
-				userOrderMap.putAll(map);
-				sellerId = list.get(i).getStr("sellerId");
-				userOrderMap.put("直营商名称", list.get(i).getStr("seller_name"));
-				userOrderMap.put("sellerId", list.get(i).getStr("sellerId"));
-			}
-			userOrderMap.put(list.get(i).getStr("custom_name"), list.get(i).getStr("count"));
-			
-			if (i == list.size() - 1) {
-				orderResult.add(userOrderMap);
-			}
-		}
-		renderJson(orderResult);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId,false);
+		renderJson(list);
+//		String keyword = getPara("k");
+//		if (StrKit.notBlank(keyword)) {
+//			setAttr("k", keyword);
+//		}
+//		Map<String, String> map = getProductMap(getPara("productNames"));
+//		String startDate = getPara("startDate");
+//		String endDate = getPara("endDate");
+//		String isGift = getPara("isGift");
+//		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+//		List<Record> list = new ArrayList<>();
+//		if (keyword.equals("order") || keyword.equals("print")) {
+//			list = SalesOrderDetailQuery.me().findSellerOrderByDataArea(dataArea, keyword, startDate, endDate, isGift);
+//		} else {
+//			list = SalesOutstockDetailQuery.me().findSellerOutStockByDataArea(dataArea, keyword, startDate, endDate, isGift);
+//		}
+//		List<Map<String, String>> orderResult = new ArrayList<>();
+//		String sellerId = "";
+//		Map<String, String> userOrderMap = new HashMap<>();
+//		for (int i = 0; i < list.size(); i++) {
+//			if (!sellerId.equals(list.get(i).getStr("sellerId"))) {
+//				if (i != 0) {
+//					orderResult.add(userOrderMap);
+//					userOrderMap = new HashMap<>();
+//				}
+//				userOrderMap.putAll(map);
+//				sellerId = list.get(i).getStr("sellerId");
+//				userOrderMap.put("直营商名称", list.get(i).getStr("seller_name"));
+//				userOrderMap.put("sellerId", list.get(i).getStr("sellerId"));
+//			}
+//			userOrderMap.put(list.get(i).getStr("custom_name"), list.get(i).getStr("count"));
+//			
+//			if (i == list.size() - 1) {
+//				orderResult.add(userOrderMap);
+//			}
+//		}
+//		renderJson(orderResult);
 	}
 	
 	//我部门的直营商赠品详细
-//	public void mSellerDetailGiftReportList() {
-//		String keyword = getPara("k");
-//		if (StrKit.notBlank(keyword)) {
-//			keyword = StringUtils.urlDecode(keyword);
-//			setAttr("k", keyword);
-//		}
-//		String startDate = getPara("startDate");
-//		String endDate = getPara("endDate");
-//		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-//		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString(); 
-//		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId,true);
-//		renderJson(list);
-//	}
+	public void mSellerDetailGiftReportList() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString(); 
+		List<Record> list = SalesOrderQuery.me().findByMSellerDetail(startDate,endDate,keyword, dataArea,sellerId,true);
+		renderJson(list);
+	}
 	
 	
 	//我的客户详细
@@ -664,18 +675,18 @@ public class _ReportController extends JBaseController {
 		List<String>watchHead=new ArrayList<>();
 		watchHead.add("客户名称");
 		watchHead.add("销售额(元)");
-		String productNames = "";
+//		String productNames = "";
 		List<Record> findBySellerId = SellerProductQuery.me().findCustomNameBySellerId(sellerId);
 		for (int i = 0; i < findBySellerId.size(); i++) {
 			String customName = findBySellerId.get(i).getStr("custom_name");
 			watchHead.add(customName);
-			if (i == findBySellerId.size() - 1) {
-				productNames = productNames + customName;
-			} else {
-				productNames = productNames + customName + ",";
-			}			
+//			if (i == findBySellerId.size() - 1) {
+//				productNames = productNames + customName;
+//			} else {
+//				productNames = productNames + customName + ",";
+//			}			
 		}
-		setAttr("productNames", productNames);
+//		setAttr("productNames", productNames);
 		setAttr("watchHead", watchHead);
 		render("customerDetails.html");
 	}
@@ -693,58 +704,27 @@ public class _ReportController extends JBaseController {
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
-			setAttr("keyword", keyword);
+			setAttr("k", keyword);
 		}
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
-		Map<String, String> map = getProductMap(getPara("productNames"));
-		String isGift = getPara("isGift");
-		List<Record> list = new ArrayList<>();
-		List<Record> totalList = new ArrayList<>();
-		if (keyword.equals("order") || keyword.equals("print")) {
-			list = SalesOrderQuery.me().findCustomerOrderByUserId(startDate,endDate,keyword, userId,isGift);
-			totalList = SalesOrderQuery.me().findCustomerTotalAmountByUserId(startDate, endDate, userId, keyword);
-		} else {
-			list = SalesOutstockDetailQuery.me().findCustomerOutStockByUserId(userId, startDate, endDate, isGift);
-			totalList = SalesOutstockQuery.me().findCustomerOutTotalAmountByUserId(startDate, endDate, userId);
-		}
-		List<Map<String, String>> orderResult = new ArrayList<>();
-		String customerId = "";
-		Map<String, String> userOrderMap = new HashMap<>();
-		for (int i = 0; i < list.size(); i++) {
-			if (!customerId.equals(list.get(i).getStr("customer_id"))) {
-				if (i != 0) {
-					orderResult.add(userOrderMap);
-					userOrderMap = new HashMap<>();
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		//我的客户卖出商品详情
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId,false);
+		List<Record> list1=SalesOrderQuery.me().findMoney(startDate,endDate,keyword, userId);
+		for (Record record : list) {
+			String customerId=record.getStr("id");
+			for (Record record1 : list1) {
+				String customerId1=record1.getStr("customer_id");
+				if (customerId.equals(customerId1)) {
+					record.set("销售额(元)", record1.get("totalAmount"));
+					break;
 				}
-				userOrderMap.putAll(map);
-				customerId = list.get(i).getStr("customer_id");
-				userOrderMap.put("客户名称", list.get(i).getStr("customer_name"));
-				userOrderMap.put("销售额(元)", "0");
-				userOrderMap.put("customerId", list.get(i).getStr("customer_id"));
-			}
-			userOrderMap.put(list.get(i).getStr("custom_name"), list.get(i).getStr("count"));
-			
-			if (i == list.size() - 1) {
-				orderResult.add(userOrderMap);
 			}
 		}
-		for (Map<String, String> result : orderResult) {
-			for (Record record : totalList) {
-				if (result.get("customerId").equals(record.getStr("customer_id"))) {
-					result.put("销售额(元)", record.getStr("count"));
-					continue;
-				}	
-			}
-		}
-		renderJson(orderResult);
-	}
-	
-	//我的客户详细
-//	public void customerDetailsGiftReportList() {
+		renderJson(list);
 //		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 //		String userId = user.getId();
-//
 //		//判断有没有user_id传过来
 //		String user_id = getPara("user_id");
 //		if (StrKit.notBlank(user_id)) {
@@ -754,14 +734,75 @@ public class _ReportController extends JBaseController {
 //		String keyword = getPara("k");
 //		if (StrKit.notBlank(keyword)) {
 //			keyword = StringUtils.urlDecode(keyword);
-//			setAttr("k", keyword);
+//			setAttr("keyword", keyword);
 //		}
 //		String startDate = getPara("startDate");
 //		String endDate = getPara("endDate");
-//		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-//		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId,true);
-//		renderJson(list);
-//	}
+//		Map<String, String> map = getProductMap(getPara("productNames"));
+//		String isGift = getPara("isGift");
+//		List<Record> list = new ArrayList<>();
+//		List<Record> totalList = new ArrayList<>();
+//		if (keyword.equals("order") || keyword.equals("print")) {
+//			list = SalesOrderQuery.me().findCustomerOrderByUserId(startDate,endDate,keyword, userId,isGift);
+//			totalList = SalesOrderQuery.me().findCustomerTotalAmountByUserId(startDate, endDate, userId, keyword);
+//		} else {
+//			list = SalesOutstockDetailQuery.me().findCustomerOutStockByUserId(userId, startDate, endDate, isGift);
+//			totalList = SalesOutstockQuery.me().findCustomerOutTotalAmountByUserId(startDate, endDate, userId);
+//		}
+//		List<Map<String, String>> orderResult = new ArrayList<>();
+//		String customerId = "";
+//		Map<String, String> userOrderMap = new HashMap<>();
+//		for (int i = 0; i < list.size(); i++) {
+//			if (!customerId.equals(list.get(i).getStr("customer_id"))) {
+//				if (i != 0) {
+//					orderResult.add(userOrderMap);
+//					userOrderMap = new HashMap<>();
+//				}
+//				userOrderMap.putAll(map);
+//				customerId = list.get(i).getStr("customer_id");
+//				userOrderMap.put("客户名称", list.get(i).getStr("customer_name"));
+//				userOrderMap.put("销售额(元)", "0");
+//				userOrderMap.put("customerId", list.get(i).getStr("customer_id"));
+//			}
+//			userOrderMap.put(list.get(i).getStr("custom_name"), list.get(i).getStr("count"));
+//			
+//			if (i == list.size() - 1) {
+//				orderResult.add(userOrderMap);
+//			}
+//		}
+//		for (Map<String, String> result : orderResult) {
+//			for (Record record : totalList) {
+//				if (result.get("customerId").equals(record.getStr("customer_id"))) {
+//					result.put("销售额(元)", record.getStr("count"));
+//					continue;
+//				}	
+//			}
+//		}
+//		renderJson(orderResult);
+	}
+	
+//	我的客户详细
+	public void customerDetailsGiftReportList() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String userId = user.getId();
+
+		//判断有没有user_id传过来
+		String user_id = getPara("user_id");
+		if (StrKit.notBlank(user_id)) {
+			userId = StringUtils.urlDecode(user_id);
+			setAttr("userId", userId);
+		}
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetail(startDate,endDate,keyword, userId,sellerId,true);
+		renderJson(list);
+	}
 	
 	private Map<String, String> getProductMap(String productNames) {
 		Map<String, String> map = new HashMap<>();
