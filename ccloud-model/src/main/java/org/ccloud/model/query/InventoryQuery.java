@@ -288,4 +288,9 @@ public class InventoryQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
+	public Record findProductStoreCountByWarehouseId(String sellerProductId, String wareHouseId) {
+		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT cc.balance_count FROM cc_inventory_detail cc WHERE cc.sell_product_id = ? and cc.warehouse_id = ? order by cc.create_date desc limit 1 ");
+		return Db.findFirst(defaultSqlBuilder.toString(), sellerProductId, wareHouseId);
+	}
+
 }

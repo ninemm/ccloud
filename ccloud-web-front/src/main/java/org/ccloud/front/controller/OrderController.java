@@ -434,6 +434,7 @@ public class OrderController extends BaseFrontController {
 					return false;
 				}
 
+				String warehouseId = StringUtils.getArrayFirst(paraMap.get("warehouseId"));
 				String[] sellProductIds = paraMap.get("sellProductId");
 				// 常规商品
 				if (sellProductIds != null && sellProductIds.length > 0) {
@@ -441,7 +442,7 @@ public class OrderController extends BaseFrontController {
 					for (int index = 0; index < sellProductIds.length; index++) {
 						if (StrKit.notBlank(sellProductIds[index])) {
 							String message = SalesOrderDetailQuery.me().insertForApp(paraMap, orderId, sellerId, sellerCode, user.getId(), date,
-									user.getDepartmentId(), user.getDataArea(), index);
+									user.getDepartmentId(), user.getDataArea(), index, warehouseId);
 							if (StrKit.notBlank(message)) {
 								result[0] = message;
 								return false;
@@ -458,7 +459,7 @@ public class OrderController extends BaseFrontController {
 					for (int index = 0; index < giftSellProductIds.length; index++) {
 						if (StrKit.notBlank(giftSellProductIds[index])) {
 							String message = SalesOrderDetailQuery.me().insertForAppGift(paraMap, orderId, sellerId, sellerCode, user.getId(),
-									date, user.getDepartmentId(), user.getDataArea(), index);
+									date, user.getDepartmentId(), user.getDataArea(), index, warehouseId);
 							if (StrKit.notBlank(message)) {
 								result[0] = message;
 								return false;
@@ -479,7 +480,7 @@ public class OrderController extends BaseFrontController {
 						for (SellerProduct sellerProduct : list) {
 							String message = SalesOrderDetailQuery.me().insertForAppComposition(sellerProduct, orderId, sellerId, sellerCode,
 									user.getId(), date, user.getDepartmentId(), user.getDataArea(),
-									Integer.parseInt(number), user.getId());
+									Integer.parseInt(number), user.getId(), warehouseId);
 							if (StrKit.notBlank(message)) {
 								result[0] = message;
 								return false;
