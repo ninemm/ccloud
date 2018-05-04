@@ -170,14 +170,14 @@ function selectDealer(selectDataArea,obj) {
 				$.cookie(Utils.longitudeCache, data.result.location.lng, { expires: 7 });
 				$.cookie(Utils.latitudeCache, data.result.location.lat, { expires: 7 });
 			}
+			if(cityName.length != 0) {
+				renderCityMap({"name": cityName}, curProvName);
+			} else if(provName.length != 0){
+				renderProvMap({"name": curProvName}, true);
+			} else {
+				renderChinaMap(true);
+			}
 		});
-		if(cityName.length != 0) {
-			renderCityMap({"name": cityName}, curProvName);
-		} else if(provName.length != 0){
-			renderProvMap({"name": curProvName}, true);
-		} else {
-			renderChinaMap(true);
-		}
 
 	});
 }

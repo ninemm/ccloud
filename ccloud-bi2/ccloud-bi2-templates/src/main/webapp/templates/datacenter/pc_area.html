@@ -1,6 +1,5 @@
 <#include "_inc/_pc_layout.html"/>
 <#macro script_import>
-    <script type="text/javascript" src="${CTPATH}/json/china-city-map.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=su3AmHLUcBprpnOLmVHo7r8AljbW8X6t"></script>
     <script type="text/javascript" src="${CTPATH}/js/heatmap.min.js"></script>
 </#macro>
@@ -19,7 +18,7 @@
         height: 12rem;
     }
     
-    #product_rank_div{
+    #div_product_rank{
         overflow-y:scroll;
         max-height: 34rem;
     }
@@ -274,7 +273,7 @@
             } else {
                 prTitle = '全国' + prTitle
             }
-            var $p = $("#product_rank_p");
+            var $p = $("#p_product_rank");
             $p.empty();
             $p.text(prTitle);
 
@@ -303,9 +302,7 @@
 <@layout>
 
 <section>
-    
     <div class="bi-body">
-        
         <div class="row" >
             <div class="col-md-9">
                 <#include "_inc/_pc_search_box.html"/>
@@ -327,8 +324,8 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <p class="title" id="product_rank_p"></p>
-                <div id="product_rank_div">
+                <p class="title" id="p_product_rank"></p>
+                <div id="div_product_rank">
                     <table id="product_rank" class="table table-striped table-bordered">
                         <thead>
                           <tr>
