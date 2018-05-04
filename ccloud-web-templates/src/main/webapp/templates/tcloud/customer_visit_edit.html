@@ -183,36 +183,20 @@
 								        			if(imageLists!=null){
 									        			numImage = imageLists.length;
 								        			}
+								        			var maxOrderList = data.maxOrderList;
 								        			for(var i = 0 ; i < activityExecute.length ; i++){
-								        				var html = "";
-								        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
-						                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
-							                          
-							                           for(var j = 0 ; j < numImage ; j++){
-							                            	if(imageLists[j].orderList == activityExecute[i].orderList){
-								                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imageLists[j].savePath+')"></li>';
-							                           			imageArr.push({"pic":imageLists[j].originalPath, "picname":imageLists[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imageLists[j].savePath});
-							                            	}
-							                            }
-								                        if(numImage==0 || (imageLists[imageLists.length-1].orderList != activityExecute[i].orderList && i == (activityExecute.length-1))){
+								        				if(maxOrderList == i){
+									        				var html = "";
+									        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
+							                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
 						                                	html +='</ul>'
 							                                	+'<div class="weui-uploader__input-box">'
 							                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
 							                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
 							                                	+'</div></div></div>';
 							                                	$("#activity_execute_id").val(activityExecute[i].id);
-								                          }else{
-								                          	numI++;
-								                          	html +='</ul></div></div>';
-								                          }
-														 $(".imgeActivity").append(html);
-								        				
-								        			}
-								        			var maxOrderList = data.maxOrderList;
-								        			if(numImage != null && imageLists!=null){
-									        			if(imageLists.length>0 && activityExecute.length == maxOrderList){
-									        				$("._submit_btn").hide();
-									        			}
+															 $(".imgeActivity").append(html);
+								        				}
 								        			}
 								        		}
 								        }
@@ -272,10 +256,10 @@
         //    return false;
         //}
 
-        if($("#location").val().length==0) { -->
+        /*if($("#location").val().length==0) { 
              $.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); 
              return false;
-         } 
+         }*/ 
         
         if(imageArr.length == 0){
         	 $.toptip('照片不能为空', 3000, 'error'); 
@@ -298,10 +282,10 @@
             return false;
         }
 
-        if($.trim($("#location").val()).length==0) {
+        /*if($.trim($("#location").val()).length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
-        }
+        }*/
 
         $.confirm("您确定要新增补录吗？","新增补录", function() {
             doNoSubmit();

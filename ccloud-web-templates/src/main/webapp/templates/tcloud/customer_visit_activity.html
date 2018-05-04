@@ -104,31 +104,31 @@
         var _orderList = "${(orderList)!}";
        	var imgeList = ${(imgeLists)!'1'};
        	numImage = imgeList.length ;
-       if(activityExecutesList != null){
+        if(activityExecutesList != null){
               		html +='<div><input id="orderList" type="hidden" value="'+activityExecutesList.orderList+'"/>'+activityExecutesList.remark+'<div class="weui-uploader__bd">'
                      +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
+	                if(imgeList.length>0){
 	                     for(var j = 0 ; j < imgeList.length ; j++){
 	                       	if(imgeList[j].orderList == activityExecutesList.orderList){
 			                        html +='<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
 	                        }
-		                }
-		                console.log(${(customerVisit)!});
-                      	$("#question_type").val("${(customerVisit.typeName)!}");
-                      	var cv = "${(customerVisit.templete_remark)!}";
-                      	console.log(cv);
-                      	if(cv == ""){
-				        $("#question_desc").val("${(customerVisit.question_desc)!}");
-                      	}else{
-                      		$("#question_desc").val(cv);
-                      	}
-				        //$("#location").val("${(customerVisit.location)!}");
-				        $("#problem_id").val("${(customerVisit.question_type)!}");
-	      					$('._submit_btn').hide();
-      						flang = true;
-	                     if(flang == false){
+	                  	}
+	                  	$('._submit_btn').hide();
+     					flang = true;
+	                }
+                   	$("#question_type").val('${(customerVisit.typeName)!}');
+                   	var cv = '${(customerVisit.templete_remark)!}';
+                   	if(cv == ""){
+	      				$("#question_desc").val('${(customerVisit.question_desc)!}');
+                   	}else{
+                   		$("#question_desc").val(cv);
+                   	}
+			        //$("#location").val('${(customerVisit.location)!}');
+			        $("#problem_id").val('${(customerVisit.question_type)!}');
+			        if(flang == false){
 	                		html +='</ul><div class="weui-uploader__input-box">'
 	                        	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" multiple="" capture="camera">'
-	                        	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType"></div></div></div>';
+	                        	+'</div></div></div>';
 					        $("#question_type").select({
 						        title: "请选择问题类型",
 						        multi: false,
@@ -201,7 +201,6 @@
 	        $(".imgeActivity").html("");
 			$(".imgeActivity").append(html);
     	}
-    	
 
         var index; //第几张图片
         var uploadIndex;
@@ -480,7 +479,7 @@
                     <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
                 </div>
             </section>
-            <section class="weui-cells weui-cells_form select-area">
+            <section class="weui-cells weui-cells_form">
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
                         <div class="weui-uploader imgeActivity">
