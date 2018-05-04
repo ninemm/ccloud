@@ -194,7 +194,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		List<UserGroupRel> userGroupRelList = new ArrayList<>();
 		List<String> gList = new ArrayList<>();
 
-		
+
 		if (user.getId() == null) {
 			user.setSalt(EncryptUtils.salt());
 			user.setPassword(EncryptUtils.encryptPassword(user.getPassword(), user.getSalt()));
@@ -216,7 +216,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					Record record = UserGroupRelQuery.me().findByUserIdAndGroupId(user.getId(), deleteGroupId);
 					UserGroupRelQuery.me().batchDelete(record.get("id").toString());
 			}
-		}		
+		}
 		if (user.saveOrUpdate()) {
 			for (String groupId : groupLists) {
 	    		UserGroupRel userGroupRel = new UserGroupRel();
@@ -235,8 +235,8 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	private void clearUserCache(User user) {
 		MenuManager.clearListByKey(user.getId());
-		RealmSecurityManager rsm = (RealmSecurityManager)SecurityUtils.getSecurityManager();    
-        ShiroDbRealm realm = (ShiroDbRealm)rsm.getRealms().iterator().next();   
+		RealmSecurityManager rsm = (RealmSecurityManager)SecurityUtils.getSecurityManager();
+        ShiroDbRealm realm = (ShiroDbRealm)rsm.getRealms().iterator().next();
         realm.clearCachedAuthorizationInfo(user);
 	}
 
@@ -483,29 +483,29 @@ public class _UserController extends JBaseCRUDController<User> {
 			renderAjaxResultForSuccess("保存成功");
 		}
 	}
-	
+
 	@RequiresPermissions(value = { "/admin/user/uploading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void upload() {
-	
+
 		render("upload.html");
 	}
-	
+
 	public void userTemplate() {
 		String realPath = getSession().getServletContext().getRealPath("\\") +"\\WEB-INF\\admin\\user\\userTemplate.xls";
 		renderFile(new File(realPath.replace("\\", "/")));
 	}
-	
+
 	@Before(Tx.class)
 	public void uploading() {
 		int inCnt = 0;
 		int existCnt = 0;
 		int errorCnt = 0;
 		File file = getFile().getFile();
-		
+
 		String deptId = getPara("departmentId");
 		Department dept = DepartmentQuery.me().findById(deptId);
-		
+
 		ImportParams params = new ImportParams();
 		params.setReadRows(99);//一次读100条
 		List<UserExecel> list = ExcelImportUtil.importExcel(file, UserExecel.class, params);
@@ -521,7 +521,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					errorCnt++;
 					continue;
 				}
-				
+
 				if(excel.getMobile()==null) {
 					break;
 				}
@@ -556,7 +556,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					us.setDepartmentId(deptId);
 					us.setDepartmentName(dept.getDeptName());
 					us.save();
-					
+
 					userGroupRel = new UserGroupRel();
 					userGroupRel.set("id",StrKit.getRandomUUID());
 					userGroupRel.set("user_id", userId);
@@ -566,7 +566,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				} else {
 					existCnt++;
 				}
-				
+
 			}
 			params.setStartRows(params.getStartRows() + list.size());
 			list = ExcelImportUtil.importExcel(file, UserExecel.class, params);
@@ -581,18 +581,18 @@ public class _UserController extends JBaseCRUDController<User> {
 		renderJson(map);
 //		renderAjaxResultForSuccess("成功导入用户" + inCnt + "个,已存在用户" + existCnt + "个,导入失败"+errorCnt+"个");
 	}
-	
+
 	private void setUser(User user, UserExecel excel) {
 		user.set("realname", excel.getContact());
 		user.set("mobile", excel.getMobile());
 		user.set("status", 1);
 		user.set("create_date", new Date());
 	}
-	
+
 	public void updatePassword() {
 		render("password.html");
 	}
-	
+
 	public void changePassword() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String oldPassword = getPara("oldPassword");
@@ -609,7 +609,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			renderAjaxResultForSuccess("修改成功");
 		}
 	}
-	
+
 	@RequiresPermissions(value = { "/admin/user/downloading", "/admin/dealer/all",
 	"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
@@ -617,16 +617,16 @@ public class _UserController extends JBaseCRUDController<User> {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		//多选部门ID集合
 		//String deptIds = getPara("deptId");
-		
+
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\user\\"
 				+ "用户信息.xlsx";
 		String userId = "";
 		Page<User> page = UserQuery.me().paginateUser(1, Integer.MAX_VALUE,  keyword, dataArea, "u.create_date",userId);
 		List<User> userList = page.getList();
-		
+
 		List<UserExecel> excellist = Lists.newArrayList();
 		for (User record : userList) {
-		
+
 			UserExecel excel = new UserExecel();
 			excel.setUsername((String) record.get("username"));
 			excel.setContact((String) record.get("realname"));
@@ -635,7 +635,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			excel.setDeptName((String) record.get("department_name"));
 			excellist.add(excel);
 		}
-		
+
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, UserExecel.class, excellist);
 		File file = new File(filePath.replace("\\", "/"));
@@ -653,12 +653,12 @@ public class _UserController extends JBaseCRUDController<User> {
 				e.printStackTrace();
 			}
 		}
-		
+
 		ExcelExportUtil.closeExportBigExcel();
-		
+
 		renderFile(new File(filePath.replace("\\", "/")));
-	}	
-	
+	}
+
 	@Before(UCodeInterceptor.class)
 	@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
 	public void resetPassword() {
@@ -669,9 +669,9 @@ public class _UserController extends JBaseCRUDController<User> {
 			renderAjaxResultForSuccess("删除成功");
 		} else {
 			renderAjaxResultForError("删除失败!");
-		}		
+		}
 	}
-	
+
 	/*public void station_tree() {
     	String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
         List<Map<String, Object>> list = DepartmentQuery.me().findDepartmentListAsTree(1, dataArea);
@@ -679,9 +679,9 @@ public class _UserController extends JBaseCRUDController<User> {
     }*/
 	@RequiresPermissions(value = { "/admin/user/edit", "/admin/all" }, logical = Logical.OR)
 	public void send() {
-		
+
 	}
-	
+
 	public void sendSave(String id) {
 		User user = UserQuery.me().findById(id);
 		UserHistory userHistory = new UserHistory();
@@ -712,7 +712,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		userHistory.save();
 //		renderAjaxResultForSuccess("更新成功");
 	}
-	
+
 	//验证用户名不能重复
 	public void checkUserName(){
 		//用户名唯一
@@ -803,7 +803,7 @@ public class _UserController extends JBaseCRUDController<User> {
 						return;
 					}
 					ArrayList<Integer> list=  (ArrayList<Integer>) item.get("department");
-					
+
 					String array = "[";
 					// List转换成数组
 					for (int i = 0; i < list.size(); i++) {
@@ -852,7 +852,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		}
 		renderAjaxResultForSuccess();
 	}
-	
+
 	@Before(WorkWechatApiConfigInterceptor.class)
 	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
 	public void synUser2(){
@@ -866,7 +866,7 @@ public class _UserController extends JBaseCRUDController<User> {
 				String result = this.createWxDepartment(department);
 				if (StrKit.isBlank(result)) {
 					renderAjaxResultForError("同步用户部门失败");
-					return;					
+					return;
 				}
 				departmentWxId = result;
 			} else {
@@ -879,10 +879,10 @@ public class _UserController extends JBaseCRUDController<User> {
 			} else {
 				renderAjaxResultForSuccess("同步用户成功");
 				return;
-			}			
+			}
 		}
-			
-	}	
+
+	}
 
 	@SuppressWarnings("unchecked")
 	private String createWxUser(String result, User user) {
@@ -1017,4 +1017,3 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 
 }
-

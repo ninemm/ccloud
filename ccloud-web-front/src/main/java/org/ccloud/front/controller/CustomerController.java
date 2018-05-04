@@ -991,12 +991,17 @@ public class CustomerController extends BaseFrontController {
 
 		boolean updated;
 
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
 		// 查看客户库是否存在这个客户
-		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
-
-		if (persist != null && sellerCustomer.getId() == null) {
-			return "该客户已存在，请导入";
+		boolean isSellerCustomerExist = CustomerJoinCorpQuery.me().findByMobileAndCustNameInSellerId(customer.getMobile(), customer.getCustomerName(), corpSellerId);
+		if (isSellerCustomerExist && sellerCustomer.getId() == null) {
+			return "公司账套中已存在该客户，请导入客户";
 		}
+		
+		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
 
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()
@@ -1038,7 +1043,6 @@ public class CustomerController extends BaseFrontController {
 		}
 
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		sellerCustomer.setSellerId(sellerId);
 		sellerCustomer.setCustomerId(customer.getId());
@@ -1083,9 +1087,6 @@ public class CustomerController extends BaseFrontController {
 		if (!updated) {
 			return "操作失败";
 		}
-
-		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
-		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
 
 		CustomerJoinCorpQuery.me().deleteByCustomerIdAndSellerId(customer.getId(), corpSellerId);
 		CustomerJoinCorp customerJoinCorp = new CustomerJoinCorp();

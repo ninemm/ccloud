@@ -57,7 +57,6 @@
 
     $(function() {
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
-
         <#if !sellerCustomer?? || !sellerCustomer.lat?? >
             wxReadyGetLocation(
                 function(lng, lat, addComp, address) {
@@ -67,15 +66,6 @@
                         $("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
                         $('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
                         $('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
-                        $("#delivery-address").cityPicker({
-                            title: "请选择配送地址",
-                            onClose: function(obj) {
-                                var areaCode = obj.value.join(",");
-                                var areaName = obj.displayValue.join(",");
-                                $('#areaCode').val(areaCode);
-                                $('#areaName').val(areaName);
-                            }
-                        });
                     </#if>
                     $("#lng").val(lng.toFixed(6));
                     $("#lat").val(lat.toFixed(6));
@@ -136,7 +126,19 @@
             });
         
         if($("#delivery-address").val().length == 2) $("#delivery-address").val('');
-
+ 		 <#if !sellerCustomer?? || !sellerCustomer.lat?? >
+	 		<#if type=="add">
+				 $("#delivery-address").cityPicker({
+				    title: "请选择配送地址",
+				    onClose: function(obj) {
+				        var areaCode = obj.value.join(",");
+				        var areaName = obj.displayValue.join(",");
+				        $('#areaCode').val(areaCode);
+				        $('#areaName').val(areaName);
+				    }
+				});
+			 </#if>
+		 </#if>
         <#if type!="company" && type!="add">
         $("#delivery-address").cityPicker({
             title: "请选择配送地址",
