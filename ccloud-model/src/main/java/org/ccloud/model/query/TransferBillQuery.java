@@ -116,4 +116,9 @@ public class TransferBillQuery extends JBaseQuery {
 
 	}
 
+	public TransferBill findSellerIdByBillSn(String today, String sellerId) {
+		String sql = "SELECT * FROM cc_transfer_bill tb WHERE tb.seller_id=? AND tb.biz_date=? ORDER BY tb.create_date DESC";
+		return DAO.findFirst(sql,sellerId,today);
+	}
+
 }

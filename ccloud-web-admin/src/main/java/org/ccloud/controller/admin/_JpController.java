@@ -3,28 +3,65 @@
  */
 package org.ccloud.controller.admin;
 
-import com.jfinal.aop.Before;
-import com.jfinal.kit.PropKit;
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Db;
-import com.jfinal.plugin.activerecord.IAtom;
-import comparator.SellerDeptComparator;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.shiro.util.CollectionUtils;
+import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
-import org.ccloud.model.*;
-import org.ccloud.model.query.*;
-import org.ccloud.model.vo.remote.jp.pull.*;
+import org.ccloud.model.Brand;
+import org.ccloud.model.Department;
+import org.ccloud.model.Goods;
+import org.ccloud.model.GoodsCategory;
+import org.ccloud.model.GoodsType;
+import org.ccloud.model.Product;
+import org.ccloud.model.PurchaseOrder;
+import org.ccloud.model.PurchaseOrderDetail;
+import org.ccloud.model.Seller;
+import org.ccloud.model.SellerSynchronize;
+import org.ccloud.model.Supplier;
+import org.ccloud.model.User;
+import org.ccloud.model.query.BrandQuery;
+import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.GoodsCategoryQuery;
+import org.ccloud.model.query.GoodsQuery;
+import org.ccloud.model.query.GoodsTypeQuery;
+import org.ccloud.model.query.ProductQuery;
+import org.ccloud.model.query.PurchaseOrderQuery;
+import org.ccloud.model.query.SellerQuery;
+import org.ccloud.model.query.SellerSynchronizeQuery;
+import org.ccloud.model.query.SupplierQuery;
+import org.ccloud.model.vo.remote.jp.pull.JpGoodsCategoryResponseEntity;
+import org.ccloud.model.vo.remote.jp.pull.JpProductResponseEntity;
+import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInDetailResponse;
+import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInMainResponse;
+import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInRequestBody;
+import org.ccloud.model.vo.remote.jp.pull.JpPurchaseStockInResponseBody;
+import org.ccloud.model.vo.remote.jp.pull.JpSellerAccountResponseEntity;
+import org.ccloud.model.vo.remote.jp.pull.JpSellerResponseEntity;
+import org.ccloud.model.vo.remote.jp.pull.TypeConst;
 import org.ccloud.remote.jp.pull.http.JpHttpClientExecute;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.GsonUtils;
 
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.*;
+import com.jfinal.aop.Before;
+import com.jfinal.kit.PropKit;
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.IAtom;
+
+import comparator.SellerDeptComparator;
 
 /**
  * 劲牌
@@ -41,6 +78,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 	private Map<String, String> params;
 	private static final String BRAND_CODE = "B001";
 	private Brand brand;
+	private Supplier supplier;
 	public _JpController() {
 		PropKit.use("ccloud.properties");
 		httpUrl = PropKit.get("jp.api.httpclient.url");
@@ -56,6 +94,10 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		}
 		if(brand == null) {
 			brand = BrandQuery.me().findByCode(BRAND_CODE);
+		}
+		
+		if (supplier == null) {
+			supplier = SupplierQuery.me().findById(brand.getSupplierId());
 		}
 	}
 	
@@ -221,7 +263,6 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				goodsType.setCreateDate(calendar.getTime());
 				needAddGoodType = true;
 			}
-			final List<GoodsCategory> goodsCategories = new ArrayList<GoodsCategory>();
 			for (Iterator<JpGoodsCategoryResponseEntity> iterator = responseGoodsCategories.iterator(); iterator.hasNext();) {
 				goodsCategory = iterator.next();
 				storedGoodsCategory = GoodsCategoryQuery.me().findByCode(goodsCategory.getcInvCCode(), brand.getId());
@@ -253,13 +294,13 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					if(parentCategory != null)
 						parentId = parentCategory.getId();
 					else {
-						continue;
+						parentId = "0";
 					}
 					
 					storedGoodsCategory.setParentId(parentId);
 					storedGoodsCategory.setState(1);
 					storedGoodsCategory.setSupplierId(brand.getSupplierId());
-					goodsCategories.add(storedGoodsCategory);
+					storedGoodsCategory.save();
 				}
 				storedGoodsCategory = null;
 				parentCode = null;
@@ -273,8 +314,6 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				@Override
 				public boolean run() throws SQLException {
 					try {
-						if(goodsCategories.size() > 0)
-							Db.batchSave(goodsCategories, goodsCategories.size());
 						if(goodsList.size() > 0)
 							Db.batchSave(goodsList, goodsList.size());
 						if(needAdd)
@@ -346,8 +385,12 @@ public class _JpController extends JBaseCRUDController<Goods> {
 						if(goods == null)
 							continue;
 						storedProduct.setGoodsId(goods.getId());
-						storedProduct.setSmallUnit("瓶");
-						storedProduct.setBigUnit("件");
+						if (StrKit.notBlank(responseEntity.getmComUnitName())) {
+							storedProduct.setSmallUnit(responseEntity.getmComUnitName());
+						} else {
+							storedProduct.setSmallUnit("瓶");
+						}
+						storedProduct.setBigUnit(responseEntity.getcComUnitName());
 						storedProduct.setConvertRelate(responseEntity.getcInvMNum());
 						storedProduct.setCost(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
 						storedProduct.setPrice(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
@@ -375,6 +418,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 	 * 拉取采购单入库信息
 	 */
 	public void pullPurchaseStockIns() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		boolean result = false;
 		Calendar calendar = Calendar.getInstance();
 		FastDateFormat fdf = FastDateFormat.getInstance(DateUtils.DEFAULT_FILE_NAME_FORMATTER);
@@ -393,8 +437,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		params.put("BusinessDate", purchaseTime);
 		
 		JpPurchaseStockInResponseBody responseBody = JpHttpClientExecute.executeGet(requestUrl, requestBody, params, headers);
-		if(responseBody != null && 
-			responseBody.getFlsg().equals("success") &&
+		if(responseBody != null && responseBody.getFlsg() != null && responseBody.getFlsg().equals("success") &&
 			!CollectionUtils.isEmpty(responseBody.getData())) {
 			final List<PurchaseOrder> purchaseOrders = new ArrayList<PurchaseOrder>();
 			final List<PurchaseOrderDetail> purchaseOrderDetails = new ArrayList<PurchaseOrderDetail>();
@@ -436,6 +479,9 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				department = DepartmentQuery.me().findById(seller.getDeptId());
 				purchaseOrder.setDataArea(department.getDataArea());
 				purchaseOrder.setSupplierId(brand.getSupplierId());
+				purchaseOrder.setContact(supplier.getContact());
+				purchaseOrder.setBizUserId(user.getId());
+				purchaseOrder.setMobile(supplier.getMobile());
 				purchaseOrder.setCreateDate(calendar.getTime());
 				mainPurchaseTotalAmount = new BigDecimal(0);
 				

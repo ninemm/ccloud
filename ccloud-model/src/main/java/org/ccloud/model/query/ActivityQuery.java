@@ -280,12 +280,12 @@ public class ActivityQuery extends JBaseQuery {
 	}
 	
 	
-	public List<Record> _findByCustomerId(String customerId) {
+	public List<Record> _findByCustomerId(String customerId,String userId) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT a.id as activityApplyId, ca.title,d.`name`,a.create_date from cc_activity_apply a  ");
 		fromBuilder.append(" LEFT JOIN cc_activity ca on ca.id = a.activity_id ");
 		fromBuilder.append(" LEFT JOIN cc_expense_detail cea on a.expense_detail_id = cea.id ");
 		fromBuilder.append(" LEFT JOIN dict d on d.type=cea.flow_dict_type and d.`value` = cea.item1 ");
-		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` = '"+Consts.ACTIVITY_APPLY_STATUS_PASS+"'");
+		fromBuilder.append(" where a.seller_customer_id ='"+customerId+"' and a.`status` in ('"+Consts.ACTIVITY_APPLY_STATUS_PASS+"','"+Consts.ACTIVITY_APPLY_STATUS_VERIFICATION+"') and a.biz_user_id = '"+userId+"' ");
 		fromBuilder.append(" GROUP BY a.id");
 		return Db.find(fromBuilder.toString());
 	}

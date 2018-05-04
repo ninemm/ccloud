@@ -71,6 +71,7 @@
           <span class="fr">${(salesOrder.outDate)!}</span>
         </p>
         <p>操作人：${(salesOrder.outName)!}</p>
+          <p>备注：${(outRemark)!'无'}</p>
         <#if outstockInfo?? && outstockInfo?length gt 1>
           <p>备注：数量修改 <br> ${outstockInfo!}</p>
         </#if>

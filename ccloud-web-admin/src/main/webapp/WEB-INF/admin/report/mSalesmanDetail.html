@@ -50,22 +50,6 @@
 		return param;
 	};
 	
-	var initGiftParams = function(params) {
-		var keyword = $('#status  option:selected').val();
-		if(keyword == ""){
-			keyword = "order";
-		}
-		var param = {
-			status: keyword,
-			startDate: $('#startDate').val() + " 00:00:00",
-			endDate: $('#endDate').val() + " 23:59:59",
-			productNames: $('#productNames').val(),
-			isGift: "1",
-			sortName:params
-		};
-		return param;
-	};	
-	
 	$("#search-submit").click(function() {
 		var validate = $('#form').data('bootstrapValidator');
 		validate.validate();
@@ -122,9 +106,7 @@
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
 				<#if watchHead??>
 					<#list watchHead as bean>
-						<#if bean != '销售额(元)'>
-							{field: "${bean}", title: "${bean}", align: "center",  edit:false},
-						</#if>
+						{field: "${bean}", title: "${bean}", align: "center",  edit:false},
 	   				</#list>
 				</#if>
    			];
@@ -159,7 +141,6 @@
 <section class="content">
 	<div class="row content-row">
 	    	<form class="form-horizontal" role="form" id="form">
-	    	<input id="productNames" value="${productNames!}" type="hidden">
 			<div class="form-group" style="margin-bottom:0px;">
               	<div class="col-sm-3">
 					<label class="control-label col-sm-4">状态:</label>

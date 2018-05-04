@@ -19,6 +19,7 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
+import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.SellerProduct;
 import org.ccloud.model.User;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -81,21 +82,21 @@ public class OrderController extends BaseFrontController {
 		List<Map<String, Object>> bizUsers = new ArrayList<>();
 		bizUsers.add(all);
 		List<User> users = new ArrayList<User>();
-		
+
 		Subject subject = SecurityUtils.getSubject();
 		if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
 			users = UserQuery.me().findByDeptDataArea(dataArea);
 		} else {
 			users.add(user);
 		}
-		
+
 		for (User u : users) {
 			Map<String, Object> items = new HashMap<>();
 			items.put("title", u.getRealname());
 			items.put("value", u.getId());
 			bizUsers.add(items);
 		}
-		
+
 		String history = getPara("history");
 		setAttr("history", history);
 		setAttr("bizUsers",JSON.toJSON(bizUsers));
@@ -238,6 +239,22 @@ public class OrderController extends BaseFrontController {
 		List<Comment> comments = WorkFlowService.me().getProcessComments(proc_inst_id);
 		setAttr("comments", comments);
 
+		List<SalesOutstock> outList = SalesOutstockQuery.me().findListByOrderId(id);
+
+		if (outList.size() > 0) {
+			StringBuilder outRemark = new StringBuilder();
+			int num = 1;
+			for (int i = 0; i < outList.size(); i++) {
+				if (StrKit.notBlank(outList.get(i).getRemark())) {
+					outRemark.append(num + "." + outList.get(i).getRemark() + "<br>");
+					num++;
+				}
+			}
+			if (outRemark.length() > 0) {
+				setAttr("outRemark", outRemark.toString());
+			}
+		}
+
 		StringBuilder printComments = new StringBuilder();
 		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);
 		for (int i = 0; i < printRecord.size(); i++) {
@@ -256,7 +273,7 @@ public class OrderController extends BaseFrontController {
 		}
 		render("operate_history.html");
 	}
-	
+
 	private String modifyPrice(String ordedId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
 		StringBuilder stringBuilder = new StringBuilder();
@@ -268,16 +285,16 @@ public class OrderController extends BaseFrontController {
 				double smallproductPrice=product_price/conver_relate;
 				double smallprice=price/conver_relate;
 				smallproductPrice=new BigDecimal(smallproductPrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
 				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
 				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ product_price+ "(" + price+ ")<br>");
 				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallproductPrice+ "(" +  smallprice + ")<br>");
 			}
 		}
-		
+
 		return stringBuilder.toString();
 	}
-	
+
 	private String priceChange(String orderId) {
 		String[] productNames = getParaValues("productName");
 		String[] bigUnits = getParaValues("bigUnit");
@@ -291,13 +308,13 @@ public class OrderController extends BaseFrontController {
 		}else {
 			salesOrderName=salesOrder.getStr("customer_name");
 		}
-		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" + 
-				"	        <div></div>\n" + 
-				"	        <p>\n" + 
-				"	          价格修改\n" + 
-				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" + 
-				"	        </p>\n" + 
-				"	        <p>操作人："+salesOrderName+"</p>\n" + 
+		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" +
+				"	        <div></div>\n" +
+				"	        <p>\n" +
+				"	          价格修改\n" +
+				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" +
+				"	        </p>\n" +
+				"	        <p>操作人："+salesOrderName+"</p>\n" +
 				"	         <p>");
 		boolean priceChange=false;
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
@@ -306,23 +323,23 @@ public class OrderController extends BaseFrontController {
 				double conver_relate = Double.parseDouble(orderDetails.get(i).getStr("convert_relate"));
 				double price = Double.parseDouble(orderDetails.get(i).getStr("price"));
 				double smallprice=price/conver_relate;
-				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
 				stringBuilder.append("●" + productNames[i] + "<br>");
 				stringBuilder.append("-每" + bigUnits[i] + "价格修改为"+ bigPriceSpans[i]+ "(" + price+ ")<br>");
 				stringBuilder.append("-每" + smallUnits[i] + "价格修改为"+ smallPriceSpans[i]+ "(" +  smallprice+ ")<br>");
 				priceChange=true;
 			}
 		}
-		stringBuilder.append("</p>\n" + 
+		stringBuilder.append("</p>\n" +
 				"	      </div>");
-		
+
 		if (priceChange) {
 			return stringBuilder.toString();
 		}else {
 			return null;
 		}
 	}
-	
+
 //	private String priceChange(String orderId) {
 //		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
 //		Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
@@ -332,15 +349,15 @@ public class OrderController extends BaseFrontController {
 //		}else {
 //			salesOrderName=salesOrder.getStr("customer_name");
 //		}
-//		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" + 
-//				"	        <div></div>\n" + 
-//				"	        <p>\n" + 
-//				"	          价格修改\n" + 
-//				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" + 
-//				"	        </p>\n" + 
-//				"	        <p>操作人："+salesOrderName+"</p>\n" + 
+//		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" +
+//				"	        <div></div>\n" +
+//				"	        <p>\n" +
+//				"	          价格修改\n" +
+//				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" +
+//				"	        </p>\n" +
+//				"	        <p>操作人："+salesOrderName+"</p>\n" +
 //				"	         <p>");
-//		
+//
 //		boolean priceChange=false;
 //		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
 //			if (!record.getInt("price").equals(record.getInt("product_price"))) {
@@ -350,14 +367,14 @@ public class OrderController extends BaseFrontController {
 //				double smallproductPrice=product_price/conver_relate;
 //				double smallprice=price/conver_relate;
 //				smallproductPrice=new BigDecimal(smallproductPrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-//				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
+//				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
 //				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
 //				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ product_price+ "(" + price+ ")<br>");
 //				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallproductPrice+ "(" +  smallprice + ")<br>");
 //				priceChange=true;
 //			}
 //		}
-//		stringBuilder.append("</p>\n" + 
+//		stringBuilder.append("</p>\n" +
 //				"	      </div>");
 //		if (priceChange) {
 //			return stringBuilder.toString();
@@ -365,11 +382,11 @@ public class OrderController extends BaseFrontController {
 //			return "";
 //		}
 //	}
-	
-	
+
+
 	private String buildOutstockInfo(String ordedId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
-		
+
 		StringBuilder stringBuilder = new StringBuilder();
 
 		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
@@ -408,7 +425,7 @@ public class OrderController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
-       
+
 		Map<String, String[]> paraMap = getParaMap();
 		String result = this.saveOrder(paraMap, user, sellerId, sellerCode);
 		if (StrKit.isBlank(result)) {
@@ -453,7 +470,7 @@ public class OrderController extends BaseFrontController {
 								result[0] = message;
 								return false;
 							}
-							
+
 						}
 
 					}
@@ -611,7 +628,7 @@ public class OrderController extends BaseFrontController {
 					renderAjaxResultForError("订单已审核");
 					return false;
 				}
-				
+
 				Map<String, Object> var = Maps.newHashMap();
 				var.put("pass", pass);
 				var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
@@ -623,7 +640,7 @@ public class OrderController extends BaseFrontController {
 
 				//是否改价格
 				if (pass == 1 && edit == 1) {
-					
+
 					Map<String, String[]> paraMap = getParaMap();
 					String result = editOrder(paraMap, user);
 					if (StrKit.notBlank(result)) {
@@ -641,13 +658,13 @@ public class OrderController extends BaseFrontController {
 				String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 				stringBuilder.append(comments);
 				WorkFlowService workflowService = new WorkFlowService();
-				
+
 				int completeTask = workflowService.completeTask(taskId, stringBuilder.toString(), var);
 				if (completeTask==1) {
 					renderAjaxResultForError("已审核");
 					return false;
 				}
-				
+
 				//审核订单后将message中是否阅读改为是
 				Message message = MessageQuery.me().findByObjectIdAndToUserId(orderId, user.getId());
 				if (null != message) {
@@ -848,7 +865,7 @@ public class OrderController extends BaseFrontController {
 		map.put("orderDetail", orderDetail);
 		renderJson(map);
 	}
-	
+
 	public void getOrderInfo() {
 		String orderId = getPara("orderId");
 		Record order = SalesOrderQuery.me().findMoreById(orderId);
@@ -858,7 +875,7 @@ public class OrderController extends BaseFrontController {
 		map.put("orderDetail", orderDetailList);
 
 		renderJson(map);
-	}	
+	}
 
 	public void getOrderProductDetail() {
 		String orderId = getPara("orderId");
@@ -868,7 +885,7 @@ public class OrderController extends BaseFrontController {
 		map.put("orderDetail", orderDetail);
 		renderJson(map);
 	}
-	
+
 	public void getBizUser() {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -886,8 +903,8 @@ public class OrderController extends BaseFrontController {
 			items.put("value", order.getBizUserId());
 			bizUsers.add(items);
 		}
-		
+
 		renderJson(bizUsers);
 	}
-	  
+
 }

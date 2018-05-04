@@ -254,7 +254,8 @@ public class CustomerVisitController extends BaseFrontController {
 	
 	public void activityChoose(){
 		String customerId = getPara("customerId");
-		List<Record> activityRecords = ActivityQuery.me()._findByCustomerId(customerId);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Record> activityRecords = ActivityQuery.me()._findByCustomerId(customerId,user.getId());
 		List<Map<String, String>> activityList = Lists.newArrayList();
 	    for (Record record : activityRecords) {
 		    	Map<String, String> map = Maps.newHashMap();

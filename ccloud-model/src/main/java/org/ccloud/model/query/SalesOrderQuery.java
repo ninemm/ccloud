@@ -269,16 +269,10 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setContact(StringUtils.getArrayFirst(paraMap.get("contact")));
 		salesOrder.setMobile(StringUtils.getArrayFirst(paraMap.get("mobile")));
 		salesOrder.setAddress(StringUtils.getArrayFirst(paraMap.get("address")));
-		try {
-			if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lat"))))
-				salesOrder.setLat(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lat"))));
-			if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lng"))))
-				salesOrder.setLng(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lng"))));
-		} catch (Exception e) {
-			log.error("===========error lat：" + StringUtils.getArrayFirst(paraMap.get("lat")));
-			log.error("===========error lng：" + StringUtils.getArrayFirst(paraMap.get("lng")));
-			log.error(e.getMessage(), e);
-		}
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lat"))))
+			salesOrder.setLat(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lat"))));
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lng"))))
+			salesOrder.setLng(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lng"))));
 		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("location"))))
 			salesOrder.setLocation(StringUtils.getArrayFirst(paraMap.get("location")));
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
@@ -941,28 +935,34 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Record findTotalAmountByUserId(String startDate, String endDate, String keyword, String userId) {
-		LinkedList<Object> params = new LinkedList<Object>();
-		boolean needWhere = true;
-		StringBuilder fromBuilder = new StringBuilder();
-			if (keyword.equals("sok.biz_date")) {
-				fromBuilder.append("SELECT SUM(sok.total_amount) totalAmount  FROM cc_sales_outstock sok ");
-				needWhere = appendIfNotEmpty(fromBuilder, "sok.biz_user_id", userId, params, needWhere);
-			}else {
-				fromBuilder.append("SELECT SUM(so.total_amount) totalAmount  FROM cc_sales_order so ");
-				needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", userId, params, needWhere);
-			}
-			if (StrKit.notBlank(startDate)) {
-				fromBuilder.append(" and "+keyword+" >= ? ");
-				params.add(startDate);
-			}
-			if (StrKit.notBlank(endDate)) {
-				fromBuilder.append(" and "+keyword+" <= ? ");
-				params.add(endDate);
-			}
-		
-		return Db.findFirst(fromBuilder.toString(), params.toArray());
-	}
-	
+        LinkedList<Object> params = new LinkedList<Object>();
+        boolean needWhere = true;
+        StringBuilder fromBuilder = new StringBuilder();
+            if (keyword.equals("sok.biz_date")) {
+                fromBuilder.append("SELECT SUM(sok.total_amount) totalAmount  FROM cc_sales_outstock sok ");
+                fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id=sok.id ");
+                fromBuilder.append("LEFT JOIN cc_sales_order so ON so.id=sojo.order_id ");
+                fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
+                needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", userId, params, needWhere);
+                fromBuilder.append(" and sok.status NOT in("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+            }else {
+                fromBuilder.append("SELECT SUM(so.total_amount) totalAmount  FROM cc_sales_order so ");
+                fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
+                needWhere = appendIfNotEmpty(fromBuilder, "so.biz_user_id", userId, params, needWhere);
+                fromBuilder.append(" and so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
+            }
+            if (StrKit.notBlank(startDate)) {
+                fromBuilder.append(" and "+keyword+" >= ? ");
+                params.add(startDate);
+            }
+            if (StrKit.notBlank(endDate)) {
+                fromBuilder.append(" and "+keyword+" <= ? ");
+                params.add(endDate);
+            }
+        
+        return Db.findFirst(fromBuilder.toString(), params.toArray());
+    }
+
 	//我客户的详情
 	public List<Record> findByCustomerDetail(String startDate, String endDate, String keyword, String userId,
 			String sellerId, boolean ifGift) {

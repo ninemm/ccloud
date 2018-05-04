@@ -181,7 +181,7 @@ public class SellerQuery extends JBaseQuery {
 		String sql="SELECT s.id FROM cc_sales_order so LEFT JOIN cc_customer_type ct ON ct.id = so.customer_type_id LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id LEFT JOIN cc_seller s ON s.customer_id = sc.customer_id WHERE so.id =?";
 		return Db.findFirst(sql,orderId);
 	}
-	
+
 	public List<Record> findDeptByLevel(){
 		StringBuilder sql = new StringBuilder("SELECT CONCAT(d.data_area, '%') AS id, cs.seller_name AS text ");
 		sql.append("FROM department d ");
@@ -189,7 +189,7 @@ public class SellerQuery extends JBaseQuery {
 		sql.append("WHERE (d.dept_level = '1' OR d.dept_level = '2') AND cs.jpwx_open_id is not null ");
 		return Db.find(sql.toString());
 	}
-	
+
 	public List<Seller> findListByCode(String sellerCode) {
 		String sql = "select * from cc_seller where seller_code = ?";
 		return DAO.find(sql, sellerCode);

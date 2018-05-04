@@ -59,8 +59,8 @@
 					toastr.error(data.message,'操作失败');
 				}
 				setTimeout( function(){
-							l.stop();
-									}, 1 * 1000 );
+							window.history.back(-1);
+									}, 2 * 1000 );
 			},
 			error : function() {
 				l.stop();
@@ -87,7 +87,7 @@
 			$.each(productList, function(idx, item) {
 				var option = {
 					id: item.sellerProductId,
-					text: item.name+item.specificationValue
+					text: item.custom_name
 				}
 				productOptionArr.push(option);
 		        pOptionArr = productOptionArr;
@@ -283,8 +283,8 @@
 							<th class="col-sm-2 center">规格</th>
 							<th class="col-sm-1 center">单位</th>
 							<th class="col-sm-1 center">库存数量</th>
-							<th class="col-sm-1 center">盘盈(+)/盘亏(-)</th>
-							<th class="col-sm-3 center">备注</th>
+							<th class="col-sm-2 center">盘盈(+)/盘亏(-)</th>
+							<th class="col-sm-2 center">备注</th>
 						</tr>
 					</thead>
 					<tbody id="sProdBody">
@@ -363,3 +363,5 @@
 </section>
 
 </@layout>
+
+	

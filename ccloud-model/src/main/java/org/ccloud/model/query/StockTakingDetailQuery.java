@@ -147,14 +147,14 @@ public class StockTakingDetailQuery extends JBaseQuery {
 
 	//盘点 查询出经销商所有商品
 	public List<Record> findByWarehouseIdAndSellerId(String warehouseId, String seller_id) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT sp.id sellerProductId , p.`name` , t1.valueName specificationValue , p.big_unit bigUnit , t2.balance_count ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT sp.id sellerProductId , p.`name` , t1.valueName specificationValue , p.big_unit bigUnit , t2.balance_count,sp.custom_name ");
 		fromBuilder.append(" FROM cc_seller_product sp  ");
 	 	fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 	 	fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 	 	fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 ON t1.product_set_id = sp.product_id ");
-	 	fromBuilder.append(" LEFT JOIN( SELECT i.balance_count , i.sell_product_id FROM cc_inventory_detail i WHERE i.warehouse_id = ? GROUP BY i.sell_product_id ORDER BY i.create_date DESC) t2 ON t2.sell_product_id = sp.id ");
+	 	fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE c.warehouse_id =? GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = sp.id ");
 	 	fromBuilder.append(" WHERE sp.is_enable=1 and sp.seller_id =? ORDER BY sp.order_list");
-	 	return Db.find(fromBuilder.toString(), warehouseId,seller_id);
+	 	return Db.find(fromBuilder.toString(),warehouseId,seller_id);
 	}
 	
 	public List<Record> findByStockTakingId (String stockTakingId){
