@@ -26,7 +26,6 @@ import org.ccloud.model.User;
 import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.CustomerJoinCorpQuery;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
-import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -291,7 +290,7 @@ public class CustomerImportBiz {
 					if(totalResult.getDelCustomerCorps().size() > 0)
 						CustomerJoinCorpQuery.me().batchDeleteByCustomerIdAndSellerId(totalResult.getDelCustomerCorps());
 					if(totalResult.getAddCustomers().size() > 0) {
-						Db.batchSave(totalResult.getAddCustomers(), 10000);
+						Db.batchSave(MyCollectionUtils.removeRepeat(totalResult.getAddCustomers()), 10000);
 					}
 					if(totalResult.getAddSellerCusts().size() > 0) {
 						Db.batchSave(MyCollectionUtils.removeRepeat(totalResult.getAddSellerCusts()), 10000);
