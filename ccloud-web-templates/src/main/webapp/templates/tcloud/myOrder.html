@@ -42,7 +42,7 @@
   		<#else>
   			clearStorage();
 			setItemBykey("startDate", $.today());
-			setItemBykey("endDate", $.today() + ' 23:59:59');    			
+			setItemBykey("endDate", $.today() + ' 23:59:59');
 		</#if>
 		showBizUser(${bizUsers!});
 		$(document).on("submit", ".weui-search-bar__form", function() {
@@ -54,15 +54,15 @@
 			combo();
 		}).on("change", "#status", function() {
 			setItemBykey("status", $("#status").data('values'));
-			setItemBykey("statusName", $("#status").val());		
+			setItemBykey("statusName", $("#status").val());
 			combo();
 		}).on("change", "#customerTypeId", function() {
 			setItemBykey("customerTypeId", $("#customerTypeId").data('values'));
-			setItemBykey("customerTypeName", $("#customerTypeId").val());		
+			setItemBykey("customerTypeName", $("#customerTypeId").val());
 			combo();
 		}).on("change", "#bizUserId", function() {
 			setItemBykey("bizUserId", $("#bizUserId").data('values'));
-			setItemBykey("bizUserName", $("#bizUserId").val());		
+			setItemBykey("bizUserName", $("#bizUserId").val());
 			combo();
 		}).on("change", "#date", function() {
 			getDateOrder();
@@ -71,7 +71,7 @@
 			startDate = $('#start-date').val();
 			endDate = $('#end-date').val() + ' 23:59:59';
 			setItemBykey("startDate", startDate);
-			setItemBykey("endDate", endDate);				
+			setItemBykey("endDate", endDate);
 			combo();
 		}).on('click', '.list-layer', function () {
 			var $this = $(this);
@@ -167,11 +167,11 @@
 		$noMore.hide();
 		var params = getParam();
 		
-		Utils.ajax('${CPATH}/order/orderList', params, 
+		Utils.ajax('${CPATH}/order/orderList', params,
 			function(data) {
 				$loading.hide();
 				$("#orderCount").html(data.orderCount+" 单");
-				$("#orderAmount").html(data.orderAmount+" 元");				
+				$("#orderAmount").html(data.orderAmount+" 元");
 				if(data.orderList.length == 0) {
 					if($('.weui-panel').length == 0) $noMore.show();
 					loading = true;
@@ -223,11 +223,11 @@
 					} else {
 						$newOrder.find("#cancel").remove();
 					}
-					$newOrder.find("#orderAgain").on('click', function(){ 
+					$newOrder.find("#orderAgain").on('click', function(){
  						OrderAgain("${CPATH}/order/getOrderInfo?orderId=" + el.id, "${CPATH}/product");
 					});
 
-					$newOrder.find("#status").on('click', function(){ 
+					$newOrder.find("#status").on('click', function(){
  						 window.location.href = "${CPATH}/order/operateHistory?id=" + el.id + "&proc_inst_id=" + el.proc_inst_id;
  						 event.stopPropagation();
 					});
@@ -279,10 +279,10 @@
 			"bizUserId":bizUserSession,
 			"startDate": startDateSession,
 			"endDate" : endDateSession
-		}		
-		</#if>		
+		}
+		</#if>
 		return params;
-	}	
+	}
 	
 	function getDateOrder(){
 		var dateType = $("#date").data('values');
@@ -303,7 +303,7 @@
 		endDate = $.today() + ' 23:59:59';
 		setItemBykey("dayName", $("#date").val());
 		setItemBykey("startDate", startDate);
-		setItemBykey("endDate", endDate);		
+		setItemBykey("endDate", endDate);
 		combo();
 	}
 
@@ -324,7 +324,7 @@
 			return '全部出库'
 		} else if (value == 3001) {
 			return '全部出库-订单关闭'
-		} 
+		}
 		return value
 	}
 	
@@ -359,7 +359,7 @@
                 var productName = "";
                 if(item.is_composite == 1){
                     productName = "<span class='ctag'>组合</span>";
-                    productName = productName + item.custom_name;                
+                    productName = productName + item.custom_name;
                 }else if (item.is_gift == 1) {
                     productName = "<span class='tag'>赠品</span>";
                     productName = productName + item.custom_name;
@@ -381,13 +381,13 @@
                     "<div class='fr width-60'>￥"+smallPrice+" "+
                     "<span class='gray'>("+sPrice+")</span></div></div>"+
                     "<div class='weui-flex__item t-r'>"+smallCount+" " +item.small_unit+" "+
-                    "</div></div>"; 
+                    "</div></div>";
             });
             
             $("#p"+orderId).append(str);
             }
         });
-	  }  
+	  }
 	}
 	
     function agree(id, taskId, pass) {
@@ -423,7 +423,7 @@
 			"comment": comment,
 			'pass' : pass
 		}
-		Utils.ajax('${CPATH}/order/complete', params, 
+		Utils.ajax('${CPATH}/order/complete', params,
 			function(res){
 				if (res.errorCode > 0) {
 				    $.toptip(res.message, 'error');

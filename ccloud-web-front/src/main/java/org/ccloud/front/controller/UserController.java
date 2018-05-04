@@ -1,7 +1,6 @@
 package org.ccloud.front.controller;
 
 import java.math.BigInteger;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -308,12 +307,7 @@ public class UserController extends BaseFrontController {
 					
 					for (User user : userList) {
 						user.setAvatar(wxUserResult.getStr("headimgurl"));
-						try {
-							String nickname = URLEncoder.encode(wxUserResult.getStr("nickname"), "utf-8");
-							user.setNickname(nickname);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						user.setNickname(wxUserResult.getStr("nickname"));
 						user.setWechatOpenId(openId);
 						if (!user.saveOrUpdate()) {
 							ret.set("message", "手机号绑定失败，请联系管理员");

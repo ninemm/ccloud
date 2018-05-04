@@ -96,7 +96,7 @@ public class CustomerController extends BaseFrontController {
 		setAttr("searchArea", JSON.toJSON(nearBy));
 
 		String history = getPara("history");
-		setAttr("history", history);		
+		setAttr("history", history);
 		render("customer.html");
 	}
 
@@ -114,12 +114,12 @@ public class CustomerController extends BaseFrontController {
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		String region = getPara("region");
-		
+
 		String custName = getPara("searchKey");
 		String custTypeId = getPara("customerType");
 		Integer pageSize = getParaToInt("pageSize");
 		Integer pageNumber = getParaToInt("pageNumber");
-		
+
 		if (StrKit.notBlank(region)) {
 			selectDataArea = UserQuery.me().findById(region).getDataArea() + "%";
 		}
@@ -185,7 +185,7 @@ public class CustomerController extends BaseFrontController {
 							"                                                                     sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
 							"                                                                     contact:'" + customer.getStr("contact") + "',\n" +
 							"                                                                     mobile:'" + customer.getStr("mobile") + "',\n" +
-							"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");				
+							"                                                                     address:'" + customer.getStr("address") + "'})\">客户拜访</div>\n");
 				}
 				if ((salesOrderAdd && !customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))
 						|| (salesOrderSeller && customer.getStr("customer_kind").equals(Consts.CUSTOMER_KIND_SELLER))) {
@@ -193,7 +193,7 @@ public class CustomerController extends BaseFrontController {
 							"                                                                    sellerCustomerId:'" + customer.getStr("sellerCustomerId") + "',\n" +
 							"                                                                    contact:'" + customer.getStr("contact") + "',\n" +
 							"                                                                    mobile:'" + customer.getStr("mobile") + "',\n" +
-							"                                                                    address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");				
+							"                                                                    address:'" + customer.getStr("address") + "'})\" >下订单</div>\n");
 				}
 				html.append("	</div>\n");
 			}
@@ -300,7 +300,7 @@ public class CustomerController extends BaseFrontController {
 			html.append("<div class=\"weui-panel weui-panel_access\">\n" +
 					"                        <a href=\"/order/orderDetail?orderId=" + order.getStr("id") + "\">\n" +
 					"                        <div class=\"ft14\">\n");
-			if (order.get("receive_type").toString().equals("0")) 
+			if (order.get("receive_type").toString().equals("0"))
 				html.append("                                <span class=\"tag\">" + order.getStr("receive_Name") + "</span>\n");
 			html.append(order.getStr("order_sn") + "\n" +
 					"                            <span class=\"fr blue\">" + order.getStr("statusName") + "</span>\n" +
@@ -336,7 +336,7 @@ public class CustomerController extends BaseFrontController {
 	}
 
 	public void historyOrder() {
-		
+
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerCustomerId = getPara("sellerCustomerId");
 
@@ -357,9 +357,9 @@ public class CustomerController extends BaseFrontController {
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void edit() {
-		
+
 		String id = getPara("sellerCustomerId");
-		
+
 		if (StrKit.notBlank(id)) {
 
 			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
@@ -367,11 +367,11 @@ public class CustomerController extends BaseFrontController {
 
 		}
 		String history = getPara("history");
-		setAttr("history", history);	
+		setAttr("history", history);
 		setAttr("customerType", JSON.toJSONString(getCustomerType1()));
 		if(StrKit.notBlank(id)) setAttr("type", "edit");
 		else setAttr("type", "add");
-		
+
 		render("customer_edit.html");
 	}
 
@@ -412,12 +412,12 @@ public class CustomerController extends BaseFrontController {
 
 	@Before(Tx.class)
 	public void save() {
-		
+
 		String updated = "";
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Map<String, Object> map = Maps.newHashMap();
 		List<ImageJson> list = Lists.newArrayList();
-		
+
 		Customer customer = getModel(Customer.class);
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		sellerCustomer.setIsChecked(0);
@@ -430,7 +430,7 @@ public class CustomerController extends BaseFrontController {
 				return;
 			}
 		}
-		
+
 		String picJson = getPara("pic");
 		String oldPic = getPara("oldPic");
 		String areaName = getPara("areaName");
@@ -457,13 +457,13 @@ public class CustomerController extends BaseFrontController {
 				.splitToList(custTypeNames);
 
 		if (StrKit.notBlank(picJson)) {
-			
+
 			JSONArray array = JSON.parseArray(picJson);
 			for (int i = 0; i < array.size(); i++) {
 				JSONObject obj = array.getJSONObject(i);
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
-				
+
 				ImageJson image = new ImageJson();
 				image.setImgName(picname);
 				String originalPath = qiniuUpload(pic);
@@ -500,7 +500,7 @@ public class CustomerController extends BaseFrontController {
 		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 
 		if(isChecked == null || !isChecked) {
-			
+
 			//如果不走流程直接做操作
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_NORMAL);
 
@@ -513,14 +513,14 @@ public class CustomerController extends BaseFrontController {
 		}
 
 		if (sellerCustomer != null && StrKit.notBlank(sellerCustomer.getId())) {
-			
+
 			CustomerVO temp = new CustomerVO();
 			temp.setAreaCode(areaCode);
 			temp.setAreaName(areaName);
 			temp.setCustTypeList(custTypeList);
 			temp.setCustTypeNameList(custTypeNameList);
 			temp.setContact(customer.getContact());
-			
+
 			temp.setMobile(customer.getMobile());
 			temp.setAddress(customer.getAddress());
 			temp.setNickname(sellerCustomer.getNickname());
@@ -535,7 +535,7 @@ public class CustomerController extends BaseFrontController {
 			map.put("customerVO", temp);
 
 		} else {
-			
+
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_AUDIT);
 			if (StrKit.notBlank(updated)) {
 				renderAjaxResultForError(updated);
@@ -579,7 +579,7 @@ public class CustomerController extends BaseFrontController {
 //			return;
 //		}
 //		CookieUtils.put(this, taskId,taskId);
-		
+
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		List<String> custTypeNameList = CustomerJoinCustomerTypeQuery.me().findCustomerTypeNameListBySellerCustomerId(id, dealerDataArea);
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
@@ -655,7 +655,7 @@ public class CustomerController extends BaseFrontController {
 			diffAttrList.add("导入附近客户");
 			setAttr("diffAttrList", diffAttrList);
 		}
-		
+
 		//审核后将message中是否阅读改为是
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
@@ -663,7 +663,7 @@ public class CustomerController extends BaseFrontController {
 			message.setIsRead(Consts.IS_READ);
 			message.update();
 		}
-		
+
 		render("customer_review.html");
 	}
 
@@ -684,7 +684,7 @@ public class CustomerController extends BaseFrontController {
 					renderAjaxResultForError(updated);
 				}
 			}
-		
+
 		}else {
 			renderAjaxResultForError("该客户不存在");
 		}
@@ -819,7 +819,7 @@ public class CustomerController extends BaseFrontController {
 
 					CustomerJoinCustomerTypeQuery.me().deleteBySellerCustomerId(sellerCustomerId);
 					List<String> customerTypes = customerVO.getCustTypeList();
-					
+
 					for (String custType : customerTypes) {
 						CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 						ccType.setSellerCustomerId(sellerCustomerId);
@@ -853,33 +853,33 @@ public class CustomerController extends BaseFrontController {
 				updated = sellerCustomer.saveOrUpdate();
 			}
 		}
-		
+
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", status);
-		
+
 		int completeTask = workFlowService.completeTask(taskId, comment, var);
 		if (completeTask==1) {
 			renderAjaxResultForError("已审核");
 			return;
 		}
-		
+
 		Message message = new Message();
 		message.setSellerId(sellerId);
 		message.setContent(comment);
 		message.setFromUserId(user.getId());
-		
+
 		message.setToUserId(toUser.getId());
 		message.setDeptId(user.getDepartmentId());
 		message.setDataArea(user.getDataArea());
 		message.setType(Message.CUSTOMER_REVIEW_TYPE_CODE);
-		
+
 		message.setObjectId(sellerCustomerId);
 		message.setIsRead(0);
 		message.setObjectType(Consts.OBJECT_TYPE_CUSTOMER);
-		
+
 		message.setTitle(sellerCustomer.getCustomer().getCustomerName());
 		MessageKit.sendMessage(Actions.ProcessMessage.PROCESS_MESSAGE_SAVE, message);
-		
+
 		if (updated){
 			renderAjaxResultForSuccess("操作成功");
 		}
@@ -888,11 +888,11 @@ public class CustomerController extends BaseFrontController {
 	}
 	//isEnable 0:新增或编辑 1:停用 2:导入公司客户 3:导入附件客户
 	private String startProcess(String customerId, Map<String, Object> param, int isEnable) {
-		
+
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(customerId);
 		boolean isUpdated = true;
 		Boolean isCustomerAudit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
-		
+
 		if (sellerCustomer == null) {
 			return "该客户不存在";
 		}
@@ -902,7 +902,7 @@ public class CustomerController extends BaseFrontController {
 				return "该客户正在审核中";
 			}
 		}
-		
+
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
@@ -949,7 +949,7 @@ public class CustomerController extends BaseFrontController {
 			}
 			param.put("manager", managerUserName);
 			param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
-			
+
 			String defKey = Consts.PROC_CUSTOMER_REVIEW;
 
 			param.put("isEnable", isEnable);
@@ -962,9 +962,9 @@ public class CustomerController extends BaseFrontController {
 			sellerCustomer.setIsChecked(0);
 			sellerCustomer.setStatus(SellerCustomer.CUSTOMER_AUDIT);
 		}
-		
+
 		isUpdated = sellerCustomer.update();
-		
+
 		if (!isUpdated)
 			return "操作失败";
 
@@ -1052,7 +1052,7 @@ public class CustomerController extends BaseFrontController {
 		sellerCustomer.setSubType("100301");
 		sellerCustomer.setCustomerKind("100401");
 		sellerCustomer.setStatus(status);
-		
+
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		Department department = DepartmentQuery.me().findByDataArea(deptDataArea);
 		sellerCustomer.setDataArea(deptDataArea);
@@ -1106,7 +1106,7 @@ public class CustomerController extends BaseFrontController {
 			return "";
 		}
 	}
-	
+
 	public void detail() {
 		String id = getPara("id");
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
@@ -1134,7 +1134,7 @@ public class CustomerController extends BaseFrontController {
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
 		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area");
-		
+
 		Page<Record> customerList = SellerCustomerQuery.me()._findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
 		Map<String, Object> map = new HashMap<>();
 		map.put("customerList", customerList.getList());

@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableMap;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
@@ -42,12 +44,7 @@ import org.ccloud.model.Station;
 import org.ccloud.model.User;
 import org.ccloud.model.UserGroupRel;
 import org.ccloud.model.UserHistory;
-import org.ccloud.model.query.DepartmentQuery;
-import org.ccloud.model.query.GroupQuery;
-import org.ccloud.model.query.StationQuery;
-import org.ccloud.model.query.UserGroupRelQuery;
-import org.ccloud.model.query.UserHistoryQuery;
-import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.model.vo.UserExecel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -127,14 +124,14 @@ public class _UserController extends JBaseCRUDController<User> {
 	public void save() {
 		final User user = getModel(User.class);
 	/*	try {
-			if (StrKit.notBlank(user.getNickname())) {
-				String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
-				user.setNickname(nickname);
-			}
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		if (StrKit.notBlank(user.getNickname())) {
+			String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
+			user.setNickname(nickname);
+		}
+	} catch (UnsupportedEncodingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}*/
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
@@ -515,7 +512,6 @@ public class _UserController extends JBaseCRUDController<User> {
 				String userId = "";
 				User us = null;
 				UserGroupRel userGroupRel = null;
-				//user用来判断同一个部门用户是否存在
 				User user = UserQuery.me()._findUserByUsername(excel.getUsername());
 				if(user !=null) {
 					username +=excel.getUsername()+"、";
@@ -526,16 +522,15 @@ public class _UserController extends JBaseCRUDController<User> {
 				if(excel.getMobile()==null) {
 					break;
 				}
-				//user00用来接收存有微信openID的用户信息
-				User user00 = null;
+				User user00 = new User();
 				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
 				for(User user01:uss) {
-					if(StrKit.notBlank(user01.getWechatOpenId())) {
+					if(!user01.getWechatOpenId().equals("")) {
 						user00 = user01;
 						break;
 					}
 				}
-				// 检查不同部门用户是否存在
+				// 检查用户是否存在
 				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 				if (us == null) {
@@ -739,6 +734,41 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 		}
 		map.put("valid", result);
+		renderJson(map);
+	}
+
+	public void dealerUser(){
+		List<Record> department  = SellerQuery.me().findDeptByLevel();
+
+		List<Map<String, Object>> departmentList = new ArrayList<>();
+
+		for(Record name : department) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", name.getStr("id"));
+			item.put("text", name.getStr("text"));
+			departmentList.add(item);
+		}
+
+		setAttr("departmentType", JSON.toJSON(departmentList));
+		render("dealer_user.html");
+	}
+
+	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
+	public void dealerUserList(){
+
+		String sort = getPara("sort");
+		String sortOrder = getPara("sortOrder");
+		Map<String, String[]> paraMap = getParaMap();
+		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
+		String departmentType = getPara("departmentType");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+
+		Page<Record> page = UserQuery.me().paginateByDeptAndKey(getPageNumber(), getPageSize(), keyword, departmentType, sort, sortOrder);
+		List<Record> customerList = page.getList();
+
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
 	}
 }

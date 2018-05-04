@@ -931,8 +931,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			renderAjaxResultForError("已审核");
 			return;
 		}
-		
-		
 		Message message = new Message();
 		message.setSellerId(sellerId);
 		message.setContent(comment);
@@ -1117,8 +1115,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		renderJson(flang);
 	}
-	
-	
+
 	public void getCustomerType() {
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
 				.findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());

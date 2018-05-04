@@ -131,7 +131,7 @@ public class ProductQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_goods_category c ON g.goods_category_id = c.id ");
 		fromBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 		fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sp.product_id ");
-		fromBuilder.append(" INNER JOIN cc_inventory c2 ON p.id = c2.product_id  INNER JOIN cc_inventory_detail d on d.sell_product_id = sp.id");
+		fromBuilder.append(" LEFT JOIN cc_inventory c2 ON p.id = c2.product_id  INNER JOIN cc_inventory_detail d on d.sell_product_id = sp.id");
 		fromBuilder.append(" and c2.warehouse_id = d.warehouse_id  and d.sell_product_id =? GROUP BY d.sell_product_id");
 		List<Record> list = Db.find(fromBuilder.toString(),sellerProductId);	
 		List<ProductInfo> plist = new ArrayList<>();
@@ -198,8 +198,8 @@ public class ProductQuery extends JBaseQuery {
 				+ "LEFT JOIN cc_seller_product csp on csp.product_id=cp.id "
 				+ "LEFT JOIN cc_seller cs on cs.id=csp.seller_id "
 				+ "LEFT JOIN `user` u on u.department_id=cs.dept_id "
-				+ "WHERE u.id=? and cs.seller_type=0 and u.data_area='"+dataArea+"' GROUP BY cp.id";
-		return DAO.find(sql, userId);
+				+ "WHERE u.id=? and cs.seller_type=0 and u.data_area=? GROUP BY cp.id";
+		return DAO.find(sql, userId, dataArea);
 	}
 	
 	public List<Product> findAllByUser(String userId,String dataArea,String supplierId){
@@ -469,7 +469,7 @@ public class ProductQuery extends JBaseQuery {
 	}	
 	
 	public Product findbyProductSn(String productSn) {
-		return DAO.doFindFirst("product_sn = ?",productSn);
+		return DAO.doFindFirst("product_sn",productSn);
 	}
   	
 }

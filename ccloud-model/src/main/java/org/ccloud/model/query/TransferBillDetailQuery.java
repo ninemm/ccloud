@@ -107,5 +107,34 @@ public class TransferBillDetailQuery extends JBaseQuery {
 		return DAO.doFind("transfer_bill_id = ?", id);
 	}
 
+	public List<Record> _findByTransferBillDetailId(String id) {
+		StringBuilder fromBuilder = new StringBuilder("select c1.transfer_bill_sn,c1.from_warehouse_id,c1.to_warehouse_id,c1.biz_user_id,c1.biz_date,c1.`status`,c1.create_date,c1.data_area,  ");
+	 	fromBuilder.append("c2.seller_product_id,c2.product_count");
+	 	fromBuilder.append(" FROM cc_transfer_bill c1 ");
+	 	fromBuilder.append(" inner JOIN cc_transfer_bill_detail c2 ON c1.id = c2.transfer_bill_id ");
+	 	fromBuilder.append(" WHERE c2.transfer_bill_id = ?");
+	 	List<Record> list = Db.find(fromBuilder.toString(), id);
+	 	for (Record record : list) {
+	 		Record record1  = TransferBillDetailQuery.me().getProductBySellerProId(record.getStr("seller_product_id"),record.getStr("from_warehouse_id"));
+	 		record.set("custom_name", record1.getStr("custom_name"));
+	 		record.set("specificationValue", record1.getStr("specificationValue"));
+	 		record.set("bigUnit", record1.getStr("bigUnit"));
+	 		record.set("balance_count", record1.getStr("balance_count"));
+		}
+	 	return list;
+	}
+
+	private Record getProductBySellerProId(String seller_product_id, String from_warehouse_id) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT p.`name` , t1.valueName specificationValue , p.big_unit bigUnit , t2.balance_count,sp.custom_name ");
+		fromBuilder.append(" FROM cc_seller_product sp  ");
+	 	fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
+	 	fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+	 	fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 ON t1.product_set_id = sp.product_id ");
+	 	fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE c.warehouse_id =? and c.sell_product_id=? GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = sp.id ");
+		fromBuilder.append(" WHERE sp.id = ?");
+		return Db.findFirst(fromBuilder.toString(), from_warehouse_id,seller_product_id,seller_product_id);
+	}
 	
+	
+
 }

@@ -327,7 +327,7 @@ public class SellerProductQuery extends JBaseQuery {
 		String sql ="SELECT sp.custom_name , sp.seller_id FROM cc_seller_product sp WHERE sp.seller_id IN( SELECT cs.id FROM department d LEFT JOIN cc_seller cs ON cs.dept_id = d.id WHERE d.data_area LIKE ?)";
 		return Db.find(sql,dataArea+"%");
 	}
-	
+
 	public List<Record> findByUserId(String userId){
 		StringBuilder fromBuilder = new StringBuilder(" SELECT cgc. NAME AS cgc_name,cgc.id");
 		fromBuilder.append(" FROM	cc_seller_product csp ");
