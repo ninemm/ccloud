@@ -247,7 +247,15 @@ public class SellerProductQuery extends JBaseQuery {
 		stringBuilder.append(" LEFT JOIN cc_product p ON sp.product_id =p.id ");
 		stringBuilder.append(" WHERE s.id = ?");
 		return  Db.find(stringBuilder.toString(), sellerId);
-		
+	}
+	
+	public List<Record> findConvertRelate1(String sellerId) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT sp.custom_name,p.convert_relate,p.id ");
+		stringBuilder.append(" FROM cc_seller s  ");
+		stringBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.seller_id=s.id ");
+		stringBuilder.append(" LEFT JOIN cc_product p ON sp.product_id =p.id ");
+		stringBuilder.append(" WHERE s.id = ? GROUP BY p.id");
+		return  Db.find(stringBuilder.toString(), sellerId);
 	}
 	
 	public SellerProduct findbyCustomerNameAndSellerIdAndProductId(String customName,String sellerId) {
@@ -312,6 +320,11 @@ public class SellerProductQuery extends JBaseQuery {
 
 	public List<Record> findCustomNameBySellerId(String sellerId) {
 		String sql ="SELECT sp.custom_name FROM cc_seller_product sp WHERE sp.seller_id =?";
+		return Db.find(sql,sellerId);
+	}
+	
+	public List<Record> findCustomNameBySellerId1(String sellerId) {
+		String sql ="SELECT sp.custom_name FROM cc_seller_product sp LEFT JOIN cc_product p ON sp.product_id=p.id WHERE sp.seller_id =? GROUP BY p.id";
 		return Db.find(sql,sellerId);
 	}
 

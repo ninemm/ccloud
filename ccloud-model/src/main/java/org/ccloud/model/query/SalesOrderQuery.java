@@ -2950,7 +2950,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	//我管理的直营商详情
 	public List<Record> findByMSellerDetail1(String startDate, String endDate, String keyword, String dataArea,
 		String sellerId, boolean ifGift) {
-			List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
+			List<Record> records = SellerProductQuery.me().findConvertRelate1(sellerId);
 			StringBuilder fromBuilder=new StringBuilder("SELECT ");
 			for (Record record : records) {
 				String customName=record.getStr("custom_name");
@@ -2961,9 +2961,11 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append("b.seller_name '直营商名称',b.id ");
 			fromBuilder.append(" FROM(SELECT a.id,a.sell_product_id,sum(a.product_count) product_count,a.seller_name FROM (");
 			if (keyword.equals("sok.biz_date")) {
-				fromBuilder.append(" SELECT s.id,sokd.sell_product_id,s.seller_name ,sum(sokd.product_count) product_count");
+				fromBuilder.append(" SELECT s.id,p.id sell_product_id,s.seller_name ,sum(sokd.product_count) product_count");
 				fromBuilder.append(" FROM cc_sales_order so LEFT JOIN cc_sales_order_join_outstock sojo ON so.id = sojo.order_id ");
 				fromBuilder.append(" LEFT JOIN cc_sales_outstock sok on sok.id=sojo.outstock_id LEFT JOIN cc_sales_outstock_detail sokd");
+				fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sokd.sell_product_id ");
+				fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id=p.id ");
 				fromBuilder.append(" ON sokd.outstock_id=sok.id LEFT JOIN cc_seller s ON s.id=so.seller_id LEFT JOIN cc_seller_customer sc ON sc.id = sok.customer_id");
 				fromBuilder.append(" WHERE sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 				if (ifGift) {
@@ -2973,12 +2975,14 @@ public class SalesOrderQuery extends JBaseQuery {
 				}
 				fromBuilder.append(" AND sok.data_area like '"+ dataArea+"' ");
 				fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
-				fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"' GROUP BY s.id,sokd.sell_product_id");
+				fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"' GROUP BY s.id,p.id");
 			}else {
-				fromBuilder.append(" SELECT s.id,sd.sell_product_id,s.seller_name ,sum(sd.product_count) product_count");
+				fromBuilder.append(" SELECT s.id,p.id sell_product_id,s.seller_name ,sum(sd.product_count) product_count");
 				fromBuilder.append(" FROM cc_sales_order so LEFT JOIN cc_sales_order_detail sd ON sd.order_id=so.id");
 				fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=so.seller_id");
 				fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = so.customer_id ");
+				fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=sd.sell_product_id ");
+				fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id=p.id ");
 				fromBuilder.append(" WHERE so.status NOT in("+Consts.SALES_ORDER_STATUS_CANCEL+","+Consts.SALES_ORDER_STATUS_REJECT+") ");
 				fromBuilder.append(" and sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 				if (ifGift) {
@@ -2988,12 +2992,14 @@ public class SalesOrderQuery extends JBaseQuery {
 				}
 				fromBuilder.append(" AND so.data_area like '"+ dataArea+"' ");
 				fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
-				fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"' GROUP BY s.id,sd.sell_product_id");
+				fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"' GROUP BY s.id,p.id");
 			}
-			fromBuilder.append(" UNION ALL SELECT s.id,srid.sell_product_id ,s.seller_name,-sum(srid.product_count) product_count ");
+			fromBuilder.append(" UNION ALL SELECT s.id,p.id sell_product_id ,s.seller_name,-sum(srid.product_count) product_count ");
 			fromBuilder.append(" from cc_sales_refund_instock sri ");
 			fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id ");
 			fromBuilder.append(" LEFT JOIN cc_seller s ON s.id=sri.seller_id LEFT JOIN cc_seller_customer sc ON sc.id = sri.customer_id");
+			fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=srid.sell_product_id ");
+			fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id=p.id ");
 			fromBuilder.append(" WHERE sri.`status` NOT IN("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 			if (ifGift) {
 				fromBuilder.append(" and srid.is_gift=1 ");
@@ -3003,7 +3009,7 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(" AND sri.data_area like '"+ dataArea+"' ");
 			fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 			fromBuilder.append(" AND sri.create_date <= '"+endDate+"'");
-			fromBuilder.append(" GROUP BY s.id,srid.sell_product_id)a GROUP BY a.id,a.sell_product_id) b GROUP BY b.id");
+			fromBuilder.append(" GROUP BY s.id,p.id)a GROUP BY a.id,a.sell_product_id) b GROUP BY b.id");
 			
 			return Db.find(fromBuilder.toString());
 	}
