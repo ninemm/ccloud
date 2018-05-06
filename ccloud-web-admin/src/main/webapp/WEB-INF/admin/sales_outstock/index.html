@@ -324,10 +324,10 @@ function orderDetail(id) {
 		 b = false;
 		}
 	    $("[name='dataItem']:checked").each(function() {
-	       if($(this).next().val() == 0){
-	        layer.alert("您所选订单中没全部打印,请先全部打印后再出库");
-	        b = false;
-	       }else{
+<!-- 	       if($(this).next().val() == 0){ -->
+<!-- 	        layer.alert("您所选订单中没全部打印,请先全部打印后再出库"); -->
+<!-- 	        b = false; -->
+<!-- 	       }else{ -->
 	        StockOutSn = $(this).next().next().val();
 	        createDate = $(this).next().next().next().val();
 	        customerName = $(this).nextAll("input:last").val();
@@ -337,7 +337,7 @@ function orderDetail(id) {
 	       "customerName":customerName
 	       }
 	       batchStockOut.push(stockOut);
-	       }	
+<!-- 	       }	 -->
 		});
 		if(b){
 		$.each(batchStockOut, function(idx, item) {
@@ -375,11 +375,12 @@ function orderDetail(id) {
 }
 
  function checkIsPrint(isPrint,url){
-   if(isPrint == 0){
-   layer.alert("此订单未打印,请先打印后再出库")
-   }else{
-    window.location.href = url;
-   }
+<!--    if(isPrint == 0){ -->
+<!--    layer.alert("此订单未打印,请先打印后再出库") -->
+<!--    }else{ -->
+<!--     window.location.href = url; -->
+<!--    } -->
+	window.location.href = url;
  }
  
  
