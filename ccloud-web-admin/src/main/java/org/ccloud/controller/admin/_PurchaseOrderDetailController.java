@@ -172,7 +172,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 			return;
 		}
 		Department department = DepartmentQuery.me().findById(user.getDepartmentId());
-		if(department.getOrderReviewerId().equals("")) {
+		if(StrKit.isBlank(department.getOrderReviewerId())) {
 			message = "部门未配置订单审核人";
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("message",message);

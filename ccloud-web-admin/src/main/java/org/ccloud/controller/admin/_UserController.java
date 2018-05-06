@@ -15,10 +15,19 @@
  */
 package org.ccloud.controller.admin;
 
-import cn.afterturn.easypoi.excel.ExcelExportUtil;
-import cn.afterturn.easypoi.excel.ExcelImportUtil;
-import cn.afterturn.easypoi.excel.entity.ExportParams;
-import cn.afterturn.easypoi.excel.entity.ImportParams;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -519,10 +528,10 @@ public class _UserController extends JBaseCRUDController<User> {
 				if(excel.getMobile()==null) {
 					break;
 				}
-				User user00 = new User();
+				User user00 = null;
 				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
 				for(User user01:uss) {
-					if(!user01.getWechatOpenId().equals("")) {
+					if(StrKit.notBlank(user01.getWechatOpenId())) {
 						user00 = user01;
 						break;
 					}
@@ -536,8 +545,20 @@ public class _UserController extends JBaseCRUDController<User> {
 					us.setId(userId);
 					this.setUser(us, excel);
 					us.setCreateDate(new Date());
-					us.setGroupName(excel.getUserGroup());
-					us.setUsername(excel.getUsername());
+					String uGdest = "";
+					if (excel.getUserGroup()!=null) {
+						Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+						Matcher m = p.matcher(excel.getUserGroup());
+						uGdest = m.replaceAll("");
+					}
+					us.setGroupName(uGdest);
+					String udest = "";
+					if (excel.getUsername()!=null) {
+						Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+						Matcher m = p.matcher(excel.getUsername());
+						udest = m.replaceAll("");
+					}
+					us.setUsername(udest);
 					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 					us.setDataArea(dataArea);
 					if(user00 != null) {
@@ -577,8 +598,20 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 	
 	private void setUser(User user, UserExecel excel) {
-		user.set("realname", excel.getContact());
-		user.set("mobile", excel.getMobile());
+		String dest = "";
+		if (excel.getContact()!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(excel.getContact());
+			dest = m.replaceAll("");
+		}
+		user.set("realname", dest);
+		String destt = "";
+		if (excel.getMobile()!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(excel.getMobile());
+			destt = m.replaceAll("");
+		}
+		user.set("mobile", destt);
 		user.set("status", 1);
 		user.set("create_date", new Date());
 	}
