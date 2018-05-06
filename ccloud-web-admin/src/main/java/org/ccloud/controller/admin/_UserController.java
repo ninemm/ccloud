@@ -524,10 +524,10 @@ public class _UserController extends JBaseCRUDController<User> {
 				if(excel.getMobile()==null) {
 					break;
 				}
-				User user00 = new User();
+				User user00 = null;
 				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
 				for(User user01:uss) {
-					if(!user01.getWechatOpenId().equals("")) {
+					if(StrKit.notBlank(user01.getWechatOpenId())) {
 						user00 = user01;
 						break;
 					}
