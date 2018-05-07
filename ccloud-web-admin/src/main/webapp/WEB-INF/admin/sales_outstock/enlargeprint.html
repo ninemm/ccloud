@@ -16,7 +16,7 @@
 
 <#macro css>
 	td, th  {
-		padding:8px 0;
+		padding:3px 0;
 	} 
 	.signatureArea {
 	   font-size: 15px;
@@ -36,7 +36,7 @@
 var headerInfo =
 	'<div class="header clear clearheader">' +
 	    '<div class="titleArea">' +
-			'<h1>{0}送货单</h1>' +
+			'<span style="font-size:17px; font-weight:bolder;">{0}送货单</span>' +
 		'</div>' +
 	'</div>';
 
@@ -147,7 +147,7 @@ function queryPrintDetail(financePrint) {
                         });
 
                         let len = item.orderProductInfos.length;
-                        for (let i = len; i < 5; i++) {
+                        for (let i = len; i < 4; i++) {
                             content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
                         }
                     }
@@ -177,7 +177,7 @@ function queryPrintDetail(financePrint) {
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 5;
+                    defaultPageSize = 4;
                 });
 
                 $("#print-content").html(batchPrintContent);

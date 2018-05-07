@@ -258,9 +258,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}	
 		
 		if (sort == "" || null == sort) {
-			fromBuilder.append("order by " + "o.create_date desc");
+			fromBuilder.append(" order by " + "o.create_date desc");
 		} else {
-			fromBuilder.append("order by " + sort + " " + order);
+			fromBuilder.append(" order by " + sort + " " + order);
 		}
 
 		if (params.isEmpty())
