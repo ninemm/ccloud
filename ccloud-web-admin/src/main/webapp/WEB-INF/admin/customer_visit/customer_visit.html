@@ -6,12 +6,16 @@
     <!-- bootstrap-table -->
     <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
     <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+	<!-- bootstrap-datetimepicker -->
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>    
     <!-- audio -->
     <script src="${CPATH}/static/plugins/audiojs/audio.min.js"></script>
 </#macro>
 
 <#macro css_import>
-
+	<!-- bootstrap-datetimepicker -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
     <!-- bootstrap-table-->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
     <!-- bootstrapValidator -->
@@ -26,6 +30,7 @@
     var batchFlg = true;
 
     $(function() {
+    	jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
         jQuery.mm.initEditTable('#_customer_visit_table', url, initParams, initFields(), null);
         initCustomerType();
         initQuestionType();
@@ -45,6 +50,7 @@
         var questionType = $('#question_type').val();
         var bizUser = $('#bizUser').val();
         var status = $('#status').val();
+        var createDate = $('#startDate').val();
         var param = {
             size: params.limit,
             page: params.offset/params.limit + 1,
@@ -52,6 +58,7 @@
             questionType: questionType,
             customerType: customerType,
             status: status,
+            createDate: createDate,
             bizUser : bizUser
         };
         return param;
@@ -62,7 +69,16 @@
             [
             {field: "customer_name", title: "客户", align: "center", width: '7%', edit:false},
             {field: "customer_type", title: "客户类型", align: "center", width: '8%', edit:false},
-            {field: "questionName", title: "问题类型", align: "center", width: '5%', edit: false},
+            {field: "question_type", title: "问题类型", align: "center", width: '5%',
+				formatter: function(value, row, rowIndex) {
+	                if(value == "100501") return "客户拜访";
+	                if(value == "100502") return "网点开发";
+	                if(value == "100503") return "氛围布置";
+	                if(value == "100504") return "产品陈列";
+	                if(value == "100505") return "客情维护";	                	                
+				},
+				edit: false
+			},
             {field: "question_desc", title: "问题描述", align: "center", width: '28%', edit: false},
             {field: "visit_user", title: "拜访人", align: "center", width: '5%',edit: false},
             {field: "status", title: "状态", align: "center", width: '8%',
@@ -71,18 +87,16 @@
                 if(value == "100102") return "待审核";
                 if(value == "100103") return "审核拒绝";
             }, edit: false},
-            {field: "review_user", title: "审核人", align: "center", width: '5%', edit: false},
-            {field: "create_date", title: "创建时间", align: "center", width: '12%', edit: false},
-            {field: "modify_date", title: "审核时间", align: "center", width: '12%', edit: false},
+            {field: "create_date", title: "拜访时间", align: "center", width: '12%', edit: false},
             {field: "action", title: "操作", align: "center", width: '10%',
             formatter: function(value, row, rowIndex) {
                 var audit = [row.location,row.lng,row.lat,row.advice,row.solution,row.status,row.photo,row.vedio];
                 auditInfo[row.id] = audit;
                 var strHtml = '';
                 if(row.status == "100102") {
-                    strHtml = '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="审核拜访结果" onclick="audit(\''+row.id+'\', \'' + row.taskId + '\')">审核</a> ';
+                    strHtml = '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="审核拜访结果" onclick="audit(\''+row.id+'\')">审核</a> ';
                 }
-                strHtml += '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="查看审核" onclick="audit(\''+row.id+'\', \'' + row.taskId + '\')">查看</a> ';
+                strHtml += '<a href="javascript:void(0);" class="btn btn-xs btn-primary btn-flat" title="查看审核" onclick="audit(\''+row.id+'\')">查看</a> ';
                 return strHtml;
                 },
                 edit:false
@@ -92,7 +106,7 @@
     };
 
     function audit(id, taskId) {
-        var url = "${(CPATH)!}/admin/customerVisit/audit?id=" + id + "&taskId=" + taskId;
+        var url = "${(CPATH)!}/admin/customerVisit/audit?id=" + id;
         location.href = url;
     };
 
@@ -235,7 +249,15 @@
                         <input id="post-search-input" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称"  style="width:100%;">
                     </div>
                 </div>
-                <div class="col-sm-4" style="text-align:center;">
+				<div class="col-sm-4">
+					<label class="control-label col-sm-4">拜访日期:</label>
+					<div class="col-sm-8 input-group input-group-sm">
+						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="拜访日期" >
+					</div>
+				</div>                
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12" style="text-align:center;">
                      <input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
                 </div>
             </div>

@@ -179,9 +179,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return outstock.save();
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String keyword, String startDate, 
-			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId, String carWarehouseId) {
-		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName,t0.id as orderId,t0.order_sn,t0.create_date as orderDate ,t0.realname as bizName ";
+	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String searchSn, String startDate, 
+			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId, String carWarehouseId, String searchName) {
+		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName,cso.id as orderId,cso.order_sn,cso.create_date as orderDate ,uu.realname as bizName ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
@@ -191,7 +191,8 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("left join user u on u.id = o.biz_user_id ");
 		fromBuilder.append("left join cc_customer_type ct on ct.id = o.customer_type_id ");
 		fromBuilder.append("left join cc_sales_order_join_outstock sojo on sojo.outstock_id = o.id ");
-		fromBuilder.append("LEFT JOIN (SELECT cso.id ,cso.order_sn,cso.create_date,cso.`status`,u.realname,cso.biz_user_id from cc_sales_order cso LEFT JOIN `user` u on u.id = cso.biz_user_id ) t0 on t0.id = sojo.order_id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
+		fromBuilder.append("LEFT JOIN `user` uu ON uu.id = cso.biz_user_id ");
 		
 		if (StrKit.notBlank(status)) {
 			fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
@@ -207,8 +208,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 		}
 		boolean needWhere = true;
 
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cso.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.outstock_sn", searchSn, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", searchName, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
@@ -250,7 +254,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}		
 
-		fromBuilder.append(" and t0.status != "+Consts.SALES_ORDER_STATUS_CANCEL+" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and cso.status != " + Consts.SALES_ORDER_STATUS_CANCEL + " ");
 
 		if (sort == "" || null == sort) {
 			fromBuilder.append("order by " + "o.create_date desc");
