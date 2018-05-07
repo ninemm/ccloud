@@ -251,4 +251,24 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		renderFile(new File(filePath.replace("\\", "/")));
 	} 
+	
+	public void  totalAmount() {
+		render("total_amount.html");
+	}
+	
+	public void getTotalAmount() {
+		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+		String sort = getPara("sort");
+		String sortOrder = getPara("sortOrder");
+		String customerTypeId = getPara("customerTypeId");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Page<Record> page = ReceivablesQuery.me().paginateTotalAmount(getPageNumber(),getPageSize(),customerTypeId,deptDataArea,sellerId,keyword,sort,sortOrder);
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
+		
+		renderJson(map);
+	}
 }
