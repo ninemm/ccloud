@@ -92,10 +92,10 @@
 
             var $tbody = $("#dealer_rank tbody");
             $tbody.empty();
-            $tbody.append("<tr><th>经销商</th><th>金额(万元)</th></tr>");
+            $tbody.append("<tr><th>经销商</th><th>订单数(笔)</th><th>金额(万元)</th></tr>");
             for(var i = 0; i < data.length; i++){
                 var fun = "setDealer('" + data[i].dealerCode + "'" + "," + "'" + data[i].dealerName + "'," + "'" + data[i].data_area + "')";
-                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].dealerName + "</a></td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
+                $tbody.append("<tr onclick=" + fun +"><td><a href=\"javascript:void();\">" + data[i].dealerName + "</a></td><td class='t-r'>" + data[i].totalCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
             
             var dataDealerCode = (data[0] != undefined ? data[0].dealerCode : '');
@@ -262,6 +262,9 @@
                         <tr>
                             <th>
                                 经销商
+                            </th>
+                            <th>
+                                订单数(单)
                             </th>
                             <th>
                                 金额(万元)

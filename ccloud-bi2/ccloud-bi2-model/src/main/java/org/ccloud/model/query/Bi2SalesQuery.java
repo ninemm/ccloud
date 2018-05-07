@@ -475,7 +475,7 @@ public class Bi2SalesQuery extends JBaseQuery {
 			sqlBuilder.append(" se.seller_name sellerName,se.id dealerCode ");
 		}
 
-		sqlBuilder.append(" , TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as totalAmount  ");
+		sqlBuilder.append(" , COUNT(DISTINCT o.id) as totalCount, TRUNCATE((IFNULL(SUM(cc.product_amount),0) - IFNULL(SUM(t1.refundAmount),0))/10000,2) as totalAmount  ");
 		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
 		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
 		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
