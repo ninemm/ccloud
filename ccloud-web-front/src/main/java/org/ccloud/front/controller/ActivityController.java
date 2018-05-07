@@ -308,7 +308,7 @@ public class ActivityController extends BaseFrontController {
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		Map<String, Object> param = Maps.newHashMap();
-		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
 		param.put("customerName", customerName);
@@ -443,7 +443,7 @@ public class ActivityController extends BaseFrontController {
 
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
-		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
+		var.put(Consts.WORKFLOW_APPLY_COMFIRM_USERNAME, user.getUsername());
 
 		comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment);
 		var.put("comment", comment);
