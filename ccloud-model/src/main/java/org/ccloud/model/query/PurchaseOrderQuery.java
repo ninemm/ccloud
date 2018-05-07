@@ -174,4 +174,8 @@ public class PurchaseOrderQuery extends JBaseQuery {
 		}
 		return SN;
 	}
+
+	public PurchaseOrder findByStockSn(String stockOutSn) {
+		return DAO.doFindFirst("stock_out_sn = ?", stockOutSn);
+	}
 }

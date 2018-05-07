@@ -334,7 +334,86 @@ public class _JpController extends JBaseCRUDController<Goods> {
 	}
 	
 	/**
-	 * 拉取产品信息
+	 * 拉取产品信息(根据已存在商品拉取)
+	 */
+	public void pullProductsByGoods() {
+		Calendar calendar = Calendar.getInstance();
+		// 查询出劲牌所有商品
+		List<Goods> goodsList = GoodsQuery.me().findByBrand(brand.getId());
+		if(CollectionUtils.isEmpty(goodsList)) {
+			renderAjaxResultForError("没有找到商品");
+			return;
+		}
+		
+		String apiName = PropKit.get("jp.api.httpclient.products");
+		String requestUrl = JpHttpClientExecute.getRequestUrl(apiName);
+		
+		params.put("clientCode", PropKit.get("jp.api.httpclient.products.clientCode"));
+		
+		Goods goodsCode = null;
+		String result = null;
+		List<JpProductResponseEntity> responseProducts = null;
+		// 循环所有商
+		for (Iterator<Goods> iterator = goodsList.iterator(); iterator.hasNext();) {
+			goodsCode = iterator.next();
+			params.remove("cInvCCode");
+			params.put("cInvCCode", goodsCode.getCode());
+			
+			try {
+				result = JpHttpClientExecute.executeGet(requestUrl, params, headers);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if(StrKit.notBlank(result) && result.contains("\"code\"")) {
+				renderAjaxResultForError("劲牌接口异常");
+				return;
+			}
+			responseProducts = GsonUtils.deserializeList(result, TypeConst.JP_PRODUCT_RESPONSE_ENTITY_LIST_TYPE);
+			
+			if(!CollectionUtils.isEmpty(responseProducts)) {
+				JpProductResponseEntity responseEntity = null;
+				Product storedProduct = null;
+				List<Product> products = new ArrayList<Product>();
+				// 将拉取到的产品信息与系统中的产品比对， 如果不存在则添加
+				for (Iterator<JpProductResponseEntity> productIterator = responseProducts.iterator(); productIterator.hasNext();) {
+					responseEntity = productIterator.next();
+					storedProduct = ProductQuery.me().findbyProductSn(responseEntity.getcInvCode());
+					if(storedProduct == null) {
+						storedProduct = new Product();
+						storedProduct.setId(StrKit.getRandomUUID());
+						storedProduct.setProductSn(responseEntity.getcInvCode());
+						storedProduct.setName(responseEntity.getcInvName());
+						storedProduct.setGoodsId(goodsCode.getId());
+						if (StrKit.notBlank(responseEntity.getmComUnitName())) {
+							storedProduct.setSmallUnit(responseEntity.getmComUnitName());
+						} else {
+							storedProduct.setSmallUnit("瓶");
+						}
+						storedProduct.setBigUnit(responseEntity.getcComUnitName());
+						storedProduct.setConvertRelate(responseEntity.getcInvMNum());
+						storedProduct.setCost(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
+						storedProduct.setPrice(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
+						storedProduct.setFreezeStore(0);
+						storedProduct.setIsMarketable(responseEntity.getIstate() != null && responseEntity.getIstate() == 1 ? Boolean.TRUE.booleanValue() : Boolean.FALSE.booleanValue());
+						storedProduct.setMarketPrice(responseEntity.getCurrentPrice() == null ? new BigDecimal(0) : responseEntity.getCurrentPrice());
+						storedProduct.setWeight(responseEntity.getiInvWeight() == null || responseEntity.getiInvWeight() == 0 ? null : responseEntity.getiInvWeight());
+						storedProduct.setCreateDate(calendar.getTime());
+						products.add(storedProduct);
+					}
+					responseEntity = null;
+					storedProduct = null;
+				}
+				if(products.size() > 0)
+					Db.batchSave(products, products.size());
+				
+			}
+			goodsCode = null;
+		}
+		renderAjaxResultForSuccess();
+	}	
+	
+	/**
+	 * 拉取产品信息(根据已存在分类)
 	 */
 	public void pullProducts() {
 		Calendar calendar = Calendar.getInstance();
@@ -460,6 +539,11 @@ public class _JpController extends JBaseCRUDController<Goods> {
 			for (Iterator<JpPurchaseStockInMainResponse> iterator = responseBody.getData().iterator(); iterator.hasNext();) {
 				/**************添加采购单主单信息********************/
 				mainStockIn = iterator.next();
+				stockOutSn = mainStockIn.getOrderNum();
+				PurchaseOrder order = PurchaseOrderQuery.me().findByStockSn(stockOutSn);
+				if (order != null) {
+					continue;
+				}
 				purchaseStockInDetails = mainStockIn.getOrderDetails();
 				sellerCode = purchaseStockInDetails.get(0).getDealerMarketCode();
 				purchaseOrder = new PurchaseOrder();
@@ -472,7 +556,6 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				seller = sellers.get(0);
 				mainIndex++;
 				porderSn = "PO" + sellerCode + nowDateTimeStr.substring(0,8)+(Integer.valueOf(PurchaseOrderQuery.me().getNewSn(seller.getId()) + mainIndex));
-				stockOutSn = mainStockIn.getOrderNum();
 				purchaseOrder.setPorderSn(porderSn);
 				purchaseOrder.setStockOutSn(stockOutSn);
 				purchaseOrder.setSupplierId(brand.getSupplierId());
