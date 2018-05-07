@@ -301,6 +301,9 @@ public class OrderController extends BaseFrontController {
 		String[] smallUnits = getParaValues("smallUnit");
 		String[] bigPriceSpans = getParaValues("bigPriceSpan");
 		String[] smallPriceSpans = getParaValues("smallPriceSpan");
+		if (null==productNames) {
+			return null;
+		}
 		Record salesOrder = SalesOrderQuery.me().findRecordById(orderId);
 		String salesOrderName="";
 		if (null==salesOrder.getStr("customer_name")){

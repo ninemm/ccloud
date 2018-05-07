@@ -14,6 +14,15 @@
 	<link rel="stylesheet"  href="${CPATH}/static/plugins/jquery/jquery-ui.css">
 </#macro>
 
+<#macro css>
+	td, th  {
+		padding:8px 0;
+	} 
+	.signatureArea {
+	   font-size: 15px;
+	}
+</#macro>
+
 <#macro script>
    var $pagesize = $("#pagesize");
 
@@ -61,7 +70,7 @@ var headerStr =
 			'<td>瓶数</td>' +
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
-			'<td >购货价格</td>' +
+			'<td style="width:10%">购货价格</td>' +
 			'<td colspan="2" class="center2">条码</td>' +
 		'</tr>' +
 	'</thead>';
@@ -85,7 +94,7 @@ var headerStr =
 				'<div class="stat">' +
 					'<div><span>联系电话：{2}</span><span class="sign" >收货单位签字盖章</span></div>' +
 				'</div>' +
-				'<div style="text-align: left; width: inherit; font-size: 10px; line-height: 12px;">' +
+				'<div style="text-align: left; width: inherit; line-height: 12px;">' +
 					'<span class="width200">备注：{3}</span><span style="float: right;">{4}</span>' +
 				'</div>' +
 			'</div>';
