@@ -64,8 +64,7 @@
 
 	var $form = $("#form");
 	$(function() {
-	if('${(taskId)}' == 'null' || '${(taskId)}' == '') {
-			$("#do_submit").hide();
+	if('${(customerVisit.status)}' != '100102') {
 			$("#do_submit").hide();
 			$("#auditComment").hide();
 		}
@@ -96,7 +95,7 @@
 				setTimeout( function(){
 						l.stop();
 						lt.stop();
-						location.href = '${CPATH}/admin/index';
+						location.href = '${CPATH}/admin/customerVisit/index';
 								}, 2 * 1000 );
 			},
 			error : function() {
@@ -132,7 +131,7 @@
 		</div>
 		<form action="${CPATH}/admin/customerVisit/complete" method="post" id="form" class="form-horizontal" >
 			<input type="hidden" name="id" value="${(customerVisit.id)!}">
-			<input type="hidden" name="taskId" value="${(taskId)!}">
+			<input type="hidden" name="proc_inst_id" value="${(customerVisit.proc_inst_id)!}">
 			<input type="hidden" name="status" id="status">
 			<div class="row form-horizontal">
                 <div class="gallery" id="gallery">
@@ -174,7 +173,7 @@
 					<div class="col-sm-5">
 						<label class="control-label col-sm-4">问题类型：</label>
 						<div class="input-group col-sm-8">
-							<p class="form-control-static">${(customerVisit.typeName)!}</p>
+							<p class="form-control-static">${DICT_NAME(customerVisit.question_type)}</p>
 						</div>
 					</div>
 					<div class="col-sm-5">
