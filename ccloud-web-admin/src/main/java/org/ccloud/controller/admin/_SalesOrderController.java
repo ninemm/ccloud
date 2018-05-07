@@ -471,7 +471,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		
 		Map<String, Object> param = Maps.newHashMap();
-		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
 		param.put("customerName", customerName);
@@ -607,7 +607,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
-		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
+		var.put(Consts.WORKFLOW_APPLY_COMFIRM_USERNAME, user.getUsername());
 		
 		//是否改价格
 		if (pass == 1 && edit == 1) {
@@ -657,7 +657,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		boolean priceChange=false;
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
 		for (int i = 0; i < productNames.length; i++) {
-			if (Double.parseDouble(orderDetails.get(i).getStr("price"))!=Double.parseDouble(bigPriceSpans[i])) {
+			if (!orderDetails.get(i).getInt("price").equals(orderDetails.get(i).getInt("product_price"))) {
 				double conver_relate = Double.parseDouble(orderDetails.get(i).getStr("convert_relate"));
 				double price = Double.parseDouble(orderDetails.get(i).getStr("price"));
 				double smallprice=price/conver_relate;

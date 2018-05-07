@@ -39,6 +39,7 @@ import java.util.*;
 @RouterMapping(url = "/order")
 @RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 public class OrderController extends BaseFrontController {
+
 	//我的订单
 	@RequiresPermissions(value = { "/admin/salesOrder", "/admin/dealer/all" }, logical = Logical.OR)
 	public void myOrder() {
@@ -347,7 +348,7 @@ public class OrderController extends BaseFrontController {
 	
 	private String buildOutstockInfo(String ordedId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
-		
+
 		StringBuilder stringBuilder = new StringBuilder();
 
 		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
@@ -525,7 +526,7 @@ public class OrderController extends BaseFrontController {
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 
 		Map<String, Object> param = Maps.newHashMap();
-		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
 		param.put("customerName", customerName);
@@ -589,7 +590,7 @@ public class OrderController extends BaseFrontController {
 				
 				Map<String, Object> var = Maps.newHashMap();
 				var.put("pass", pass);
-				var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
+				var.put(Consts.WORKFLOW_APPLY_COMFIRM_USERNAME, user.getUsername());
 				StringBuilder stringBuilder = new StringBuilder();
 				//是否改价格
 				if (pass == 1 && edit == 1) {
