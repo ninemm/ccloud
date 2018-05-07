@@ -483,7 +483,7 @@ public class _ProductCompositionController extends JBaseCRUDController<ProductCo
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		
 		Map<String, Object> param = Maps.newHashMap();
-		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
 		param.put("customerName", customerName);

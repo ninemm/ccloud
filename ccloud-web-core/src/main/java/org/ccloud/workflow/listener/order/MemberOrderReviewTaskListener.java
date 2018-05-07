@@ -22,8 +22,15 @@ public class MemberOrderReviewTaskListener implements TaskListener {
 
 	@Override
 	public void notify(DelegateTask task) {
-		Object object = task.getVariable(Consts.WORKFLOW_APPLY_USER);
-		User user = (User) object;
+		User user = null;
+		Object _username = task.getVariable(Consts.WORKFLOW_APPLY_USERNAME);
+		if (_username != null) {
+			user = UserQuery.me()._findUserByUsername(_username.toString());
+		} else {
+			Object _user = task.getVariable(Consts.WORKFLOW_APPLY_USER);
+			user = (User) _user;
+		}
+
 		Object _sellerId = task.getVariable(Consts.WORKFLOW_APPLY_SELLER_ID);
 		String sellerId = _sellerId.toString();
 		Object _customerName = task.getVariable("customerName");
