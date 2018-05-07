@@ -40,7 +40,6 @@ import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.Activity;
 import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
-import org.ccloud.model.SalesOutstock;
 import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.excel.ExcelUploadUtils;
@@ -115,13 +114,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("sellers", sellers);
 		render("index.html");
 	}
-
+	
 	//第三方订单
 	@RequiresPermissions("/admin/salesOrder/otherOrder")
 	public void otherOrder() {
 		render("other_order.html");
 	}
-
+	
 	//第三方订单统计
 	@RequiresPermissions("/admin/salesOrder/otherOrder")
 	public void getOtherCount() {
@@ -132,21 +131,21 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String platformName = getPara("platformName");
-
+		
 		if (StrKit.notBlank(platformName)) {
 			platformName = StringUtils.urlDecode(platformName);
 		}
-
+		
 		String status = getPara("status");
 		String receiveType = getPara("receiveType");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		Record record = OrderInfoQuery.me().getCountInfo(keyword, startDate, endDate, platformName, status, receiveType, null, sellerId);
 		renderJson(record);
 	}
-
+	
 	//第三方订单列表
 	public void otherList() {
-
+		
 		String keyword = getPara("k");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
@@ -155,26 +154,26 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String platformName = getPara("platformName");
-
+		
 		if (StrKit.notBlank(platformName)) {
 			platformName = StringUtils.urlDecode(platformName);
 		}
-
+		
 		String status = getPara("status");
 		String receiveType = getPara("receiveType");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-
+		
 		// 获取排序相关信息
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
-		Page<Record> page = OrderInfoQuery.me().paginate(getPageNumber(), getPageSize(), keyword,
+		Page<Record> page = OrderInfoQuery.me().paginate(getPageNumber(), getPageSize(), keyword, 
 				startDate, endDate, order, sort, platformName, status, receiveType, sellerId);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
-
+		
 	}
-
+	
 	//第三方订单详情
 	@RequiresPermissions("/admin/salesOrder/otherOrder")
 	public void otherDetail() {
@@ -190,12 +189,12 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		render("other_detail.html");
 
 	}
-
+	
 	//第三方订单页面
 	public void upload() {
 		render("upload.html");
 	}
-
+	
 	//第三方订单读取模板
 	public void otherOrderTemplate() {
 		String type = getPara("type");
@@ -207,10 +206,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}
 		renderFile(new File(realPath.replace("\\", "/")));
 	}
-
+	
 	//第三方订单页面导入
 	public void uploading() {
-
+		
 		UploadFile uploadFile = getFile();
 		String type = getPara("type");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
@@ -232,7 +231,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			renderAjaxResultForSuccess("成功导入订单" + num[0] + "单,已存在订单" + num[1] + "个");
 		}
 	}
-
+	
 	public void list() {
 
 		String keyword = getPara("k");
@@ -314,7 +313,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 			customerOptionList.add(customerOptionMap);
 		}
-
+		
 		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
 		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
 		setAttr("isCheckStore", isCheckStore);
@@ -352,8 +351,8 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			renderAjaxResultForError("库存不足或仓库中未找到对应商品");
 		}
 	}
-
-	private boolean saveOrder(final Map<String, String[]> paraMap, final User user,
+	
+	private boolean saveOrder(final Map<String, String[]> paraMap, final User user, 
 			final String sellerId, final String sellerCode) {
         boolean isSave = Db.tx(new IAtom() {
             @Override
@@ -362,7 +361,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         		Integer productNum = Integer.valueOf(productNumStr);
         		Integer count = 0;
         		Integer index = 0;
-
+        		
         		String orderId = StrKit.getRandomUUID();
         		Date date = new Date();
         		String OrderSO = SalesOrderQuery.me().getNewSn(sellerId);
@@ -388,11 +387,11 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         			}
 
         		}
-
+        		
 				//是否开启
 				boolean isStartProc = isStart(sellerCode, paraMap);
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
-
+        		
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
 					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
 						return false;
@@ -407,37 +406,37 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         });
         return isSave;
 	}
-
+	
 	private boolean isStart(String sellerCode, Map<String, String[]> paraMap) {
 		//是否开启
 		Boolean startProc = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROCEDURE_REVIEW + sellerCode);
-		if(startProc != null && startProc) {
+		if(startProc != null && startProc) { 
 			return true;
 		}
 		//超过数量(件)
 		Float startNum = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_NUM_LIMIT + sellerCode);
 		Float productTotal = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("productTotalCount")));
-		if(startNum != null && productTotal > startNum) {
+		if(startNum != null && productTotal > startNum) { 
 			return true;
 		}
 		//超过金额(元)
 		Float startPrice = OptionQuery.me().findValueAsFloat(Consts.OPTION_WEB_PROC_PRICE_LIMIT + sellerCode);
 		Float total = Float.valueOf(StringUtils.getArrayFirst(paraMap.get("total")));
-		if(startPrice != null && total > startPrice) {
+		if(startPrice != null && total > startPrice) { 
 			return true;
 		}
-
+		
 		return false;
 	}
-
+	
 	public void orderProc() {
-
+		
 	}
-
+	
 	@RequiresPermissions("/admin/salesOrder/check")
 	@Before(Tx.class)
 	public void pass() {
-
+		
 		String orderId = getPara("orderId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
@@ -460,7 +459,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		renderAjaxResultForSuccess();
 
 	}
-
+	
 	private boolean start(String orderId, String customerName, String proc_def_key) {
 
 		WorkFlowService workflow = new WorkFlowService();
@@ -470,9 +469,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
-
+		
 		Map<String, Object> param = Maps.newHashMap();
-		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
 		param.put("customerName", customerName);
@@ -531,37 +530,37 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			return "全部出库-订单关闭";
 		return "无";
 	}
-
+	
 	public void audit() {
 
 		keepPara();
-
+		
 //		boolean isCheck = false;
 //		String id = getPara("id");
 //
 //		SalesOrder salesOrder = SalesOrderQuery.me().findById(id);
 //		setAttr("salesOrder", salesOrder);
-
-//		HistoricTaskInstanceQuery query = ActivitiPlugin.buildProcessEngine().getHistoryService()
-//                .createHistoricTaskInstanceQuery();
-//        query.orderByProcessInstanceId().asc();
-//        query.orderByHistoricTaskInstanceEndTime().desc();
-//        List<HistoricTaskInstance> list = query.list();
-//        for (HistoricTaskInstance hi : list) {
-//            System.out.println(hi.getAssignee() + " " + hi.getName() + " "
-//                    + hi.getStartTime());
+		
+//		HistoricTaskInstanceQuery query = ActivitiPlugin.buildProcessEngine().getHistoryService()  
+//                .createHistoricTaskInstanceQuery();  
+//        query.orderByProcessInstanceId().asc();  
+//        query.orderByHistoricTaskInstanceEndTime().desc();  
+//        List<HistoricTaskInstance> list = query.list();  
+//        for (HistoricTaskInstance hi : list) {  
+//            System.out.println(hi.getAssignee() + " " + hi.getName() + " "  
+//                    + hi.getStartTime());  
 //        }
-
+        
 //        String taskId = getPara("taskId");
 //        List<Comment> comments = WorkFlowService.me().getProcessComments(taskId);
 //		setAttr("comments", comments);
-
+		
 //		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 //		if (user != null && StrKit.equals(getPara("assignee"), user.getUsername())) {
 //			isCheck = true;
 //		}
 //		setAttr("isCheck", isCheck);
-
+		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		String orderId = getPara("id");
@@ -590,7 +589,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("orderDetailList", orderDetailList);
 		render("audit.html");
 	}
-
+	
 	@Before(Tx.class)
 	public void complete() {
 		String orderId = getPara("id");
@@ -605,17 +604,17 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String refuseReson = getPara("refuseReson","");
 		Integer pass = getParaToInt("pass", 1);
 		Integer edit = getParaToInt("edit", 0);
-
+		
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
-		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
-
+		var.put(Consts.WORKFLOW_APPLY_COMFIRM_USERNAME, user.getUsername());
+		
 		//是否改价格
 		if (pass == 1 && edit == 1) {
 			Map<String, String[]> paraMap = getParaMap();
 			editOrder(paraMap, user.getId());
 			String editInfo = buildEditInfo();
-
+			
 			comment = "通过" + " 修改订单<br>" + editInfo;
 		} else {
 			comment = (pass == 1 ? "通过" : "拒绝") + " " + (comment == null ? "" : comment) + " "
@@ -625,13 +624,13 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String comments = buildComments(Consts.OPERATE_HISTORY_TITLE_ORDER_REVIEW, DateUtils.now(), user.getRealname(), comment);
 		stringBuilder.append(comments);
 		WorkFlowService workflowService = new WorkFlowService();
-
+		
 		int completeTask = workflowService.completeTask(taskId, stringBuilder.toString(), var);
 		if (completeTask==1) {
 			renderAjaxResultForError("已审核");
 			return;
 		}
-		renderAjaxResultForSuccess("订单审核成功");
+		renderAjaxResultForSuccess("订单审核成功");		
 	}
 
 	private String priceChange(String orderId) {
@@ -647,29 +646,29 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}else {
 			salesOrderName=salesOrder.getStr("customer_name");
 		}
-		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" +
-				"	        <div></div>\n" +
-				"	        <p>\n" +
-				"	          价格修改\n" +
-				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" +
-				"	        </p>\n" +
-				"	        <p>操作人："+salesOrderName+"</p>\n" +
+		StringBuilder stringBuilder = new StringBuilder(" <div class=\"weui-cell weui-cell_access\">\n" + 
+				"	        <div></div>\n" + 
+				"	        <p>\n" + 
+				"	          价格修改\n" + 
+				"	          <span class=\"fr\">"+salesOrder.getStr("createDate")+"</span>\n" + 
+				"	        </p>\n" + 
+				"	        <p>操作人："+salesOrderName+"</p>\n" + 
 				"	         <p>");
 		boolean priceChange=false;
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(orderId);
 		for (int i = 0; i < productNames.length; i++) {
-			if (Double.parseDouble(orderDetails.get(i).getStr("price"))!=Double.parseDouble(bigPriceSpans[i])) {
+			if (!orderDetails.get(i).getInt("price").equals(orderDetails.get(i).getInt("product_price"))) {
 				double conver_relate = Double.parseDouble(orderDetails.get(i).getStr("convert_relate"));
 				double price = Double.parseDouble(orderDetails.get(i).getStr("price"));
 				double smallprice=price/conver_relate;
-				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
 				stringBuilder.append("●" + productNames[i] + "<br>");
 				stringBuilder.append("-每" + bigUnits[i] + "价格修改为"+ bigPriceSpans[i]+ "(" + price+ ")<br>");
 				stringBuilder.append("-每" + smallUnits[i] + "价格修改为"+ smallPriceSpans[i]+ "(" +  smallprice+ ")<br>");
 				priceChange=true;
 			}
 		}
-		stringBuilder.append("</p>\n" +
+		stringBuilder.append("</p>\n" + 
 				"	      </div>");
 		if (priceChange) {
 			return stringBuilder.toString();
@@ -677,7 +676,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			return null;
 		}
 	}
-
+	
 	private void editOrder(Map<String, String[]> paraMap, String userId) {
 		Date date = new Date();
 
@@ -693,7 +692,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}
 
 	}
-
+	
 	private String buildComments(String title, String date, String realname, String comment) {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("      <div class=\"weui-cell weui-cell_access\">\n");
@@ -709,10 +708,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		stringBuilder.append(comment);
 		stringBuilder.append("</p>\n");
 		stringBuilder.append("      </div>\n");
-
+		
 		return stringBuilder.toString();
 	}
-
+	
 	private String buildEditInfo() {
 		String[] productNames = getParaValues("productName");
 		String[] bigUnits = getParaValues("bigUnit");
@@ -725,9 +724,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String[] bigNumSpans = getParaValues("bigNumSpan");
 		String[] smallPriceSpans = getParaValues("smallPriceSpan");
 		String[] smallNumSpans = getParaValues("smallNumSpan");
-
+		
 		StringBuilder stringBuilder = new StringBuilder();
-
+		
 		for (int index = 0; index < productNames.length; index++) { // 若修改了产品价格或数量，则写入相关日志信息
 			boolean flag = true;
 			if (!bigPrices[index].equals(bigPriceSpans[index])) {
@@ -759,27 +758,27 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 				stringBuilder.append("-" + smallUnits[index] + "数量修改为"+ smallNums[index]+ "(" + smallNumSpans[index] + ")<br>");
 			}
 		}
-
+		
 		return stringBuilder.toString();
-	}
-
+	}	
+	
 	public void cancel() {
-
+		
 		String orderId = getPara("orderId");
 		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
 		WorkFlowService workflow = new WorkFlowService();
-
+		
 		String procInstId = salesOrder.getProcInstId();
 		if (StrKit.notBlank(procInstId))
 			workflow.deleteProcessInstance(salesOrder.getProcInstId());
-
+		
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_CANCEL);
-
+		
 		if (!salesOrder.saveOrUpdate()) {
 			renderAjaxResultForError("取消订单失败");
 			return ;
 		}
-
+		
 		renderAjaxResultForSuccess();
 	}
 	//审核通过，对库存总账进行修改
@@ -808,10 +807,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			renderJson(result);
 		}
 	}
-
+	
 	public void operateHistory() {
 		keepPara();
-
+		
 		String id = getPara(0);
 
 		Record salesOrder = SalesOrderQuery.me().findRecordById(id);
@@ -820,23 +819,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String proc_inst_id = getPara(1);
 		List<Comment> comments = WorkFlowService.me().getProcessComments(proc_inst_id);
 		setAttr("comments", comments);
-
-		List<SalesOutstock> outList = SalesOutstockQuery.me().findListByOrderId(id);
-
-		if (outList.size() > 0) {
-			StringBuilder outRemark = new StringBuilder();
-			int num = 1;
-			for (int i = 0; i < outList.size(); i++) {
-				if (StrKit.notBlank(outList.get(i).getRemark())) {
-					outRemark.append(num + "." + outList.get(i).getRemark() + "<br>");
-					num++;
-				}
-			}
-			if (outRemark.length() > 0) {
-				setAttr("outRemark", outRemark.toString());
-			}
-		}
-
+		
 		StringBuilder printComments = new StringBuilder();
 		List<Record> printRecord = OutstockPrintQuery.me().findByOrderId(id);
 		for (int i = 0; i < printRecord.size(); i++) {
@@ -855,7 +838,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		}
 		render("operate_history.html");
 	}
-
+	
 	private String modifyPrice(String ordedId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
 		StringBuilder stringBuilder = new StringBuilder();
@@ -867,21 +850,21 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 				double smallproductPrice=product_price/conver_relate;
 				double smallprice=price/conver_relate;
 				smallproductPrice=new BigDecimal(smallproductPrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+				smallprice=new BigDecimal(smallprice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();    
 				stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
 				stringBuilder.append("-每" + record.getStr("big_unit") + "价格修改为"+ product_price+ "(" + price+ ")<br>");
 				stringBuilder.append("-每" + record.getStr("small_unit") + "价格修改为"+ smallproductPrice+ "(" +  smallprice+ ")<br>");
 			}
 		}
-
+		
 		return stringBuilder.toString();
 	}
-
+	
 	private String buildOutstockInfo(String ordedId) {
 		List<Record> orderDetails = SalesOrderDetailQuery.me().findByOrderId(ordedId);
-
+		
 		StringBuilder stringBuilder = new StringBuilder();
-
+		
 		for (Record record : orderDetails) { // 若修改了产品价格或数量，则写入相关日志信息
 			if (!record.getInt("out_count").equals(record.getInt("product_count"))) {
 					stringBuilder.append("●" + record.getStr("custom_name") + "<br>");
@@ -890,10 +873,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 					stringBuilder.append("-" + record.getStr("small_unit") + "数量修改为"+ Math.round(record.getInt("out_count")%convert) + "(" + Math.round(record.getInt("product_count")%convert) + ")<br>");
 			}
 		}
-
+		
 		return stringBuilder.toString();
 	}
-
+	
 	public void detailBySn() {
 
 		String order_sn = getPara(0);
@@ -922,19 +905,19 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 				+ "销售订单.xlsx";
 		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId, status);
 		List<Record> salesOderList = page.getList();
-
+		
 		List<SalesOrderExcel> excellist = Lists.newArrayList();
 		for (Record record : salesOderList) {
-
+		
 			String orderId = record.get("id");
 			//客户信息
 			String customerInfo = record.getStr("customer_name")+"," + record.get("prov_name")+record.get("city_name")+record.get("country_name")+record.get("address");
 			//下单日期
-			String saveDate =record.getStr("create_date").substring(0, 10);
+			String saveDate =record.getStr("create_date").substring(0, 10); 
 			//下单时间
 			String createDate = record.getStr("create_date");
 			//打印状态
-
+			
 			//打印时间
 			List<Record> outstockPrints = OutstockPrintQuery.me().findByOrderId(record.getStr("id"));
 			String printDate = "";
@@ -970,10 +953,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,printDate,re.getStr("small_unit"),activityTitle);
 					excellist.add(excel);
 				}
-
+				
 			}
 		}
-
+		
 		ExportParams params = new ExportParams();
 		Workbook wb = ExcelExportUtil.exportBigExcel(params, SalesOrderExcel.class, excellist);
 		File file = new File(filePath.replace("\\", "/"));
@@ -991,12 +974,12 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 				e.printStackTrace();
 			}
 		}
-
+		
 		ExcelExportUtil.closeExportBigExcel();
-
+		
 		renderFile(new File(filePath.replace("\\", "/")));
 	}
-
+	
 	public SalesOrderExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String activity) {
 		SalesOrderExcel excel = new SalesOrderExcel();
 		excel.setProductName(re.getStr("custom_name"));

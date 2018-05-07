@@ -9,10 +9,7 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
-import org.ccloud.model.query.SalesOrderDetailQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SalesOutstockQuery;
-import org.ccloud.model.query.WxMessageTemplateQuery;
+import org.ccloud.model.query.*;
 import org.joda.time.DateTime;
 
 import java.util.Date;
@@ -25,10 +22,23 @@ public class OrderReviewExecutionListener implements ExecutionListener {
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 
-		Object _user = execution.getVariable(Consts.WORKFLOW_APPLY_USER);
-		User user = (User) _user;
-		Object _confirm = execution.getVariable(Consts.WORKFLOW_APPLY_COMFIRM);
-		User confirm = (User) _confirm;
+		User user = null;
+		Object _username = execution.getVariable(Consts.WORKFLOW_APPLY_USERNAME);
+		if (_username != null) {
+			user = UserQuery.me()._findUserByUsername(_username.toString());
+		} else {
+			Object _user = execution.getVariable(Consts.WORKFLOW_APPLY_USER);
+			user = (User) _user;
+		}
+
+		User confirm = null;
+		Object _confirmUsername = execution.getVariable(Consts.WORKFLOW_APPLY_COMFIRM_USERNAME);
+		if (_confirmUsername != null) {
+			confirm = UserQuery.me()._findUserByUsername(_confirmUsername.toString());
+		} else {
+			Object _confirm = execution.getVariable(Consts.WORKFLOW_APPLY_COMFIRM);
+			confirm = (User) _confirm;
+		}
 
 		Object _sellerId = execution.getVariable(Consts.WORKFLOW_APPLY_SELLER_ID);
 		String sellerId = _sellerId.toString();

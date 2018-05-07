@@ -21,6 +21,7 @@ import java.util.List;
 import org.ccloud.Consts;
 import org.ccloud.model.Receivables;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -134,5 +135,43 @@ public class ReceivablesQuery extends JBaseQuery {
 			return Db.find(fromBuilder.toString());
 
 		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	public Page<Record> paginateTotalAmount(int pageNumber, int pageSize, String id,String dataArea,String sellerId,String keyword,String sort,String sortOrder) {
+		
+		String select;
+		StringBuilder fromBuilder;
+		LinkedList<Object> params = new LinkedList<Object>();
+		select = "SELECT cc.customer_name, SUM(t.a1) as amount, SUM(t.act_amount) as actAmount,SUM(t.balance_amount) as balanceAmount ";
+		fromBuilder = new StringBuilder(" from ( ");
+		fromBuilder.append("SELECT r.object_id as custId, sc.customer_id, r.receive_amount as a1, r.act_amount, r.balance_amount FROM cc_receivables r ");
+		fromBuilder.append("JOIN cc_seller_customer sc on sc.id = r.object_id ");
+		fromBuilder.append("WHERE r.data_area LIKE '"+dataArea+"' and sc.seller_id = '"+sellerId+"' UNION ALL ");
+		fromBuilder.append("select p.obj_id as custId, sc.customer_id, -p.pay_amount as a1, -p.act_amount, -p.balance_amount FROM cc_payables p ");
+		fromBuilder.append("JOIN cc_seller_customer sc on sc.id = p.obj_id ");
+		fromBuilder.append("WHERE p.data_area LIKE '"+dataArea+"' and sc.seller_id = '"+sellerId+"') as t ");
+		fromBuilder.append("JOIN cc_customer cc on cc.id = t.customer_id ");
+		fromBuilder.append("JOIN cc_customer_join_customer_type cjct ON t.custId = cjct.seller_customer_id ");
+		fromBuilder.append(" WHERE 1=1 ");
+		if(StrKit.notBlank(keyword)){
+			fromBuilder.append(" and cc.customer_name like '%"+keyword+"%' ");
+		}
+		if(!("0".equals(id)) && id != null) {
+			fromBuilder.append(" and cjct.customer_type_id = '"+id+"' ");
+		}
+		fromBuilder.append(" group by t.custId ");
+		if(StrKit.notBlank(sort)) {
+			fromBuilder.append(" order by "+sort);
+			if(!sortOrder.equals("")) {
+				fromBuilder.append(" "+ sortOrder);
+			}
+		}else {
+			fromBuilder.append(" ORDER BY cc.customer_name");
+		}
+		
+		
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 }

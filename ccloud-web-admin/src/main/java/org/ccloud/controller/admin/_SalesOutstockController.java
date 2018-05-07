@@ -83,9 +83,10 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	public void list() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
+		String orderSn = getPara("searchSn");
+		String searchName = getPara("searchName");
+		if (StrKit.notBlank(searchName)) {
+			searchName = StringUtils.urlDecode(searchName);
 		}
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -100,8 +101,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, keyword, startDate,
-				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId,carWarehouseId);
+		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, orderSn, startDate,
+				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId,carWarehouseId, searchName);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -200,9 +201,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		for (String s : outId) {
 			printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 			if (isFinancePrint == 0) {
-				orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
+				orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);	
 			}else {
-				orderProductInfos = SalesOutstockDetailQuery.me().findFinancePrintProductInfo(s);
+				orderProductInfos = SalesOutstockDetailQuery.me().findFinancePrintProductInfo(s);	
 			}
 			printAllNeedInfo.setOrderProductInfos(orderProductInfos);
 			printAllNeedInfos.add(printAllNeedInfo);
@@ -294,9 +295,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			result.put("result", 200);
 			renderJson(result);
 		}
-
-
-
+		
+		
+		
 	}
 
 	@Before(Tx.class)
@@ -325,10 +326,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				String total = StringUtils.getArrayFirst(paraMap.get("total"));
 				Integer count = 0;
 				Integer index = 0;
-				if (null==user.getId()) {
-					renderAjaxResultForError("客户类型不能为空!");
-					return false;
-				}
+
 				while (productNum > count) {
 					index++;
 					String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
@@ -465,15 +463,12 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					printAllNeedInfo printAllNeedInfo = SalesOutstockQuery.me().findStockOutForPrint(s);
 					//获取订单明细
 					List<orderProductInfo> orderProductInfos = SalesOutstockDetailQuery.me().findPrintProductInfo(s);
-
+					
 					SalesOutstock salesOutstock = SalesOutstockQuery.me().findById(s);
 					//订单总金额
 					BigDecimal productAmout=salesOutstock.getTotalAmount();
-
+					
 					String total=productAmout.toString();
-					if (null==user) {
-						return false;
-					}
 					if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, date,
 							user.getDepartmentId(), user.getDataArea(), user.getId(),
 							printAllNeedInfo.getOutstockSn(),printAllNeedInfo.getCustomerId(),
@@ -499,7 +494,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 						SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(printAllNeedInfo.getCustomerId());
 						String countTotal = productAmout.toString();
 						createPayables(sellerCustomer, countTotal,seller);
-
+						
 						Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
 						if (!PurchaseInstockQuery.me().insertByBatchSalesOutStock(printAllNeedInfo, seller,
 								purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date, sellerId)) {
@@ -556,7 +551,11 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 		String tax = getPara("tax");
-		String keyword = new String(getPara("k").getBytes("ISO8859-1"), "UTF-8");
+		String orderSn = getPara("searchSn");
+		String searchName = getPara("searchName");
+		if (StrKit.notBlank(searchName)) {
+			searchName = StringUtils.urlDecode(searchName);
+		}
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String printStatus = getPara("printStatus");
@@ -567,8 +566,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "销售出库.xlsx";
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
-				printStatus, stockOutStatus, null, dataArea, null, null,null,null);
+		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, orderSn, startDate, endDate,
+				printStatus, stockOutStatus, null, dataArea, null, null,null,null, searchName);
 		List<Record> salesOutstckList = page.getList();
 
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
@@ -577,7 +576,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			//客户信息
 			String customerInfo = record.getStr("customer_name")+"," + record.get("prov_name")+record.get("city_name")+record.get("country_name")+record.get("address");
 			//下单日期
-			String saveDate =record.getStr("create_date").substring(0, 10);
+			String saveDate =record.getStr("create_date").substring(0, 10); 
 			//下单时间
 			String createDate = record.getStr("create_date");
 			List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outStockId);
@@ -637,7 +636,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		renderFile(new File(filePath.replace("\\", "/")));
 	}
-
+	
 	public SalesOutstockExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit) {
 		SalesOutstockExcel excel = new SalesOutstockExcel();
 		excel.setProductName(re.getStr("custom_name"));
@@ -686,7 +685,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		excel.setCreateDate(record.getStr("create_date"));
 		return excel;
 	}
-
+	
 	//业务员汇总打印信息
 	public void queryUserStockDetail() {
 		String outstockId = getPara("outstockId");
@@ -696,9 +695,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		beginDate = beginDate + " 00:00:00";
 		String endDate = getPara("endDate");
 		endDate = endDate + " 23:59:59";
-
+	    
 		List<Record> records = SalesOutstockQuery.me().getUserPrintInfo(outId, userId);
 		renderJson(records);
 	}
-
+	
 }

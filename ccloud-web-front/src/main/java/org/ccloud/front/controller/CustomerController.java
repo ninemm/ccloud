@@ -1145,7 +1145,7 @@ public class CustomerController extends BaseFrontController {
 
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
-		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area");
+		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area") + "%";
 		
 		Page<Record> customerList = SellerCustomerQuery.me()._findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
 		Map<String, Object> map = new HashMap<>();
