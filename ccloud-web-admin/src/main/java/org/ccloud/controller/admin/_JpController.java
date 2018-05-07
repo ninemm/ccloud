@@ -229,11 +229,12 @@ public class _JpController extends JBaseCRUDController<Goods> {
 	 * 拉取商品
 	 */
 	public void pullGoodsCategories() {
+		String goodsTypeCode = getPara("goodsType");
 		Calendar calendar = Calendar.getInstance();
 		String apiName = PropKit.get("jp.api.httpclient.goodsCategories");
 		String requestUrl = JpHttpClientExecute.getRequestUrl(apiName);
 		params.put("clientCode", PropKit.get("jp.api.httpclient.goodsCategories.clientCode"));
-		params.put("cInvCCode", "1");
+		params.put("cInvCCode", goodsTypeCode);
 		String result = null;
 		try {
 			result = JpHttpClientExecute.executeGet(requestUrl, params, headers);
@@ -275,19 +276,21 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					storedGoodsCategory.setGrade(goodsCategory.getiInvCGrade());
 					storedGoodsCategory.setIsParent(2 == goodsCategory.getiInvCGrade() ? 0 : 1);
 					storedGoodsCategory.setName(goodsCategory.getcInvCName());
-					goods = GoodsQuery.me().findByCode(goodsCategory.getcInvCCode());
-					if(goods == null) {
-						goods = new Goods();
-						goods.setId(StrKit.getRandomUUID());
-						goods.setBrandId(brand.getId());
-						goods.setGoodsCategoryId(storedGoodsCategory.getId());
-						goods.setCode(goodsCategory.getcInvCCode());
-						goods.setCreateDate(calendar.getTime());
-						goods.setName(goodsCategory.getcInvCName());
-						goods.setGoodsTypeId(goodsType.getId());
-						goods.setState(1);
-						goods.setProductImageListStore("[]");
-						goodsList.add(goods);
+					if (storedGoodsCategory.getGrade() == 3) {
+						goods = GoodsQuery.me().findByCode(goodsCategory.getcInvCCode());
+						if(goods == null) {
+							goods = new Goods();
+							goods.setId(StrKit.getRandomUUID());
+							goods.setBrandId(brand.getId());
+							goods.setGoodsCategoryId(storedGoodsCategory.getId());
+							goods.setCode(goodsCategory.getcInvCCode());
+							goods.setCreateDate(calendar.getTime());
+							goods.setName(goodsCategory.getcInvCName());
+							goods.setGoodsTypeId(goodsType.getId());
+							goods.setState(1);
+							goods.setProductImageListStore("[]");
+							goodsList.add(goods);
+						}
 					}
 					parentCode = goodsCategory.getParent();
 					parentCategory = GoodsCategoryQuery.me().findByCode(parentCode, brand.getId());
