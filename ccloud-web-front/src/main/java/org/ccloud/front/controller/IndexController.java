@@ -22,12 +22,9 @@ import org.ccloud.core.BaseFrontController;
 import org.ccloud.core.addon.HookInvoker;
 import org.ccloud.core.cache.ActionCache;
 import org.ccloud.interceptor.SessionInterceptor;
-import org.ccloud.model.Dict;
 import org.ccloud.model.User;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.CustomerVisitQuery;
-import org.ccloud.model.query.DictQuery;
-import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
@@ -38,8 +35,6 @@ import org.ccloud.utils.StringUtils;
 
 import com.jfinal.aop.Clear;
 import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.render.Render;
 
 @RouterMapping(url = "/")
@@ -66,26 +61,26 @@ public class IndexController extends BaseFrontController {
 		setGlobleAttrs();
 		String para = getPara();
 		
-		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+//		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 //		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 		if (user != null) {
-			Dict order = DictQuery.me().findByKey("message_type", "order");
-			Page<Record> orderPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, order.getValue(), null, user.getId(), null);
-			setAttr("orderPage", orderPage);
-			
-			Dict customer = DictQuery.me().findByKey("message_type", "customer");
-			Page<Record> customerPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, customer.getValue(), null, user.getId(), null);
-			setAttr("customerPage", customerPage);
-			
-			Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
-			Page<Record> customerVisitPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, customerVisit.getValue(), null, user.getId(), null);
-			setAttr("customerVisitPage", customerVisitPage);
-			
-			
-			Dict activity = DictQuery.me().findByKey("message_type", "activity");
-			Page<Record> activityPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, activity.getValue(), null, user.getId(), null);
-			setAttr("activityPage",activityPage);
+//			Dict order = DictQuery.me().findByKey("message_type", "order");
+//			Page<Record> orderPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, order.getValue(), null, user.getId(), null);
+//			setAttr("orderPage", orderPage);
+//			
+//			Dict customer = DictQuery.me().findByKey("message_type", "customer");
+//			Page<Record> customerPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, customer.getValue(), null, user.getId(), null);
+//			setAttr("customerPage", customerPage);
+//			
+//			Dict customerVisit = DictQuery.me().findByKey("message_type", "customer_visit");
+//			Page<Record> customerVisitPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, customerVisit.getValue(), null, user.getId(), null);
+//			setAttr("customerVisitPage", customerVisitPage);
+//			
+//			
+//			Dict activity = DictQuery.me().findByKey("message_type", "activity");
+//			Page<Record> activityPage = MessageQuery.me().paginateObj(getPageNumber(), Integer.MAX_VALUE, sellerId, activity.getValue(), null, user.getId(), null);
+//			setAttr("activityPage",activityPage);
 			
 			setAttr("orderTotal", SalesOrderQuery.me().findToDoOrderReviewCount(user.getUsername()));
 			setAttr("customerVisitTotal", CustomerVisitQuery.me().findToDoCustomerVisitReviewCount(user.getUsername()));
