@@ -946,7 +946,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	    		fromBuilder.append(" FROM cc_sales_refund_instock sri ");
 	    		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = sri.customer_id");
 	    		fromBuilder.append(" WHERE sri.`status` NOT IN("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-	    		fromBuilder.append(" AND sri.biz_user_id >= '"+userId+"'");
+	    		fromBuilder.append(" AND sri.biz_user_id = '"+userId+"'");
 	    		fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 	    		fromBuilder.append(" AND sri.create_date <= '"+endDate+"')a");
         return Db.findFirst(fromBuilder.toString(), params.toArray());
