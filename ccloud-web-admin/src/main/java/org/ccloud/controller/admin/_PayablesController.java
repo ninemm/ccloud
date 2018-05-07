@@ -129,7 +129,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String balance_amount = getPara("balance_amount");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//通过客户Id找到应收账款主表ID
-		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type, user.getDepartmentId() );
+		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type);
 		PurchaseInstock purchaseInstock = PurchaseInstockQuery.me().findBySn(ref_sn);
 		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		Page<Payment> page = PaymentQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,deptDataArea);
