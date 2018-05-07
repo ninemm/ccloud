@@ -580,7 +580,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					purchaseOrderDetail.setId(StrKit.getRandomUUID());
 					purchaseOrderDetail.setDeptId(purchaseOrder.getDeptId());
 					purchaseOrderDetail.setDataArea(purchaseOrder.getDataArea());
-					purchaseOrderDetail.setCreateDate(calendar.getTime());
+					purchaseOrderDetail.setCreateDate(purchaseStockInDetail.getBusinessDate());
 					purchaseOrderDetail.setOrderList(index);
 					purchaseOrderDetail.setPurchaseOrderId(purchaseOrder.getId());
 					product = ProductQuery.me().findbyProductSn(purchaseStockInDetail.getcInvCode());
