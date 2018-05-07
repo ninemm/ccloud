@@ -209,7 +209,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		boolean needWhere = true;
 
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
 		}
@@ -251,8 +251,12 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}		
 
-		fromBuilder.append(" and t0.status != "+Consts.SALES_ORDER_STATUS_CANCEL+" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		fromBuilder.append(" and t0.status != "+Consts.SALES_ORDER_STATUS_CANCEL);
 
+		if (StrKit.notBlank(keyword)) {
+			fromBuilder.append(" and ( o.outstock_sn like '%"+keyword+"%' or c.customer_name like '%"+keyword+"%' ) ");
+		}	
+		
 		if (sort == "" || null == sort) {
 			fromBuilder.append("order by " + "o.create_date desc");
 		} else {
