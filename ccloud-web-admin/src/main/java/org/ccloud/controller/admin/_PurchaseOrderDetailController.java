@@ -87,7 +87,11 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 			productInfoMap.put(productId, record);
 			
 			productOptionMap.put("id", productId);
-			productOptionMap.put("text", customName+"/"+productNamePig);
+			if(StrKit.notBlank(productNamePig)) {
+				productOptionMap.put("text", customName+"/"+productNamePig);
+			}else {
+				productOptionMap.put("text", customName);
+			}
 			
 			productOptionList.add(productOptionMap);
 		}
@@ -168,7 +172,7 @@ public class _PurchaseOrderDetailController extends JBaseCRUDController<Purchase
 			return;
 		}
 		Department department = DepartmentQuery.me().findById(user.getDepartmentId());
-		if(department.getOrderReviewerId().equals("")) {
+		if(StrKit.isBlank(department.getOrderReviewerId())) {
 			message = "部门未配置订单审核人";
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("message",message);

@@ -287,8 +287,6 @@ public class GoodsCategoryQuery extends JBaseQuery {
 		fromBuilder.append("  GROUP BY gc.`id` ORDER BY gc.`parent_id`,gc.`order_list`");
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
-	
-	
 	public GoodsCategory findByCode(String code, String brandId) {
 		StringBuilder sqlBuilder = new StringBuilder();
 		sqlBuilder.append("SELECT g.id, g.brand_id, g.supplier_id, ");

@@ -66,7 +66,7 @@ public class PayablesDetailQuery extends JBaseQuery {
 //销售退货单应付账款详情
 public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,String dataArea) {
 		
-		String select = "SELECT COALESCE(t3.act_amount,0) as act_amount, t3.ref_sn, IF (sod.is_composite = 0,t3.pay_amount,so.total_amount) pay_amount,IF (sod.is_composite = 0,t3.pay_amount,so.total_amount) - COALESCE (t3.act_amount, 0) AS balance_amount, t3.object_id, d.name as ref_Name,t3.ref_type, t3.create_date, t3.biz_date ";
+		String select = "SELECT COALESCE(t3.act_amount,0) as act_amount, t3.ref_sn, CASE sod.is_composite when 0 then t3.pay_amount when 1 then so.total_amount else t3.pay_amount END as pay_amount,CASE sod.is_composite when 0 then t3.pay_amount when 1 then so.total_amount else t3.pay_amount END - COALESCE (t3.act_amount, 0) AS balance_amount, t3.object_id, d.name as ref_Name,t3.ref_type, t3.create_date, t3.biz_date ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM (SELECT SUM(r.act_amount) AS act_amount, t2.ref_sn, t2.pay_amount AS pay_amount, t2.pay_amount - r.act_amount AS ");
 		fromBuilder.append("balance_amount, t2.object_id, t2.ref_type, t2.create_date, t2.biz_date FROM cc_payment r RIGHT JOIN (SELECT SUM(pay_amount) AS pay_amount, object_id, ref_type, create_date, biz_date, ref_sn FROM `cc_payables_detail` c ");
 		fromBuilder.append(" WHERE c.object_id ='"+id+"'");

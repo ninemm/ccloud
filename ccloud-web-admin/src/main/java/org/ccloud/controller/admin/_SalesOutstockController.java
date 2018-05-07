@@ -326,10 +326,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				String total = StringUtils.getArrayFirst(paraMap.get("total"));
 				Integer count = 0;
 				Integer index = 0;
-				if (null==user.getId()) {
-					renderAjaxResultForError("客户类型不能为空!");
-					return false;
-				}
+
 				while (productNum > count) {
 					index++;
 					String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
@@ -472,9 +469,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					BigDecimal productAmout=salesOutstock.getTotalAmount();
 					
 					String total=productAmout.toString();
-					if (null==user) {
-						return false;
-					}
 					if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, date,
 							user.getDepartmentId(), user.getDataArea(), user.getId(),
 							printAllNeedInfo.getOutstockSn(),printAllNeedInfo.getCustomerId(),

@@ -187,7 +187,7 @@ public class _SalesInstockController extends JBaseCRUDController<SalesOrder> {
 		Record refund = SalesRefundInstockQuery.me().findMoreById(salesRefundInstock.getId());
 		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(salesRefundInstock.getId());
 		SalesRefundInstockDetail instock = SalesRefundInstockDetailQuery.me().findByInstockId(salesRefundInstock.getId());
-		setAttr("rejectAmount", instock.getStr("rejectAmount"));
+		setAttr("rejectAmount", instock.getStr("total_reject_amount"));
 
 		setAttr("refund", refund);
 		setAttr("refundDetail", refundDetail);

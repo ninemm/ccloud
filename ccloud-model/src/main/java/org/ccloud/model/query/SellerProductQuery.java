@@ -82,7 +82,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId,String sta,String sellerProductIds) {
+	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId,String sta,String sellerProductIds,String categoryId) {
 		String select = "SELECT csp.*,cgc.name as cgc_name,cp.name as productName, csp.custom_name,csp.store_count,csp.price,cp.big_unit,cp.small_unit,cp.convert_relate,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name` order by css.id) AS cps_name";
 		StringBuilder fromBuilder = new StringBuilder("from cc_seller_product csp LEFT JOIN cc_product cp ON  csp.product_id = cp.id LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id "
 				+ " LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
@@ -100,6 +100,9 @@ public class SellerProductQuery extends JBaseQuery {
 		}
 		if(sta.equals("1") && !sellerProductIds.equals("")) {
 			fromBuilder.append(" and csp.id  not in ("+sellerProductIds+")");
+		}
+		if(StrKit.notBlank(categoryId)) {
+			fromBuilder.append(" and cgc.id  = '"+categoryId+"' ");
 		}
 		fromBuilder.append(" GROUP BY csp.id ORDER BY csp.is_enable desc,csp.order_list,cgs.name,css.name ");
 		
@@ -336,5 +339,17 @@ public class SellerProductQuery extends JBaseQuery {
 	public List<Record> findCustomNameByDataArea(String dataArea) {
 		String sql ="SELECT sp.custom_name , sp.seller_id FROM cc_seller_product sp WHERE sp.seller_id IN( SELECT cs.id FROM department d LEFT JOIN cc_seller cs ON cs.dept_id = d.id WHERE d.data_area LIKE ?)";
 		return Db.find(sql,dataArea+"%");
+	}
+
+	public List<Record> findByUserId(String userId){
+		StringBuilder fromBuilder = new StringBuilder(" SELECT cgc. NAME AS cgc_name,cgc.id");
+		fromBuilder.append(" FROM	cc_seller_product csp ");
+		fromBuilder.append(" LEFT JOIN cc_product cp ON csp.product_id = cp.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = csp.seller_id ");
+		fromBuilder.append(" LEFT JOIN USER u ON u.department_id = cs.dept_id ");
+		fromBuilder.append(" LEFT JOIN cc_goods cg ON cg.id = cp.goods_id ");
+		fromBuilder.append(" LEFT JOIN cc_goods_category cgc ON cgc.id = cg.goods_category_id ");
+		fromBuilder.append(" WHERE	cs.is_enabled = 1 AND u.id = '"+userId+"' GROUP BY cgc. NAME ORDER BY cgc.id ");
+		return Db.find(fromBuilder.toString());
 	}
 }

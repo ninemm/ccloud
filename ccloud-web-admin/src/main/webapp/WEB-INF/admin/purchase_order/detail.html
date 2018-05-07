@@ -169,7 +169,7 @@
 			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
 			rowTotal.toFixed(2);
 		}
-		$curTr.find(".rowTotal").text(rowTotal);
+		$curTr.find(".rowTotal").text(rowTotal.toFixed(2));
 		$curTr.find("#inputRowTotal").val(rowTotal);
 
 		totalF();
@@ -182,7 +182,7 @@
 			total += Number($(item).text());
 		});
 		total.toFixed(2);
-		$("#total").text(total);
+		$("#total").text(total.toFixed(2));
 		$("#inputTotal").val(total);
 	}
 
@@ -230,7 +230,7 @@
 				$("#supplierCode").val(order.code);
 				$("#supplierName").val(order.supplier_name);
 				$("#contact").val(order.contact);
-				$("#mobile").val(order.mobile);
+				$("#mobile").val(order.supplierMobile);
 				$("#warehouseCode").val(order.warehouseCode);
 				$("#biz_user_id").val(order.biz_user_id);
 				$("#deptId").val(order.dept_id);

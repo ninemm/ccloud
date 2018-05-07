@@ -269,16 +269,10 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setContact(StringUtils.getArrayFirst(paraMap.get("contact")));
 		salesOrder.setMobile(StringUtils.getArrayFirst(paraMap.get("mobile")));
 		salesOrder.setAddress(StringUtils.getArrayFirst(paraMap.get("address")));
-		try {
-			if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lat"))))
-				salesOrder.setLat(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lat"))));
-			if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lng"))))
-				salesOrder.setLng(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lng"))));
-		} catch (Exception e) {
-			log.error("===========error lat：" + StringUtils.getArrayFirst(paraMap.get("lat")));
-			log.error("===========error lng：" + StringUtils.getArrayFirst(paraMap.get("lng")));
-			log.error(e.getMessage(), e);
-		}
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lat"))))
+			salesOrder.setLat(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lat"))));
+		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lng"))))
+			salesOrder.setLng(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lng"))));
 		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("location"))))
 			salesOrder.setLocation(StringUtils.getArrayFirst(paraMap.get("location")));
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
@@ -976,7 +970,6 @@ public class SalesOrderQuery extends JBaseQuery {
 	    		fromBuilder.append(" AND sri.create_date <= '"+endDate+"')a");
         return Db.findFirst(fromBuilder.toString(), params.toArray());
     }
-	
 	//我客户的详情
 	public List<Record> findByCustomerDetail(String startDate, String endDate, String keyword, String userId,
 			String sellerId, boolean ifGift) {

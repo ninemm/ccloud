@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.jfinal.kit.Ret;
 import org.apache.shiro.SecurityUtils;
@@ -499,7 +501,6 @@ public class CustomerController extends BaseFrontController {
 		Boolean isChecked = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_CUSTOMER_REVIEW + getSessionAttr("sellerCode"));
 
 		if(isChecked == null || !isChecked) {
-			
 			//如果不走流程直接做操作
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_NORMAL);
 
@@ -521,7 +522,13 @@ public class CustomerController extends BaseFrontController {
 			temp.setContact(customer.getContact());
 			
 			temp.setMobile(customer.getMobile());
-			temp.setAddress(customer.getAddress());
+			String dest = "";
+			if (customer.getAddress()!=null) {
+				Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+				Matcher m = p.matcher(customer.getAddress());
+				dest = m.replaceAll("");
+			}
+			temp.setAddress(dest);
 			temp.setNickname(sellerCustomer.getNickname());
 			temp.setCustomerName(customer.getCustomerName());
 
@@ -534,7 +541,7 @@ public class CustomerController extends BaseFrontController {
 			map.put("customerVO", temp);
 
 		} else {
-			
+
 			updated = doSave(sellerCustomer, customer, areaCode, areaName, customerTypeIds, list, custTypeList, SellerCustomer.CUSTOMER_AUDIT);
 			if (StrKit.notBlank(updated)) {
 				renderAjaxResultForError(updated);
@@ -1021,7 +1028,13 @@ public class CustomerController extends BaseFrontController {
 			if(areaCodeList.size() == 3) customer.setCountryCode(areaCodeList.get(2));
 			else customer.setCountryCode("");
 		}
-
+		String dest = "";
+		if (customer.getAddress()!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(customer.getAddress());
+			dest = m.replaceAll("");
+		}
+		customer.setAddress(dest);
 		if (areaNameList.size() != 0) {
 			customer.setProvName(areaNameList.get(0));
 			customer.setCityName(areaNameList.get(1));
@@ -1073,7 +1086,10 @@ public class CustomerController extends BaseFrontController {
 			CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 			ccType.setSellerCustomerId(sellerCustomer.getId());
 			ccType.setCustomerTypeId(custTypeId);
-			ccType.save();
+			boolean save = ccType.save();
+			if (!save) {
+				return "操作失败";
+			}
 		}
 
 		UserJoinCustomerQuery.me().deleteBySelerCustomerIdAndUserId(sellerCustomer.getId(), user.getId());

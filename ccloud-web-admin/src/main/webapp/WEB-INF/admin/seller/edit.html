@@ -267,7 +267,7 @@
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm seller_code" type="text" onblur="changeCode()" <#if seller??>disabled</#if> name="seller.seller_code" value="${(seller.seller_code)!}">
+								<input class="form-control input-sm seller_code" type="text" onblur="changeCode()" <#if seller??>disabled</#if> name="seller.seller_code" value="${(seller.seller_code)!}" placeholder = "8个任意大写字母或数字">
 								<span id="checkWarn">已经存在该编码，请重新输入</span>
 							</div>
 						</div>
