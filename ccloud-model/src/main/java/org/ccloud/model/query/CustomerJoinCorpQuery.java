@@ -18,6 +18,8 @@ package org.ccloud.model.query;
 import java.util.LinkedList;
 import org.ccloud.model.CustomerJoinCorp;
 
+import com.google.common.collect.Lists;
+import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.IDataLoader;
 
@@ -69,6 +71,26 @@ public class CustomerJoinCorpQuery extends JBaseQuery {
 
 	public int deleteByCustomerIdAndSellerId(String CustomerId, String SellerId) {
 		return DAO.doDelete("customer_id = ? AND seller_id = ?", CustomerId, SellerId);
+	}
+	
+	public boolean findByMobileAndCustNameInSellerId(String mobile, String custName, String sellerId) {
+		
+		StringBuilder builder = new StringBuilder("SELECT COUNT(*)");
+		builder.append(" FROM cc_customer_join_corp sc");
+		builder.append(" JOIN cc_customer c on sc.customer_id = c.id");
+		
+		boolean needWhere = true;
+		LinkedList<Object> params = Lists.newLinkedList();
+		
+		needWhere = appendIfNotEmpty(builder, "c.customer_name", custName, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "c.mobile", mobile, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "sc.seller_id", sellerId, params, needWhere);
+		
+		Long count =  Db.queryLong(builder.toString(), params.toArray());
+		if (count.intValue() == 1)
+			return true;
+		
+		return false;
 	}
 	
 }
