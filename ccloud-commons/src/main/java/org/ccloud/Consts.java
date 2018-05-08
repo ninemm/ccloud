@@ -38,6 +38,7 @@ public class Consts {
 	public static final String WORKFLOW_APPLY_USER = "applyUser";
 	public static final String WORKFLOW_APPLY_COMFIRM = "applyComfirm";
 	public static final String WORKFLOW_APPLY_USERNAME = "applyUsername";
+	public static final String WORKFLOW_APPLY_COMFIRM_USERNAME = "applyComfirmUsername";
 	public static final String WORKFLOW_APPLY_SELLER_ID = "sellerId";
 	public static final String WORKFLOW_APPLY_SELLER_CODE = "sellerCode";
     public static final List<String> QRDEALERCODE = new ArrayList<>(Arrays.asList("02701015"));

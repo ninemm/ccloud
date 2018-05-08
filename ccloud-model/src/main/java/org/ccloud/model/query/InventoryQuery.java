@@ -178,7 +178,7 @@ public class InventoryQuery extends JBaseQuery {
 		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT * FROM ( ");
 		defaultSqlBuilder.append("(SELECT cu.warehouse_id,IFNULL(t1.balance_count,0) as balance_count,cw.type,cw.is_default,cu.user_id ");
 		defaultSqlBuilder.append("FROM cc_user_join_warehouse cu LEFT JOIN cc_warehouse cw ON cw.id = cu.warehouse_id LEFT JOIN ( ");
-		defaultSqlBuilder.append("SELECT cc.balance_count, cc.warehouse_id,cc.sell_product_id FROM cc_inventory_detail cc WHERE cc.sell_product_id = ? order by cc.create_date desc limit 1 ");
+		defaultSqlBuilder.append("SELECT IFNULL(SUM(cc.in_count), 0) - IFNULL(SUM(cc.out_count), 0) AS balance_count, cc.warehouse_id,cc.sell_product_id FROM cc_inventory_detail cc WHERE cc.sell_product_id = ? GROUP BY cc.warehouse_id ");
 		defaultSqlBuilder.append(") t1 on t1.warehouse_id = cu.warehouse_id ");
 		defaultSqlBuilder.append("WHERE cu.user_id = ?) ");
 		defaultSqlBuilder.append("UNION ALL ");

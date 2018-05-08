@@ -88,6 +88,8 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
+		String startDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		setAttr("startDate", startDate);
 		render("customer_visit.html");
 	}
 
@@ -112,6 +114,11 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         	customerType = StringUtils.urlDecode(customerType);
             setAttr("customerType", customerType);
         }
+        
+        String createDate = getPara("createDate");
+        if (StrKit.notBlank(createDate)) {
+            setAttr("createDate", createDate);
+        }        
 
         String status = getPara("status");
         if(StrKit.notBlank(status)) {
@@ -123,7 +130,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         	bizUser = StringUtils.urlDecode(bizUser);
         	setAttr("bizUser", bizUser);
 		}
-        Page<CustomerVisit> page = CustomerVisitQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser);
+        Page<CustomerVisit> page = CustomerVisitQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser, createDate);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -249,8 +256,13 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String id = getPara("id");
-		String taskId = getPara("taskId");
-
+		String proc_inst_id = getPara("proc_inst_id");
+		Record record = WorkFlowService.getTaskId(proc_inst_id);
+		if (record == null) {
+			renderAjaxResultForError("未查询到TASKID");
+			return;			
+		}
+		String taskId = record.getStr("ID_");
 		String commentDesc = getPara("comment");
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
