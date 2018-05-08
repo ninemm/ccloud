@@ -496,9 +496,30 @@ section {
 }
 
 .bi-body {
-	/* background: #f3f3f3; */
+	background: #f3f3f3;
 	height: 100%;
 	overflow: hidden;
+}
+.nav-justified{
+	margin:0 auto;
+	width:98%;
+	font-size: .8rem;
+	margin-top: .3rem;
+}
+
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+	background-color:#ea6f5a;
+}
+
+.row {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
+.search-box {
+	background: #fff;
 }
 
 header {
@@ -604,7 +625,7 @@ header {
 
 .mapType-div .mapType {
 	display: inline;
-	font-size: .7rem;
+	font-size: .5rem;
 	width: 50%;
 	text-align: center;
 	height: 1.4rem;
@@ -650,8 +671,9 @@ header {
 
 .map {
 	width: 100%;
-	height: 18rem;
+	height: 17rem;
 	box-sizing: border-box;
+	background: #fff;
 }
 
 .map-nav {
@@ -663,7 +685,7 @@ header {
 }
 
 .title {
-	/*background: #f9f9f9;*/
+	background: #fff;
 	height: 2rem;
 	line-height: 2rem;
 	width: 100%;
@@ -937,6 +959,6 @@ th {
 
 #dealerList{
 	overflow-y:scroll;
-	max-height: 10rem;
+	max-height: 7.5rem;
 }
 

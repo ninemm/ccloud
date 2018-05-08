@@ -7,19 +7,35 @@
 
 </#macro>
 <#macro css>
-    #allmap{
-        height: 12rem;
-    }
+
     #customer_rank{
         height:18rem;
+        background: #fff!important;
     }
+
     #area_rank{
         height:18rem;
+        background: #fff!important;
+    }
+
+    #allmap{
+        height: 13.5rem;
+    }
+
+    .allmap{
+        height: 18rem;
+        background: #fff;
     }
 
     #div_product_rank{
         overflow-y:scroll;
         max-height: 34rem;
+    }
+
+    .div_product_rank{
+        margin-top: 5px;
+        margin-bottom: 5px;
+        background: #fff;
     }
 
 </#macro>
@@ -545,6 +561,7 @@
 <@layout>
 <section>
     <div class="bi-body">
+        <#include "_inc/_pc_nav_box.html"/>
         <div class="row" >
             <div class="col-md-9">
                 <#include "_inc/_pc_search_box.html"/>
@@ -558,21 +575,23 @@
                         <div id="area_rank"></div>
                     </div>
                     <div class="col-md-6">
-                        <p class="title">我附近的终端分布</p>
-                        <div class="mapType-div">
-                            <a class="mapType active-mapType" onclick="setMapType(0)">销售情况</a>
-                            <a class="mapType" onclick="setMapType(1)">开发情况</a>
-                        </div>
-                        <div id="allmap"></div>
-                        <div id="product_customerId" style="display:none;">
-                            <p id="p_customerId_product"  class="txt-color-red"><span id="product_customer-name"></span></p>
-                            <div class="weui-cells weui-cells_form">
-                                <div class="weui-cell" style="padding: 0">
-                                    <table class="table table-striped table-bordered" id="customerId_product">
-                                        <tbody>
-                        
-                                        </tbody>
-                                    </table>
+                        <div class="allmap">
+                            <p class="title">我附近的终端分布</p>
+                            <div class="mapType-div">
+                                <a class="mapType active-mapType" onclick="setMapType(0)">销售情况</a>
+                                <a class="mapType" onclick="setMapType(1)">开发情况</a>
+                            </div>
+                            <div id="allmap"></div>
+                            <div id="product_customerId" style="display:none;">
+                                <p id="p_customerId_product"  class="txt-color-red"><span id="product_customer-name"></span></p>
+                                <div class="weui-cells weui-cells_form">
+                                    <div class="weui-cell" style="padding: 0">
+                                        <table class="table table-striped table-bordered" id="customerId_product">
+                                            <tbody>
+                            
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -592,17 +611,19 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <p class="title" id="p_product_rank"></p>
-                <div id="div_product_rank">
-                    <table id="product_rank" class="table table-striped table-bordered">
-                        <thead>
-                          <tr>
-                            <tr><th>产品</th><th width="20%">数量(件)</th><th width="25%">金额(万元)</th></tr>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                <div class="div_product_rank">
+                    <p class="title" id="p_product_rank"></p>
+                    <div id="div_product_rank">
+                        <table id="product_rank" class="table table-striped table-bordered">
+                            <thead>
+                              <tr>
+                                <tr><th>产品</th><th width="20%">数量(件)</th><th width="25%">金额(万元)</th></tr>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

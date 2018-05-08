@@ -75,7 +75,7 @@ public class BiPcController extends BaseFrontController {
 
 		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(dataArea, null, null, brandId));
 
-		render("index.html");
+		render("pc_index.html");
 	}
 
 	public void selectDealer() {
@@ -166,24 +166,24 @@ public class BiPcController extends BaseFrontController {
 	}*/
 
 	public void area() {
-		setAttr("cur_nav", "area");
+		setAttr("cur_nav", "pc_area");
 		render("pc_area.html");
 	}
 
 	@Before(WorkWechatJSSDKInterceptor.class)
 	public void customer() {
 		//initWechatConfig();
-		setAttr("cur_nav", "customer");
+		setAttr("cur_nav", "pc_customer");
 		render("pc_customer.html");
 	}
 
 	public void product() {
-		setAttr("cur_nav", "product");
+		setAttr("cur_nav", "pc_product");
 		render("pc_product.html");
 	}
 
 	public void dealer() {
-		setAttr("cur_nav", "dealer");
+		setAttr("cur_nav", "pc_dealer");
 		render("pc_dealer.html");
 	}
 

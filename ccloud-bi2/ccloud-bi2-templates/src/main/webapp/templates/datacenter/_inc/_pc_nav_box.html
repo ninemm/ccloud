@@ -1,0 +1,7 @@
+ <ul class="nav nav-pills nav-justified">
+    <li class="<#if '/pc/index' == REQUEST.requestURI!>active</#if>"><a href="${CPATH}/pc/index">首页</a></li>
+    <li class="<#if cur_nav ?? && (cur_nav == 'pc_area')>active</#if>"><a href="${CPATH}/pc/area">地区</a></li>
+    <li class="<#if cur_nav ?? && (cur_nav == 'pc_customer')>active</#if>"><a href="${CPATH}/pc/customer">客户</a></li>
+    <li class="<#if cur_nav ?? && (cur_nav == 'pc_product')>active</#if>"><a href="${CPATH}/pc/product">产品</a></li>
+    <li class="<#if cur_nav ?? && (cur_nav == 'pc_dealer')>active</#if>"><a href="${CPATH}/pc/dealer">经销商</a></li>
+  </ul>

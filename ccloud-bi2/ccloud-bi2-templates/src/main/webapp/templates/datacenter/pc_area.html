@@ -8,19 +8,32 @@
 <#macro css>
     #customer_rank{
         height: 18rem;
+        background: #fff!important;
     }
 
     #area_rank{
-      height: 18rem;
+        height: 18rem;
+        background: #fff!important;
     }
 
     #hot_map{
-        height: 12rem;
+        height: 13.5rem;
+    }
+
+    .hot_map{
+        height: 18rem;
+        background: #fff;
     }
     
     #div_product_rank{
         overflow-y:scroll;
-        max-height: 34rem;
+        max-height: 33rem;
+    }
+
+    .div_product_rank{
+        margin-top: 5px;
+        margin-bottom: 5px;
+        background: #fff;
     }
     
 </#macro>
@@ -303,6 +316,7 @@
 
 <section>
     <div class="bi-body">
+        <#include "_inc/_pc_nav_box.html"/>
         <div class="row" >
             <div class="col-md-9">
                 <#include "_inc/_pc_search_box.html"/>
@@ -314,27 +328,31 @@
                         <div id="area_rank"></div>
                     </div>
                     <div class="col-md-6">
-                        <p class="title" id="p_hot_map"></p>
-                        <div class="mapType-div">
-                            <a class="mapType active-mapType" onclick="setHotMapType(0)">销售分布</a>
-                            <a class="mapType" onclick="setHotMapType(1)">开发分布</a>
+                        <div class="hot_map">
+                            <p class="title" id="p_hot_map"></p>
+                            <div class="mapType-div">
+                                <a class="mapType active-mapType" onclick="setHotMapType(0)">销售分布</a>
+                                <a class="mapType" onclick="setHotMapType(1)">开发分布</a>
+                            </div>
+                            <div id="hot_map"></div>
                         </div>
-                        <div id="hot_map"></div>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <p class="title" id="p_product_rank"></p>
-                <div id="div_product_rank">
-                    <table id="product_rank" class="table table-striped table-bordered">
-                        <thead>
-                          <tr>
-                            <tr><th>产品</th><th width="20%">数量(件)</th><th width="25%">金额(万元)</th></tr>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                <div class="div_product_rank">
+                    <p class="title" id="p_product_rank"></p>
+                    <div id="div_product_rank">
+                        <table id="product_rank" class="table table-striped table-bordered">
+                            <thead>
+                              <tr>
+                                <tr><th>产品</th><th width="20%">数量(件)</th><th width="25%">金额(万元)</th></tr>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

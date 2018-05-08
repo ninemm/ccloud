@@ -1,54 +1,56 @@
 <div class="row">
     <div class="col-md-3">
-        <div class="filter-item">
-            <h4>日期区间</h4>
-            <div class="relative weui-flex" id="getDate">
-                <input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
-                <div style="width:1rem" class="t-c">—</div>
-                <input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
-            </div>
-        </div>
-        <div class="filter-item">
-            <h4>品牌</h4>
-            <div class="relative ft12" id="getBrand">
-                <span  class="red-button" data-id="">全部</span>
-                <#list session['brand_id_array'] as brandId>
-                    <span data-id='${brandId!}'">${session['brand_name_array'][brandId_index]!}</span>
-                </#list>
-            </div>
-        </div>
-        <div id="customer">
-            <header>
-                <div class="weui-search-bar" id="searchBar">
-                    <form class="weui-search-bar__form">
-                        <div class="weui-search-bar__box">
-                            <i class="weui-icon-search"></i>
-                            <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
-                            <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
-                        </div>
-                        <label class="weui-search-bar__label" id="searchText">
-                            <i class="weui-icon-search"></i>
-                            <span>请输入经销商名称</span>
-                        </label>
-                    </form>
-                    <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+        <div class="search-box">
+            <div class="filter-item">
+                <h4>日期区间</h4>
+                <div class="relative weui-flex" id="getDate">
+                    <input type="text" id="start-date" class="weui-input weui-flex__item" readonly>
+                    <div style="width:1rem" class="t-c">—</div>
+                    <input type="text" id="end-date" class="weui-input weui-flex__item" readonly>
                 </div>
-            </header>
-            <article id="infinite">
-                <div class="weui-cells" id="dealerList">
-                    <div class='weui-cell'onclick="selectDealer('',this)"><div class='weui-cell__hd'>全部经销商</div></div>
-                    <#list session['dealer_data_area_array'] as dealerDataArea>
-                        <div class='weui-cell'onclick="selectDealer('${dealerDataArea!}',this)"><div class='weui-cell__hd' id="${dealerDataArea!}">${session['dealer_name_array'][dealerDataArea_index]!}</div></div>
+            </div>
+            <div class="filter-item">
+                <h4>品牌</h4>
+                <div class="relative ft12" id="getBrand">
+                    <span  class="red-button" data-id="">全部</span>
+                    <#list session['brand_id_array'] as brandId>
+                        <span data-id='${brandId!}'">${session['brand_name_array'][brandId_index]!}</span>
                     </#list>
                 </div>
-                <div class="weui-loadmore" id="loading" style="display: none;">
-                    <i class="weui-loading"></i>
-                    <span class="weui-loadmore__tips">正在加载</span>
-                </div>
-                <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
-                    <span class="weui-loadmore__tips">暂无数据</span>
-                </div>
-            </article>
+            </div>
+            <div id="customer">
+                <header>
+                    <div class="weui-search-bar" id="searchBar">
+                        <form class="weui-search-bar__form">
+                            <div class="weui-search-bar__box">
+                                <i class="weui-icon-search"></i>
+                                <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="">
+                                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+                            </div>
+                            <label class="weui-search-bar__label" id="searchText">
+                                <i class="weui-icon-search"></i>
+                                <span>请输入经销商名称</span>
+                            </label>
+                        </form>
+                        <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+                    </div>
+                </header>
+                <article id="infinite">
+                    <div class="weui-cells" id="dealerList">
+                        <div class='weui-cell'onclick="selectDealer('',this)"><div class='weui-cell__hd'>全部经销商</div></div>
+                        <#list session['dealer_data_area_array'] as dealerDataArea>
+                            <div class='weui-cell'onclick="selectDealer('${dealerDataArea!}',this)"><div class='weui-cell__hd' id="${dealerDataArea!}">${session['dealer_name_array'][dealerDataArea_index]!}</div></div>
+                        </#list>
+                    </div>
+                    <div class="weui-loadmore" id="loading" style="display: none;">
+                        <i class="weui-loading"></i>
+                        <span class="weui-loadmore__tips">正在加载</span>
+                    </div>
+                    <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
+                        <span class="weui-loadmore__tips">暂无数据</span>
+                    </div>
+                </article>
+            </div>
         </div>
     </div>
     <div class="col-md-9">
