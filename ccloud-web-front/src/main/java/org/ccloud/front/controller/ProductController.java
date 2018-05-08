@@ -92,7 +92,14 @@ public class ProductController extends BaseFrontController {
 		if (!StrKit.notBlank(categoryId)) {
 			categoryId=goodsCategory.get(0).getStr("categoryId");
 		}
-		productList=	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,0,10);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
+			productList = SellerProductQuery.me().findProductListForAppByCar(sellerId, keyword, tag,wlist.get(0).getId(),categoryId,0,10);
+		} else {
+			productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,0,10);
+		}
+//		productList=	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,0,10);
 		List<Record> compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword, tag);
 		Set<String> tagSet = new LinkedHashSet<String>();
 		for (Record record : productList) {
