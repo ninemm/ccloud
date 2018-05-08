@@ -243,7 +243,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(stockOutStatus);
 		}
 		if (StrKit.notBlank(salesmanId)) {
-			fromBuilder.append(" and t0.biz_user_id = ?");
+			fromBuilder.append(" and cso.biz_user_id = ?");
 			params.add(salesmanId);
 		}
 		if (StrKit.notBlank(carWarehouseId)) {
