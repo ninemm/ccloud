@@ -1,51 +1,5 @@
 package org.ccloud.front.controller;
 
-import java.awt.Color;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.ccloud.Consts;
-import org.ccloud.core.BaseFrontController;
-import org.ccloud.message.Actions;
-import org.ccloud.message.MessageKit;
-import org.ccloud.model.ActivityApply;
-import org.ccloud.model.ActivityExecute;
-import org.ccloud.model.Customer;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.CustomerVisit;
-import org.ccloud.model.CustomerVisitJoinActivity;
-import org.ccloud.model.Dict;
-import org.ccloud.model.ExpenseDetail;
-import org.ccloud.model.Message;
-import org.ccloud.model.User;
-import org.ccloud.model.WxMessageTemplate;
-import org.ccloud.model.query.ActivityApplyQuery;
-import org.ccloud.model.query.ActivityExecuteQuery;
-import org.ccloud.model.query.ActivityQuery;
-import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
-import org.ccloud.model.query.CustomerTypeQuery;
-import org.ccloud.model.query.CustomerVisitQuery;
-import org.ccloud.model.query.DictQuery;
-import org.ccloud.model.query.ExpenseDetailQuery;
-import org.ccloud.model.query.MessageQuery;
-import org.ccloud.model.query.OptionQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.query.WxMessageTemplateQuery;
-import org.ccloud.model.vo.ImageJson;
-import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DateUtils;
-import org.ccloud.utils.ImageUtils;
-import org.ccloud.workflow.service.WorkFlowService;
-import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
-import org.joda.time.DateTime;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -274,7 +228,8 @@ public class CustomerVisitController extends BaseFrontController {
 	
 	public void activityChoose(){
 		String customerId = getPara("customerId");
-		List<Record> activityRecords = ActivityQuery.me()._findByCustomerId(customerId);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Record> activityRecords = ActivityQuery.me()._findByCustomerId(customerId,user.getId());
 		List<Map<String, String>> activityList = Lists.newArrayList();
 	    for (Record record : activityRecords) {
 		    	Map<String, String> map = Maps.newHashMap();
@@ -602,7 +557,7 @@ public class CustomerVisitController extends BaseFrontController {
 			MessageKit.sendMessage(Actions.NotifyWechatMessage.CUSTOMER_VISIT_AUDIT_MESSAGE, kv);
 		}
 		
-
+		
 		int completeTask = workFlowService.completeTask(taskId, comment, var);
 		if (completeTask==1) {
 			renderAjaxResultForError("已审核");
@@ -1057,7 +1012,7 @@ public class CustomerVisitController extends BaseFrontController {
 		map.put("message", message);
 		renderJson(map);
 	}
-
+	
 	public void showActivity() {
 		String activityApplyId = getPara("activityApplyId");
 		Record activity = ActivityQuery.me().findByActivityApplyId(activityApplyId);
@@ -1070,5 +1025,5 @@ public class CustomerVisitController extends BaseFrontController {
 		map.put("expenseDetail", expenseDetail);
 		renderJson(map);
 	}
-
+	
 }

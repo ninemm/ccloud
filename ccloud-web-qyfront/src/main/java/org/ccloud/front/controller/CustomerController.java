@@ -39,7 +39,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by WT on 2017/11/29.
@@ -465,6 +466,7 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+
 				String waterFont3 = sellerCustomer.getLocation();
 //				String waterFont3 = "湖北省-武汉市-洪山区";
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
@@ -516,7 +518,13 @@ public class CustomerController extends BaseFrontController {
 			temp.setContact(customer.getContact());
 			
 			temp.setMobile(customer.getMobile());
-			temp.setAddress(customer.getAddress());
+			String dest = "";
+			if (customer.getAddress()!=null) {
+				Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+				Matcher m = p.matcher(customer.getAddress());
+				dest = m.replaceAll("");
+			}
+			temp.setAddress(dest);
 			temp.setNickname(sellerCustomer.getNickname());
 			temp.setCustomerName(customer.getCustomerName());
 
@@ -850,6 +858,7 @@ public class CustomerController extends BaseFrontController {
 		
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", status);
+		
 		int completeTask = workFlowService.completeTask(taskId, comment, var);
 		if (completeTask==1) {
 			renderAjaxResultForError("已审核");
@@ -1015,7 +1024,13 @@ public class CustomerController extends BaseFrontController {
 			if(areaCodeList.size() == 3) customer.setCountryCode(areaCodeList.get(2));
 			else customer.setCountryCode("");
 		}
-
+		String dest = "";
+		if (customer.getAddress()!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(customer.getAddress());
+			dest = m.replaceAll("");
+		}
+		customer.setAddress(dest);
 		if (areaNameList.size() != 0) {
 			customer.setProvName(areaNameList.get(0));
 			customer.setCityName(areaNameList.get(1));
@@ -1067,7 +1082,10 @@ public class CustomerController extends BaseFrontController {
 			CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 			ccType.setSellerCustomerId(sellerCustomer.getId());
 			ccType.setCustomerTypeId(custTypeId);
-			ccType.save();
+			boolean save = ccType.save();
+			if (!save) {
+				return "操作失败";
+			}
 		}
 
 		UserJoinCustomerQuery.me().deleteBySelerCustomerIdAndUserId(sellerCustomer.getId(), user.getId());
@@ -1124,7 +1142,7 @@ public class CustomerController extends BaseFrontController {
 
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
-		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area");
+		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area") + "%";
 		
 		Page<Record> customerList = SellerCustomerQuery.me()._findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
 		Map<String, Object> map = new HashMap<>();
