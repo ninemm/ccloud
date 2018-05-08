@@ -6,8 +6,8 @@
 		 dynamicConfig="true">
 
     <diskStore path="java.io.tmpdir"/>
-	
-	<!-- 
+	<cacheManagerEventListenerFactory class="" properties=""/>
+	<!--
 	属性简介：
 		maxElementsInMemory：缓存最大个数
 		eternal：对象是否永久有效，一但设置了，timeout将不起作用
