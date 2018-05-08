@@ -32,6 +32,7 @@
         $("#mobile").val("${(customerVisit.mobile)!}");
         $("#address").val("${(customerVisit.prov_name)!}"+" "+"${(customerVisit.city_name)!}"+" "+"${(customerVisit.country_name)!}"+" "+"${(customerVisit.address)!}");
         $("#question_type").val("${(customerVisit.typeName)!}");
+         $("#question_type").attr("readonly",true);
         $("#question_desc").val("${(customerVisit.question_desc)!}")
         $("#location").val("${(customerVisit.location)!}");
         if("${(customerVisit.title)!}"==""){
