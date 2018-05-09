@@ -67,9 +67,9 @@ public class ReceivablesQuery extends JBaseQuery {
 		if(!keyword.equals("")) {
 			fromBuilder.append(" and c.customer_name like '%"+keyword+"%' ");
 		}
-		fromBuilder.append(" and r.create_date >= ?");
+		fromBuilder.append(" and rd.create_date >= ?");
 		params.add(startDate+" 00:00:00");
-		fromBuilder.append(" and r.create_date <= ?");
+		fromBuilder.append(" and rd.create_date <= ?");
 		params.add(endDate+" 23:59:59");
 		fromBuilder.append(" GROUP BY rd.object_id ORDER BY r.create_date DESC");
 		
