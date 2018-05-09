@@ -342,10 +342,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(sql.toString(), params.toArray());
 	}
 
-	public List<Record> _findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea){
+	public List<Record> _findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea, String userId, String startDate){
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.visit_user realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.visit_user realname, ccv.photo, cc.customer_name, ccv.create_date ");
 
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = ccv.seller_customer_id ");
@@ -356,13 +356,20 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
 
-		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
+		appendIfNotEmpty(sql, "ccv.user_id", userId, params, false);
+		appendIfNotEmpty(sql, "ccv.seller_customer_id", customerName, params, false);
+		appendIfNotEmpty(sql, "ccv.question_type", questionType, params, false);
 		appendIfNotEmpty(sql, "ccv.question_type", questionType, params, false);
 		appendIfNotEmptyWithLike(sql,"ct.id", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
-
-		sql.append("GROUP BY ccv.visit_user, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
-		sql.append("ORDER BY ccv.create_date ");
+		if (StrKit.notBlank(startDate)) {
+			String beginDate = startDate + " 00:00:00";
+			String endDate = startDate + " 23:59:59";
+			sql.append(" AND ccv.create_date >= ? AND ccv.create_date <= ? ");
+			params.add(beginDate);
+			params.add(endDate);
+		}		
+		sql.append("ORDER BY ccv.create_date, ccv.user_id ");
 
 		return Db.find(sql.toString(), params.toArray());
 	}

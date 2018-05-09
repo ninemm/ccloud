@@ -183,7 +183,8 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 	public void image() {
 
-		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
+		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("text", "全部");
@@ -201,7 +202,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
 		setAttr("customerType", JSON.toJSON(customerTypeList));
 
-		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(), null);
+		List<Record> nameList = SellerCustomerQuery.me().findName(selectDataArea, null);
 		List<Map<String, Object>> customerList = new ArrayList<>();
 		customerList.add(all);
 
@@ -224,7 +225,21 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			item.put("text", questionType.getName());
 			questionTypeList.add(item);
 		}
-
+		
+		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByDataArea(selectDataArea);
+		List<Map<String, Object>> userList = new ArrayList<>();
+		userList.add(all);
+		for(CustomerVisit customerVisit:customerVisits) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", customerVisit.getStr("user_id"));
+			item.put("text", customerVisit.getStr("realname"));
+			userList.add(item);
+		}
+		setAttr("userList", JSON.toJSON(userList));
+		
+		String startDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		setAttr("startDate", startDate);
+		
 		setAttr("questionType", JSON.toJSON(questionTypeList));
 		render("image.html");
 	}
@@ -550,10 +565,12 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");
 		String questionType = getPara("question_type");
+		String userId = getPara("user_id");
+		String startDate = getPara("startDate");		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
+		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea, userId, startDate);
 		if(imageList.size() == 0) renderAjaxResultForError();
 		else renderAjaxResultForSuccess();
 	}
@@ -563,11 +580,13 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");
 		String questionType = getPara("question_type");
+		String userId = getPara("user_id");
+		String startDate = getPara("startDate");		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		String domain = OptionQuery.me().findByKey("cdn_domain").getOptionValue();
-		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
+		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea, userId, startDate);
 
 		String zipFileName = "拜访图片.zip";
 
@@ -588,7 +607,6 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 			int k = 1;
 			for(String savePath : photoList){
-
 				List<ImageJson> list = JSON.parseArray(savePath, ImageJson.class);
 
 				for (int i = 0; i < list.size(); i++){
