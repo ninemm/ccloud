@@ -34,9 +34,9 @@ var headerStr =
 	'<table class="printContent clearcontent">' +
 		'<thead>' +
 		'<tr>' +
-			'<td class="text-center width8">发货单号</td>' +
+			'<td class="text-center width8">退货单号</td>' +
 			'<td class="width16">{0}</td>' +
-			'<td class="text-center width8">下单时间</td>' +
+			'<td class="text-center width8">退货时间</td>' +
 			'<td colspan="2">{1}</td>' +
 			'<td class="text-center width8">制单时间</td>' +
 			'<td colspan="2">{2}</td>' +
@@ -60,7 +60,7 @@ var headerStr =
 			'<td>瓶数</td>' +
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
-			'<td class="center2">购货价格</td>' +
+			'<td class="center2">退货价格</td>' +
 			'<td class="center2">条码</td>' +
 		'</tr>' +
 	'</thead>';
@@ -106,8 +106,7 @@ function queryPrintDetail() {
         success: function(data) {
             if (data && data.rows) {
                 var curDate = new Date().Format("yyyy-MM-dd hh:mm");
-                $.each(data.rows,
-                function(index, item) {
+                $.each(data.rows, function(index, stockInPrintInfo) {
                      var f1 = 0;
 				     var f2 = 0;
                      var l1 = 0;
@@ -116,15 +115,16 @@ function queryPrintDetail() {
                      var content = '<tbody>';
                      var content1 = "";
 				     var content2 = "";
-                     let saleMoney = 0;                     
-                    if (item.orderProductInfos) {
-                        $.each(item.orderProductInfos,
+                     let saleMoney = 0;    
+                     item =  stockInPrintInfo.printInfo                 
+                     if (stockInPrintInfo.ProductInfos) {
+                        $.each(stockInPrintInfo.ProductInfos,
                         function(idx, subitem) {
-                            len =  item.orderProductInfos.length;
+                            len =  stockInPrintInfo.ProductInfos.length;
                             l1 = len;
                             if (idx < 6) {
                             d1 = idx;
-                            let barCode = subitem.barCode;
+                            let barCode = subitem.bar_code;
                             if (!barCode) barCode = '无';
                             let totalMoney = 0;
                             let cBigAmount = subitem.bigCount
@@ -135,25 +135,24 @@ function queryPrintDetail() {
 							if (cSmallAmount == 0) {
 								cSmallAmount = '';
 							}
-                            let isGift = subitem.isgift;
+                            let isGift = subitem.is_gift;
                             if (isGift != 0) {
                                 isGift = '(赠品)';
                             } else {
                                 isGift = "";
                                 totalMoney = subitem.bigCount
-										* subitem.bigPrice
+										* subitem.big_Price
 										+ subitem.smallCount
-										* subitem.smallPrice;
+										* subitem.small_price;
 										saleMoney = saleMoney + totalMoney;
                             }
-                            var productAmout = subitem.productAmout
-                            f1 = f1 + productAmout;
-                            content1 += $.format(contentStr, (idx + 1), subitem.productName, cBigAmount, subitem.bigPrice + '元', cSmallAmount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
+                            f1 = f1 + totalMoney;
+                            content1 += $.format(contentStr, (idx + 1), subitem.custom_name, cBigAmount, subitem.big_Price + '元', cSmallAmount, subitem.small_price + '元', barCode, isGift,totalMoney+ '元')
                          }
                         
                             if (5<idx && idx<12) {
                             d2 = idx;
-                            let barCode = subitem.barCode;
+                            let barCode = subitem.bar_code;
                             if (!barCode) barCode = '无';
                             let cBigAmount = subitem.bigCount
 							if (cBigAmount == 0) {
@@ -164,20 +163,19 @@ function queryPrintDetail() {
 								cSmallAmount = '';
 							}
                             let totalMoney = 0;
-                            let isGift = subitem.isgift;
+                            let isGift = subitem.is_gift;
                             if (isGift != 0) {
                                 isGift = '(赠品)';
                             } else {
                                 isGift = "";
                                 totalMoney = subitem.bigCount
-										* subitem.bigPrice
+										* subitem.big_Price
 										+ subitem.smallCount
-										* subitem.smallPrice;
-										saleMoney = saleMoney + totalMoney;
+										* subitem.small_price;
+								saleMoney = saleMoney + totalMoney;
                             }
-                            var productAmout = subitem.productAmout
-                            f2 = f2 + productAmout;
-                            content2 += $.format(contentStr, (idx + 1), subitem.productName, cBigAmount, subitem.bigPrice + '元', cSmallAmount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
+                            f2 = f2 + totalMoney;
+                            content2 += $.format(contentStr, (idx + 1), subitem.custom_name, cBigAmount, subitem.big_Price + '元', cSmallAmount, subitem.small_price + '元', barCode, isGift,totalMoney+ '元')
                           }
                         });
                      
@@ -215,15 +213,15 @@ function queryPrintDetail() {
 
                     headerInfoContent = $.format(headerInfo, '总部', '退');
 
-                    let placeOrderMan = item.placeOrderMan;
-                    let placeOrderPhone = item.placeOrderPhone;
+                   let placeOrderMan = item.realname;
+                    let placeOrderPhone = item.mobile ;
                     let warehousePhone = item.warehousePhone;
                     let remark = item.remark;
                     if (!warehousePhone) warehousePhone = '无';
                     if (!remark) remark = '';
-                    let placeOrderTime = new Date(item.placeOrderTime).Format("yyyy-MM-dd hh:mm");;
+                    let placeOrderTime = new Date(item.returnOrderTime).Format("yyyy-MM-dd hh:mm");;
 
-                    headerContent = $.format(headerStr, item.outstockSn, placeOrderTime, curDate, item.customerName, item.customerContacts, item.customerPhone, item.deliveryAddress, placeOrderMan, placeOrderPhone, item.warehouseName);
+                    headerContent = $.format(headerStr, item.instock_sn, placeOrderTime, curDate, item.customer_name, item.ccontact, item.cmobile, item.delivery_address, placeOrderMan, placeOrderPhone, item.warehouseName);
 
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
