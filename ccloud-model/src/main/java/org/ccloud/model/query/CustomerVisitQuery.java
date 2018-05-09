@@ -177,7 +177,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON ccv.seller_customer_id = csc.id ");
 		sql.append("LEFT JOIN cc_customer cc ON csc.customer_id = cc.id ");
-		sql.append("JOIN dict d ON ccv.question_type = d.value ");
+		sql.append("LEFT JOIN dict d ON ccv.question_type = d.value ");
 //		sql.append("LEFT JOIN cc_customer_join_customer_type ccjct ON csc.id = ccjct.seller_customer_id ");
 		sql.append("WHERE ccv.id = ?");
 
