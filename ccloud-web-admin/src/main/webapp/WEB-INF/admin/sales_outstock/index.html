@@ -42,6 +42,10 @@
           initUser();
 	    }).on("change", "#endDate", function() {
           initUser();
+	    }).on("change", "#printStatus", function() {
+          initUser();
+	    }).on("change", "#stockOutStatus", function() {
+          initUser();
 	    })
 	});
 
@@ -446,18 +450,21 @@ function orderDetail(id) {
    <!-- 初始化业务员选择框 -->
  var initUser = function () {
         var strHtml = "";
-        var url = '${CPATH}/receivables/initUser';
+        var print = $("#printStatus").val();
+        var stockOutStatus = $("#stockOutStatus").val();
+        var url = '${CPATH}/admin/salesOutstock/initUser';
         $.ajax({
             url: url,
             type: 'post',
             data:{
             "startDate": $('#startDate').val() + " 00:00:00",
 			"endDate": $('#endDate').val() + " 23:59:59",
-			"print":0
+			"print": print,
+			"stockOutStatus": stockOutStatus
             },
             success: function (result) {
                 var user = result.userList;
-                strHtml = '<option selected="selected" value="">业务员选择-未打印订单</option>';
+                strHtml = '<option selected="selected" value="">业务员选择</option>';
                 for(index in user){
                     var row = user[index];
                     strHtml +='<option value="'+row.value+'">'+row.title+'</option>';

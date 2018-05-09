@@ -2280,7 +2280,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		return count;
 	}	
 
-	public List<Record> findMoney(String startDate, String endDate, String keyword, String userId) {
+	public List<Record> findMoney(String startDate, String endDate, String keyword, String userId, String customerName) {
 		  LinkedList<Object> params = new LinkedList<Object>();
 	        boolean needWhere = true;
 	        StringBuilder fromBuilder = new StringBuilder("SELECT SUM(a.totalAmount) totalAmount,a.id customer_id FROM (");
@@ -2888,7 +2888,7 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	//我的客户详细
 	public List<Record> findByCustomerDetail1(String startDate, String endDate, String keyword, String userId,
-			String sellerId, boolean ifGift, String dataArea) {
+			String sellerId, boolean ifGift, String dataArea, String customerName) {
 		List<Record> records = SellerProductQuery.me().findConvertRelate(sellerId);
 		StringBuilder fromBuilder=new StringBuilder("SELECT ");
 		for (Record record : records) {
@@ -2942,8 +2942,11 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" AND sri.biz_user_id = '"+userId+"'");
 		fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 		fromBuilder.append(" AND sri.create_date <= '"+endDate+"'");
-		fromBuilder.append(" GROUP BY sc.Id,srid.sell_product_id)a GROUP BY a.id,a.sell_product_id) b GROUP BY b.Id");
-		
+		fromBuilder.append(" GROUP BY sc.Id,srid.sell_product_id)a GROUP BY a.id,a.sell_product_id) b ");
+		if (StrKit.notBlank(customerName)) {
+			fromBuilder.append("WHERE b.customer_name like '%" + customerName + "%'");
+		}
+		fromBuilder.append(" GROUP BY b.Id");
 		return Db.find(fromBuilder.toString());
 	}
 
