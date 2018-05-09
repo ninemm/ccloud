@@ -90,6 +90,25 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	public void index() {
 		String startDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
 		setAttr("startDate", startDate);
+		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
+	    //客户类型集合
+		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
+	    setAttr("typeList",typeList);
+	    //问题类型集合
+	    List<Dict> visitDictList = DictQuery.me().findDictByType("customer_visit");
+	    setAttr("visitDictList",visitDictList);
+	    
+	    //业务员
+	    String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+	    List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByDataArea(selectDataArea);
+		List<Map<String, Object>> customerVisitList = new ArrayList<>();
+		for(CustomerVisit customerVisit:customerVisits) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("userId", customerVisit.getStr("user_id"));
+			item.put("bizUser", customerVisit.getStr("realname"));
+			customerVisitList.add(item);
+		}
+	    setAttr("customerVisitList",customerVisitList);
 		render("customer_visit.html");
 	}
 
@@ -316,7 +335,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			renderAjaxResultForError("操作失败");
 	}
 
-	public void queryCustomerType() {
+	/*public void queryCustomerType() {
         String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
         List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
         renderAjaxResultForSuccess("success",JSON.toJSON(typeList));
@@ -325,7 +344,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	public void queryQuestionType() {
 		List<Dict> visitDictList = DictQuery.me().findDictByType("customer_visit");
 		renderAjaxResultForSuccess("success", JSON.toJSON(visitDictList));
-	}
+	}*/
 
 	private void sendMessage(String sellerId, String comment, String fromUserId, String toUserId, String deptId
 			, String dataArea, String type, String title) {
@@ -657,7 +676,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
 	}
 
-	public void queryBizUser() {
+/*	public void queryBizUser() {
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByDataArea(selectDataArea);
 		List<Map<String, Object>> customerVisitList = new ArrayList<>();
@@ -669,5 +688,5 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
 		
 		renderJson(customerVisitList);
-	}
+	}*/
 }
