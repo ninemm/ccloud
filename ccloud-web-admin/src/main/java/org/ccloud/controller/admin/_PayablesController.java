@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
@@ -84,6 +85,11 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		renderJson(list);
 	}
 	
+	public void index() {
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
+	}
 	
 	public void getPayables() {
 //		String type = getPara("type");
@@ -91,14 +97,17 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
+		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword,startDate,endDate);
 		List<Record> payList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", payList);
-		
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
 		renderJson(map);
 	}
 	
@@ -218,6 +227,8 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
@@ -225,7 +236,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
 				+ "应付账款.xlsx";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
+		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword,startDate,endDate);
 		List<Record> payablesList = page.getList();
 		
 		List<payablesExcel> excellist = Lists.newArrayList();

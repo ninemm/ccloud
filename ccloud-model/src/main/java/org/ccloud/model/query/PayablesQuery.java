@@ -58,7 +58,7 @@ public class PayablesQuery extends JBaseQuery {
 		Db.update(sqlBuilder.toString());
 	}
 	
-    public Page<Record> paginate(int pageNumber, int pageSize, String id,String userId,String dataArea,String sellerId,String deptId,String keyword) {
+    public Page<Record> paginate(int pageNumber, int pageSize, String id,String userId,String dataArea,String sellerId,String deptId,String keyword, String startDate, String endDate) {
 		Boolean b = true;
 		String select;
 		StringBuilder fromBuilder;
@@ -88,6 +88,10 @@ public class PayablesQuery extends JBaseQuery {
 				fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END like '%"+keyword+"%' ");
 			}
 		}
+		fromBuilder.append(" and r.create_date >= ?");
+		params.add(startDate+" 00:00:00");
+		fromBuilder.append(" and r.create_date <= ?");
+		params.add(endDate+" 23:59:59");
 		if (params.isEmpty())
 			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

@@ -18,9 +18,8 @@
    var $pagesize = $("#pagesize");
 
    $(function() {
-    var ids = '${outstockId!}';
-    var financePrint = '${isFinancePrint!}';
-	queryPrintDetail(financePrint);
+    var ids = '${inStockId!}';
+	queryPrintDetail();
 	initEvent();
 });
 
@@ -91,17 +90,16 @@ var headerStr =
 			'</div>';
 
 
-function queryPrintDetail(financePrint) {
+function queryPrintDetail() {
 
     var batchPrintContent = '';
     var headerContent = null;
     var footerContent = null;
     var headerInfoContent = null;
     $.ajax({
-        url: "${CPATH}/admin/salesOutstock/getPrintInfo",
+        url: "${CPATH}/admin/salesInstock/getPrintInfo",
         data: {
-            "outstockId": '${outstockId!}',
-            "isFinancePrint":'${isFinancePrint!}'
+            "inStockId": '${inStockId!}'
         },
         dataType: "json",
         async: false,
@@ -215,7 +213,7 @@ function queryPrintDetail(financePrint) {
                     var c = '</tbody></table>';
 				    c = content1 + content2;
 
-                    headerInfoContent = $.format(headerInfo, '总部', '送');
+                    headerInfoContent = $.format(headerInfo, '总部', '退');
 
                     let placeOrderMan = item.placeOrderMan;
                     let placeOrderPhone = item.placeOrderPhone;
@@ -316,9 +314,9 @@ $("#print").click(function() {
 
     if (window.confirm('确认打印吗(订单状态会变为已打印)?')) {
     $.ajax({
-      url: "${CPATH}/admin/salesOutstock/recordPrintInfo",
+     url: "${CPATH}/admin/salesInstock/recordPrintInfo",
         data: {
-            "outstockId": '${outstockId!}'
+            "inStockId": '${inStockId!}'
         },
         dataType: "json",
         async: false,

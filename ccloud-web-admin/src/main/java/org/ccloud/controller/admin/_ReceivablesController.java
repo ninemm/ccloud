@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
@@ -84,30 +85,41 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		renderJson(list);
 	}
 	
+	public void index() {
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
+	}
+
 	public void getReceivables() {
 //		String type = getPara("type");
 		String keyword=getPara("keyword");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,keyword);
+		Page<Record> page = ReceivablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,keyword,startDate,endDate);
 		List<Record> receivablesList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", receivablesList);
-		
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
 		renderJson(map);
 	}
 	
 	public void getReceivablesDetail() {
 //		String type = getPara("type");
 		String id = getPara("id");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> map;
 		if(id!=null) {
-			Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea);
+			Page<ReceivablesDetail> page = ReceivablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea,startDate,endDate);
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}else {
 			map = new HashMap<String, Object>();
@@ -211,10 +223,11 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
-		
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");		
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
 				+ "应收账款.xlsx";
-		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,keyword);
+		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,keyword,startDate,endDate);
 		List<Record> receivablesList = page.getList();
 		
 		List<receivablesExcel> excellist = Lists.newArrayList();

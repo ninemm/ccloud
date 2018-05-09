@@ -44,7 +44,7 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<ReceivablesDetail> paginate(int pageNumber, int pageSize, String id,String dataArea) {
+	public Page<ReceivablesDetail> paginate(int pageNumber, int pageSize, String id,String dataArea, String startDate, String endDate) {
 		
 		String select = "SELECT COALESCE(t3.act_amount,0) as act_amount, t3.ref_sn,IF( sod.is_composite = 0 , t3.receive_amount , so.total_amount) receive_amount , IF( sod.is_composite = 0 , t3.receive_amount , so.total_amount) - COALESCE(t3.act_amount , 0) AS balance_amount , t3.object_id, d.name as ref_Name,t3.ref_type, t3.create_date, t3.biz_date ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM (SELECT SUM(r.act_amount) AS act_amount, t2.ref_sn, t2.receive_amount AS receive_amount, t2.receive_amount - r.act_amount AS ");
@@ -62,7 +62,12 @@ public class ReceivablesDetailQuery extends JBaseQuery {
 		fromBuilder.append(" LEFT JOIN cc_sales_order_join_outstock sojo ON sojo.outstock_id=sok.id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order so ON so.id=sojo.order_id ");
 		fromBuilder.append(" LEFT JOIN cc_sales_order_detail sod ON sod.order_id=so.id ");
-		fromBuilder.append(" INNER JOIN dict d on t3.ref_type = d.`value`  GROUP BY t3.ref_sn ORDER BY t3.create_date desc ");
+		fromBuilder.append(" INNER JOIN dict d on t3.ref_type = d.`value`");
+//		fromBuilder.append(" where r.create_date >= ?");
+//		params.add(startDate+" 00:00:00");
+//		fromBuilder.append(" and r.create_date <= ?");
+//		params.add(endDate+" 23:59:59");
+		fromBuilder.append(" GROUP BY t3.ref_sn ORDER BY t3.create_date desc ");
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 

@@ -21,6 +21,7 @@ import java.util.List;
 import org.ccloud.Consts;
 import org.ccloud.model.Receivables;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -47,7 +48,7 @@ public class ReceivablesQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String id,String seller_id,String dataArea,String sellerId,String keyword) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String id,String seller_id,String dataArea,String sellerId,String keyword, String startDate, String endDate) {
 		
 		Boolean b = true;
 		String select;
@@ -75,11 +76,14 @@ public class ReceivablesQuery extends JBaseQuery {
 //				b = false;
 //			}
 //		}
-		
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
 		if(!keyword.equals("")) {
 			fromBuilder.append(" and c.customer_name like '%"+keyword+"%' ");
 		}
+		fromBuilder.append(" and r.create_date >= ?");
+		params.add(startDate+" 00:00:00");
+		fromBuilder.append(" and r.create_date <= ?");
+		params.add(endDate+" 23:59:59");
 		fromBuilder.append(" ORDER BY r.create_date DESC");
 		
 		
