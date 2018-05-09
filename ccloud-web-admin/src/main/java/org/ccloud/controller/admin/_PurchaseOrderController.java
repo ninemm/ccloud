@@ -411,7 +411,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 			}
 		}
 	}
-
+	
 	public void show_warehouse(){
 		//查询账号所拥有的仓库
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
