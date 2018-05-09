@@ -44,15 +44,18 @@ datetimepicker.min.css">
 	var initParams = function(params) {
 		
 		var keyword = $('#status  option:selected').val();
+		var customerName = $('#customerName').val();
 		if(keyword == ""){
 			keyword = "so.create_date";
 		}
 		if (keyword) keyword = encodeURIComponent(keyword);
+		if (customerName) customerName = encodeURIComponent(customerName);
 		var param = {
 			k: keyword,
 			user_id: $('#user_id').find("option:selected").val(),
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
+			customerName: customerName,
 			sortName:params
 		};
 		return param;
@@ -182,6 +185,12 @@ datetimepicker.min.css">
 						</select>
 					</div>
 				</div>
+                <div class="col-sm-4">
+                    <label class="control-label col-sm-4">客户名称:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+                        <input id="customerName" class="form-control" type="text" value="${customerName!}" name="customerName" placeholder="客户名称">
+                    </div>
+                </div>				
 				<div class="col-md-4" style="text-align:center;">
 					<input onclick="prints()" class="btn btn-sm btn-primary btn-flat" type="button" value="查询">
 				</div>

@@ -197,7 +197,11 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 			countList.add(map);
 		}
 		list.remove(0);
-		BigDecimal count = this.findMoreWareHouse(list, countList, new BigDecimal(productCount).subtract(defaultCount), convert);
+		BigDecimal surplusCount = new BigDecimal(productCount);
+		if (defaultCount.compareTo(new BigDecimal(0)) != -1) {
+			surplusCount = surplusCount.subtract(defaultCount);
+		}		
+		BigDecimal count = this.findMoreWareHouse(list, countList, surplusCount, convert);
 		if (count.compareTo(new BigDecimal(0)) == 1) {
 			result.put("status", "notEnough");
 		} else {
