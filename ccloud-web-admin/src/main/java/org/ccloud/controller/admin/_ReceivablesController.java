@@ -43,6 +43,7 @@ import org.ccloud.model.Receiving;
 import org.ccloud.model.query.ReceivingQuery;
 //import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.vo.ReceivablesAmountExcel;
 import org.ccloud.model.vo.receivablesExcel;
 import org.ccloud.model.User;
 
@@ -251,4 +252,74 @@ public class _ReceivablesController extends JBaseCRUDController<Receivables> {
 		
 		renderFile(new File(filePath.replace("\\", "/")));
 	} 
+	
+	public void  totalAmount() {
+		render("total_amount.html");
+	}
+	
+	public void getTotalAmount() {
+		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+		String sort = getPara("sort");
+		String sortOrder = getPara("sortOrder");
+		String customerTypeId = getPara("customerTypeId");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Page<Record> page = ReceivablesQuery.me().paginateTotalAmount(getPageNumber(),getPageSize(),customerTypeId,deptDataArea,sellerId,keyword,sort,sortOrder);
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", page.getList());
+		
+		renderJson(map);
+	}
+	
+	//账款汇总导出功能
+	public void downloadingAmount() {
+		String keyword=getPara("keyword");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+		}
+		String customerTypeId = getPara("customerTypeId");
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
+		
+		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\receivables\\"
+				+ "账款汇总.xlsx";
+//		Page<Record> page = ReceivablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,keyword);
+		Page<Record> page = ReceivablesQuery.me().paginateTotalAmount(1,Integer.MAX_VALUE,customerTypeId,deptDataArea,sellerId,keyword,"","");
+		List<Record> receivablesList = page.getList();
+		
+		List<ReceivablesAmountExcel> excellist = Lists.newArrayList();
+		for (Record record : receivablesList) {
+		
+			ReceivablesAmountExcel excel = new ReceivablesAmountExcel();
+			excel.setCustomerName(record.getStr("customer_name"));
+			excel.setReceiveAmount(record.getBigDecimal("amount"));
+			excel.setActAmount(record.getBigDecimal("actAmount"));
+			excel.setBalanceAmount(record.getBigDecimal("balanceAmount"));
+			excellist.add(excel);
+		}
+		
+		ExportParams params = new ExportParams();
+		Workbook wb = ExcelExportUtil.exportBigExcel(params, ReceivablesAmountExcel.class, excellist);
+		File file = new File(filePath.replace("\\", "/"));
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
+			wb.write(out);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		ExcelExportUtil.closeExportBigExcel();
+		
+		renderFile(new File(filePath.replace("\\", "/")));
+	}
 }

@@ -169,7 +169,7 @@
 			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
 			rowTotal.toFixed(2);
 		}
-		$curTr.find(".rowTotal").text(rowTotal);
+		$curTr.find(".rowTotal").text(rowTotal.toFixed(2));
 		$curTr.find("#inputRowTotal").val(rowTotal);
 
 		totalF();
