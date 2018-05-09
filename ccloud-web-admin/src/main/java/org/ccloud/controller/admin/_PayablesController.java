@@ -71,17 +71,10 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 public class _PayablesController extends JBaseCRUDController<Payables> { 
 	
 	public void getOptions(){
-//		String type = getPara("type");
 		String DataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<Record> list = new ArrayList();
-//		if(type != null) {
-//			if("1".equals(type)) {
 		list = CustomerTypeQuery.me().getCustomerTypes(DataArea);
-//			}else if("2".equals(type)) {
-//				list = GoodsCategoryQuery.me().getLeafTypes();
-//			}
-//		}
 		renderJson(list);
 	}
 	
@@ -92,7 +85,6 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	}
 	
 	public void getPayables() {
-//		String type = getPara("type");
 		String keyword = getPara("keyword");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
@@ -112,17 +104,18 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 	}
 	
 	public void getpayablesDetail() {
-//		String type = getPara("type");
 		String id = getPara("id");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> map;
 		if(!id.equals("")) {
 			Customer customer = CustomerQuery.me().findById(id);
 			Page<PayablesDetail> page = new Page<>();
 			if(customer!=null) {
-				page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea);
+				page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea,startDate,endDate);
 			}else {
-				page = PayablesDetailQuery.me().paginateSeller(getPageNumber(), getPageSize(), id,deptDataArea);
+				page = PayablesDetailQuery.me().paginateSeller(getPageNumber(), getPageSize(), id,deptDataArea,startDate,endDate);
 			}
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}else {

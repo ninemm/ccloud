@@ -31,8 +31,8 @@
 	var receivablesUrl = '${CPATH}/admin/receivables/getReceivables';
 	var receivableDetailUrl = '${CPATH}/admin/receivables/getReceivablesDetail';
 	$(function() {
-		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
-		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+		jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		updateOptions();
 		
 		/*$("#selecttype").change(function(){
@@ -43,6 +43,7 @@
 		jQuery.mm.initEditTable('#_receivables_table', receivablesUrl, getReceivablesParams, initReceivablesTable(), null);
 		$("#search-receivables").click(function(){
 			$('#_receivables_table').bootstrapTable('refresh');
+			$('#_receivables_detail_table').bootstrapTable('refresh');
 		});
 		
 		// 委托点击事件
@@ -178,8 +179,8 @@
 	        size: params.limit,
 	        page: params.offset/params.limit + 1,
 //	        type : type,
-			startDate: $('#startDate').val() + " 00:00:00",
-			endDate: $('#endDate').val() + " 23:59:59",
+			startDate: $('#startDate').val(),
+			endDate: $('#endDate').val(),
 	        id: detail_object_id
 	    };
 	    
@@ -221,11 +222,12 @@
 		}
 	}
 	function batchDown(){
-//			location.href = "${CPATH}/admin/receivables/downloading?type="+type +"&customerTypeId=" + cusType;
-			var keyword = $('#search').val();
-			if (keyword) keyword = encodeURIComponent(keyword);
-			location.href = "${CPATH}/admin/receivables/downloading?customerTypeId=" + cusType+"&keyword="+keyword;
-		}
+		var keyword = $('#search').val();
+		var startDate = $('#startDate').val();
+		var	endDate = $('#endDate').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
+		location.href = "${CPATH}/admin/receivables/downloading?customerTypeId=" + cusType+"&keyword="+keyword+"&startDate="+startDate+"&endDate="+endDate;
+	}
 
 	/* function detailMoney(ref_sn,ref_type,object_id,balance_amount){
 		var type = $("#selecttype").val();
@@ -245,7 +247,6 @@
 <!-- Main content -->
 <section class="content">
 	<div class="row content-row">
-	<form class="form-horizontal" role="form" id="form">
 		<div class="form-horizontal">
 			<div class="form-group">
 				<div class="col-sm-4">
@@ -286,7 +287,6 @@
 				</div>
 			</div>
 		</div>
-		</form>
 	</div>
 	<div class="box" >
         <table class="table table-striped table-hover table-condensed" id="_receivables_table" ></table>

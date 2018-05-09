@@ -63,8 +63,9 @@ public class PayablesDetailQuery extends JBaseQuery {
 		String select = " select * from cc_payables_detail where object_id= '"+objId+"' and dept_id='"+deptId+"' and ref_sn ='"+refSn+"' ";
 		return DAO.findFirst(select);
 	}
-//销售退货单应付账款详情
-public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,String dataArea) {
+	
+	//销售退货单应付账款详情
+	public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,String dataArea, String startDate, String endDate) {
 		
 		String select = "SELECT COALESCE(t3.act_amount,0) as act_amount, t3.ref_sn, IF (sod.is_composite = 0,t3.pay_amount,so.total_amount) pay_amount,IF (sod.is_composite = 0,t3.pay_amount,so.total_amount) - COALESCE (t3.act_amount, 0) AS balance_amount, t3.object_id, d.name as ref_Name,t3.ref_type, t3.create_date, t3.biz_date ";
 		StringBuilder fromBuilder = new StringBuilder(" FROM (SELECT SUM(r.act_amount) AS act_amount, t2.ref_sn, t2.pay_amount AS pay_amount, t2.pay_amount - r.act_amount AS ");
@@ -72,6 +73,10 @@ public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,Str
 		fromBuilder.append(" WHERE c.object_id ='"+id+"'");
 		LinkedList<Object> params = new LinkedList<Object>();
 		appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, false);
+		fromBuilder.append(" and c.create_date >= ?");
+		params.add(startDate+" 00:00:00");
+		fromBuilder.append(" and c.create_date <= ?");
+		params.add(endDate+" 23:59:59");
 		fromBuilder.append(" GROUP BY c.ref_sn  ORDER BY c.create_date DESC ) t2 ON r.ref_sn = t2.ref_sn GROUP BY t2.ref_sn ) t3 ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock cri on cri.instock_sn = t3.ref_sn ");
 		fromBuilder.append(" LEFT JOIN cc_sales_outstock sok on sok.id = cri.outstock_id ");
@@ -85,15 +90,19 @@ public Page<PayablesDetail> paginate(int pageNumber, int pageSize, String id,Str
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-//直营商采购入库应付账款详情
-public Page<PayablesDetail> paginateSeller(int pageNumber, int pageSize, String id,String dataArea) {
-	
+	//直营商采购入库应付账款详情
+	public Page<PayablesDetail> paginateSeller(int pageNumber, int pageSize, String id,String dataArea, String startDate, String endDate) {
+		
 	String select = "SELECT COALESCE(SUM(t3.act_amount),0) as act_amount, t3.ref_sn, t3.pay_amount,(t3.pay_amount) - COALESCE(SUM(t3.act_amount),0) as balance_amount, t3.object_id, d.name as ref_Name,t3.ref_type, t3.create_date, t3.biz_date ";
 	StringBuilder fromBuilder = new StringBuilder(" FROM (SELECT r.act_amount AS act_amount, t2.ref_sn, t2.pay_amount AS pay_amount, t2.pay_amount - r.act_amount AS ");
 	fromBuilder.append("balance_amount, t2.object_id, t2.ref_type, t2.create_date, t2.biz_date FROM cc_payment r RIGHT JOIN (SELECT SUM(pay_amount) AS pay_amount, object_id, ref_type, create_date, biz_date, ref_sn FROM `cc_payables_detail` c ");
 	fromBuilder.append(" WHERE c.object_id ='"+id+"'");
 	LinkedList<Object> params = new LinkedList<Object>();
 	appendIfNotEmptyWithLike(fromBuilder, "data_area", dataArea, params, false);
+	fromBuilder.append(" and c.create_date >= ?");
+	params.add(startDate+" 00:00:00");
+	fromBuilder.append(" and c.create_date <= ?");
+	params.add(endDate+" 23:59:59");
 	fromBuilder.append(" GROUP BY c.ref_sn  ORDER BY c.create_date DESC ) t2 ON r.ref_sn = t2.ref_sn ) t3  INNER JOIN dict d on t3.ref_type = d.`value`  GROUP BY t3.ref_sn ORDER BY t3.create_date desc ");
 	if (params.isEmpty())
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

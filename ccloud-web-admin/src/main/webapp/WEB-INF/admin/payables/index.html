@@ -31,8 +31,8 @@ var detail_object_id = "";
 var payablesUrl = '${CPATH}/admin/payables/getPayables';
 var payableDetailUrl = '${CPATH}/admin/payables/getpayablesDetail';
 $(function() {
-	jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
-	jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
+	jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+	jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 	updateOptions();
 	
 	/* $("#selecttype").change(function(){
@@ -43,6 +43,7 @@ $(function() {
 	jQuery.mm.initEditTable('#_payables_table', payablesUrl, getpayablesParams, initpayablesTable(), null);
 	$("#search-payables").click(function(){
 		$('#_payables_table').bootstrapTable('refresh');
+		$('#_payables_detail_table').bootstrapTable('refresh');
 	});
 	
 	// 委托点击事件
