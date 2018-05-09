@@ -454,6 +454,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				Product storedProduct = null;
 				Goods goods = null;
 				List<Product> products = new ArrayList<Product>();
+				List<Product> updateProducts = new ArrayList<>();
 				// 将拉取到的产品信息与系统中的产品比对， 如果不存在则添加
 				for (Iterator<JpProductResponseEntity> productIterator = responseProducts.iterator(); productIterator.hasNext();) {
 					responseEntity = productIterator.next();
@@ -482,6 +483,9 @@ public class _JpController extends JBaseCRUDController<Goods> {
 						storedProduct.setWeight(responseEntity.getiInvWeight() == null || responseEntity.getiInvWeight() == 0 ? null : responseEntity.getiInvWeight());
 						storedProduct.setCreateDate(calendar.getTime());
 						products.add(storedProduct);
+					} else {
+						storedProduct.setName(responseEntity.getcInvName());
+						updateProducts.add(storedProduct);
 					}
 					goods = null;
 					responseEntity = null;
@@ -489,7 +493,8 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				}
 				if(products.size() > 0)
 					Db.batchSave(products, products.size());
-				
+				if(updateProducts.size() > 0)
+					Db.batchUpdate(updateProducts, updateProducts.size());				
 			}
 			goodsCategory = null;
 		}
