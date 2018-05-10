@@ -286,4 +286,14 @@ public class GoodsCategoryQuery extends JBaseQuery {
 		fromBuilder.append("  GROUP BY gc.`id` ORDER BY gc.`parent_id`,gc.`order_list`");
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
+	
+	public List<Record> findBySellerId(String sellerId){
+		StringBuilder fromBuilder = new StringBuilder("SELECT cgc.id categoryId, cgc.`name` categoryName FROM cc_product cp ");
+		fromBuilder.append(" LEFT JOIN cc_goods cg ON cg.id = cp.goods_id ");
+		fromBuilder.append(" LEFT JOIN cc_brand cb ON cb.id = cg.brand_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_brand csb ON csb.brand_id = cb.id ");
+		fromBuilder.append(" LEFT JOIN cc_goods_category cgc on cgc.id = cg.goods_category_id ");
+		fromBuilder.append(" where csb.seller_id = '"+sellerId+"' GROUP BY cgc.id ");
+		return Db.find(fromBuilder.toString());
+	}
 }

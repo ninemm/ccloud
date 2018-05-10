@@ -416,7 +416,7 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	
 	public void addProduct(){
 			String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-			List<Record> categories =  GoodsCategoryQuery.me().findBySellerId(sellerId, "");
+			List<Record> categories =  GoodsCategoryQuery.me().findBySellerId(sellerId);
 			setAttr("categories",categories);
 			render("add_product.html");
 	}
