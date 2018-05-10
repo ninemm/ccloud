@@ -72,16 +72,6 @@
                 $tbody.append("<tr ><td><a href='javascript:void();' onclick=" + fun +">" + data[i].custom_name + "</a></td><td class='t-r'>" + data[i].productCount + "</td><td class='t-r'>" + data[i].totalAmount + "</td></tr>");
             }
 
-            var $tr = $("#product_rank tbody tr:gt(5)");
-            if($tr.length > 0){
-                $tr.hide();
-                $(".trOpen").show();
-                $(".trClose").hide();
-                $("#product_rank tfoot").show();
-            }else {
-                $("#product_rank tfoot").hide();
-            }
-
             var dataCInvCode = (data[0] != undefined ? data[0].id : '');
             var dataCInvName = (data[0] != undefined ? data[0].custom_name : '');
 
@@ -247,6 +237,9 @@
                 <#include "_inc/_pc_search_box.html"/>
                 <div class="row">
                     <div class="col-md-3">
+
+                    </div>
+                    <div class="col-md-3">
                          <p class="title" id="p_customer_rank"></p>
                         <div id="customer_rank"></div>
                     </div>
@@ -254,7 +247,7 @@
                         <p class="title" id="p_area_rank"></p>
                         <div id="area_rank"></div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
 
                     </div>
                 </div>

@@ -127,7 +127,14 @@ function initDatetimepicker(fieldId, format, minView, maxView, startView) {
 		endDate =$("#end-date").val() + ' 23:59:59';
 		$.cookie(Utils.startDateCache, startDate, {expires: 1});
 		$.cookie(Utils.endDateCache, endDate, {expires: 1});
-		initData();
+
+		if(cityName.length != 0) {
+			renderCityMap({"name": cityName}, curProvName);
+		} else if(provName.length != 0){
+			renderProvMap({"name": curProvName}, true);
+		} else {
+			renderChinaMap(true);
+		}
 	}).on('hide', function(e) {
 
 	});
