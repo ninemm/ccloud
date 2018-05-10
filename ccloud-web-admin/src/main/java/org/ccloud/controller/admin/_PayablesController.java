@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseCRUDController;
@@ -70,50 +71,51 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 public class _PayablesController extends JBaseCRUDController<Payables> { 
 	
 	public void getOptions(){
-//		String type = getPara("type");
 		String DataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<Record> list = new ArrayList();
-//		if(type != null) {
-//			if("1".equals(type)) {
 		list = CustomerTypeQuery.me().getCustomerTypes(DataArea);
-//			}else if("2".equals(type)) {
-//				list = GoodsCategoryQuery.me().getLeafTypes();
-//			}
-//		}
 		renderJson(list);
 	}
 	
+	public void index() {
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
+	}
 	
 	public void getPayables() {
-//		String type = getPara("type");
 		String keyword = getPara("keyword");
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
+		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword,startDate,endDate);
 		List<Record> payList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", payList);
-		
+		setAttr("startDate", startDate);
+		setAttr("endDate", endDate);
 		renderJson(map);
 	}
 	
 	public void getpayablesDetail() {
-//		String type = getPara("type");
 		String id = getPara("id");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> map;
 		if(!id.equals("")) {
 			SellerCustomer customer = SellerCustomerQuery.me().findById(id);
 			Page<PayablesDetail> page = new Page<>();
 			if(customer!=null) {
-				page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea);
+				page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea,startDate,endDate);
 			}else {
-				page = PayablesDetailQuery.me().paginateSeller(getPageNumber(), getPageSize(), id,deptDataArea);
+				page = PayablesDetailQuery.me().paginateSeller(getPageNumber(), getPageSize(), id,deptDataArea,startDate,endDate);
 			}
 			map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		}else {
@@ -218,6 +220,8 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
@@ -225,7 +229,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
 				+ "应付账款.xlsx";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
+		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword,startDate,endDate);
 		List<Record> payablesList = page.getList();
 		
 		List<payablesExcel> excellist = Lists.newArrayList();

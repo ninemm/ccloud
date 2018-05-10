@@ -243,7 +243,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(stockOutStatus);
 		}
 		if (StrKit.notBlank(salesmanId)) {
-			fromBuilder.append(" and t0.biz_user_id = ?");
+			fromBuilder.append(" and cso.biz_user_id = ?");
 			params.add(salesmanId);
 		}
 		if (StrKit.notBlank(carWarehouseId)) {
@@ -759,4 +759,42 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return DAO.find(sql, id);
 	}
 
+	public List<Record> findOutUserList(String sellerId, String startDate, String endDate, Integer status, Integer stockOutStatus) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.id FROM cc_sales_outstock o ");
+		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cj on cj.outstock_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cs on cs.id = cj.order_id ");
+		fromBuilder.append("LEFT JOIN `user` u on u.id = cs.biz_user_id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1 ");
+		}
+		if (status != null) {
+			fromBuilder.append(" and o.is_print = ? ");
+			params.add(status);
+		} 
+		if(stockOutStatus != null) {
+			fromBuilder.append(" and o.status != ? ");
+			params.add(stockOutStatus);
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+		fromBuilder.append("GROUP BY u.id ");
+
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	
 }

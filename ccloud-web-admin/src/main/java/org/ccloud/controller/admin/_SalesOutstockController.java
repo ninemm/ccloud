@@ -700,4 +700,27 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		renderJson(records);
 	}
 	
+	//业务员筛选
+	public void initUser() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);		
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		Integer print = getParaToInt("print");
+		Integer stockOutStatus = getParaToInt("stockOutStatus");
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> userList = new ArrayList<>();
+		userList.add(all);
+		List<Record> list = SalesOutstockQuery.me().findOutUserList(sellerId, startDate, endDate, print,stockOutStatus);
+		for (Record record : list) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.getStr("realname"));
+			item.put("value", record.getStr("id"));
+			userList.add(item);
+		}		
+		Map<String, Object> map = new HashMap<>();
+		map.put("userList", userList);		
+		renderJson(map);
+	}
 }
