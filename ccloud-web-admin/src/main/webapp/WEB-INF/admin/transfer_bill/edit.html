@@ -115,7 +115,7 @@
          var productOptionArr = new Array();
          var productMap = new Map();
          $.ajax({
-				url: "${CPATH}/admin/goods/getProductInfoBySellerIdAndWhouse",
+				url: "${CPATH}/admin/stockTaking/getProductInfo",
 				data:{"warehouse_id":warehouse_id},
 				dataType: "json",
 				async: false,
@@ -127,12 +127,12 @@
 		if(productList) {
 			$.each(productList, function(idx, item) {
 				var option = {
-					id: item.productList.sellerProductId,
-					text: item.productList.customName
+					id: item.sellerProductId,
+					text: item.custom_name
 				}
 				productOptionArr.push(option);
-				pOptionArr = productOptionArr;
-				productMap[item.productList.sellerProductId] = item;
+		        pOptionArr = productOptionArr;
+				productMap[item.sellerProductId] = item;
 				pMap = productMap;
 			});
 		}
@@ -177,12 +177,12 @@ function addNew() {
 }
 var index = 1;
 function addTr(tid, productList, optionArr) {
-	var firstProduct = productList[0].productList;
+	var firstProduct = productList[0];
 	var productId = firstProduct.sellerProductId;
 	var goodsName = firstProduct.name;
 	var specification = firstProduct.specificationValue;
 	var big_unit = firstProduct.bigUnit;
-	var balanceCount = firstProduct.balanceCount;
+	var balance_count = firstProduct.balance_count;
 
 	var $tbody = $(tid + " tbody"),
 	$tr = $tbody.find("tr:eq(0)"),
@@ -196,7 +196,7 @@ function addTr(tid, productList, optionArr) {
     $tbody.find("tr:last>td>#productId").val(productId);
     $tbody.find("tr:last>td>#specification").text(specification);
     $tbody.find("tr:last>td>#big_unit").text(big_unit);
-    $tbody.find("tr:last>td>#balanceCount").text(balanceCount);
+    $tbody.find("tr:last>td>#balance_count").text(balance_count);
     $tbody.find("tr:last>td>#factIndex").attr("value",lastTrIdx);
     $tbody.find("tr:last").find(":input").attr("disabled",false);
   
@@ -217,18 +217,18 @@ function addTr(tid, productList, optionArr) {
 
     <!--切换商品的方法  -->
     $tbody.find("tr:last>td>select.pro-slc2").change(function(){
-     var result = pMap[$(this).val()].productList;   
+     var result = pMap[$(this).val()];   
      var cproductId = result.sellerProductId;
      var cgoodsName = result.name;
      var cspecification = result.specificationValue;
      var cbig_unit = firstProduct.bigUnit;
-     var balanceCount = result.balanceCount;
+     var balance_count = result.balance_count == null ? "暂未盘点":result.balance_count;
      var $tr = $(this).parent().parent();
      $tr.find("td>#productId").val(cproductId);
      $tr.find("td>#goodsName").html(cgoodsName); 
      $tr.find("td>#specification").text(cspecification);
      $tr.find("td>#big_unit").text(cbig_unit);
-     $tr.find("td>#balanceCount").text(balanceCount);     
+      $tr.find("td>#balance_count").text(balance_count); 
      });  
 }
 
@@ -321,7 +321,7 @@ function addTr(tid, productList, optionArr) {
 					<table id="dataTable" class="table table-striped table-bordered" width="100%" >
 						<thead>
 							<tr>
-								<th class="col-sm-1 center"  style="text-align:center;">序号</th>
+								<th class="col-sm-1 center"  style="text-align:center;">操作</th>
 								<th class="col-sm-2 center"  style="text-align:center;">商品名称</th>
 								<th class="col-sm-1 center"  style="text-align:center;">规格</th>
 								<th class="col-sm-1 center"  style="text-align:center;">单位</th>
@@ -347,7 +347,7 @@ function addTr(tid, productList, optionArr) {
 									<span class="big_unit" id="big_unit"></span>
 								</td>
 									<td class="text-center">
-									<span class="balanceCount" id="balanceCount"></span>
+									<span class="balance_count" id="balance_count"></span>
 								</td>
 								<td class="text-center">
 								<input type="text" id="stock" class="stock" name="transferBillDetailList[-1].product_count" disabled="true" />
@@ -358,24 +358,22 @@ function addTr(tid, productList, optionArr) {
 	                   	            <td class="center text-center">
 										<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
 									</td>
-									<#list (list.productInfos)! as plist>
-									<td class="text-left">
-										<input type="hidden" id="productId" name="transferBillDetailList[${list_index}].product_id"  value="${list.sellerProductId}" />
-										<input type="text" id="goodsName" name="goodsName"  value="${plist.name}" disabled="disabled"/>
-									   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
+									<td class="text-center">
+										<input type="hidden" id="productId" name="transferBillDetailList[${list_index}].product_id"  value="${list.seller_product_id!}" />
+										<input type="text" id="goodsName" name="goodsName"  value="${list.custom_name!}" disabled="disabled"/>
+									   	<input type="hidden"  id="factIndex" name="factIndex" value="${list_index!}"/>
 									</td>
 									<td class="text-center">
-										<input name="specification" id="specification" value="${plist.specificationValue!}" disabled="disabled"></input>
+										<input name="specification" id="specification" value="${list.specificationValue!}" disabled="disabled"></input>
 									</td>
 									<td class="text-center">
-										<input name="big_unit" id="big_unit" value="${plist.bigUnit!}" disabled="disabled"></input>
+										<input name="big_unit" id="big_unit" value="${list.bigUnit!}" disabled="disabled"></input>
 									</td>
 									<td class="text-center">
-										<input name="balanceCount" id="balanceCount" value="${plist.balanceCount!}" disabled="disabled"></input>
+										<input name="balance_count" id="balance_count" value="${list.balance_count!}" disabled="disabled"></input>
 									</td>
-									</#list>
 									<td class="text-center">
-									<input type="text" id="stock" class="stock" name="transferBillDetailList[${list_index}].product_count"  value="${list.productCount}" />
+									<input type="text" id="stock" class="stock" name="transferBillDetailList[${list_index}].product_count"  value="${list.product_count}" />
 									</td>
 		              	           		</tr>
 		              	              </#list>

@@ -83,9 +83,10 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	public void list() {
-		String keyword = getPara("k");
-		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
+		String orderSn = getPara("searchSn");
+		String searchName = getPara("searchName");
+		if (StrKit.notBlank(searchName)) {
+			searchName = StringUtils.urlDecode(searchName);
 		}
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
@@ -100,8 +101,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, keyword, startDate,
-				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId,carWarehouseId);
+		Page<Record> page = SalesOutstockQuery.me().paginate(getPageNumber(), getPageSize(), sellerId, orderSn, startDate,
+				endDate, printStatus, stockOutStatus, status, dataArea, order, sort,salesmanId,carWarehouseId, searchName);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -550,7 +551,11 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
 		String tax = getPara("tax");
-		String keyword = new String(getPara("k").getBytes("ISO8859-1"), "UTF-8");
+		String orderSn = getPara("searchSn");
+		String searchName = getPara("searchName");
+		if (StrKit.notBlank(searchName)) {
+			searchName = StringUtils.urlDecode(searchName);
+		}
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String printStatus = getPara("printStatus");
@@ -561,8 +566,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "销售出库.xlsx";
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, keyword, startDate, endDate,
-				printStatus, stockOutStatus, null, dataArea, null, null,null,null);
+		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, orderSn, startDate, endDate,
+				printStatus, stockOutStatus, null, dataArea, null, null,null,null, searchName);
 		List<Record> salesOutstckList = page.getList();
 
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
@@ -695,4 +700,27 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		renderJson(records);
 	}
 	
+	//业务员筛选
+	public void initUser() {
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);		
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		Integer print = getParaToInt("print");
+		Integer stockOutStatus = getParaToInt("stockOutStatus");
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> userList = new ArrayList<>();
+		userList.add(all);
+		List<Record> list = SalesOutstockQuery.me().findOutUserList(sellerId, startDate, endDate, print,stockOutStatus);
+		for (Record record : list) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.getStr("realname"));
+			item.put("value", record.getStr("id"));
+			userList.add(item);
+		}		
+		Map<String, Object> map = new HashMap<>();
+		map.put("userList", userList);		
+		renderJson(map);
+	}
 }

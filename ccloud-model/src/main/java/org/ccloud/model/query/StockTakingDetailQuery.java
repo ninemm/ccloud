@@ -147,12 +147,12 @@ public class StockTakingDetailQuery extends JBaseQuery {
 
 	//盘点 查询出经销商所有商品
 	public List<Record> findByWarehouseIdAndSellerId(String warehouseId, String seller_id) {
-		StringBuilder fromBuilder = new StringBuilder("SELECT sp.id sellerProductId , p.`name` , t1.valueName specificationValue , p.big_unit bigUnit , t2.balance_count ");
+		StringBuilder fromBuilder = new StringBuilder("SELECT sp.id sellerProductId , p.`name` , t1.valueName specificationValue , p.big_unit bigUnit , t2.balance_count,sp.custom_name ");
 		fromBuilder.append(" FROM cc_seller_product sp  ");
 	 	fromBuilder.append(" LEFT JOIN cc_product p ON sp.product_id = p.id ");
 	 	fromBuilder.append(" LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
 	 	fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 ON t1.product_set_id = sp.product_id ");
-	 	fromBuilder.append(" LEFT JOIN( SELECT i.balance_count , i.sell_product_id FROM cc_inventory_detail i WHERE i.warehouse_id = ? GROUP BY i.sell_product_id ORDER BY i.create_date DESC) t2 ON t2.sell_product_id = sp.id ");
+	 	fromBuilder.append(" LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE c.warehouse_id =? GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = sp.id ");
 	 	fromBuilder.append(" WHERE sp.is_enable=1 and sp.seller_id =? ORDER BY sp.order_list");
 	 	return Db.find(fromBuilder.toString(), warehouseId,seller_id);
 	}
@@ -169,12 +169,11 @@ public class StockTakingDetailQuery extends JBaseQuery {
 
 	public List<Record> _findByStockTakingDetailId(String id, String warehouse_id) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT cstd.seller_product_id sellerProductId , csp.custom_name customName , t1.valueName specificationValue , cp.big_unit bigUnit , IFNULL(t2.balance_count, '未盘点') ");
-	 	fromBuilder.append(" balanceCount , cstd.product_count  productCount , cstd.remark remark FROM cc_stock_taking cst LEFT JOIN cc_stock_taking_detail cstd ON cstd.stock_taking_id = cst.id");
+	 	fromBuilder.append(" balance_count , cstd.product_count  productCount , cstd.remark remark FROM cc_stock_taking cst LEFT JOIN cc_stock_taking_detail cstd ON cstd.stock_taking_id = cst.id");
 	 	fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csp.id = cstd.seller_product_id LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName ");
 	 	fromBuilder.append(" FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1");
-	 	fromBuilder.append(" ON t1.product_set_id = csp.product_id LEFT JOIN cc_product cp ON cp.id = csp.product_id LEFT JOIN( SELECT * FROM cc_inventory_detail t WHERE t.create_date =");
-	 	fromBuilder.append(" (SELECT max(create_date) FROM cc_inventory_detail WHERE t.sell_product_id = sell_product_id and warehouse_id=?) GROUP BY t.sell_product_id) t2 ON t2.sell_product_id = csp.id ");
-	 	fromBuilder.append(" AND t2.warehouse_id = cst.warehouse_id WHERE cst.id = ?");
+	 	fromBuilder.append(" ON t1.product_set_id = csp.product_id LEFT JOIN cc_product cp ON cp.id = csp.product_id LEFT JOIN( SELECT i.balance_count , i.sell_product_id FROM cc_inventory_detail i WHERE i.warehouse_id = ? ");
+	 	fromBuilder.append(" GROUP BY i.sell_product_id ORDER BY i.create_date DESC) t2 ON t2.sell_product_id = csp.id WHERE cst.id = ?");
 	 	return Db.find(fromBuilder.toString(),warehouse_id, id);
 	}
 }

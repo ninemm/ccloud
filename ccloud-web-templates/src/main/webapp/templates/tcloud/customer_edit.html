@@ -43,7 +43,7 @@
 
         if($.trim($("#mobile").val()).length==0) {$.toptip('联系电话不能为空', 1000, 'error'); return false;}
         //if(/^1[34578]\d{9}$/.test($("#mobile").val())==false){$.toptip('联系电话不正确', 1000, 'error'); return false;}
-        if(/^[0-9]*$/.test($("#mobile").val())==false){$.toptip('联系电话存在非数字', 1000, 'error'); return false;}
+        //if(/^[0-9]*$/.test($("#mobile").val())==false){$.toptip('联系电话存在非数字', 1000, 'error'); return false;}
         if($.trim($("#mobile").val()).length > 30) {$.toptip('联系电话长度不能超过30', 1000, 'error'); return false;}
 
         if($.trim($("#customer_type").val()).length==0) {$.toptip('客户类型不能为空', 1000, 'error'); return false;}
@@ -57,7 +57,6 @@
 
     $(function() {
         initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
-
         <#if !sellerCustomer?? || !sellerCustomer.lat?? >
             wxReadyGetLocation(
                 function(lng, lat, addComp, address) {
@@ -67,15 +66,6 @@
                         $("#delivery-address")[0].value = addComp.province + " " + addComp.city + " " + addComp.district;
                         $('#areaCode').val(addComp.provinceNumber + "," + addComp.cityNumber + "," + addComp.districtNumber);
                         $('#areaName').val(addComp.province + "," + addComp.city + "," + addComp.district);
-                        $("#delivery-address").cityPicker({
-                            title: "请选择配送地址",
-                            onClose: function(obj) {
-                                var areaCode = obj.value.join(",");
-                                var areaName = obj.displayValue.join(",");
-                                $('#areaCode').val(areaCode);
-                                $('#areaName').val(areaName);
-                            }
-                        });
                     </#if>
                     $("#lng").val(lng.toFixed(6));
                     $("#lat").val(lat.toFixed(6));
@@ -136,7 +126,19 @@
             });
         
         if($("#delivery-address").val().length == 2) $("#delivery-address").val('');
-
+ 		 <#if !sellerCustomer?? || !sellerCustomer.lat?? >
+	 		<#if type=="add">
+				 $("#delivery-address").cityPicker({
+				    title: "请选择配送地址",
+				    onClose: function(obj) {
+				        var areaCode = obj.value.join(",");
+				        var areaName = obj.displayValue.join(",");
+				        $('#areaCode').val(areaCode);
+				        $('#areaName').val(areaName);
+				    }
+				});
+			 </#if>
+		 </#if>
         <#if type!="company" && type!="add">
         $("#delivery-address").cityPicker({
             title: "请选择配送地址",
@@ -159,7 +161,7 @@
              }
          });
 
-    var index; //第几张图片
+        var index; //第几张图片
         $uploaderFiles.on("click", "li", function() {
             index = $(this).index();
             $galleryImg.attr("style", this.getAttribute("style"));
@@ -239,7 +241,7 @@
                 $('#location-span').text(address);
                 $('#location').val(address);
             }
-        )
+        );
     }
     
     function getback() {
@@ -371,7 +373,7 @@
 			                        </ul>
                                     <#if type!="company">
                                         <div class="weui-uploader__input-box">
-                                            <input id="uploaderInput" name="customer.img_path" class="weui-uploader__input" type="file" accept="image/*" multiple="" capture="camera">
+                                            <input type="file" id="uploaderInput" name="customer.img_path" class="weui-uploader__input" accept="image/*" capture="camera">
                                             <input type="hidden" name="pic" id="pic">
                                         </div>
                                     </#if>
