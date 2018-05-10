@@ -137,8 +137,8 @@ public class Bi2SalesQuery extends JBaseQuery {
 		return Db.queryLong(sqlBuilder.toString(), params.toArray());
 	}
 
-	// 拜访总数
-	public Long findVistCount(String[] dataArea, String startDate, String endDate) {
+	// 拜访数
+	public Long findVisitCount(String[] dataArea, String startDate, String endDate) {
 
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder sqlBuilder = new StringBuilder("select count(1) ");
@@ -155,6 +155,19 @@ public class Bi2SalesQuery extends JBaseQuery {
 			sqlBuilder.append(" and cv.create_date <= ?");
 			params.add(endDate);
 		}
+		return Db.queryLong(sqlBuilder.toString(), params.toArray());
+	}
+
+	// 用户数
+	public Long findUserCount(String[] dataArea) {
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sqlBuilder = new StringBuilder("select count(1) ");
+		sqlBuilder.append(" from cc_user c ");
+		sqlBuilder.append(" where c.status = 1 ");
+
+		appendIfNotEmpty(sqlBuilder, "c.dealer_data_area", dataArea, params, false);
+
 		return Db.queryLong(sqlBuilder.toString(), params.toArray());
 	}
 

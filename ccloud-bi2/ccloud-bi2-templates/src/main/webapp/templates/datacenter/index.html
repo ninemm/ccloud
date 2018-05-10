@@ -3,19 +3,23 @@
     section {
         background: #fff;
     }
+    .topTotal {
+        margin-top: 2.4rem;
+        text-align: center;
+    }
     .compare .gather {
         display: inline-block;
         width: 49%;
-        border: 0;
-        margin-top: 2.4rem;
     }
     .compare .gather:first-child {
         border-right: 1px solid #e0e0e0;
     }
+    .compare .gather:nth-child(2) {
+        border-left: 1px solid #e0e0e0;
+    }
     .compare .gather p,.compare .gather span {
         display: block;
         width: 100%;
-        text-align: center;
     }
     #dealer_in_china_map {
       width: 100%;
@@ -114,13 +118,23 @@
         dealerCount.start();
         var orderCustomerCount = new CountUp("orderCustomerCount",0, parseInt(${orderCustomerCount!}));
         orderCustomerCount.start();
+        var  userCount = new CountUp("userCount",0, parseInt(${userCount!}));
+        userCount.start();
+        var visitCount = new CountUp("visitCount",0, parseInt(${visitCount!}));
+        visitCount.start();
         
         setTimeout(function() {
             $("#dealerCount").addClass('animated pulse');
             setTimeout(function() {
                 $("#orderCustomerCount").addClass('animated pulse');
-            }, 1000);
-        }, 2000);
+                setTimeout(function() {
+                    $("#userCount").addClass('animated pulse');
+                    setTimeout(function() {
+                        $("#visitCount").addClass('animated pulse');
+                    }, 500);
+                }, 500);
+            }, 500);
+        }, 500);
     }
 
     var dealerMapId = document.getElementById("dealer_in_china_map");
@@ -301,18 +315,33 @@
 
     <div class="bi-body">
         <#include "_inc/_bi_search_box.html"/>
-        <div class="compare">
-            <div class="gather">
-                <p>
-                    经销商总数(个):<br/><span id="dealerCount"></span>
-                </p>
+        <div class="topTotal">
+            <div class="compare">
+                <div class="gather">
+                    <p>
+                        经销商总数(个):<br/><span id="dealerCount"></span>
+                    </p>
+                </div>
+                <div class="gather">
+                    <p>
+                        总下单客户数(个):<br/><span id="orderCustomerCount"></span>
+                    </p>
+                </div>
+                <div class="clearfix"></div>
             </div>
-            <div class="gather">
-                <p>
-                    总下单客户数(个):<br/><span id="orderCustomerCount"></span>
-                </p>
+            <div class="compare">
+                <div class="gather">
+                    <p>
+                        总用户数(个):<br/><span id="userCount"></span>
+                    </p>
+                </div>
+                <div class="gather">
+                    <p>
+                        总拜访数(次):<br/><span id="visitCount"></span>
+                    </p>
+                </div>
+                <div class="clearfix"></div>
             </div>
-            <div class="clearfix"></div>
         </div>
         
         <div class="divide-line"></div>

@@ -14,23 +14,15 @@
 package org.ccloud.controller.bi;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import com.alibaba.fastjson.JSON;
 import org.ccloud.Consts;
 import org.ccloud.core.BaseFrontController;
 import org.ccloud.model.User;
 import org.ccloud.model.query.Bi2SalesQuery;
-import org.ccloud.model.query.BiManagerQuery;
 import org.ccloud.route.RouterMapping;
-import org.ccloud.utils.DateUtils;
 import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
-import org.joda.time.DateTime;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Record;
@@ -83,6 +75,8 @@ public class BiIndexController extends BaseFrontController {
 		String[] brandId = getSessionAttr(Consts.SESSION_BRAND_ID_ARRAY);
 
 		setAttr("orderCustomerCount", Bi2SalesQuery.me().findCustomerCount(dataArea, null, null, brandId));
+		setAttr("userCount", Bi2SalesQuery.me().findUserCount(dataArea));
+		setAttr("visitCount", Bi2SalesQuery.me().findVisitCount(dataArea, null, null));
 
 		render("index.html");
 	}
@@ -126,7 +120,7 @@ public class BiIndexController extends BaseFrontController {
 				Bi2SalesQuery.me().findTotalAmount(dataArea, startDate, endDate, brandId));
 
 		result.put("totalVisitCount",
-				Bi2SalesQuery.me().findVistCount(dataArea, startDate, endDate));
+				Bi2SalesQuery.me().findVisitCount(dataArea, startDate, endDate));
 
 		renderJson(result);
 
