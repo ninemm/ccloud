@@ -31,13 +31,9 @@
         background: #f2f2f2;
         margin-top: 2.4rem;
     }
-    #seller_rank{
+    #orderNum{
         width: 100%;
-        height:4rem;
-    }
-    #customer_rank{
-        width: 100%;
-        height:8rem;
+        height:14rem;
     }
 </#macro>
 <#macro script>
@@ -51,6 +47,7 @@
 
     var dealerCode = '';
     var dealerName = '';
+    var selectDataArea = '';
 
     function setDateType(type){
         setFilter(type);
@@ -66,8 +63,8 @@
     function setDealer(Code, Name, Area){
         dealerCode = Code;
         dealerName = Name;
-        dataArea = Area
-        dealer_detail(dealerCode, dealerName, dataArea);
+        selectDataArea = Area
+        dealer_detail(dealerCode, dealerName, selectDataArea);
     }
     
     //经销商
@@ -107,7 +104,7 @@
        });
     }
     
-    //直营商和产品
+    //订单数和产品
     function dealer_detail(dealerCode, dealerName, selectDataArea){
       Utils.loading();
       $.ajax({
@@ -116,13 +113,10 @@
             data:{provName: provName, cityName: cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: selectDataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
-            //直营商
-            //var sellerTitle = dealerName + '销售情况';
-            //var $p = $("#p_seller_rank");
-            //$p.empty();
-            //$p.text(sellerTitle);
-            
-            //seller_rank(data.sellerList);
+
+            //订单数量
+            var oTitle = dealerName + '订单平均金额(单位/元)';
+            orderNum(data.orderNumList, oTitle);
             
             var prTitle = dealerName + '产品销售排行';
             var $p = $("#p_product_rank");
@@ -133,75 +127,6 @@
             product_rank(data.productList);
        });
     }
-    
-    /*var sellerOption;
-    function seller_rank(sellerList){
-        var sellerIdData = [];
-        var sellerYData = [];
-        var sellerSeriesData = [];
-        var seller_rank = document.getElementById('seller_rank');
-        var $seller_rank = $(seller_rank);
-            
-        $seller_rank.height(80);
-        for(var i = 0; i < sellerList.length; i++){
-            var height = $seller_rank.height();
-            $seller_rank.height(height += 16);
-            
-            sellerIdData.push(sellerList[i].dealerCode);
-            sellerYData.push(sellerList[i].sellerName);
-            sellerSeriesData.push(sellerList[i].totalAmount);
-        }
-
-        var sellerRankChart = echarts.init(seller_rank);
-        sellerOption = {
-            color: ['#4ac7f5'],
-            grid: {
-                   left: '2%',
-                   right: '15%',
-                   bottom: 15,
-                   top: 15,
-                   containLabel: true
-            },
-            calculable : true,
-            xAxis : {
-                show : false,
-                name : '金额/万元',
-                type : 'value',
-                boundaryGap: [0, 0.01]
-            },
-            yAxis : {
-                type : 'category',
-                data : sellerYData.reverse(),
-                axisLabel : {
-                    interval : 0,
-                    fontSize : 8
-                }
-            },
-            series : {
-                type:'bar',
-                barWidth:15,
-                data:sellerSeriesData.reverse(),
-                label:{
-                    normal:{
-                           show:true,
-                           position:'right',
-                           formatter: '{c}万元'
-                    }
-                },
-                sellerIdData : sellerIdData.reverse()
-            }
-        };
-        sellerRankChart.resize();
-        sellerRankChart.setOption(sellerOption,true);
-        sellerRankChart.on('click',sellerClick);
-    }
-    function sellerClick(param) {
-        if (typeof param.seriesIndex != 'undefined') {
-            var sellerName = param.name;
-            var sellerId = sellerOption.series.sellerIdData[param.dataIndex];
-            seller_product(dateType, sellerName, sellerId);
-        }
-    }*/
     
     //产品
     function product_rank(productList){
@@ -225,26 +150,72 @@
         }
       
     }
-    
-    //直营商产品
-    /*function seller_product(dateType, sellerName, sellerId){
-      Utils.loading();
-      $.ajax({
-            url:"${CPATH}/biSales/productBySeller",
-            type:"post",
-            data:{provName: provName, cityName: cityName, countryName: '', dateType: dateType, sellerId: sellerId},
-            dataType:"json"
-        }).done(function(data){
 
-            var prTitle = sellerName + '产品销售排行';
-            var $p = $("#p_product_rank");
-            $p.empty();
-            $p.text(prTitle);
-            
-            //产品
-            product_rank(data);
-       });
-    }*/
+    //订单数量
+    function orderNum(data, oTitle){
+    
+        var xData = [];
+        var seriesData = [];
+        
+        for(var i = 0; i < data.length; i++){
+            xData.push(data[i].date) ;
+            seriesData.push(data[i].orderNum);
+        }
+        
+        var orderNum = document.getElementById('orderNum');
+        
+        var orderNumChart = echarts.init(orderNum);
+        var option = {
+            title: {
+                left: 'center',
+                top: 'top',
+                text: oTitle,
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#ea6f5a',
+                    fontSize: '.7rem'
+                }
+            },
+            tooltip : {
+            },
+            grid: {
+                left: '13%',
+                right: '8%',
+                top: '25%'
+            },
+            xAxis: {
+                data: xData
+            },
+            yAxis: {},
+            series: [{
+                name: oTitle,
+                type: 'line',
+                itemStyle: {
+                normal: {color: '#a6c84c'}
+            },
+            lineStyle: {
+                normal: {color: '#a6c84c'}
+            },
+            markPoint: {
+                label: {
+                    normal: {
+                        textStyle: {
+                            color: '#000',
+                            }
+                        }
+                    },
+                    data : [
+                        {type: 'max', name: '最大值'},
+                        {type: 'min', name: '最小值'}
+                    ]
+                 },
+                data:seriesData
+                }]
+            };
+            orderNumChart.resize();
+            orderNumChart.setOption(option, true);
+    }
+
 
 </#macro>
 <@layout>
@@ -277,6 +248,9 @@
 <!--        <p class="title" id="p_seller_rank"></p>
         <div id="seller_rank">
         </div>-->
+        <div class="divide-line"></div>
+        <div id="orderNum"></div>
+        <div class="divide-line"></div>
         <p class="title" id="p_product_rank"></p>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell" style="padding: 0">

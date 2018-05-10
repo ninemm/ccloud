@@ -137,6 +137,27 @@ public class Bi2SalesQuery extends JBaseQuery {
 		return Db.queryLong(sqlBuilder.toString(), params.toArray());
 	}
 
+	// 拜访总数
+	public Long findVistCount(String[] dataArea, String startDate, String endDate) {
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		StringBuilder sqlBuilder = new StringBuilder("select count(1) ");
+		sqlBuilder.append(" from cc_customer_visit cv ");
+
+		appendIfNotEmpty(sqlBuilder, "cv.dealer_data_area", dataArea, params, true);
+
+		if (startDate != null) {
+			sqlBuilder.append(" and cv.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (endDate != null) {
+			sqlBuilder.append(" and cv.create_date <= ?");
+			params.add(endDate);
+		}
+		return Db.queryLong(sqlBuilder.toString(), params.toArray());
+	}
+
 	// 客户总数
 	public Long findAllCustomerCount(String[] dataArea, String provName, String cityName, String countryName) {
 
@@ -530,6 +551,46 @@ public class Bi2SalesQuery extends JBaseQuery {
 
 		return Db.find(sqlBuilder.toString(), params.toArray());
 
+	}
+
+	// 订单数量
+	public List<Record> findOrderCountList(String[] dataArea, String provName, String cityName, String countryName,
+	                                       String startDate, String endDate,String[] brandId) {
+
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		StringBuilder sqlBuilder = new StringBuilder(" SELECT CONCAT(YEAR(o.biz_date) ,'-', MONTH(o.biz_date),'-',DAY(o.biz_date)) date, ");
+		sqlBuilder.append(" count(distinct o.id) as orderNum ");
+
+		sqlBuilder.append(" FROM cc_sales_outstock_detail cc ");
+		sqlBuilder.append(" JOIN cc_sales_outstock o ON o.id = cc.outstock_id ");
+		sqlBuilder.append(" JOIN cc_seller_customer csu ON csu.id = o.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer cu ON cu.id = csu.customer_id ");
+		sqlBuilder.append(" JOIN cc_customer_type ct ON ct.id = o.customer_type_id ");
+		sqlBuilder.append(" JOIN cc_seller_product cs ON cs.id = cc.sell_product_id ");
+		sqlBuilder.append(" JOIN cc_product cp on cp.id = cs.product_id ");
+		sqlBuilder.append(" JOIN cc_goods cg on cp.goods_id = cg.id ");
+
+		sqlBuilder.append(" WHERE csu.customer_kind = ? ");
+		params.add(Consts.CUSTOMER_KIND_COMMON);
+
+		appendIfNotEmpty(sqlBuilder, "o.dealer_data_area", dataArea, params, false);
+		appendIfNotEmpty(sqlBuilder, "cg.brand_id", brandId, params, false);
+		appendIfNotEmpty(sqlBuilder, "cu.prov_name", provName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cu.city_name", cityName, params, false);
+		appendIfNotEmpty(sqlBuilder, "cu.country_name", countryName, params, false);
+
+		if (startDate != null) {
+			sqlBuilder.append(" and o.biz_date >= ?");
+			params.add(startDate);
+		}
+
+		if (endDate != null) {
+			sqlBuilder.append(" and o.biz_date <= ?");
+			params.add(endDate);
+		}
+		sqlBuilder.append(" GROUP BY YEAR(o.biz_date) , MONTH(o.biz_date), DAY(o.biz_date) ");
+		return Db.find(sqlBuilder.toString(), params.toArray());
 	}
 
 	//经销商产品销售排行

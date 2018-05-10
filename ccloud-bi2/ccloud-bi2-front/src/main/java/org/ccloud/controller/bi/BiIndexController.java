@@ -125,6 +125,9 @@ public class BiIndexController extends BaseFrontController {
 		result.put("totalOrderAmount",
 				Bi2SalesQuery.me().findTotalAmount(dataArea, startDate, endDate, brandId));
 
+		result.put("totalVisitCount",
+				Bi2SalesQuery.me().findVistCount(dataArea, startDate, endDate));
+
 		renderJson(result);
 
 	}

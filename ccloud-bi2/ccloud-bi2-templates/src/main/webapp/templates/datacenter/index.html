@@ -76,10 +76,12 @@
 
     function setDateType(type){
         setFilter(type);
+        renderChinaMap();
         total();
     }
     $(document).on("click", ".confirm-search-btn", function () { //点击确定按钮
         setFilter(3);
+        renderChinaMap();
         total();
         closeCombinSearch();
     })
@@ -137,7 +139,7 @@
             $.ajax({
                 url: "${CPATH}/biSales/queryMapData",
                 type: "post",
-                data: {startDate: '2018-01-01 00:00:00', endDate: moment().format('YYYY-MM-DD HH:mm:ss')},
+                data: {startDate: startDate, endDate: endDate},
                 dataType:"json"
             }).done(function(data) {
                 prov_data = [];
@@ -253,6 +255,7 @@
                     $.cookie(Utils.latitudeCache, data.result.location.lat, { expires: 7 });
                 }
             });
+            renderChinaMap();
             total();
             closeCombinSearch();
         });
@@ -273,16 +276,21 @@
             orderTotal.start();
             var customerTotal = new CountUp("order-customer",0, parseInt(data.totalCustomerCount));
             customerTotal.start();
+            var visitTotal = new CountUp("visit-total",0, parseInt(data.totalVisitCount));
+            visitTotal.start();
         
             setTimeout(function() {
-            $("#order-sales").addClass('animated pulse');
-            setTimeout(function() {
-            $("#order-total").addClass('animated pulse');
-            setTimeout(function() {
-            $("#order-customer").addClass('animated pulse');
-            }, 1000);
-            }, 1000);
-            }, 2000);
+                $("#order-sales").addClass('animated pulse');
+                setTimeout(function() {
+                    $("#order-total").addClass('animated pulse');
+                    setTimeout(function() {
+                        $("#order-customer").addClass('animated pulse');
+                        setTimeout(function() {
+                            $("#visit-total").addClass('animated pulse');
+                        }, 500);
+                    }, 500);
+                }, 500);
+            }, 500);
         });
     }
 
@@ -324,27 +332,32 @@
             <div class="gather">
                 <img src="${CTPATH}/images/bi_money.png">
                 <p>
-                    销售总额(元):<br/><span id="order-sales"></span>
+                    销售总金额(元):<br/><span id="order-sales"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
             <div class="gather">
                 <img src="${CTPATH}/images/bi_order.png">
                 <p>
-                    订单总数(笔):<br/><span id="order-total"></span>
+                    订单总数量(笔):<br/><span id="order-total"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
             <div class="gather">
                 <img src="${CTPATH}/images/bi_customer.png">
                 <p>
-                    客户总数(个):<br/><span id="order-customer"></span>
+                    下单客户数(个):<br/><span id="order-customer"></span>
+                </p>
+                <div class="clearfix"></div>
+            </div>
+            <div class="gather">
+                <img src="${CTPATH}/images/bi_visit.png">
+                <p>
+                    拜访总数量(次):<br/><span id="visit-total"></span>
                 </p>
                 <div class="clearfix"></div>
             </div>
         </div>
-        
-        <!-- <div id="orderAvg"></div> -->
         
     </div>
 </section>

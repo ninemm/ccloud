@@ -261,7 +261,7 @@ public class BiSalesController extends BaseFrontController {
 	public void dealerDetail() {
 
 		String dataArea = getPara("dataArea", "").trim();
-//		String dataAreaArray[] = new String[]{dataArea};
+		String dataAreaArray[] = new String[]{dataArea};
 		String[] brandId = this.getBrandId(getPara("brandId"));
 
 		String provName = getPara("provName", "").trim();
@@ -273,14 +273,15 @@ public class BiSalesController extends BaseFrontController {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
-		//直营商销售情况
-//		List<Record> sellerList = Bi2SalesQuery.me().findsalesList(false, provName, cityName, countryName, dataAreaArray
-//				, startDate, endDate, brandId);
+		//经销商订单数
+		List<Record> orderNumList = Bi2SalesQuery.me().findOrderCountList(dataAreaArray, provName, cityName, countryName,
+				startDate, endDate, brandId);
+
 		//经销商产品销售排行
 		List<Record> productList = Bi2SalesQuery.me().findProductListByDealer(true, provName, cityName, countryName,
 				dataArea, startDate, endDate, brandId);
 
-//		result.put("sellerList", sellerList);
+		result.put("orderNumList", orderNumList);
 		result.put("productList", productList);
 
 		renderJson(result);
