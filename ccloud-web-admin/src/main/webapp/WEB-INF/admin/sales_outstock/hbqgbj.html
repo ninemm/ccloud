@@ -142,11 +142,7 @@ function queryPrintDetail(financePrint) {
                             if(item.customerKind == 100402){
                               content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, "", subitem.smallCount, "", barCode, isGift,"")
                             }else{
-                              if(financePrint == 0){
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,productAmout+ '元')
-                            }else{
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
-                             }
+                           	 content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
                             }
                         });
 
@@ -178,13 +174,8 @@ function queryPrintDetail(financePrint) {
                     if(item.customerKind == 100402){
                      footerContent = $.format(footerStr, "", "", warehousePhone, remark,printFootContext);
                     }else{
-                    if(financePrint == 0){
-                    var salesAmount = jQuery.mm.digitUppercase(item.salesAmount);
-                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext);
-                    }else{
-                    var salesAmount = jQuery.mm.digitUppercase(saleMoney);
-                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
-                    }
+	                    var salesAmount = jQuery.mm.digitUppercase(saleMoney);
+	                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
                     }
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;

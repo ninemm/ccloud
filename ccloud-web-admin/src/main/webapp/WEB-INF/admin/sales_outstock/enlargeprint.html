@@ -167,13 +167,8 @@ function queryPrintDetail(financePrint) {
 
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
-                    if(financePrint == 0){
-                    var salesAmount = jQuery.mm.digitUppercase(item.salesAmount);
-                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext);
-                    }else{
                     var salesAmount = jQuery.mm.digitUppercase(saleMoney);
                     footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
-                    }
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 

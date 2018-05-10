@@ -97,7 +97,11 @@
 		    return param;
 		}
 	
-	
+	function batchDown(){
+			var keyword = $('#search').val();
+			if (keyword) keyword = encodeURIComponent(keyword);
+			location.href = "${CPATH}/admin/receivables/downloadingAmount?customerTypeId=" + cusType+"&keyword="+keyword;
+	}
 	
 </#macro>
 <@layout active_id=p child_active_id=c>
@@ -115,6 +119,7 @@
 		<div class="form-horizontal">
 			<div class="form-group">
 	                <div class="col-sm-4">
+	                	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
 				 	 </div>
 					<div class="col-sm-4">
 						<label class="control-label col-sm-4">客户类型：</label>
