@@ -5,6 +5,9 @@
     <!-- bootstrap-table -->
     <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.js"></script>
     <script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
+      <!-- bootstrap-datetimepicker -->
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
     <!-- bootstrapValidator -->
     <script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
 </#macro>
@@ -12,7 +15,9 @@
 <#macro css_import>
 
     <!-- bootstrap-table-->
-    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrap-table/bootstrap-table.css">  
+    	<!-- bootstrap-datetimepicker -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">
     <!-- bootstrapValidator -->
     <link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
 
@@ -26,6 +31,8 @@ var detail_object_id = "";
 var payablesUrl = '${CPATH}/admin/payables/getPayables';
 var payableDetailUrl = '${CPATH}/admin/payables/getpayablesDetail';
 $(function() {
+	jQuery.mm.initDatetimepicker(null, '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
+	jQuery.mm.initDatetimepicker(null, '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 	updateOptions();
 	
 	/* $("#selecttype").change(function(){
@@ -36,6 +43,7 @@ $(function() {
 	jQuery.mm.initEditTable('#_payables_table', payablesUrl, getpayablesParams, initpayablesTable(), null);
 	$("#search-payables").click(function(){
 		$('#_payables_table').bootstrapTable('refresh');
+		$('#_payables_detail_table').bootstrapTable('refresh');
 	});
 	
 	// 委托点击事件
@@ -103,6 +111,8 @@ var getpayablesParams = function(params){
 	        page: params.offset/params.limit + 1,
 	        keyword :keyword,
 	//        type : type,
+			startDate: $('#startDate').val(),
+			endDate: $('#endDate').val(),
 	        customerTypeId:customerTypeId
 	    };
 	    return param;
@@ -152,6 +162,8 @@ var getpayablesDetailParams = function(params){
         size: params.limit,
         page: params.offset/params.limit + 1,
 //        type : type,
+		startDate: $('#startDate').val(),
+		endDate: $('#endDate').val(),
         id: detail_object_id
     };
     
@@ -173,7 +185,19 @@ function batchDown(){
 		if (keyword) keyword = encodeURIComponent(keyword);
 		location.href = "${CPATH}/admin/payables/downloading?customerTypeId=" + cusType+"&keyword"+keyword;
 	}
-
+	
+var validatorFields = {
+		'startDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		},
+		'endDate': {
+			validators: {
+				date : { format : 'YYYY-MM-DD', message : '日期格式不正确' }
+			}
+		}
+	}
 </#macro>
 <@layout active_id=p child_active_id=c>
 	
@@ -190,34 +214,51 @@ function batchDown(){
 	<div class="row content-row">
 		<div class="form-horizontal">
 			<div class="form-group">
-					<div class="col-sm-4">
-					 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
-				 	</div>
-					<div class="col-sm-4">
-						<label class="control-label col-sm-4">客户类型：</label>
-						<div class="col-sm-8 input-group input-group-sm">
-							<select id="category-or-customer" class="form-control">
-								<option value="0">全部</option>
-								<option value="1">供应商</option>
-							</select>
-						</div>
+				<div class="col-sm-4">
+					<label class="control-label col-sm-4">开始时间:</label>
+					<div class="col-sm-8 input-group input-group-sm">
+						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
 					</div>
-					<div class="col-sm-3">
-						<label class="control-label col-sm-4">名称：</label>
-						<div class="col-sm-8 input-group input-group-sm">
-							<input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">
-						</div>
+				</div>
+				<div class="col-sm-4">
+					<label class="control-label col-sm-4">结束时间:</label>
+					<div class="col-sm-8 input-group input-group-sm">
+						<input id="endDate" class="form-control" value="${endDate!}" name="endDate" placeholder="结束日期" >
 					</div>
-					<div class="col-sm-1">
-						<span id="search-payables" class="btn btn-primary btn-sm btn-flat" >搜索</span>
+				</div>
+				<div class="col-sm-4">
+					<label class="control-label col-sm-4">客户类型：</label>
+					<div class="col-sm-8 input-group input-group-sm">
+						<select id="category-or-customer" class="form-control">
+							<option value="0">全部</option>
+							<option value="1">供应商</option>
+						</select>
 					</div>
+				</div>
 			</div>
+			<div class="form-group">
+				<div class="col-sm-4">
+					<label class="control-label col-sm-4">名称：</label>
+					<div class="col-sm-8 input-group input-group-sm">
+						<input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索名称">
+					</div>
+				</div>
+				<div class="col-sm-6">
+				</div>
+				 <div class="col-sm-1">
+				 	<button onclick="batchDown()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导出</button>
+			 	</div>
+				<div class="col-sm-1">
+					<span id="search-payables" class="btn btn-primary btn-sm btn-flat" >搜索</span>
+				</div>
+			</div>		
+					
 		</div>
 	</div>
-	<div class="box" style="margin-top:50px;">
+	<div class="box" >
         <table class="table table-striped table-hover table-condensed" id="_payables_table" ></table>
     </div>
-    <div class="box">
+    <div class="box" style="margin-top:50px;">
         <table class="table table-striped table-hover table-condensed" id="_payables_detail_table" ></table>
     </div>
 </section>

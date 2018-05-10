@@ -433,7 +433,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	
 	public  Record findStockInForPrint(String inStockId) {
 	StringBuilder stringBuilder = new StringBuilder();
-	stringBuilder.append(" SELECT sr.id as salesRefundInstockId, sr.instock_sn, sr.payment_type, sr.remark AS stockInRemark, o.delivery_address, sr.total_reject_amount, ");
+	stringBuilder.append(" SELECT sn.phone sellerPhone,sr.id as salesRefundInstockId, sr.instock_sn, sr.payment_type, sr.remark AS stockInRemark, o.delivery_address, sr.total_reject_amount, ");
 	stringBuilder.append(" cs.customer_kind, c.id AS customerId, c.customer_name, c.contact AS ccontact, c.mobile AS cmobile, c.address AS ");
 	stringBuilder.append(" caddress, ct. NAME AS customerTypeName, ct. CODE AS customerTypeCode, u.realname, u.mobile, w. CODE AS ");
 	stringBuilder.append(" warehouseCode, cp.factor, w.`name` AS warehouseName, w.phone AS warehousePhone, sr.create_date AS returnOrderTime, ");
@@ -564,7 +564,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 
 	public Record findStockInForPrintByNoOrder(String inStockId) {
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(" SELECT sr.id as salesRefundInstockId, sr.instock_sn, sr.payment_type, sr.remark AS stockInRemark, c.address AS delivery_address, sr.total_reject_amount, ");
+		stringBuilder.append(" SELECT sn.phone sellerPhone, sr.id as salesRefundInstockId, sr.instock_sn, sr.payment_type, sr.remark AS stockInRemark, c.address AS delivery_address, sr.total_reject_amount, ");
 		stringBuilder.append(" cs.customer_kind, c.id AS customerId, c.customer_name, c.contact AS ccontact, c.mobile AS cmobile, c.address AS ");
 		stringBuilder.append(" caddress, ct. NAME AS customerTypeName, ct. CODE AS customerTypeCode, u.realname, u.mobile, w. CODE AS ");
 		stringBuilder.append(" warehouseCode, cp.factor, w.`name` AS warehouseName, w.phone AS warehousePhone, sr.create_date AS returnOrderTime, ");

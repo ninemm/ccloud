@@ -19,16 +19,14 @@
 
    $(function() {
     var ids = '${outstockId!}';
-    var financePrint = '${isFinancePrint!}';
-	queryPrintDetail(financePrint);
+	queryPrintDetail();
 	initEvent();
 });
 
 var headerInfo =
 	'<div class="header clear clearheader">' +
 	    '<div class="titleArea" style="margin-top: 4rem;">' +
-			'<h1>{0}送货单</h1>' +
-			'<img id="imgName"  src={2} style="width: 80px;position: absolute;top: -52px;left: 0 "   class="imgStyle"  />'+ 
+			'<h1>{0}退货单</h1>' +
 		'</div>' +
 	'</div>';
 	
@@ -43,9 +41,9 @@ var headerStr =
 	'<table class="printContent clearcontent">' +
 		'<thead>' +
 		'<tr>' +
-			'<td class="text-center width8">发货单号</td>' +
-			'<td class="width8">{0}</td>' +
-			'<td class="text-center width8">下单时间</td>' +
+			'<td class="text-center width8">退货单号</td>' +
+			'<td class="width16">{0}</td>' +
+			'<td class="text-center width8">退货时间</td>' +
 			'<td colspan="2" class="width8">{1}</td>' +
 			'<td class="text-center width8">制单时间</td>' +
 			'<td colspan="2">{2}</td>' +
@@ -69,8 +67,8 @@ var headerStr =
 			'<td>瓶数</td>' +
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
-			'<td style="width:10%">购货价格</td>' +
-			'<td colspan="3" class="center2">条码</td>' +
+			'<td style="width:10%">退货价格</td>' +
+			'<td colspan="2" class="center2">条码</td>' +
 		'</tr>' +
 	'</thead>';
 
@@ -99,88 +97,76 @@ var headerStr =
 			'</div>';
 
 
-function queryPrintDetail(financePrint) {
+function queryPrintDetail() {
 
     var batchPrintContent = '';
     var headerContent = null;
     var footerContent = null;
     var headerInfoContent = null;
     $.ajax({
-        url: "${CPATH}/admin/salesOutstock/getPrintInfo",
+        url: "${CPATH}/admin/salesInstock/getPrintInfo",
         data: {
-            "outstockId": '${outstockId!}',
-            "isFinancePrint":'${isFinancePrint!}'
+            "inStockId": '${inStockId!}'
         },
         dataType: "json",
         async: false,
         success: function(data) {
             if (data && data.rows) {
                 var curDate = new Date().Format("yyyy-MM-dd hh:mm");
-                $.each(data.rows,
-                function(index, item) {
+
+                $.each(data.rows, function(index, stockInPrintInfo) {
+                 item =  stockInPrintInfo.printInfo
                     var content = '<tbody>';
-                     let saleMoney = 0;
-                    if (item.orderProductInfos) {
-                        $.each(item.orderProductInfos,
-                        function(idx, subitem) {
-                            let barCode = subitem.barCode;
+                    if (stockInPrintInfo.ProductInfos) {
+                        $.each(stockInPrintInfo.ProductInfos,function(idx, subitem) {
+                            let barCode = subitem.bar_code;
                             if (!barCode) barCode = '无';
-                            let totalMoney = 0;
-                            let isGift = subitem.isgift;
+                            let isGift = subitem.is_gift;
                             if (isGift != 0) {
                                 isGift = '(赠品)';
                             } else {
                                 isGift = "";
-                                totalMoney = subitem.bigCount
-										* subitem.bigPrice
-										+ subitem.smallCount
-										* subitem.smallPrice;
-										saleMoney = saleMoney + totalMoney;
                             }
-                            var productAmout = subitem.productAmout
-                            
-                            if(item.customerKind == 100402){
-                              content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, "", subitem.smallCount, "", barCode, isGift,"")
+                            var productAmout = subitem.reject_amount
+                            if(item.customer_kind == 100402){
+                            content += $.format(contentStr, (idx + 1), subitem.custom_name, subitem.bigCount, "", subitem.smallCount, "", barCode, isGift,"")
                             }else{
-                           	 content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
+                            content += $.format(contentStr, (idx + 1), subitem.custom_name, subitem.bigCount, subitem.big_Price + '元', subitem.smallCount, subitem.small_price + '元', barCode, isGift,productAmout+ '元')
                             }
                         });
 
-                        let len = item.orderProductInfos.length;
-                        for (let i = len; i < 6; i++) {
+                        let len = stockInPrintInfo.ProductInfos.length;
+                        for (let i = len; i < 5; i++) {
                             content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
                         }
                     }
                     content += '</tbody></table>';
 
-                     if(item.orderQrcodeUrl !=null ){
-                      src = "${CPATH}/"+item.orderQrcodeUrl;
-                      headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '送',src);
-                	 }else{
-                	 headerInfoContent = $.format(jjheaderInfo, (item.sellerName != null) ? item.sellerName: "", '送');
-                	 }
-                    let placeOrderMan = item.placeOrderMan;
-                    let placeOrderPhone = item.placeOrderPhone;
+                    headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '退');
+
+                    let placeOrderMan = item.realname;
+                    let placeOrderPhone = item.mobile ;
                     let warehousePhone = item.warehousePhone;
                     let remark = item.remark;
                     if (!warehousePhone) warehousePhone = '无';
                     if (!remark) remark = '';
-                    let placeOrderTime = new Date(item.placeOrderTime).Format("yyyy-MM-dd hh:mm");;
+                    let placeOrderTime = new Date(item.returnOrderTime).Format("yyyy-MM-dd hh:mm");;
 
-                    headerContent = $.format(headerStr, item.outstockSn, placeOrderTime, curDate, item.customerName, item.customerContacts, item.customerPhone, item.deliveryAddress, placeOrderMan, placeOrderPhone, item.warehouseName);
+                    headerContent = $.format(headerStr, item.instock_sn, placeOrderTime, curDate, item.customer_name, item.ccontact, item.cmobile, item.delivery_address, placeOrderMan, placeOrderPhone, item.warehouseName);
 
+                    var salesAmount = DX(item.total_reject_amount);
+                    
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
-                    if(item.customerKind == 100402){
-                     footerContent = $.format(footerStr, "", "", warehousePhone, remark,printFootContext);
+                    
+                    if(item.customer_kind == 100402){
+                    footerContent = $.format(footerStr, "", "", warehousePhone, remark,printFootContext);
                     }else{
-                    var salesAmount = jQuery.mm.digitUppercase(saleMoney);
-                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
+                    footerContent = $.format(footerStr, salesAmount, item.total_reject_amount, warehousePhone, remark,printFootContext);
                     }
-
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 6;
+                    defaultPageSize = 5;
                 });
 
                 $("#print-content").html(batchPrintContent);
@@ -263,9 +249,9 @@ $("#print").click(function() {
 
     if (window.confirm('确认打印吗(订单状态会变为已打印)?')) {
     $.ajax({
-      url: "${CPATH}/admin/salesOutstock/recordPrintInfo",
+       url: "${CPATH}/admin/salesInstock/recordPrintInfo",
         data: {
-            "outstockId": '${outstockId!}'
+            "inStockId": '${inStockId!}'
         },
         dataType: "json",
         async: false,

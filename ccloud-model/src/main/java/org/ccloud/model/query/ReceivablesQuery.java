@@ -21,6 +21,7 @@ import java.util.List;
 import org.ccloud.Consts;
 import org.ccloud.model.Receivables;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -47,40 +48,30 @@ public class ReceivablesQuery extends JBaseQuery {
 		});
 	}
 
-	public Page<Record> paginate(int pageNumber, int pageSize, String id,String seller_id,String dataArea,String sellerId,String keyword) {
+	public Page<Record> paginate(int pageNumber, int pageSize, String id,String seller_id,String dataArea,String sellerId,String keyword, String startDate, String endDate) {
 		
 		Boolean b = true;
 		String select;
 		StringBuilder fromBuilder;
 		LinkedList<Object> params = new LinkedList<Object>();
-//		if("1".equals(type)) {
-			select = " SELECT r.object_id AS id, t1.customerTypeNames, c.customer_name AS name, r.receive_amount, r.act_amount,r.balance_amount ";
-			fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r inner JOIN (SELECT c1.id, c1.customer_id,ct.id as customer_type_id, GROUP_CONCAT(ct. NAME) AS customerTypeNames FROM cc_seller_customer c1 inner JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id inner JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
-			if(!("0".equals(id)) && id != null){
-				fromBuilder.append(" WHERE cjct.customer_type_id = '"+ id+"'");
-				b = false;
-			}
-			if(b) {
-				fromBuilder.append(" WHERE 1=1 ");
-			}
-			
-			fromBuilder.append(" and c1.seller_id = ? GROUP BY c1.id ) t1 ON r.object_id = t1.id inner JOIN `cc_customer` AS c ON c.id = t1.customer_id ");
-			params.add(sellerId);
-			
-//		}else {
-//			select = "SELECT s.id,s.code,s.name,r.receive_amount,r.act_amount,r.balance_amount";
-//			fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r INNER JOIN `cc_supplier` AS s on r.object_id=s.id ");
-//			if(!"0".equals(id)){
-//				fromBuilder.append("WHERE s.id = '"+ id+"'");
-//				b = false;
-//			}
-//		}
-		
+		select = " SELECT r.object_id AS id, t1.customerTypeNames, c.customer_name AS name, sum(rd.receive_amount) receive_amount , sum(rd.act_amount) act_amount , sum(rd.balance_amount) balance_amount ";
+		fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r inner JOIN (SELECT c1.id, c1.customer_id,ct.id as customer_type_id, GROUP_CONCAT(ct. NAME) AS customerTypeNames FROM cc_seller_customer c1 inner JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id inner JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
+		if(!("0".equals(id)) && id != null){
+			fromBuilder.append(" WHERE cjct.customer_type_id = '"+ id+"'");
+		}
+		fromBuilder.append(" WHERE c1.seller_id = ? GROUP BY c1.id ) t1 ON r.object_id = t1.id ");
+		params.add(sellerId);
+		fromBuilder.append(" inner JOIN `cc_customer` AS c ON c.id = t1.customer_id ");
+		fromBuilder.append(" JOIN cc_receivables_detail rd ON rd.object_id=r.object_id ");
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
 		if(!keyword.equals("")) {
 			fromBuilder.append(" and c.customer_name like '%"+keyword+"%' ");
 		}
-		fromBuilder.append(" ORDER BY r.create_date DESC");
+		fromBuilder.append(" and rd.create_date >= ?");
+		params.add(startDate+" 00:00:00");
+		fromBuilder.append(" and rd.create_date <= ?");
+		params.add(endDate+" 23:59:59");
+		fromBuilder.append(" GROUP BY rd.object_id ORDER BY r.create_date DESC");
 		
 		
 		if (params.isEmpty())
@@ -134,5 +125,43 @@ public class ReceivablesQuery extends JBaseQuery {
 			return Db.find(fromBuilder.toString());
 
 		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	public Page<Record> paginateTotalAmount(int pageNumber, int pageSize, String id,String dataArea,String sellerId,String keyword,String sort,String sortOrder) {
+		
+		String select;
+		StringBuilder fromBuilder;
+		LinkedList<Object> params = new LinkedList<Object>();
+		select = "SELECT cc.customer_name, SUM(t.a1) as amount, SUM(t.act_amount) as actAmount,SUM(t.balance_amount) as balanceAmount ";
+		fromBuilder = new StringBuilder(" from ( ");
+		fromBuilder.append("SELECT r.object_id as custId, sc.customer_id, r.receive_amount as a1, r.act_amount, r.balance_amount FROM cc_receivables r ");
+		fromBuilder.append("JOIN cc_seller_customer sc on sc.id = r.object_id ");
+		fromBuilder.append("WHERE r.data_area LIKE '"+dataArea+"' and sc.seller_id = '"+sellerId+"' UNION ALL ");
+		fromBuilder.append("select p.obj_id as custId, sc.customer_id, -p.pay_amount as a1, -p.act_amount, -p.balance_amount FROM cc_payables p ");
+		fromBuilder.append("JOIN cc_seller_customer sc on sc.id = p.obj_id ");
+		fromBuilder.append("WHERE p.data_area LIKE '"+dataArea+"' and sc.seller_id = '"+sellerId+"') as t ");
+		fromBuilder.append("JOIN cc_customer cc on cc.id = t.customer_id ");
+		fromBuilder.append("JOIN cc_customer_join_customer_type cjct ON t.custId = cjct.seller_customer_id ");
+		fromBuilder.append(" WHERE 1=1 ");
+		if(StrKit.notBlank(keyword)){
+			fromBuilder.append(" and cc.customer_name like '%"+keyword+"%' ");
+		}
+		if(!("0".equals(id)) && id != null) {
+			fromBuilder.append(" and cjct.customer_type_id = '"+id+"' ");
+		}
+		fromBuilder.append(" group by t.custId ");
+		if(StrKit.notBlank(sort)) {
+			fromBuilder.append(" order by "+sort);
+			if(!sortOrder.equals("")) {
+				fromBuilder.append(" "+ sortOrder);
+			}
+		}else {
+			fromBuilder.append(" ORDER BY cc.customer_name");
+		}
+		
+		
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 }

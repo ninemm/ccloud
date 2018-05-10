@@ -86,6 +86,7 @@
                 if(value == "100101") return "正常";
                 if(value == "100102") return "待审核";
                 if(value == "100103") return "审核拒绝";
+                if(value == "100104") return "待补录";
             }, edit: false},
             {field: "create_date", title: "拜访时间", align: "center", width: '12%', edit: false},
             {field: "action", title: "操作", align: "center", width: '10%',
@@ -152,6 +153,7 @@
         strHtml +='<option value="100101"> 正常 </option>';
         strHtml +='<option value="100102"> 待审核 </option>';
         strHtml +='<option value="100103"> 审核拒绝 </option>';
+        strHtml +='<option value="100104"> 待补录 </option>';
         $("#status").html(strHtml);
     };
     

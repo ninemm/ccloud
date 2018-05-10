@@ -685,12 +685,17 @@ public class _ReportController extends JBaseController {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
+		String customerName = getPara("customerName");
+		if (StrKit.notBlank(customerName)) {
+			customerName = StringUtils.urlDecode(customerName);
+			setAttr("customerName", customerName);
+		}
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		//我的客户卖出商品详情
-		List<Record> list = SalesOrderQuery.me().findByCustomerDetail1(startDate,endDate,keyword, userId,sellerId,false,dataArea);
-		List<Record> list1=SalesOrderQuery.me().findMoney(startDate,endDate,keyword, userId);
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetail1(startDate,endDate,keyword, userId,sellerId,false,dataArea, customerName);
+		List<Record> list1=SalesOrderQuery.me().findMoney(startDate,endDate,keyword, userId, customerName);
 		for (Record record : list) {
 			String customerId=record.getStr("id");
 			for (Record record1 : list1) {
@@ -721,10 +726,15 @@ public class _ReportController extends JBaseController {
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
+		String customerName = getPara("customerName");
+		if (StrKit.notBlank(customerName)) {
+			customerName = StringUtils.urlDecode(customerName);
+			setAttr("customerName", customerName);
+		}		
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
-		List<Record> list = SalesOrderQuery.me().findByCustomerDetail1(startDate,endDate,keyword, userId,sellerId,true,dataArea);
+		List<Record> list = SalesOrderQuery.me().findByCustomerDetail1(startDate,endDate,keyword, userId,sellerId,true,dataArea, customerName);
 		renderJson(list);
 	}
 	
