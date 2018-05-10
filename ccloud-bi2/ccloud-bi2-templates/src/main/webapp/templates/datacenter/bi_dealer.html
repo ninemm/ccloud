@@ -63,7 +63,7 @@
     function setDealer(Code, Name, Area){
         dealerCode = Code;
         dealerName = Name;
-        selectDataArea = Area
+        selectDataArea = Area;
         dealer_detail(dealerCode, dealerName, selectDataArea);
     }
     
@@ -115,7 +115,7 @@
         }).done(function(data){
 
             //订单数量
-            var oTitle = dealerName + '订单平均金额(单位/元)';
+            var oTitle = dealerName + '每日订单数量(单位/笔)';
             orderNum(data.orderNumList, oTitle);
             
             var prTitle = dealerName + '产品销售排行';
