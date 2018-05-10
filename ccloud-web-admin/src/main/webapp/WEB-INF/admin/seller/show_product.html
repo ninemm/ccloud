@@ -54,54 +54,53 @@
 	var initFields = function() {
 		var fields =
 			[	
-				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' name='dataItem1' value=''/>", align: "center", width: '1%',
+				{field: "", title: "<input type='checkbox' onclick='checkAll(this)' name='dataItem1' value=''/>", align: "center", width: '0.1%',
 				formatter: function(value, row, rowIndex) {
 					var strHtml = '<input type="checkbox" name="dataItem" id="dataItem" value="'+row.id+'"/>';
 					return strHtml;
 				},
 				edit:false
 				},
-				{field: "order_list", title: "排序", align: "center", width: '3%',
+				{field: "order_list", title: "排序", align: "center", width: '2%',
 					formatter : function(value,row,rowIndex){
-						var strHtml = '<input class="form-control input-sm" style="margin-left:20%;" type="number" id="order_list" name="order_list" value="'+row.order_list+'"  min="0" >';
+						var strHtml = '<input class="form-control" type="number" id="order_list" name="order_list" value="'+row.order_list+'"  min="0" >';
 						return strHtml;
 					},
 				 edit: false}, 
       			{field: "productName", title: "&nbsp;&nbsp;产品名称&nbsp;&nbsp;", align: "center", width: '10%',edit:false},
       			{field: "", title: "", align: "center", width: '0.1%',edit:false},
-      			{field: "custom_name", title: "产品自定义名称", align: "center", width: '10%',
+      			{field: "custom_name", title: "自定义名称", align: "center", width: '12%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '<input type="text" size="40" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'" onblur="changeCustomName(this)"/><input type="hidden"  name="_custom_name" id="_custom_name" value="'+row.custom_name+'" />';
+					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'" onblur="changeCustomName(this)"/><input type="hidden"  name="_custom_name" id="_custom_name" value="'+row.custom_name+'" />';
 					return strHtml;
 				},
       				edit:false},
-      			{field: "cps_name", title: "产品规格", align: "center", width: '10%',edit:false},
-      			{field: "store_count", title: "库存数量", align: "center", width: '3%',
+      			{field: "cps_name", title: "产品规格", align: "center", width: '7%',edit:false},
+      			{field: "store_count", title: "库存数量", align: "center", width: '2%',
       				formatter: function(value, row, rowIndex){
       					if(value==null){
-      						var strHtml = '<input type="text" size="10" readonly style="text-align:center;background-color:transparent;border:0px;" name="store_count" value="暂未盘点"/>';
+      						return "暂未盘点";
       					}else{
-      						var strHtml = '<input type="text" size="10" readonly style="text-align:center;background-color:transparent;border:0px;" name="store_count" value="'+row.store_count+'"/>';
+      						 return row.store_count;
       					}
-      					return strHtml;
       				},
       			edit:false},
-      			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '20%',
+      			{field: "bigPrice", title: "销售价格(整)", align: "center", width: '8%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/><input type="hidden" size="9"  name="_bigPrice" value="'+row.price+'"/>/'+row.big_unit;
+					var strHtml = '￥<input type="text" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bigPrice" value="'+formatNumber(row.price)+'" onblur="changeMoney(this)"/><input type="hidden" size="9"  name="_bigPrice" value="'+row.price+'"/>/'+row.big_unit;
 					return strHtml;
 				},
       			 edit:false},
       			 {field: "convert_relate", title: "换算", align: "center", width: '1%',edit:false},
-      			 {field: "samllPrice", title: "销售价格(零)", align: "center", width: '7%',
+      			 {field: "samllPrice", title: "销售价格(零)", align: "center", width: '6%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" readonly style="width:45px;text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>/'+row.small_unit;
+					var strHtml = '￥<input type="text" readonly style="width:45px;text-align:center;background-color:transparent;border:0px;" name="smallPrice" value="'+(row.price/row.convert_relate).toFixed(2)+'"/>/'+row.small_unit;
 					return strHtml;
 				},
       			 edit:false},
-      			 {field: "cost", title: "成本(整)", align: "center", width: '7%',
+      			 {field: "cost", title: "成本&nbsp;(整)", align: "center", width: '6%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="width:40px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="cost" value="'+formatNumber(row.cost)+'" onblur="changeCostPrice(this)"/><input type="hidden"  name="_cost" value="'+row.cost+'"/>';
+					var strHtml = '￥<input type="text" style="width:40px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="cost" value="'+formatNumber(row.cost)+'" onblur="changeCostPrice(this)"/><input type="hidden"  name="_cost" value="'+row.cost+'"/>';
 					return strHtml;
 				},
       			 edit:false},
@@ -114,27 +113,27 @@
 				},
 				{field: "", title: "账期价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="9" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+formatNumber(row.account_price)+'" onblur="changeAccountPrice(this)"/><input type="hidden" name="_accountPrice" value="'+row.account_price+'"/>';
+					var strHtml = '￥<input type="text" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="accountPrice" value="'+formatNumber(row.account_price)+'" onblur="changeAccountPrice(this)"/><input type="hidden" name="_accountPrice" value="'+row.account_price+'"/>';
 					return strHtml;
 				},
       			 edit:false},
       			 {field: "", title: "税务价格(整)", align: "center", width: '7%',
       				formatter: function(value, row, rowIndex) {
-					var strHtml = '￥<input type="text" size="7" onblur = "changeTaxPrice(this)" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="taxPrice" value="'+formatNumber(row.tax_price)+'"/><input type="hidden"  name="_taxPrice" value="'+row.tax_price+'"/>/'+row.big_unit;
+					var strHtml = '￥<input type="text" onblur = "changeTaxPrice(this)" style="width:45px;text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="taxPrice" value="'+formatNumber(row.tax_price)+'"/><input type="hidden"  name="_taxPrice" value="'+row.tax_price+'"/>/'+row.big_unit;
 					return strHtml;
 				},
       			 edit:false},
-				{field: "bar_code", title: "条码", align: "center", width: '3%',
+				{field: "bar_code", title: "条码", align: "center", width: '8%',
       				formatter: function(value, row, rowIndex) {
       				if(value==null){
-      					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bar_code" value=""/>';
+      					var strHtml = '<input type="text"  style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bar_code" value=""/>';
       				}else{
       					var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="bar_code" value="'+row.bar_code+'"/>';		
       				}
 					return strHtml;
 				},
       				edit:false},
-      			{field: "tags", title: "标签", align: "center", width: '7%',
+      			{field: "tags", title: "标签", align: "center", width: '8%',
       				formatter: function(value, row, rowIndex) {
       				if(value!=null){
 						var strHtml = '<input type="text" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="tags" value="'+row.tags+'" placeholder="多个标签用英文逗号隔开"/>';
@@ -168,7 +167,7 @@
 					},
 					edit:false
 				},
-				{field: "action", title: "操作", align: "center", width: '17%',
+				{field: "action", title: "操作", align: "center", width: '5%',
 				formatter: function(value, row, rowIndex) {
 					if(row.is_enable == 0){
 					  var  strHtml = '<div style="width:100px;"><a onclick="change(\''+row.id+'\')" class="btn btn-xs bg-olive btn-flat" >上架</a>';

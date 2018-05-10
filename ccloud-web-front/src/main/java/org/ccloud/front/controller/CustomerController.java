@@ -421,13 +421,13 @@ public class CustomerController extends BaseFrontController {
 		List<ImageJson> list = Lists.newArrayList();
 		
 		Customer customer = getModel(Customer.class);
-		/* String repl = "";  
+		String repl = "";  
 	        if (StrKit.notBlank(customer.getAddress())) {  
 	            Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
 	            Matcher m = p.matcher(customer.getAddress());  
 	            repl = m.replaceAll("");  
 	        }  
-	    customer.setAddress(repl);*/
+	    customer.setAddress(repl);
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
