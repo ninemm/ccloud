@@ -27,6 +27,18 @@ $(function () {
 	initDatetimepicker('#start-date', 'yyyy-MM-dd', 2, 4, 2);
 	initDatetimepicker('#end-date', 'yyyy-MM-dd', 2, 4, 2);
 	$("[data-id='" + brandId + "']").addClass('red-button').siblings().removeClass('red-button');
+
+	$("[value='" + dataArea + "']").attr('selected', 'selected').siblings().removeAttr('selected');
+	$("#searchBar").select2({
+		theme: "classic",
+		width: "95%",
+		language: "zh-CN"
+	});
+
+	$("#searchBar").on("select2:select",function(e){
+
+		selectDealer(e.params.data.id);
+	})
 });
 
 // 时间切换选择, 如近一天，近一周等
@@ -121,27 +133,10 @@ function initDatetimepicker(fieldId, format, minView, maxView, startView) {
 	});
 }
 
-$("#searchInput").on("input", function() {
-	if ($("#searchInput").val() == '') {
-		$(".weui-cell").show();
-	}
-
-	$(".weui-cell").hide().filter(":contains("+ $("#searchInput").val().trim() +")").show();
-});
-
-$("#searchClear").on("click", function() {
-	$(".weui-cell").show();
-});
-
-$("#searchCancel").on("click", function() {
-	$(".weui-cell").show();
-});
-
-function selectDealer(selectDataArea,obj) {
+function selectDealer(selectDataArea) {
 	Utils.loading();
 	dataArea = selectDataArea;
 	$.cookie(Utils.dataAreaCache, dataArea, { expires: 1 });
-	$("#dealerName").text($(obj).find(".weui-cell__hd").eq(0).text() + '汇总信息');
 	$.ajax({
 		url:CPATH + '/pc/selectDealer',
 		type:"post",

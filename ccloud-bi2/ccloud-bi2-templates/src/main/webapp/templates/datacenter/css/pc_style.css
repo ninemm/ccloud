@@ -956,7 +956,9 @@ i.icon.icon-next {
 th {
 	text-align: center;
 }
-
+#selectDIV {
+	text-align: center;
+}
 #dealerList{
 	overflow-y:scroll;
 	max-height: 7.5rem;

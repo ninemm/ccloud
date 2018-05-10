@@ -18,8 +18,15 @@
                     </#list>
                 </div>
             </div>
-            <div id="customer">
-                <header>
+            <div id="selectDIV">
+                
+                <select id="searchBar" class="select2">
+                    <option value="" selected="selected">全部经销商</option>
+                    <#list session['dealer_data_area_array'] as dealerDataArea>
+                        <option value="${dealerDataArea!}">${session['dealer_name_array'][dealerDataArea_index]!}</option>
+                    </#list>
+                </select>
+ <!--               <header>
                     <div class="weui-search-bar" id="searchBar">
                         <form class="weui-search-bar__form">
                             <div class="weui-search-bar__box">
@@ -49,7 +56,7 @@
                     <div class="weui-loadmore weui-loadmore_line" id="noMore" style="display: none;">
                         <span class="weui-loadmore__tips">暂无数据</span>
                     </div>
-                </article>
+                </article>-->
             </div>
         </div>
     </div>
