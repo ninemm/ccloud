@@ -45,6 +45,7 @@ import javax.swing.ImageIcon;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.jfinal.kit.Kv;
+import com.jfinal.kit.PathKit;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
@@ -592,11 +593,12 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 		if(StrKit.notBlank(customerName)) zipFileName = SellerCustomerQuery.me().findById(customerName).getCustomer().getCustomerName() + zipFileName;
 		if(StrKit.notBlank(customerType)) zipFileName = customerType + zipFileName;
-		zipFileName = URLEncoder.encode(zipFileName, "UTF-8");
+		zipFileName = PathKit.getWebRootPath() + "/" + URLEncoder.encode(zipFileName, "UTF-8");
 
 		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName));
 
 		List<File> fileList = new ArrayList<>();
+		List<String> deleteList = new ArrayList<>();
 		for(Record record : imageList) {
 
 			String photo = record.getStr("photo");
@@ -613,24 +615,32 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 					ImageJson image = list.get(i);
 
 					String fileName = image.getSavePath();
-					String filePath = DateUtils.dateToStr(record.getDate("create_date"), "yyyy-MM-dd" )
+					String filePath = PathKit.getWebRootPath() + "/" + DateUtils.dateToStr(record.getDate("create_date"), DateUtils.DEFAULT_FILE_NAME_TWO_FORMATTER)
 							+ record.getStr("realname") + "拜访" + record.getStr("customer_name")
 							+  "图片" + k + ".jpg";
 
 					fileList.add(getImage(domain, fileName, filePath));
+					deleteList.add(filePath);
 					 k++;
 				}
 			}
 		}
-
 		File[] files = fileList.toArray(new File[fileList.size()]);
 		zipFile(files, "", zos);
 
 		zos.flush();
 		zos.close();
-
+		this.deleteImageCache(deleteList);
 		renderFile(new File(zipFileName));
+	}
 
+	private void deleteImageCache(List<String> filePath) {
+		for (String savePath : filePath) {
+			File file = new File(savePath);
+			if (file.exists() && file.isFile()) {
+				file.delete();
+			}			
+		}
 	}
 
 	private File getImage(String domain, String fileName, String filePath) throws Exception {
