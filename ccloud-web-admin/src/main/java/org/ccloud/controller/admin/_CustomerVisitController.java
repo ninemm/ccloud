@@ -423,7 +423,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	
 	@SuppressWarnings("deprecation")
 	public void exportExcel(List<Record> dataList, String filePath, String startDate, String bizUser) throws IOException {
-		if (StrKit.notBlank(bizUser)) {
+		if (StrKit.notBlank(bizUser) && dataList.size() > 0) {
 			String userName = dataList.get(0).getStr("visit_user");
 			filePath = userName + filePath;
 		}
