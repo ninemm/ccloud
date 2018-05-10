@@ -368,6 +368,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         String status = getPara("status");
         String bizUser = getPara("bizUser");
         String filePath = "";
+        String startDate = getPara("startDate");
 
 		if (StrKit.notBlank(customerType)) {
 			filePath = filePath + customerType;
@@ -399,8 +400,18 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
+		
+		if (StrKit.notBlank(keyword)) {
+			filePath = filePath + keyword;
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		
+		if (StrKit.notBlank(startDate)) {
+			setAttr("startDate", startDate);
+		}
         
-        List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser);
+        List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser, startDate);
         try {
 			exportExcel(visitList, filePath);
 		} catch (Exception e) {
