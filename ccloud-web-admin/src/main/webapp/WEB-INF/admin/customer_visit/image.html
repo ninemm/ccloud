@@ -4,13 +4,17 @@
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
 	<script src="${CPATH}/static/plugins/select2/js/select2.js"></script>
-	<!-- bootstrapvalidator -->
+	<!-- bootstrap-datetimepicker -->
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script> 	
 </#macro>
 
 <#macro css_import>
 	<!-- bootstrapvalidator -->
 	<link rel="stylesheet" href="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.css">
 	<link rel="stylesheet" href="${CPATH}/static/plugins/select2/css/select2.css">
+	<!-- bootstrap-datetimepicker -->
+	<link rel="stylesheet" href="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.css">	
 </#macro>
 <#macro css>
 	.select2-container {
@@ -27,7 +31,7 @@
 
 	var $form = $("#form");
 	$(function(){
-
+	jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 	$(document).on("change", "#customer_type", function() {
 		$.get("${CPATH}/admin/customerVisit/getCustomer?customerType=" + $('#customer_type').val(), function(result){
 			$("#customer_name").select2('destroy').empty();
@@ -47,6 +51,12 @@
 		$("#customer_name").select2({
 			data: customerName
 		});
+		
+		var userList = ${(userList)!};
+		
+		$("#user_id").select2({
+			data: userList
+		});		
 
 		var questionType = ${(questionType)};
 
@@ -61,7 +71,7 @@
 			{btn : ['确定', '取消']},
 			function() {
 				layer.closeAll();
-				$.get('${CPATH}/admin/customerVisit/count?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val() + '&question_type=' + $('#question_type').val() ,
+				$.get('${CPATH}/admin/customerVisit/count?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val() + '&user_id='+ $('#user_id').val() + '&startDate=' + $('#startDate').val() + '&question_type=' + $('#question_type').val() ,
 				function(result){
 					if (result.errorCode > 0) {
 						toastr.error(result.message, '没有图片');
@@ -69,7 +79,7 @@
 						layer.load(1, {
 							shade: [0.4,'#000']
 						});
-						window.open('${CPATH}/admin/customerVisit/exportImage?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val() + '&question_type=' + $('#question_type').val(),"_parent","","");
+						window.open('${CPATH}/admin/customerVisit/exportImage?customer_type=' + $('#customer_type').val() + '&customer_name=' + $('#customer_name').val() + '&user_id='+ $('#user_id').val() + '&startDate=' + $('#startDate').val() + '&question_type=' + $('#question_type').val(),"_parent","","");
 						setTimeout(function() {
 							layer.closeAll();
 						}, 1000);
@@ -98,7 +108,7 @@
 <section class="content">
 	<div class="box box-default">
 		<div class="box-header with-border">
-			<h3 class="box-title">导出</h3>
+			<h3 class="box-title">图片导出</h3>
 			<div class="box-tools">
 				<button type="button" class="btn btn-box-tool" data-widget="collapse">
 					<i class="fa fa-minus"></i>
@@ -106,32 +116,52 @@
 			</div>
 		</div>
 		<form id="form" class="form-horizontal" >
-			<div class="box-body">
-				<div class="form-group col-sm-12">
-					<label class="control-label col-sm-2">问题类型:</label>
-					<div class="input-group col-md-4 col-sm-2">
-						<select class="form-control input-sm" type="text" id="question_type" name="question_type" value="" readonly>
-						</select>
+		<div class="box-body">
+			<div class="col-sm-12 ">
+				<div class="row">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">问题类型:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" type="text" id="question_type" name="question_type" value="" readonly>
+							</select>
+		               	</div>
 					</div>
-					<label class="control-label col-sm-2">客户类型:</label>
-					<div class="input-group col-md-4 col-sm-2">
-						<select class="form-control input-sm" type="text" id="customer_type" name="customer_type" value="" readonly>
-						</select>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">客户类型:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" type="text" id="customer_type" name="customer_type" value="" readonly>
+							</select>
+		               	</div>
 					</div>
-					<label class="control-label col-sm-2">客户名称:</label>
-					<div class="input-group col-md-4 col-sm-2">
-						<select class="form-control input-sm" type="text" id="customer_name" name="customer_name" value="" readonly>
-						</select>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">客户名称:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" type="text" id="customer_name" name="customer_name" value="" readonly>
+							</select>
+		               	</div>
 					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">业务员:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select class="form-control input-sm" type="text" id="user_id" name="user_id" value="" readonly>
+							</select>
+		               	</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">拜访日期:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="拜访日期" >
+		               	</div>
+					</div>			
 				</div>
 			</div>
-		</form>
+		</div>
 	
 		<div class="box-footer"> 
 			<button type="button" onclick="doSubmit()" class="btn btn-sm bg-olive btn-flat">导出</button>
 			<input type="button" class="btn btn-sm btn-primary btn-flat" onclick="window.history.back(); return false;" value="返  回" hidefocus="true" />
 		</div>
+	</form>
 	</div>
 </section>
-
 </@layout>

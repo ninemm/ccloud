@@ -1,6 +1,8 @@
 package org.ccloud.front.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -316,7 +318,16 @@ public class UserController extends BaseFrontController {
 					
 					User user = userList.get(0);
 					user.setAvatar(wxUserResult.getStr("avatar"));
-					user.setNickname(wxUserResult.getStr("name"));
+					try {
+						if (StrKit.notBlank(wxUserResult.getStr("nickname"))) {
+							String nickname = URLEncoder.encode(wxUserResult.getStr("nickname"), "utf-8");
+							user.setNickname(nickname);
+						}
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+//						user.setNickname(wxUserResult.getStr("nickname"));
 					user.setWechatUseriId(wechatUserId);
 					if (!user.saveOrUpdate()) {
 						ret.set("message", "手机号绑定失败，请联系管理员");
