@@ -381,7 +381,8 @@ public class CustomerVisitQuery extends JBaseQuery {
 			sql.append(" AND ccv.create_date >= ? AND ccv.create_date <= ? ");
 			params.add(beginDate);
 			params.add(endDate);
-		}		
+		}
+		sql.append("GROUP BY ccv.id ");
 		sql.append("ORDER BY ccv.create_date, ccv.user_id ");
 
 		return Db.find(sql.toString(), params.toArray());
