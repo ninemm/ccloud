@@ -36,17 +36,17 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DataAreaUtil;
 import org.ccloud.utils.StringUtils;
-import org.ccloud.model.Customer;
 import org.ccloud.model.Payables;
 import org.ccloud.model.PayablesDetail;
 import org.ccloud.model.Payment;
+import org.ccloud.model.SellerCustomer;
 //import org.ccloud.model.PurchaseInstock;
 import org.ccloud.model.User;
-import org.ccloud.model.query.CustomerQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.PayablesDetailQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.PaymentQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 //import org.ccloud.model.query.PurchaseInstockQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.payablesExcel;
@@ -110,7 +110,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		Map<String, Object> map;
 		if(!id.equals("")) {
-			Customer customer = CustomerQuery.me().findById(id);
+			SellerCustomer customer = SellerCustomerQuery.me().findById(id);
 			Page<PayablesDetail> page = new Page<>();
 			if(customer!=null) {
 				page = PayablesDetailQuery.me().paginate(getPageNumber(), getPageSize(), id,deptDataArea,startDate,endDate);
