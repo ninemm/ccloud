@@ -183,12 +183,10 @@ public class SellerQuery extends JBaseQuery {
 	}
 
 	public List<Record> findDeptByLevel(){
-		StringBuilder sql = new StringBuilder("SELECT CONCAT(d.data_area, '%') AS id, cs.seller_name AS text ");
-		sql.append("FROM department d ");
-		sql.append("JOIN cc_seller cs ON d.id = cs.dept_id ");
-		sql.append("WHERE (d.dept_level = '1' OR d.dept_level = '2') AND cs.jpwx_open_id is not null ");
+		StringBuilder sql = new StringBuilder("SELECT d.data_area id,d.dept_name text from department d LEFT JOIN cc_seller cs ON cs.dept_id = d.id WHERE d.dept_level IN(1 , 2) AND d.qywx_deptid is NOT NULL  AND cs.id IS NOT NULL ");
 		return Db.find(sql.toString());
 	}
+	
 	public List<Seller> findListByCode(String sellerCode) {
 		String sql = "select * from cc_seller where seller_code = ?";
 		return DAO.find(sql, sellerCode);
