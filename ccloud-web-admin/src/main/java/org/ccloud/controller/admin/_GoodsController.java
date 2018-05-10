@@ -91,7 +91,7 @@ public class _GoodsController extends JBaseCRUDController<Goods> {
             setAttr("k", keyword);
         }
 
-        Page<Goods> page = GoodsQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date");
+        Page<Goods> page = GoodsQuery.me().paginate(getPageNumber(), getPageSize(), keyword, "create_date , code asc ");
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 		

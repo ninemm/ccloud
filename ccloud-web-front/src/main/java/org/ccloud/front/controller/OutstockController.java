@@ -340,7 +340,7 @@ public class OutstockController extends BaseFrontController {
 						payables.setBalanceAmount(payables.getBalanceAmount().add(salesOutstock.getTotalAmount()));
 					}
 
-					if (payables.saveOrUpdate()) {
+					if (!payables.saveOrUpdate()) {
 						result[0] = "生成直营商的应付账款错误";
 						return false;
 					}
