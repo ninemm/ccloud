@@ -20,12 +20,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
@@ -513,9 +514,9 @@ public class _UserController extends JBaseCRUDController<User> {
 				String userId = "";
 				User us = null;
 				UserGroupRel userGroupRel = null;
-				User user = UserQuery.me()._findUserByUsername(excel.getUsername());
+				User user = UserQuery.me()._findUserByUsername(deleteSpace(excel.getUsername()));
 				if(user !=null) {
-					username +=excel.getUsername()+"、";
+					username +=deleteSpace(excel.getUsername())+"、";
 					errorCnt++;
 					continue;
 				}
@@ -524,7 +525,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					break;
 				}
 				User user00 = null;
-				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
+				List<User> uss = UserQuery.me().findByMobile(deleteSpace(excel.getMobile()));
 				for(User user01:uss) {
 					if(StrKit.notBlank(user01.getWechatOpenId())) {
 						user00 = user01;
@@ -532,7 +533,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					}
 				}
 				// 检查用户是否存在
-				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
+				us = UserQuery.me().findByMobileAndDeptId(deleteSpace(excel.getMobile()),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 				if (us == null) {
 					us = new User();
@@ -541,7 +542,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					this.setUser(us, excel);
 					us.setCreateDate(new Date());
 					us.setGroupName(excel.getUserGroup());
-					us.setUsername(excel.getUsername());
+					us.setUsername(deleteSpace(excel.getUsername()));
 					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 					us.setDataArea(dataArea);
 					if(user00 != null) {
@@ -581,8 +582,8 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 	
 	private void setUser(User user, UserExecel excel) {
-		user.set("realname", excel.getContact());
-		user.set("mobile", excel.getMobile());
+		user.set("realname", deleteSpace(excel.getContact()));
+		user.set("mobile", deleteSpace(excel.getMobile()));
 		user.set("status", 1);
 		user.set("create_date", new Date());
 	}
@@ -771,5 +772,16 @@ public class _UserController extends JBaseCRUDController<User> {
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
+	}
+	
+	
+	private String deleteSpace(String str) {
+		String repl = "";  
+        if (StrKit.notBlank(str)) {  
+            Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
+            Matcher m = p.matcher(str);  
+            repl = m.replaceAll("");  
+        }  
+        return repl;
 	}
 }

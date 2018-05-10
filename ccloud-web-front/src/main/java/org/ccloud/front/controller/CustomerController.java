@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.jfinal.kit.Ret;
 import org.apache.shiro.SecurityUtils;
@@ -419,6 +421,13 @@ public class CustomerController extends BaseFrontController {
 		List<ImageJson> list = Lists.newArrayList();
 		
 		Customer customer = getModel(Customer.class);
+		/* String repl = "";  
+	        if (StrKit.notBlank(customer.getAddress())) {  
+	            Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
+	            Matcher m = p.matcher(customer.getAddress());  
+	            repl = m.replaceAll("");  
+	        }  
+	    customer.setAddress(repl);*/
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
@@ -468,8 +477,8 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-				String waterFont3 = sellerCustomer.getLocation();
-//				String waterFont3 = "湖北省-武汉市-洪山区";
+//				String waterFont3 = sellerCustomer.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
