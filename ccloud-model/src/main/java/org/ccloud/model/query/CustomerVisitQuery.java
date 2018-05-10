@@ -84,12 +84,18 @@ public class CustomerVisitQuery extends JBaseQuery {
 		}
 		
 		if(StrKit.notBlank(createDate)) {
+			String startDate = createDate + " 00:00:00";
+			String endDate = createDate + " 23:59:59";			
 			if (needWhere) {
 				fromBuilder.append(" WHERE cc_v.create_date >= ? ");
-				params.add(createDate);
+				fromBuilder.append(" AND cc_v.create_date <= ? ");
+				params.add(startDate);
+				params.add(endDate);
 			} else {
 				fromBuilder.append(" AND cc_v.create_date >= ? ");
-				params.add(createDate);
+				fromBuilder.append(" AND cc_v.create_date <= ? ");
+				params.add(startDate);
+				params.add(endDate);
 			}
 		}		
 
@@ -277,7 +283,7 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.findFirst(fromBuilder.toString(), visitId);
 	}
 	
-	public List<Record> exportVisit(String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status,String bizUserId){
+	public List<Record> exportVisit(String keyword, String dataArea,String customerType,String questionType,String groupBy, String orderby, String status,String bizUserId, String startDate){
 
 		StringBuilder fromBuilder = new StringBuilder("select cc_v.*,(select `name` from dict where type='customer_audit' and `value`=cc_v.`status`) visitStatus,cc.customer_name,GROUP_CONCAT(cc_t.`name`) customer_type, d.name questionName, art.ID_ taskId,cc.mobile customerMobile ");
 		fromBuilder.append("from cc_customer_visit cc_v left join cc_seller_customer cc_s on cc_v.seller_customer_id = cc_s.id left join cc_customer cc on cc_s.customer_id = cc.id ");
@@ -305,6 +311,13 @@ public class CustomerVisitQuery extends JBaseQuery {
 		if(StrKit.notBlank(bizUserId)) {
 			fromBuilder.append("and cc_v.user_id = '"+bizUserId+"' ");
 		}
+		
+		if(StrKit.notBlank(startDate)) {
+			String beginDate = startDate + " 00:00:00";
+			String endDate = startDate + " 23:59:59";
+			fromBuilder.append(" and cc_v.create_date >= '"+beginDate+"' ");
+			fromBuilder.append(" and cc_v.create_date <= '"+endDate+"' ");
+		}		
 
 		fromBuilder.append(" GROUP BY cc_v.id ");
 		fromBuilder.append(" ORDER BY " + orderby);
@@ -342,10 +355,10 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return Db.find(sql.toString(), params.toArray());
 	}
 
-	public List<Record> _findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea){
+	public List<Record> _findPhoto(String customerType, String customerName, String questionType, String data_area, String dealerDataArea, String userId, String startDate){
 
 		LinkedList<Object> params = new LinkedList<Object>();
-		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.visit_user realname, GROUP_CONCAT(ccv.photo SEPARATOR '_') as photo, cc.customer_name, ccv.create_date ");
+		StringBuilder sql = new StringBuilder("SELECT ccv.id, ccv.visit_user realname, ccv.photo, cc.customer_name, ccv.create_date ");
 
 		sql.append("FROM cc_customer_visit ccv ");
 		sql.append("LEFT JOIN cc_seller_customer csc ON csc.id = ccv.seller_customer_id ");
@@ -356,13 +369,21 @@ public class CustomerVisitQuery extends JBaseQuery {
 
 		sql.append(" WHERE LENGTH(ccv.photo) > 2 ");
 
-		appendIfNotEmpty(sql,"ccv.seller_customer_id", customerName, params, false);
+		appendIfNotEmpty(sql, "ccv.user_id", userId, params, false);
+		appendIfNotEmpty(sql, "ccv.seller_customer_id", customerName, params, false);
+		appendIfNotEmpty(sql, "ccv.question_type", questionType, params, false);
 		appendIfNotEmpty(sql, "ccv.question_type", questionType, params, false);
 		appendIfNotEmptyWithLike(sql,"ct.id", customerType, params, false);
 		appendIfNotEmptyWithLike(sql, "ccv.data_area", data_area, params, false);
-
-		sql.append("GROUP BY ccv.visit_user, cc.id, DATE_FORMAT(ccv.create_date,'%m-%d-%Y') ");
-		sql.append("ORDER BY ccv.create_date ");
+		if (StrKit.notBlank(startDate)) {
+			String beginDate = startDate + " 00:00:00";
+			String endDate = startDate + " 23:59:59";
+			sql.append(" AND ccv.create_date >= ? AND ccv.create_date <= ? ");
+			params.add(beginDate);
+			params.add(endDate);
+		}
+		sql.append("GROUP BY ccv.id ");
+		sql.append("ORDER BY ccv.create_date, ccv.user_id ");
 
 		return Db.find(sql.toString(), params.toArray());
 	}

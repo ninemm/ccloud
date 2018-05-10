@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -125,15 +126,15 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/user", "/admin/all" }, logical = Logical.OR)
 	public void save() {
 		final User user = getModel(User.class);
-	/*	try {
-		if (StrKit.notBlank(user.getNickname())) {
-			String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
-			user.setNickname(nickname);
+		try {
+			if (StrKit.notBlank(user.getNickname())) {
+				String nickname = URLEncoder.encode(user.getNickname(), "utf-8");
+				user.setNickname(nickname);
+			}
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-	} catch (UnsupportedEncodingException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}*/
 		String stationList = getPara("stationList");
 		String stationName = getPara("stationName");
 		String groupList = getPara("groupList");
@@ -792,6 +793,17 @@ public class _UserController extends JBaseCRUDController<User> {
 		}
 
 		Page<Record> page = UserQuery.me().paginateByDeptAndKey(getPageNumber(), getPageSize(), keyword, departmentType, sort, sortOrder);
+		List<Record> list = page.getList();
+		for (Record user : list) {
+			try {
+				if (StrKit.notBlank(user.getStr("nickname"))) {
+					String nickname = URLDecoder.decode(user.getStr("nickname"), "utf-8");
+					user.set("nickname",nickname);
+				}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);

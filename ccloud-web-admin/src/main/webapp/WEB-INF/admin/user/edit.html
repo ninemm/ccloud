@@ -67,7 +67,8 @@ $(function() {
 	jQuery.mm.initValidator('#form', validatorFields)
 	getStation();
 	getGroup();
-	
+	var nickname = decodeURI('${(user.nickname)!}');
+	$("#userNickname").val(nickname);
 	$('#_dept_tree').click(function() {
 		layer.open({
 			title:'所属部门',
@@ -248,7 +249,7 @@ function doSubmit(){
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">昵称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="user.nickname" value="${(user.nickname)!}" placeholder="2-2个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" name="user.nickname" id="userNickname" value="" placeholder="2-2个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
