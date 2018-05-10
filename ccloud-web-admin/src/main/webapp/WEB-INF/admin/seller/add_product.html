@@ -33,10 +33,12 @@
 
 		var keyword = $('#search').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
+		var categoryId = $("#categoryId option:selected").val();
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
 			k: keyword,
+			categoryId: categoryId
 		};
 		return param;
 	};
@@ -183,8 +185,8 @@
                     <div class="col-sm-6 input-group input-group-sm">
 		                <select class="form-control" id="categoryId">
 		                    <option value="">--请选择--</option>
-		                    <#list records! as ss >
-		                        <option value="${ss.id!}">${(ss.cgc_name)!}</option>
+		                    <#list categories! as ss >
+		                        <option value="${ss.categoryId!}">${(ss.categoryName)!}</option>
 		                    </#list>
 		                </select>
 	                </div>

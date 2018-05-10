@@ -55,6 +55,7 @@ import org.ccloud.model.UserJoinCustomer;
 import org.ccloud.model.query.BrandQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.GoodsTypeQuery;
 import org.ccloud.model.query.GroupQuery;
 import org.ccloud.model.query.PrintTemplateQuery;
@@ -414,6 +415,9 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 	}
 	
 	public void addProduct(){
+			String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+			List<Record> categories =  GoodsCategoryQuery.me().findBySellerId(sellerId, "");
+			setAttr("categories",categories);
 			render("add_product.html");
 	}
 	
@@ -423,10 +427,11 @@ public class _SellerController extends JBaseCRUDController<Seller> {
             keyword = StringUtils.urlDecode(keyword);
             setAttr("k", keyword);
         }
+        String categoryId = getPara("categoryId");
         User user=getSessionAttr(Consts.SESSION_LOGINED_USER);
         String sellerId =getSessionAttr(Consts.SESSION_SELLER_ID);
         Seller seller = SellerQuery.me().findById(sellerId);
-        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.name",seller.getId(),user.getId());
+        Page<Product> page = ProductQuery.me().paginate_pro(getPageNumber(), getPageSize(),keyword,  "cp.name",seller.getId(),user.getId(),categoryId);
 
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);

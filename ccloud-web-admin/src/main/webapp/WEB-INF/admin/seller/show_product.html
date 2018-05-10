@@ -67,8 +67,8 @@
 						return strHtml;
 					},
 				 edit: false}, 
-      			{field: "productName", title: "产品名称", align: "center", width: '5%',edit:false},
-      			{field: "cgc_name", title: "产品类别", align: "center", width: '3%',edit:false},
+      			{field: "productName", title: "&nbsp;&nbsp;产品名称&nbsp;&nbsp;", align: "center", width: '10%',edit:false},
+      			{field: "", title: "", align: "center", width: '0.1%',edit:false},
       			{field: "custom_name", title: "产品自定义名称", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
 					var strHtml = '<input type="text" size="40" style="text-align:center;background-color:transparent;border-bottom: 1px dashed #dbdbdb;border-top:0px;border-left:0px;border-right:0px;" name="custom_name" value="'+row.custom_name+'" onblur="changeCustomName(this)"/><input type="hidden"  name="_custom_name" id="_custom_name" value="'+row.custom_name+'" />';
