@@ -20,13 +20,18 @@
 		}
 	</style>
 </head>
-
+<#macro script>
+	$(document).ready(function() {
+		var nickname = decodeURI('${nickname!}');
+		$("#nickname").html(nickname);
+	});
+</#macro>
 <body>
 	<header>
 		<img src="${avatar!}" alt="微信图像">
 	</header>
 	<main>
-		<div id="nickname">${nickname!}</div>
+		<div id="nickname"></div>
 		<div class="input-area">
 			<div>
 				<i class="icon-mobile"></i>
