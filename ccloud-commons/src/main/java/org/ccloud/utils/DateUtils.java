@@ -34,6 +34,8 @@ public class DateUtils {
     public static final String DEFAULT_DATETIME_FORMAT_MILLI_SEC = "yyyy-MM-dd HH:mm:ss.SSS";
     /** 文件名日期格式, 精确到毫秒  */
     public static final String DEFAULT_FILE_NAME_FORMATTER = "yyyyMMddHHmmssSSS";
+    /** 文件名日期格式, 精确到秒  */
+    public static final String DEFAULT_FILE_NAME_TWO_FORMATTER = "yyyyMMddHHmmss";    
     /** 文件目录日期格式  */
     public static final String DEFAULT_DIRECTORY_FORMATTER = "yyyyMM";
     
