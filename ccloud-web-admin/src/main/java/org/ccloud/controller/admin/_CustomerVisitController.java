@@ -413,7 +413,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         
         List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser, startDate);
         try {
-			exportExcel(visitList, filePath);
+			exportExcel(visitList, filePath, startDate, bizUser);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -422,9 +422,16 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void exportExcel(List<Record> dataList, String filePath) throws IOException {
-
+	public void exportExcel(List<Record> dataList, String filePath, String startDate, String bizUser) throws IOException {
+		if (StrKit.notBlank(bizUser)) {
+			String userName = dataList.get(0).getStr("visit_user");
+			filePath = userName + filePath;
+		}
+		if (StrKit.notBlank(startDate)) {
+			filePath = startDate + filePath;
+		}
 		filePath = filePath +  "客户拜访记录.xls";
+		
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
@@ -601,6 +608,14 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea, userId, startDate);
 
 		String zipFileName = "拜访图片.zip";
+		if (StrKit.notBlank(userId)) {
+			String userName = imageList.get(0).getStr("visit_user");
+			zipFileName = userName + zipFileName;
+		}
+		
+		if (StrKit.notBlank(startDate)) {
+			zipFileName = startDate + zipFileName;
+		}
 
 		if(StrKit.notBlank(customerName)) zipFileName = SellerCustomerQuery.me().findById(customerName).getCustomer().getCustomerName() + zipFileName;
 		if(StrKit.notBlank(customerType)) zipFileName = customerType + zipFileName;
