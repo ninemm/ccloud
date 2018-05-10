@@ -186,7 +186,4 @@ public class SellerQuery extends JBaseQuery {
 		StringBuilder sql = new StringBuilder("SELECT d.data_area id,d.dept_name text from department d LEFT JOIN cc_seller cs ON cs.dept_id = d.id WHERE d.dept_level IN(1 , 2) AND d.qywx_deptid is NOT NULL  AND cs.id IS NOT NULL ");
 		return Db.find(sql.toString());
 	}
-	
-	
-	
 }
