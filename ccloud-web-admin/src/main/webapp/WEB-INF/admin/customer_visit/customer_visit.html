@@ -183,11 +183,12 @@
             var customerType = $('#customer_type').val();
             var questionType = $('#question_type').val();
             var status = $('#status').val();
-            var bizUser = $("#bizUser").val()
+            var bizUser = $("#bizUser").val();
+            var startDate = $('#startDate').val();
             layer.load(1, {
                 shade: [0.4,'#000']
             });
-            window.open("${CPATH}/admin/customerVisit/exportVisit?k="+keyword+"&questionType="+questionType+"&customerType="+customerType+"&status="+status+"&bizUser="+bizUser,"_parent","","");
+            window.open("${CPATH}/admin/customerVisit/exportVisit?k="+keyword+"&questionType="+questionType+"&customerType="+customerType+"&status="+status+'&startDate='+startDate+"&bizUser="+bizUser,"_parent","","");
             setTimeout(function() {
                 layer.closeAll();
             }, 1000);

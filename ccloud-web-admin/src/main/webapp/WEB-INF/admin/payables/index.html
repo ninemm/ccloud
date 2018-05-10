@@ -182,8 +182,10 @@ function orderInfo(orderSn){
 
 function batchDown(){
 		var keyword = $('#search').val();
+		var startDate = $('#startDate').val();
+		var	endDate = $('#endDate').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
-		location.href = "${CPATH}/admin/payables/downloading?customerTypeId=" + cusType+"&keyword"+keyword;
+		location.href = "${CPATH}/admin/payables/downloading?customerTypeId=" + cusType+"&keyword"+keyword+"&startDate="+startDate+"&endDate="+endDate;
 	}
 	
 var validatorFields = {
