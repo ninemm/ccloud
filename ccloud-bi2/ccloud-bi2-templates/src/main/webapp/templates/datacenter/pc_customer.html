@@ -9,12 +9,12 @@
 <#macro css>
 
     #customer_rank{
-        height:18rem;
+        height:16rem;
         background: #fff!important;
     }
 
     #area_rank{
-        height:18rem;
+        height:16rem;
         background: #fff!important;
     }
 
@@ -29,7 +29,7 @@
 
     #div_product_rank{
         overflow-y:scroll;
-        max-height: 34rem;
+        max-height: 33rem;
     }
 
     .div_product_rank{
@@ -383,7 +383,7 @@
                          type:'pie',
                          selectedMode: 'single',
                          radius: ['35%', '65%'],
-                         center: ['30%', '50%'],
+                         center: ['33%', '50%'],
                          label: {
                              normal: {
                                  show: false
@@ -481,12 +481,8 @@
             var areaYData = [];
             var areaSeriesData = [];
             var area_rank = document.getElementById('area_rank');
-            var $area_rank = $(area_rank);
-            
-            $area_rank.height(80);
+
             for(var i = 0; i < data.length; i++){
-                var height = $area_rank.height();
-                $area_rank.height(height += 16);
             
                 if (cityName.trim() != '') {
                     areaYData.push(data[i].country_name);
@@ -566,7 +562,7 @@
             <div class="col-md-9">
                 <#include "_inc/_pc_search_box.html"/>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                          <p class="title" id="p_customer_rank"></p>
                         <div id="customer_rank" id="customer_rank"></div>
                     </div>
@@ -574,7 +570,7 @@
                         <p class="title" id="p_area_rank"></p>
                         <div id="area_rank"></div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="allmap">
                             <p class="title">我附近的终端分布</p>
                             <div class="mapType-div">

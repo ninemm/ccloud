@@ -7,12 +7,12 @@
 </#macro>
 <#macro css>
     #customer_rank{
-        height: 18rem;
+        height: 16rem;
         background: #fff!important;
     }
 
     #area_rank{
-        height: 18rem;
+        height: 16rem;
         background: #fff!important;
     }
 
@@ -159,26 +159,22 @@
             } else {
                 crTitle = '全国' + crTitle
             }
+            var $p = $("#p_customer_rank");
+            $p.empty();
+            $p.text(crTitle);
 
             var customer_rank = document.getElementById('customer_rank');
             //var $customer_rank = $(customer_rank);
 
             var customerRankChart = echarts.init(customer_rank);
             var crOption = {
-                title: [{
-                    text: crTitle,
-                    textStyle: {
-                        fontWeight: 'normal',
-                        fontSize: 16
-                    }
-                }],
                 color: ['#4ac7f5', '#f36f8a', '#fd9173', '#AF89D6', '#5f71d2'],
                 series: [
                     {
                         name:crTitle,
                         type:'pie',
                         radius: ['25%', '45%'],
-                        center: ['50%', '60%'],
+                        center: ['50%', '50%'],
                         avoidLabelOverlap: false,
                         label: {
                             normal: {
@@ -207,38 +203,33 @@
         }).done(function(data){
             var areaYData = [];
             var areaSeriesData = [];
-            var length = data.length > 5 ? 5 : data.length;
 
-            for(var i = 0; i < length; i++){
+            for(var i = 0; i < data.length; i++){
                 areaYData.push(data[i][0]) ;
                 areaSeriesData.push(data[i][1]);
             }
 
-            var areaTitle = '区域销售统计Top5(金额/万元)';
+            var areaTitle = '区域销售统计(金额/万元)';
             if((provName + cityName).trim() != '' ){
                 areaTitle = provName + cityName + areaTitle;
             } else {
                 areaTitle = '全国' + areaTitle
             }
+            var $p = $("#p_area_rank");
+            $p.empty();
+            $p.text(areaTitle);
 
             var area_rank = document.getElementById('area_rank');
             var $area_rank = $(area_rank);
 
             var areaRankChart = echarts.init(area_rank);
             var option = {
-                title: [{
-                    text: areaTitle,
-                    textStyle: {
-                        fontWeight: 'normal',
-                        fontSize: 16
-                    }
-                }],
                 color: ['#4ac7f5'],
                 grid: {
                     left: '2%',
                     right: '15%',
                     bottom: 15,
-                    top: 60,
+                    top: 15,
                     containLabel: true
                 },
                 calculable : true,
@@ -250,11 +241,15 @@
                 }],
                 yAxis : [{
                     type : 'category',
-                    data : areaYData.reverse()
+                    data : areaYData.reverse(),
+                    axisLabel : {
+                        interval : 0,
+                        fontSize : 8
+                    }
                 }],
                 series : [{
                     type: 'bar',
-                    barWidth: 20,
+                    barWidth: 15,
                     data: areaSeriesData.reverse(),
                     label: {
                         normal: {
@@ -321,13 +316,15 @@
             <div class="col-md-9">
                 <#include "_inc/_pc_search_box.html"/>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
+                        <p class="title" id="p_customer_rank"></p>
                         <div id="customer_rank"></div>
                     </div>
                     <div class="col-md-3">
+                        <p class="title" id="p_area_rank"></p>
                         <div id="area_rank"></div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="hot_map">
                             <p class="title" id="p_hot_map"></p>
                             <div class="mapType-div">
