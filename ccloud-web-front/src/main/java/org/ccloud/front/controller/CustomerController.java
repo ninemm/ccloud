@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.jfinal.kit.Ret;
 import org.apache.shiro.SecurityUtils;
@@ -25,6 +27,7 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
+import org.ccloud.utils.JsoupUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -419,6 +422,7 @@ public class CustomerController extends BaseFrontController {
 		List<ImageJson> list = Lists.newArrayList();
 		
 		Customer customer = getModel(Customer.class);
+	    customer.setAddress(JsoupUtils.clear(customer.getAddress()));
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
@@ -468,8 +472,8 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-				String waterFont3 = sellerCustomer.getLocation();
-//				String waterFont3 = "湖北省-武汉市-洪山区";
+//				String waterFont3 = sellerCustomer.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));

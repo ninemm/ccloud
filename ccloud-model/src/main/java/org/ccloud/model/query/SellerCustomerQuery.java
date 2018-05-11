@@ -122,7 +122,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String sort,String sortOrder, String customerType, String keyword1) {
+	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String sort,String sortOrder, String customerType, String keyword1,String status) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -143,6 +143,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "ct.id", customerType, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword1, params, needWhere);
+		if(StrKit.notBlank(status)) {
+			needWhere = appendIfNotEmpty(fromBuilder, "sc.is_enabled", status, params, needWhere);
+		}
 		fromBuilder.append("  GROUP BY sc.id ");
 		if(StrKit.notBlank(sort)) {
 			fromBuilder.append(" order by "+sort);
