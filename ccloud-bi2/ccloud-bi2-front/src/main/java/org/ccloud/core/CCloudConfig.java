@@ -30,12 +30,14 @@ import org.ccloud.core.render.CCloudRenderFactory;
 import org.ccloud.interceptor.AdminInterceptor;
 import org.ccloud.interceptor.GlobelInterceptor;
 import org.ccloud.interceptor.PublicInterceptor;
+import org.ccloud.interceptor.SessionInterceptor;
 import org.ccloud.log.SystemLogThread;
 import org.ccloud.message.plugin.MessagePlugin;
 import org.ccloud.model.core.JModelMapping;
 import org.ccloud.model.core.Table;
 import org.ccloud.qiniu.QiniuPlugin;
 import org.ccloud.route.RouterMapping;
+import org.ccloud.shiro.core.ShiroInterceptor;
 import org.ccloud.utils.ClassUtils;
 import org.ccloud.utils.StringUtils;
 
@@ -226,9 +228,9 @@ public abstract class CCloudConfig extends JFinalConfig {
 		interceptors.add(new GlobelInterceptor());
 		interceptors.add(new AdminInterceptor());
 		interceptors.add(new HookInterceptor());
-//		interceptors.add(new ShiroInterceptor());
+		interceptors.add(new ShiroInterceptor());
 		interceptors.add(new PublicInterceptor());
-//		interceptors.add(new SessionInterceptor());
+		interceptors.add(new SessionInterceptor());
 	}
 
 	public void configHandler(Handlers handlers) {

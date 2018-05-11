@@ -33,7 +33,7 @@ public class SessionInterceptor implements Interceptor {
 		if (user != null || controllerKey.startsWith(Consts.FIRST_URL)) {
 			inv.invoke();
 		} else {
-			inv.getController().redirect("/user/timeout");
+			inv.getController().renderText("登录超时，请重新登录");
 		}
 	}
 
