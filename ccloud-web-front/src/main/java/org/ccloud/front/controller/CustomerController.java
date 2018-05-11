@@ -1285,7 +1285,7 @@ public class CustomerController extends BaseFrontController {
 		Map<String, Object> map = Maps.newHashMap();
 
 		String isUpdate = "";
-		if (isChecked)
+		if (isChecked != null && isChecked)
 			 isUpdate = startProcess(sellerCustomerId, map, 2);
 
 		if (StrKit.isBlank(isUpdate)) renderAjaxResultForSuccess("操作成功");
