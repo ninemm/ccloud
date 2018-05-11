@@ -515,9 +515,9 @@ public class _UserController extends JBaseCRUDController<User> {
 				String userId = "";
 				User us = null;
 				UserGroupRel userGroupRel = null;
-				User user = UserQuery.me()._findUserByUsername(excel.getUsername());
+				User user = UserQuery.me()._findUserByUsername(deleteSpace(excel.getUsername()));
 				if(user !=null) {
-					username +=excel.getUsername()+"、";
+					username +=deleteSpace(excel.getUsername())+"、";
 					errorCnt++;
 					continue;
 				}
@@ -526,7 +526,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					break;
 				}
 				User user00 = null;
-				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
+				List<User> uss = UserQuery.me().findByMobile(deleteSpace(excel.getMobile()));
 				for(User user01:uss) {
 					if(StrKit.notBlank(user01.getWechatOpenId())) {
 						user00 = user01;
@@ -534,7 +534,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					}
 				}
 				// 检查用户是否存在
-				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
+				us = UserQuery.me().findByMobileAndDeptId(deleteSpace(excel.getMobile()),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 				if (us == null) {
 					us = new User();
@@ -542,20 +542,8 @@ public class _UserController extends JBaseCRUDController<User> {
 					us.setId(userId);
 					this.setUser(us, excel);
 					us.setCreateDate(new Date());
-					String uGdest = "";
-					if (excel.getUserGroup()!=null) {
-						Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-						Matcher m = p.matcher(excel.getUserGroup());
-						uGdest = m.replaceAll("");
-					}
-					us.setGroupName(uGdest);
-					String udest = "";
-					if (excel.getUsername()!=null) {
-						Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-						Matcher m = p.matcher(excel.getUsername());
-						udest = m.replaceAll("");
-					}
-					us.setUsername(udest);
+					us.setGroupName(excel.getUserGroup());
+					us.setUsername(deleteSpace(excel.getUsername()));
 					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 					us.setDataArea(dataArea);
 					if(user00 != null) {
@@ -595,20 +583,8 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 	
 	private void setUser(User user, UserExecel excel) {
-		String dest = "";
-		if (excel.getContact()!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(excel.getContact());
-			dest = m.replaceAll("");
-		}
-		user.set("realname", dest);
-		String destt = "";
-		if (excel.getMobile()!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(excel.getMobile());
-			destt = m.replaceAll("");
-		}
-		user.set("mobile", destt);
+		user.set("realname", deleteSpace(excel.getContact()));
+		user.set("mobile", deleteSpace(excel.getMobile()));
 		user.set("status", 1);
 		user.set("create_date", new Date());
 	}
@@ -808,5 +784,16 @@ public class _UserController extends JBaseCRUDController<User> {
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
 		renderJson(map);
+	}
+	
+	
+	private String deleteSpace(String str) {
+		String repl = "";  
+        if (StrKit.notBlank(str)) {  
+            Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
+            Matcher m = p.matcher(str);  
+            repl = m.replaceAll("");  
+        }  
+        return repl;
 	}
 }

@@ -128,7 +128,19 @@ var validatorFields = {
 	}
 };
 
+function iGetInnerText(testStr) {
+        var resultStr = testStr.replace(/\ +/g, ""); //去掉空格
+        return resultStr;
+    }
+
 function doSubmit(){
+	console.log($("#username").val()+"--"+$("#realname").val()+"--"+$("#password").val());
+	$("#username").val(iGetInnerText($("#username").val()));
+	$("#realname").val(iGetInnerText($("#realname").val()));
+	$("#nickname").val(iGetInnerText($("#nickname").val()));
+	if($("#password").val() != null){
+		$("#password").val(iGetInnerText($("#password").val()));
+	}
 	var l = Ladda.create( document.querySelector( '#do_submit' ) );
 	var t = '${(t)!}';
 	var count = $("#station_option").select2("data").length;
@@ -237,32 +249,32 @@ function doSubmit(){
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">用户名:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm username" type="text" name="user.username" value="${(user.username)!}" <#if user??>readonly</#if> placeholder="1-15个任意字符">
+		                 	<input class="form-control input-sm username" type="text" id = "username" name="user.username" value="${(user.username)!}" <#if user??>readonly</#if> placeholder="1-15个任意字符">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">真实姓名:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="user.realname" value="${(user.realname)!}" placeholder="2-2个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" id = "realname" name="user.realname" value="${(user.realname)!}" placeholder="2-2个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">昵称:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="user.nickname" id="userNickname" value="" placeholder="2-2个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" id = "nickname" name="user.nickname" value="${(user.nickname)!}" placeholder="2-2个任意字母数字">
 		               	</div>
 					</div>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">手机:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="user.mobile" value="${(user.mobile)!}" placeholder="2-2个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" id = "mobile" name="user.mobile" value="${(user.mobile)!}" placeholder="2-2个任意字母数字">
 		               	</div>
 					</div>
 					<#if !user??>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">密码:</label>
 						<div class="input-group col-md-4 col-sm-10">
-		                 	<input class="form-control input-sm" type="text" name="user.password" value="${(user.password)!}" placeholder="2-2个任意字母数字">
+		                 	<input class="form-control input-sm" type="text" id = "password" name="user.password" value="${(user.password)!}" placeholder="2-2个任意字母数字">
 		               	</div>
 					</div>
 					<#else>

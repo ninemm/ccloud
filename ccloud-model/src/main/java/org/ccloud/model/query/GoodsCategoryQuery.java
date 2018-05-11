@@ -297,4 +297,14 @@ public class GoodsCategoryQuery extends JBaseQuery {
 		List<GoodsCategory> list = DAO.find(sqlBuilder.toString(), code, brandId);
 		return CollectionUtils.isNotEmpty(list) ? list.get(0) : null;
 	}
+
+	public List<Record> findBySellerId(String sellerId){
+		StringBuilder fromBuilder = new StringBuilder("SELECT cgc.id categoryId, cgc.`name` categoryName FROM cc_product cp ");
+		fromBuilder.append(" LEFT JOIN cc_goods cg ON cg.id = cp.goods_id ");
+		fromBuilder.append(" LEFT JOIN cc_brand cb ON cb.id = cg.brand_id ");
+		fromBuilder.append(" LEFT JOIN cc_seller_brand csb ON csb.brand_id = cb.id ");
+		fromBuilder.append(" LEFT JOIN cc_goods_category cgc on cgc.id = cg.goods_category_id ");
+		fromBuilder.append(" where cp.is_marketable = 1 and csb.seller_id = '"+sellerId+"' GROUP BY cgc.id ");
+		return Db.find(fromBuilder.toString());
+	}
 }

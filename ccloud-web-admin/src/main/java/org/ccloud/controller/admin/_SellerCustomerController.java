@@ -80,6 +80,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sort = getPara("sort");
 		String sortOrder = getPara("sortOrder");
+		String status = getPara("status");
 		Map<String, String[]> paraMap = getParaMap();
 		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
 		String keyword1 = StringUtils.getArrayFirst(paraMap.get("k1"));
@@ -89,7 +90,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		Page<Record> page = SellerCustomerQuery.me()._paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType,keyword1);
+		Page<Record> page = SellerCustomerQuery.me()._paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType,keyword1,status);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -432,7 +433,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		Page<Record> page = SellerCustomerQuery.me()._paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "","");
+		Page<Record> page = SellerCustomerQuery.me()._paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "","","1");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
@@ -522,7 +523,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 					break;
 				}
 				// 检查客户是否存在
-				Customer customer = CustomerQuery.me().findByCustomerNameAndMobile(excel.getCustomerName(), excel.getMobile());
+				Customer customer = CustomerQuery.me().findByCustomerNameAndMobile(deleteSpace(excel.getCustomerName()), deleteSpace(excel.getMobile()));
 
 				if (customer == null) {
 					customer = new Customer();
@@ -547,7 +548,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 					sellerCustomer.set("is_archive", 1);
 					sellerCustomer.set("sub_type", Consts.CUSTOMER_SUB_TYPE_A);
 					sellerCustomer.set("customer_kind", Consts.CUSTOMER_KIND_COMMON);
-					sellerCustomer.set("nickname", excel.getNickname());
+					sellerCustomer.set("nickname", deleteSpace(excel.getNickname()));
 					sellerCustomer.set("data_area", dept_dataArea);
 					sellerCustomer.set("dept_id", dept.getId());
 					sellerCustomer.set("create_date", new Date());
@@ -579,20 +580,14 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 	}
 
 	private void setCustomer(Customer customer, CustomerExcel excel) {
-		customer.set("customer_name", excel.getCustomerName());
-		customer.set("contact", excel.getContact());
-		customer.set("mobile", excel.getMobile());
-		customer.set("email", excel.getEmail());
-		customer.set("prov_name", excel.getProvName());
-		customer.set("city_name", excel.getCityName());
-		customer.set("country_name", excel.getCountyName());
-		String dest = "";
-		if (excel.getAddress()!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(excel.getAddress());
-			dest = m.replaceAll("");
-		}
-		customer.set("address", dest);
+		customer.set("customer_name", deleteSpace(excel.getCustomerName()));
+		customer.set("contact", deleteSpace(excel.getContact()));
+		customer.set("mobile", deleteSpace(excel.getMobile()));
+		customer.set("email", deleteSpace(excel.getEmail()));
+		customer.set("prov_name", deleteSpace(excel.getProvName()));
+		customer.set("city_name", deleteSpace(excel.getCityName()));
+		customer.set("country_name", deleteSpace(excel.getCountyName()));
+		customer.set("address", deleteSpace(excel.getAddress()));
 	}
 
 	private void insertCustomerJoinCustomerType(String sellerCustomerId, CustomerExcel excel, User user) {
@@ -1210,5 +1205,15 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			}
 		}
 		renderJson(flang);
+	}
+	
+	private String deleteSpace(String str) {
+		String repl = "";  
+        if (StrKit.notBlank(str)) {  
+            Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
+            Matcher m = p.matcher(str);  
+            repl = m.replaceAll("");  
+        }  
+        return repl;
 	}
 }
