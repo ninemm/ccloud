@@ -337,14 +337,6 @@
             data:{"provName": provName, "cityName": cityName, countryName: '', startDate: startDate, endDate: endDate, dataArea: dataArea, brandId: brandId},
             dataType:"json"
         }).done(function(data){
-            
-            if(data.length > 6){
-                var height = 160 + (data.length -6) * 40;
-                $customer_rank.height(height);
-            }else{
-                $customer_rank.height(160);
-            }
-
 
             var crLegendData = [];
             var crSeriesData = [];
@@ -572,7 +564,7 @@
                     </div>
                     <div class="col-md-5">
                         <div class="allmap">
-                            <p class="title">我附近的终端分布</p>
+                            <p class="title">经销商附近的终端分布</p>
                             <div class="mapType-div">
                                 <a class="mapType active-mapType" onclick="setMapType(0)">销售情况</a>
                                 <a class="mapType" onclick="setMapType(1)">开发情况</a>
