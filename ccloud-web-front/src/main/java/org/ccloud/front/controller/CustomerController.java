@@ -27,6 +27,7 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
+import org.ccloud.utils.JsoupUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -421,13 +422,7 @@ public class CustomerController extends BaseFrontController {
 		List<ImageJson> list = Lists.newArrayList();
 		
 		Customer customer = getModel(Customer.class);
-		String repl = "";  
-	        if (StrKit.notBlank(customer.getAddress())) {  
-	            Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
-	            Matcher m = p.matcher(customer.getAddress());  
-	            repl = m.replaceAll("");  
-	        }  
-	    customer.setAddress(repl);
+	    customer.setAddress(JsoupUtils.clear(customer.getAddress()));
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
