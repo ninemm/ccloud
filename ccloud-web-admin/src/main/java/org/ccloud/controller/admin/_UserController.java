@@ -943,6 +943,7 @@ public class _UserController extends JBaseCRUDController<User> {
 			String msg = apiResult.getStr("errmsg");
 			String msgSplit[] = msg.split(":");
 			String userCode = msgSplit[1];
+			System.out.println("wechatId----------------------:" + userCode);
 			UserQuery.me().updateQywxId(user.getMobile(), userCode);
 			ApiResult userInfo = ConUserApi.getUser(userCode);
 			ArrayList<Integer> list = (ArrayList<Integer>) userInfo.get("department");
