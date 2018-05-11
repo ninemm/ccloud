@@ -900,12 +900,12 @@ public class _UserController extends JBaseCRUDController<User> {
 	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
 	public void synUser2(){
 		String userIds = getPara("userIds");
-		String deptId = getPara("departmentType");
+		String departmentType = getPara("departmentType");
 		String[] user_Ids = userIds.split(",");
 		String departmentWxId = null;
 		for (String userId : user_Ids) {
 			User user = UserQuery.me().findById(userId);
-			Department department = DepartmentQuery.me().findById(deptId);
+			Department department = DepartmentQuery.me().findByDataArea(departmentType);
 			if (StrKit.isBlank(department.getQywxDeptid())) {
 //				String result = this.createWxDepartment(department);
 //				if (StrKit.isBlank(result)) {
