@@ -327,7 +327,7 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		detail.setId(StrKit.getRandomUUID());
 		detail.setRefundInstockId(orderId);
 		detail.setSellProductId(giftSellerProductId);
-		
+		detail.setProductCount(productCount);
 		BigDecimal productAmount = new BigDecimal(0);
 		String productPrice = paraMap.get("giftBigPrice")[index];
 		if ("bigUnit".equals(giftUnit)) {
