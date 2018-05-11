@@ -67,6 +67,18 @@
 	function doSubmit(){
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		checkIsTheSameWarehouse();
+		var stock = $(".stock");
+		stock.each(function(index,element){
+			if(index==0){
+				return true
+			};
+			var x = $(this).val();
+			if(x==null||x==""){
+				toastr.error('调拨数量不能为空','操作失败');
+				buer=true;
+				
+			}
+		});
 		if(buer){
 			return;
 		}
@@ -228,7 +240,7 @@ function addTr(tid, productList, optionArr) {
      $tr.find("td>#goodsName").html(cgoodsName); 
      $tr.find("td>#specification").text(cspecification);
      $tr.find("td>#big_unit").text(cbig_unit);
-      $tr.find("td>#balance_count").text(balance_count); 
+     $tr.find("td>#balance_count").text(balance_count); 
      });  
 }
 
@@ -321,7 +333,7 @@ function addTr(tid, productList, optionArr) {
 					<table id="dataTable" class="table table-striped table-bordered" width="100%" >
 						<thead>
 							<tr>
-								<th class="col-sm-1 center"  style="text-align:center;">序号</th>
+								<th class="col-sm-1 center"  style="text-align:center;">操作</th>
 								<th class="col-sm-2 center"  style="text-align:center;">商品名称</th>
 								<th class="col-sm-1 center"  style="text-align:center;">规格</th>
 								<th class="col-sm-1 center"  style="text-align:center;">单位</th>

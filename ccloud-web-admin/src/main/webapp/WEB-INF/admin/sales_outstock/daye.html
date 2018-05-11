@@ -150,11 +150,7 @@ function queryPrintDetail(financePrint) {
                             }
                             var productAmout = subitem.productAmout
                             f1 = f1 + productAmout;
-                            if(financePrint == 0){
-                            content1 += $.format(contentStr, (idx + 1), subitem.productName, cBigAmount, subitem.bigPrice + '元', cSmallAmount, subitem.smallPrice + '元', barCode, isGift,productAmout+ '元')
-                            }else{
                             content1 += $.format(contentStr, (idx + 1), subitem.productName, cBigAmount, subitem.bigPrice + '元', cSmallAmount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
-                            }
                          }
                         
                             if (5<idx && idx<12) {
@@ -183,11 +179,7 @@ function queryPrintDetail(financePrint) {
                             }
                             var productAmout = subitem.productAmout
                             f2 = f2 + productAmout;
-                            if(financePrint == 0){
-                            content2 += $.format(contentStr, (idx + 1), subitem.productName, cBigAmount, subitem.bigPrice + '元', cSmallAmount, subitem.smallPrice + '元', barCode, isGift,productAmout+ '元')
-                            }else{
                             content2 += $.format(contentStr, (idx + 1), subitem.productName, cBigAmount, subitem.bigPrice + '元', cSmallAmount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
-                            }
                           }
                         });
                      
@@ -237,17 +229,10 @@ function queryPrintDetail(financePrint) {
 
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
-                    if(financePrint == 0){
-                    var salesAmount = DX(item.salesAmount);
-                    footerContent = $.format(footerStr, salesAmount, item.salesAmount, warehousePhone, remark,printFootContext);
-                    batchPrintContent += headerInfoContent + headerContent + c
-						+ footerContent;
-                    }else{
                     var salesAmount = DX(saleMoney);
                     footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
                     batchPrintContent += headerInfoContent + headerContent + c
 						+ footerContent;
-                    }
 
                     defaultPageSize = 7;
                 });

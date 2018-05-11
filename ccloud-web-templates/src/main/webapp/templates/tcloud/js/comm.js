@@ -179,7 +179,14 @@ function closePop() {
 }
 //确认输入
 function confirmInput() {
-	$currentInput.val($(".pop-input input").val());
+	var num = parseFloat($(".pop-input input").val());
+	if($currentInput.attr('id') == 'bigNum' || $currentInput.attr('id') == 'smallNum' ){
+		if(!(Math.floor(num) === num)){
+			$.toptip("请输入正整数!", 'warning');
+			return false;
+		}
+	}
+	$currentInput.val(num);
 	closePop();
 }
 

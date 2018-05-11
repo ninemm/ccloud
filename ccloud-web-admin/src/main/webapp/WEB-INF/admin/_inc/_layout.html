@@ -81,6 +81,8 @@ $(document).ready(function() {
 	fix();
 	initUrls();
 	initToast();
+	var userDate = decodeURI('${USER.nickname!USER.username} - ${(session['sellerName'])!}');
+	$("#userDate").text(userDate);
 });
 
 function initTree() {
