@@ -94,8 +94,10 @@ public class _ModuleController extends JBaseCRUDController<Module> {
 		setAttr("list", list);
 
 		String id = getPara("id");
-		Module module = ModuleQuery.me().findById(id);
-		setAttr("module", module);
+		if (id != null) {
+			Module module = ModuleQuery.me().findById(id);
+			setAttr("module", module);
+		}
 	}
 	
 	@Override
