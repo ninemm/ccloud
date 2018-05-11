@@ -170,9 +170,7 @@ public class ProductQuery extends JBaseQuery {
 			 	     									+ " LEFT JOIN cc_goods_specification css on css.id = cgs.goods_specification_id "
 			 	     									+ " LEFT JOIN cc_goods cg on cg.id=cp.goods_id "
 			 	     									+ "LEFT JOIN cc_brand cb on cb.id=cg.brand_id "
-			 	     									+ "LEFT JOIN cc_seller_brand csb on csb.brand_id = cb.id "
-			 	     									+ "LEFT JOIN cc_seller cs on cs.id = csb.seller_id  "
-			 	     									+ "LEFT JOIN `user` u on u.department_id = cs.dept_id ");
+			 	     									+ "LEFT JOIN cc_seller_brand csb on csb.brand_id = cb.id ");
 		if(StrKit.notBlank(categoryId)) {
 			fromBuilder.append("LEFT JOIN cc_goods_category cgc on cgc.id = cg.goods_category_id ");
 		}
@@ -180,10 +178,10 @@ public class ProductQuery extends JBaseQuery {
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(!keyword.equals("")){
 			appendIfNotEmptyWithLike(fromBuilder, "cp.name", keyword, params, true);
-			fromBuilder.append(" and cp.is_marketable=1 and u.id='"+userId+"' ");
+			fromBuilder.append(" and cp.is_marketable=1 and csb.seller_id='"+sellerId+"' ");
 	//				+ " and cs.seller_type = 0 and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}else{
-			fromBuilder.append(" where cp.is_marketable=1 and u.id='"+userId+"' ");
+			fromBuilder.append(" where cp.is_marketable=1 and csb.seller_id='"+sellerId+"' ");
 	//				+ " and cs.seller_type = 0 and cp.id  not in (select product_id from cc_seller_product where seller_id ='" + sellerId+"')");
 		}
 		if(StrKit.notBlank(categoryId)) {
