@@ -526,7 +526,12 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		JpPurchaseStockInRequestBody requestBody = new JpPurchaseStockInRequestBody();
 		
 		params.put("clientCode", PropKit.get("jp.api.httpclient.purchaseStockIn.clientCode"));
-		params.put("DealerMarketCode", "");
+		String DealerMarketCode = getPara("sellerCode");
+		if (StrKit.notBlank(DealerMarketCode)) {
+			params.put("DealerMarketCode", DealerMarketCode);
+		} else {
+			params.put("DealerMarketCode", "");
+		}
 		String purchaseTime = getPara("purchaseTime");
 		if(StrKit.isBlank(purchaseTime)) {
 			FastDateFormat shortFdf = FastDateFormat.getInstance(DateUtils.DEFAULT_NORMAL_FORMATTER);
