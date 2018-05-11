@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.Logical;
@@ -46,6 +47,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
+import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
@@ -547,6 +549,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		render("download.html");
 	}
 
+	@SuppressWarnings("deprecation")
 	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
@@ -562,11 +565,10 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		String stockOutStatus = getPara("stockOutStatus");
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "销售出库.xlsx";
 
-		Page<Record> page = SalesOutstockQuery.me().paginate(1, Integer.MAX_VALUE, sellerId, orderSn, startDate, endDate,
+		Page<Record> page = SalesOutstockQuery.me().paginateDowning(1, Integer.MAX_VALUE, sellerId, orderSn, startDate, endDate,
 				printStatus, stockOutStatus, null, dataArea, null, null,null,null, searchName);
 		List<Record> salesOutstckList = page.getList();
 
@@ -579,6 +581,14 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			String saveDate =record.getStr("create_date").substring(0, 10); 
 			//下单时间
 			String createDate = record.getStr("create_date");
+			//审核时间内容
+			String dateComment = "";
+			if(StrKit.notBlank(record.getStr("time"))) {
+				String[] completeDate = record.getStr("time").split(",");
+				for(int i = 0; i < completeDate.length ; i++) {
+					dateComment += "第"+(i+1)+"次审核时间："+ completeDate[i].substring(0,completeDate[i].indexOf("."))+";";
+				}
+			}
 			List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outStockId);
 			for (Record re : outstockDetail) {
 				SalesOrder salesOrder = SalesOrderQuery.me().findOutOrderId(outStockId);
@@ -602,12 +612,12 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
 				if(!bigCount.equals("0")) {
 					SalesOutstockExcel excel = new SalesOutstockExcel();
-					excel = saveExcel(re,record,bigPrice,bigCount,customerInfo,saveDate,createDate,printDate,re.getStr("big_unit"));
+					excel = saveExcel(re,record,bigPrice,bigCount,customerInfo,saveDate,createDate,printDate,re.getStr("big_unit"),dateComment);
 					excellist.add(excel);
 				}
 				if(!smallCount.equals("0")){
 					SalesOutstockExcel excel = new SalesOutstockExcel();
-					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,printDate,re.getStr("small_unit"));
+					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,printDate,re.getStr("small_unit"),dateComment);
 					excellist.add(excel);
 				}
 
@@ -637,7 +647,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		renderFile(new File(filePath.replace("\\", "/")));
 	}
 	
-	public SalesOutstockExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit) {
+	public SalesOutstockExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String comment) {
 		SalesOutstockExcel excel = new SalesOutstockExcel();
 		excel.setProductName(re.getStr("custom_name"));
 		excel.setValueName(re.getStr("valueName"));
@@ -656,6 +666,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		excel.setSaveDate(saveDate);
 		excel.setCreateDate(createDate);
 		excel.setPrintDate(printDate);
+		excel.setCompleteDate(comment);
 		if (record.get("bizName") == null) {
 			excel.setBizUser("");
 		} else {
