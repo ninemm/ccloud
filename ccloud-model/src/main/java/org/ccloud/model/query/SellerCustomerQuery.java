@@ -752,7 +752,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 	public List<Record> findListBySellerId(String sellerId) {
 		StringBuilder fromBuilder = new StringBuilder(
-				" select cs.id, cc.customer_name, cc.contact, cc.mobile, cc.prov_name, cc.city_name, cc.country_name, cc.address, GROUP_CONCAT(u.realname) as userName ");
+				" select cs.id, cc.customer_name, cc.contact, cc.mobile, cc.prov_name, cc.city_name, cc.country_name, cc.address, GROUP_CONCAT(u.realname) as userName, GROUP_CONCAT(u.id) as userId");
 		fromBuilder.append(" from `cc_seller_customer` cs ");
 		fromBuilder.append(" LEFT JOIN cc_customer cc ON cs.customer_id = cc.id ");
 		fromBuilder.append(" LEFT JOIN cc_user_join_customer ujc ON cs.id = ujc.seller_customer_id");
