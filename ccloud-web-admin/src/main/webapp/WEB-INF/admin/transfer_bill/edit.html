@@ -67,6 +67,18 @@
 	function doSubmit(){
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		checkIsTheSameWarehouse();
+		var stock = $(".stock");
+		stock.each(function(index,element){
+			if(index==0){
+				return true
+			};
+			var x = $(this).val();
+			if(x==null||x==""){
+				toastr.error('调拨数量不能为空','操作失败');
+				buer=true;
+				
+			}
+		});
 		if(buer){
 			return;
 		}
@@ -228,7 +240,7 @@ function addTr(tid, productList, optionArr) {
      $tr.find("td>#goodsName").html(cgoodsName); 
      $tr.find("td>#specification").text(cspecification);
      $tr.find("td>#big_unit").text(cbig_unit);
-      $tr.find("td>#balance_count").text(balance_count); 
+     $tr.find("td>#balance_count").text(balance_count); 
      });  
 }
 

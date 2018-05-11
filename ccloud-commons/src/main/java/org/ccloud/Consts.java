@@ -172,6 +172,7 @@ public class Consts {
 	public static final String OPTION_WEB_PROC_PLANS_LIMIT = "web_proc_plans_limit_";//计划起止日期配置
 	public static final String OPTION_WEB_MEMBER_NUMBER_LIMIT = "web_member_number_limit_";//数据上传类型配置
 	public static final String OPTION_FILE_ROOT_PATH = "web_file_root_path";
+	public static final String OPTION_WEB_PROC_REFUND = "web_proc_refund_"; //退货审核开关设置
 
 	public static final String OPTION_ON = "true";
 	public static final String OPTION_OFF = "false";

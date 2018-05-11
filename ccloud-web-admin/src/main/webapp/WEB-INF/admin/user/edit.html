@@ -67,7 +67,8 @@ $(function() {
 	jQuery.mm.initValidator('#form', validatorFields)
 	getStation();
 	getGroup();
-	
+	var nickname = decodeURI('${(user.nickname)!}');
+	$("#userNickname").val(nickname);
 	$('#_dept_tree').click(function() {
 		layer.open({
 			title:'所属部门',
