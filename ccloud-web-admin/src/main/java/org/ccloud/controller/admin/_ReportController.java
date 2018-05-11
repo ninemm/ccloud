@@ -39,7 +39,6 @@ public class _ReportController extends JBaseController {
 	//库存详细
 	public void inventoryDetail() {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 		List<Warehouse> wlist= new ArrayList<>();
 		String user_id = user.getId();
@@ -50,7 +49,6 @@ public class _ReportController extends JBaseController {
 		}else {
 			wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
 		}
-		
 		setAttr("wlist", wlist);
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		setAttr("startDate", date);
@@ -67,7 +65,6 @@ public class _ReportController extends JBaseController {
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		Page<InventoryDetail> page=new Page<>();
-		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		boolean isSuperAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
 		String user_id = user.getId();
@@ -78,7 +75,6 @@ public class _ReportController extends JBaseController {
 		}else {
 			admin=false;
 		}
-		
 		if(null==getPara("sortName[offset]")) {
 			page = InventoryDetailQuery.me().findByDataArea(1, Integer.MAX_VALUE,dataArea,warehouseId,sort,order,startDate,endDate,user_id,admin);
 		}else {

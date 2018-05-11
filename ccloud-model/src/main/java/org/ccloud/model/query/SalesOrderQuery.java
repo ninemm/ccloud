@@ -946,7 +946,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	    		fromBuilder.append(" FROM cc_sales_refund_instock sri ");
 	    		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = sri.customer_id");
 	    		fromBuilder.append(" WHERE sri.`status` NOT IN("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-	    		fromBuilder.append(" AND sri.biz_user_id = '"+userId+"'");
+	    		fromBuilder.append(" AND sri.input_user_id = '"+userId+"'");
 	    		fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 	    		fromBuilder.append(" AND sri.create_date <= '"+endDate+"')a");
         return Db.findFirst(fromBuilder.toString(), params.toArray());
@@ -2309,7 +2309,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		    		fromBuilder.append(" FROM cc_sales_refund_instock sri ");
 		    		fromBuilder.append(" LEFT JOIN cc_seller_customer sc ON sc.id = sri.customer_id");
 		    		fromBuilder.append(" WHERE sri.`status` NOT IN("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
-		    		fromBuilder.append(" AND sri.biz_user_id = '"+userId+"'");
+		    		fromBuilder.append(" AND sri.input_user_id = '"+userId+"'");
 		    		fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 		    		fromBuilder.append(" AND sri.create_date <= '"+endDate+"' GROUP BY sc.id )a GROUP BY a.id");
 	        return Db.find(fromBuilder.toString(), params.toArray());
@@ -2871,7 +2871,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" UNION ALL SELECT u.id userId,srid.sell_product_id ,u.realname,-sum(srid.product_count) product_count");
 		fromBuilder.append(" FROM cc_sales_refund_instock sri ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id ");
-		fromBuilder.append(" LEFT JOIN `user` u ON u.id = sri.biz_user_id LEFT JOIN cc_seller_customer sc ON sc.id = sri.customer_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = sri.input_user_id LEFT JOIN cc_seller_customer sc ON sc.id = sri.customer_id");
 		fromBuilder.append(" WHERE sri.`status` NOT IN("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		if (ifGift) {
 			fromBuilder.append(" and srid.is_gift=1 ");
@@ -2939,7 +2939,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and srid.is_gift=0 ");
 		}
-		fromBuilder.append(" AND sri.biz_user_id = '"+userId+"'");
+		fromBuilder.append(" AND sri.input_user_id = '"+userId+"'");
 		fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 		fromBuilder.append(" AND sri.create_date <= '"+endDate+"'");
 		fromBuilder.append(" GROUP BY sc.Id,srid.sell_product_id)a GROUP BY a.id,a.sell_product_id) b ");
@@ -3055,7 +3055,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" UNION ALL SELECT u.id userId,srid.sell_product_id ,u.realname,-sum(srid.product_count) product_count");
 		fromBuilder.append(" FROM cc_sales_refund_instock sri ");
 		fromBuilder.append(" LEFT JOIN cc_sales_refund_instock_detail srid ON srid.refund_instock_id = sri.id ");
-		fromBuilder.append(" LEFT JOIN `user` u ON u.id = sri.biz_user_id LEFT JOIN cc_seller_customer sc ON sc.id = sri.customer_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = sri.input_user_id LEFT JOIN cc_seller_customer sc ON sc.id = sri.customer_id");
 		fromBuilder.append(" WHERE sri.`status` NOT IN("+Consts.SALES_REFUND_INSTOCK_REFUSE+","+Consts.SALES_REFUND_INSTOCK_CANCEL+") AND sc.customer_kind ="+Consts.CUSTOMER_KIND_COMMON);
 		if (ifGift) {
 			fromBuilder.append(" and srid.is_gift=1 ");
@@ -3170,7 +3170,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and srid.is_gift=0 ");
 		}
-		fromBuilder.append(" AND sri.biz_user_id = '"+userId+"'");
+		fromBuilder.append(" AND sri.input_user_id = '"+userId+"'");
 		fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 		fromBuilder.append(" AND sri.create_date <= '"+endDate+"'");
 		fromBuilder.append(" GROUP BY ct.id,srid.sell_product_id)a ");
@@ -3223,7 +3223,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and srid.is_gift=0 ");
 		}
-		fromBuilder.append(" AND sri.biz_user_id = '"+userId+"'");
+		fromBuilder.append(" AND sri.input_user_id = '"+userId+"'");
 		fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 		fromBuilder.append(" AND sri.create_date <= '"+endDate+"'");
 		fromBuilder.append(" GROUP BY srid.sell_product_id)a ");
