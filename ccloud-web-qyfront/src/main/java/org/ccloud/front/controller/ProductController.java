@@ -1,27 +1,32 @@
 package org.ccloud.front.controller;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.ccloud.Consts;
+import org.ccloud.core.BaseFrontController;
+import org.ccloud.model.*;
+import org.ccloud.model.query.*;
+import org.ccloud.route.RouterMapping;
+
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-import org.ccloud.Consts;
-import org.ccloud.core.BaseFrontController;
-import org.ccloud.model.CustomerType;
-import org.ccloud.model.Dict;
-import org.ccloud.model.User;
-import org.ccloud.model.Warehouse;
-import org.ccloud.model.query.*;
-import org.ccloud.route.RouterMapping;
 import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.*;
 
 /**
  * Created by WT on 2017/11/30.
@@ -35,7 +40,7 @@ public class ProductController extends BaseFrontController {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
 		
-		List<Record> compositionRecords = ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
+		List<Record> compositionRecords = new ArrayList<Record>();
 
 		List<Map<String, Object>> productList = new ArrayList<Map<String, Object>>();
 		List<Map<String, Object>> compositionList = new ArrayList<Map<String, Object>>();
@@ -50,6 +55,7 @@ public class ProductController extends BaseFrontController {
 				productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),goodsCategoryList.get(0).getStr("categoryId"),0,10);
 			} else {
 				productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",goodsCategoryList.get(0).getStr("categoryId"),0,10);
+				compositionRecords=ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
 			}
 		}
 		
@@ -81,14 +87,20 @@ public class ProductController extends BaseFrontController {
 		String tag = getPara("tag");
 		String categoryId = getPara("categoryId");
 		
-		List<Record> goodsCategory=GoodsCategoryQuery.me().findBySellerId(sellerId,tag);
-		
+		List<Record> goodsCategory = GoodsCategoryQuery.me().findBySellerId(sellerId,tag);
+		List<Record> compositionList = new ArrayList<>();
 		List<Record> productList = new ArrayList<>();
 		if (!StrKit.notBlank(categoryId)) {
 			categoryId=goodsCategory.get(0).getStr("categoryId");
 		}
-		productList=	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,0,10);
-		List<Record> compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword, tag);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
+			productList = SellerProductQuery.me().findProductListForAppByCar(sellerId, keyword, tag,wlist.get(0).getId(),categoryId,0,10);
+		} else {
+			productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,0,10);
+			compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword, tag);
+		}
 		Set<String> tagSet = new LinkedHashSet<String>();
 		for (Record record : productList) {
 			String tags = record.getStr("tags");
@@ -111,7 +123,14 @@ public class ProductController extends BaseFrontController {
 		String categoryId = getPara("categoryId");
 		Integer pageNumber = Integer.parseInt(getPara("pageNumber"))*Integer.parseInt(getPara("pageSize"));
 		Integer pageSize = Integer.parseInt(getPara("pageSize"));
-		List<Record> productList = 	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,pageNumber,pageSize );
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		List<Record> productList =new ArrayList<>();
+		if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
+			productList = SellerProductQuery.me().findProductListForAppByCar(sellerId, keyword, tag,wlist.get(0).getId(),categoryId,pageNumber,pageSize);
+		} else {
+			productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,pageNumber,pageSize );
+		}
 		renderJson(productList);
 	}
 

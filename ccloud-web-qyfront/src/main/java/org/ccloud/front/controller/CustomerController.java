@@ -1,20 +1,17 @@
 package org.ccloud.front.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.beust.jcommander.internal.Lists;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
-import com.jfinal.aop.Before;
-import com.jfinal.kit.JsonKit;
-import com.jfinal.kit.Kv;
+import java.awt.Color;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.jfinal.kit.Ret;
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
-import com.jfinal.plugin.activerecord.tx.Tx;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -30,17 +27,26 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
+import org.ccloud.utils.JsoupUtils;
+import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.ccloud.wwechat.WorkWechatJSSDKInterceptor;
 import org.joda.time.DateTime;
 
-import java.awt.*;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
+import com.jfinal.aop.Before;
+import com.jfinal.kit.JsonKit;
+import com.jfinal.kit.Kv;
+import com.jfinal.kit.StrKit;
+import com.jfinal.plugin.activerecord.Page;
+import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.tx.Tx;
 
 /**
  * Created by WT on 2017/11/29.
@@ -417,6 +423,7 @@ public class CustomerController extends BaseFrontController {
 		List<ImageJson> list = Lists.newArrayList();
 		
 		Customer customer = getModel(Customer.class);
+	    customer.setAddress(JsoupUtils.clear(customer.getAddress()));
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");

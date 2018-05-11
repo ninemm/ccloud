@@ -196,7 +196,7 @@ public class UserController extends BaseFrontController {
 			setAttr("avatar", wxUserResult.getStr("avatar"));
 			setAttr("nickname", wxUserResult.getStr("name"));
 		}
-		
+
 		render("user_bind.html");
 	}
 	
