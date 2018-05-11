@@ -523,9 +523,9 @@ public class _UserController extends JBaseCRUDController<User> {
 				String userId = "";
 				User us = null;
 				UserGroupRel userGroupRel = null;
-				User user = UserQuery.me()._findUserByUsername(excel.getUsername());
+				User user = UserQuery.me()._findUserByUsername(deleteSpace(excel.getUsername()));
 				if(user !=null) {
-					username +=excel.getUsername()+"、";
+					username +=deleteSpace(excel.getUsername())+"、";
 					errorCnt++;
 					continue;
 				}
@@ -534,7 +534,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					break;
 				}
 				User user00 = null;
-				List<User> uss = UserQuery.me().findByMobile(excel.getMobile());
+				List<User> uss = UserQuery.me().findByMobile(deleteSpace(excel.getMobile()));
 				for(User user01:uss) {
 					if(StrKit.notBlank(user01.getWechatOpenId())) {
 						user00 = user01;
@@ -542,7 +542,7 @@ public class _UserController extends JBaseCRUDController<User> {
 					}
 				}
 				// 检查用户是否存在
-				us = UserQuery.me().findByMobileAndDeptId(excel.getMobile(),deptId);
+				us = UserQuery.me().findByMobileAndDeptId(deleteSpace(excel.getMobile()),deptId);
 				Group group = GroupQuery.me().findDataAreaAndGroupName(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString(), excel.getUserGroup());
 				if (us == null) {
 					us = new User();
@@ -550,20 +550,8 @@ public class _UserController extends JBaseCRUDController<User> {
 					us.setId(userId);
 					this.setUser(us, excel);
 					us.setCreateDate(new Date());
-					String uGdest = "";
-					if (excel.getUserGroup()!=null) {
-						Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-						Matcher m = p.matcher(excel.getUserGroup());
-						uGdest = m.replaceAll("");
-					}
-					us.setGroupName(uGdest);
-					String udest = "";
-					if (excel.getUsername()!=null) {
-						Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-						Matcher m = p.matcher(excel.getUsername());
-						udest = m.replaceAll("");
-					}
-					us.setUsername(udest);
+					us.setGroupName(excel.getUserGroup());
+					us.setUsername(deleteSpace(excel.getUsername()));
 					String dataArea = DataAreaUtil.dataAreaSetByUser(dept.getDataArea());
 					us.setDataArea(dataArea);
 					if(user00 != null) {
@@ -603,20 +591,8 @@ public class _UserController extends JBaseCRUDController<User> {
 	}
 	
 	private void setUser(User user, UserExecel excel) {
-		String dest = "";
-		if (excel.getContact()!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(excel.getContact());
-			dest = m.replaceAll("");
-		}
-		user.set("realname", dest);
-		String destt = "";
-		if (excel.getMobile()!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(excel.getMobile());
-			destt = m.replaceAll("");
-		}
-		user.set("mobile", destt);
+		user.set("realname", deleteSpace(excel.getContact()));
+		user.set("mobile", deleteSpace(excel.getMobile()));
 		user.set("status", 1);
 		user.set("create_date", new Date());
 	}
@@ -995,7 +971,7 @@ public class _UserController extends JBaseCRUDController<User> {
 
 	@Before(WorkWechatApiConfigInterceptor.class)
 	@RequiresPermissions(value = { "/admin/all"}, logical = Logical.OR)
-	public void batchSynUser(){
+	public void batchSynUser() {
 		String userIds = getPara("userIds");
 		JSONArray userIdArray = JSONArray.parseArray(userIds);
 
@@ -1003,7 +979,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		//获取部门下成员信息
 		ApiResult apiResult = ConUserApi.getDepartmentUserList(seller.getJpwxOpenId(), "1", "");
 
-		for(int i = 0; i < userIdArray.size(); i++) {
+		for (int i = 0; i < userIdArray.size(); i++) {
 			String userId = userIdArray.get(i).toString();
 			User user = UserQuery.me().findById(userId);
 			boolean isExist = false;
@@ -1013,10 +989,10 @@ public class _UserController extends JBaseCRUDController<User> {
 				return;
 			}
 			List<Map<String, Object>> userList = apiResult.getList("userlist");
-			for(Map<String, Object> item : userList){
+			for (Map<String, Object> item : userList) {
 
 				//判断是否存在该用户
-				if(item.get("mobile").equals(user.getMobile())) {
+				if (item.get("mobile").equals(user.getMobile())) {
 					isExist = true;
 					user.setWechatUseriId(item.get("userid").toString());
 
@@ -1029,7 +1005,8 @@ public class _UserController extends JBaseCRUDController<User> {
 							              "\", \"name\": \"" + user.getRealname() +
 							              "\", \"mobile\": \"" + user.getMobile();
 
-					if(user.getAvatar() != null && user.getAvatar().length() != 0) json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
+					if (user.getAvatar() != null && user.getAvatar().length() != 0)
+						json = json + "\",\"avatar_mediaid\": \"" + user.getAvatar();
 
 					json = json + "\", \"department\": [" + seller.getJpwxOpenId() + "]," +
 							       "\"position\": \"" + user.getStationId() +
@@ -1037,22 +1014,22 @@ public class _UserController extends JBaseCRUDController<User> {
 
 					ApiResult apiResult1 = ConUserApi.updateUser(json);
 
-					if(!apiResult1.getErrorCode().equals(0)) {
+					if (!apiResult1.getErrorCode().equals(0)) {
 						renderAjaxResultForError();
 						return;
 					}
 				}
 			}
-			if(!isExist){
+			if (!isExist) {
 
 				String json = "{\"userid\": \"" + user.getId() + "\", \"name\": \"" + user.getRealname() + "\", \"mobile\": \"" + user.getMobile() + "\", \"department\": [" + seller.getJpwxOpenId() + "],"
 						              + "\"position\": \"" + user.getStationId() + "\", \"enable\":1, \"to_invite\": false," + "}";
 				ApiResult apiResult1 = ConUserApi.createUser(json);
 
-				if(apiResult1.getErrorCode().equals(0)){
+				if (apiResult1.getErrorCode().equals(0)) {
 
 					user.setWechatUseriId(user.getId());
-					if(!user.saveOrUpdate()){
+					if (!user.saveOrUpdate()) {
 						renderAjaxResultForError();
 						return;
 					}
@@ -1061,5 +1038,15 @@ public class _UserController extends JBaseCRUDController<User> {
 			}
 		}
 		renderAjaxResultForSuccess();
+	}
+
+	private String deleteSpace(String str) {
+		String repl = "";  
+        if (StrKit.notBlank(str)) {  
+            Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
+            Matcher m = p.matcher(str);  
+            repl = m.replaceAll("");  
+        }  
+        return repl;
 	}
 }

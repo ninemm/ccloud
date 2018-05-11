@@ -51,7 +51,7 @@
         if($.trim($("#address").val()).length==0) {$.toptip('地址详情不能为空', 1000, 'error'); return false;}
         if($.trim($("#address").val()).length > 200) {$.toptip('地址详情长度不能超过200', 1000, 'error'); return false;}
 
-//        if($.trim($("#lng").val()).length==0) {$.toptip('请刷新定位', 1000, 'error'); return false;}
+ //       if($.trim($("#lng").val()).length==0) {$.toptip('请刷新定位', 1000, 'error'); return false;}
         return true;
     }
 
@@ -181,9 +181,15 @@
         });
 
     })
-    
+    function iGetInnerText(testStr) {
+        var resultStr = testStr.replace(/\ +/g, ""); //去掉空格
+        return resultStr;
+    }
     function doSubmit() {
-
+		$("#customer_name").val(iGetInnerText($("#customer_name").val()));
+		$("#contact").val(iGetInnerText($("#contact").val()));
+		$("#mobile").val(iGetInnerText($("#mobile").val()));
+		$("#address").val(iGetInnerText($("#address").val()));
         var children = $("#uploaderFiles")[0].children;
         var oldPic=[];
         for(var i = 0; i < children.length; i++)

@@ -27,6 +27,7 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
+import org.ccloud.utils.JsoupUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -421,6 +422,7 @@ public class CustomerController extends BaseFrontController {
 		List<ImageJson> list = Lists.newArrayList();
 		
 		Customer customer = getModel(Customer.class);
+	    customer.setAddress(JsoupUtils.clear(customer.getAddress()));
 		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
@@ -470,9 +472,14 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
+<<<<<<< HEAD
 
 				String waterFont3 = sellerCustomer.getLocation();
 //				String waterFont3 = "湖北省-武汉市-洪山区";
+=======
+//				String waterFont3 = sellerCustomer.getLocation();
+				String waterFont3 = "湖北省-武汉市-洪山区";
+>>>>>>> ccloud-cache
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
@@ -522,13 +529,7 @@ public class CustomerController extends BaseFrontController {
 			temp.setContact(customer.getContact());
 			
 			temp.setMobile(customer.getMobile());
-			String dest = "";
-			if (customer.getAddress()!=null) {
-				Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-				Matcher m = p.matcher(customer.getAddress());
-				dest = m.replaceAll("");
-			}
-			temp.setAddress(dest);
+			temp.setAddress(customer.getAddress());
 			temp.setNickname(sellerCustomer.getNickname());
 			temp.setCustomerName(customer.getCustomerName());
 
@@ -1028,13 +1029,7 @@ public class CustomerController extends BaseFrontController {
 			if(areaCodeList.size() == 3) customer.setCountryCode(areaCodeList.get(2));
 			else customer.setCountryCode("");
 		}
-		String dest = "";
-		if (customer.getAddress()!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(customer.getAddress());
-			dest = m.replaceAll("");
-		}
-		customer.setAddress(dest);
+
 		if (areaNameList.size() != 0) {
 			customer.setProvName(areaNameList.get(0));
 			customer.setCityName(areaNameList.get(1));
@@ -1086,10 +1081,7 @@ public class CustomerController extends BaseFrontController {
 			CustomerJoinCustomerType ccType = new CustomerJoinCustomerType();
 			ccType.setSellerCustomerId(sellerCustomer.getId());
 			ccType.setCustomerTypeId(custTypeId);
-			boolean save = ccType.save();
-			if (!save) {
-				return "操作失败";
-			}
+			ccType.save();
 		}
 
 		UserJoinCustomerQuery.me().deleteBySelerCustomerIdAndUserId(sellerCustomer.getId(), user.getId());
@@ -1294,7 +1286,7 @@ public class CustomerController extends BaseFrontController {
 		Map<String, Object> map = Maps.newHashMap();
 
 		String isUpdate = "";
-		if (isChecked)
+		if (isChecked != null && isChecked)
 			 isUpdate = startProcess(sellerCustomerId, map, 2);
 
 		if (StrKit.isBlank(isUpdate)) renderAjaxResultForSuccess("操作成功");
