@@ -52,6 +52,7 @@ import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.vo.SalesOrderExcel;
@@ -271,9 +272,6 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		String sellerId = getSessionAttr("sellerId");
-		if (user == null || StrKit.isBlank(sellerId)) {
-			// TODO
-		}
 
 		List<Record> productlist = SalesOrderQuery.me().findProductListBySeller(sellerId);
 
@@ -290,12 +288,22 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			productInfoMap.put(sellProductId, record);
 
 			productOptionMap.put("id", sellProductId);
-			productOptionMap.put("text", customName + "/" + speName);
+			if (StrKit.notBlank(speName)) {
+				productOptionMap.put("text", customName + "/" + speName);
+			} else {
+				productOptionMap.put("text", customName);
+			}
 
 			productOptionList.add(productOptionMap);
 		}
 
-		List<Record> customerList = SalesOrderQuery.me().findCustomerListByUser(user.getId());
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		List<Record> customerList = new ArrayList<>();
+		if (isDealerAdmin) {
+			customerList = SellerCustomerQuery.me().findListBySellerId(sellerId);
+		} else {
+			customerList = SalesOrderQuery.me().findCustomerListByUser(user.getId());
+		}
 
 		Map<String, Object> customerInfoMap = new HashMap<String, Object>();
 		List<Map<String, String>> customerOptionList = new ArrayList<Map<String, String>>();
