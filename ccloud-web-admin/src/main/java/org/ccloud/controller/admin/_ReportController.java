@@ -101,7 +101,7 @@ public class _ReportController extends JBaseController {
 	
 	//产品总计
 	public void productTotalList() {
-		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 		String sellerId = getPara("seller_id");
