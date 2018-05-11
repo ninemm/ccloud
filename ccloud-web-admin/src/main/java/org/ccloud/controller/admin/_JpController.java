@@ -117,6 +117,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		params.put("DealerCode", "");
 		params.put("type", "GetFile");
 		String result = null;
+		int size = 0;
 		try {
 			result = JpHttpClientExecute.executeGet(requestUrl, params, headers);
 		} catch (Exception e) {
@@ -153,9 +154,10 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				sellerSynchronize.setModifyDate(calendar.getTime());
 				sellerSynchronizes.add(sellerSynchronize);
 			}
+			size = sellerSynchronizes.size();
 			Db.batchSave(sellerSynchronizes, sellerSynchronizes.size());
 		}
-		renderAjaxResultForSuccess();
+		renderAjaxResultForSuccess("成功", size);
 	}
 	
 	/**
@@ -222,13 +224,14 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		}
 		if(needAddList.size() > 0)
 			Db.batchSave(needAddList, needAddList.size());
-		renderAjaxResultForSuccess();
+		renderAjaxResultForSuccess("成功", needAddList.size());
 	}
 	
 	/**
 	 * 拉取商品
 	 */
 	public void pullGoodsCategories() {
+		int i = 0;
 		String goodsTypeCode = getPara("goodsType");
 		Calendar calendar = Calendar.getInstance();
 		String apiName = PropKit.get("jp.api.httpclient.goodsCategories");
@@ -303,6 +306,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					storedGoodsCategory.setParentId(parentId);
 					storedGoodsCategory.setState(1);
 					storedGoodsCategory.setSupplierId(brand.getSupplierId());
+					i++;
 					storedGoodsCategory.save();
 				}
 				storedGoodsCategory = null;
@@ -330,7 +334,7 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				}
 			});
 		}
-		renderAjaxResultForSuccess();
+		renderAjaxResultForSuccess("成功", i);
 	}
 	
 	/**
@@ -416,6 +420,8 @@ public class _JpController extends JBaseCRUDController<Goods> {
 	 * 拉取产品信息(根据已存在分类)
 	 */
 	public void pullProducts() {
+		int goodsAddNum = 0;
+		int goodsUpdateNum = 0;
 		Calendar calendar = Calendar.getInstance();
 		// 查询出劲牌所有商品分类
 		List<GoodsCategory> brandCategories = GoodsCategoryQuery.me().findCategoryByBrandId(brand.getId());
@@ -491,6 +497,8 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					responseEntity = null;
 					storedProduct = null;
 				}
+				goodsAddNum = products.size();
+				goodsUpdateNum = updateProducts.size();
 				if(products.size() > 0)
 					Db.batchSave(products, products.size());
 				if(updateProducts.size() > 0)
@@ -498,13 +506,16 @@ public class _JpController extends JBaseCRUDController<Goods> {
 			}
 			goodsCategory = null;
 		}
-		renderAjaxResultForSuccess();
+		String resultMessage = "新增" + goodsAddNum + "个产品" + "更新" + goodsUpdateNum + "个产品";
+		renderAjaxResultForSuccess("成功", resultMessage);
 	}
 	
 	/**
 	 * 拉取采购单入库信息
 	 */
 	public void pullPurchaseStockIns() {
+		List<Map<String, Object>> resultList = new ArrayList<>();
+		List<String> codeList = new ArrayList<>();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		boolean result = false;
 		Calendar calendar = Calendar.getInstance();
@@ -515,7 +526,12 @@ public class _JpController extends JBaseCRUDController<Goods> {
 		JpPurchaseStockInRequestBody requestBody = new JpPurchaseStockInRequestBody();
 		
 		params.put("clientCode", PropKit.get("jp.api.httpclient.purchaseStockIn.clientCode"));
-		params.put("DealerMarketCode", "");
+		String DealerMarketCode = getPara("sellerCode");
+		if (StrKit.notBlank(DealerMarketCode)) {
+			params.put("DealerMarketCode", DealerMarketCode);
+		} else {
+			params.put("DealerMarketCode", "");
+		}
 		String purchaseTime = getPara("purchaseTime");
 		if(StrKit.isBlank(purchaseTime)) {
 			FastDateFormat shortFdf = FastDateFormat.getInstance(DateUtils.DEFAULT_NORMAL_FORMATTER);
@@ -560,6 +576,22 @@ public class _JpController extends JBaseCRUDController<Goods> {
 					Collections.sort(sellers, new SellerDeptComparator());
 				seller = sellers.get(0);
 				mainIndex++;
+				String code = purchaseStockInDetails.get(0).getDealerMarketCode();
+				if (codeList.contains(code)) {
+					for (int i = 0; i < resultList.size(); i++) {
+						if (resultList.get(i).get("sellerCode").equals(code)) {
+							resultList.get(i).put("sellerCount", Integer.parseInt(resultList.get(i).get("sellerCount").toString()) + 1);
+							break;
+						}
+					}					
+				} else {
+					codeList.add(code);
+					Map<String, Object> map = new HashMap<>();
+					map.put("sellerName", purchaseStockInDetails.get(0).getDealerMarketName());
+					map.put("sellerCode", purchaseStockInDetails.get(0).getDealerMarketCode());
+					map.put("sellerCount", 1);
+					resultList.add(map);
+				}
 				porderSn = "PO" + sellerCode + nowDateTimeStr.substring(0,8)+(Integer.valueOf(PurchaseOrderQuery.me().getNewSn(seller.getId()) + mainIndex));
 				purchaseOrder.setPorderSn(porderSn);
 				purchaseOrder.setStockOutSn(stockOutSn);
@@ -620,13 +652,13 @@ public class _JpController extends JBaseCRUDController<Goods> {
 				}
 			});
 		} else {
-			renderAjaxResultForSuccess("没有数据");
+			renderAjaxResultForSuccess("没有数据", resultList);
 			return;
 		}
 		if(result) {
-			renderAjaxResultForSuccess();
+			renderAjaxResultForSuccess("成功", resultList);
 		} else {
-			renderAjaxResultForError();
+			renderAjaxResultForError("失败");
 		}
 	}
 	
