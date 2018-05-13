@@ -84,7 +84,7 @@
         total();
     }
     $(document).on("click", ".confirm-search-btn", function () { //点击确定按钮
-        setFilter(3);
+        setFilter(4);
         renderChinaMap();
         total();
         closeCombinSearch();
@@ -243,7 +243,7 @@
     function selectDealer(selectDataArea,obj) {
         Utils.loading();
         dataArea = selectDataArea;
-        $.cookie(Utils.dataAreaCache, dataArea, { expires: 1 });
+        $.cookie(Utils.dataAreaCache, dataArea, { expires: 0.125 });
         $("#dealerName").text($(obj).find(".weui-cell__hd").eq(0).text() + '汇总信息');
         $.ajax({
             url:"${CPATH}/selectDealer",

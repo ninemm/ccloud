@@ -137,6 +137,29 @@ public class DateUtils {
 	}
 
 	/**
+	 * 统计两个日期之间包含的天数。
+	 *
+	 * @param strDate1
+	 * @param strDate2
+	 * @return
+	 */
+	public static int getDayDiff(String strDate1, String strDate2){
+		Date date1 = null;
+		Date date2 = null;
+		try {
+			date1 = sdf.parse(strDate1);
+			date2 = sdf.parse(strDate2);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		if (date1 == null || date2 == null) {
+			throw new InvalidParameterException("date1 and date2 cannot be null!");
+		}
+		long millSecondsInOneDay = 24 * 60 * 60 * 1000;
+		return (int) ((date1.getTime() - date2.getTime()) / millSecondsInOneDay);
+	}
+
+	/**
 	 * 功能描述：比较两个日期的大小
 	 * @param start	开始时间
 	 * @param end	结束时间
@@ -162,7 +185,7 @@ public class DateUtils {
 	 * 日期：2017年6月10日
 	 */
 	public static Date plusDays(Date date, int day) {
-		
+
 		DateTime dateTime = new DateTime(date);
 		return dateTime.plusDays(day).toDate();
 		
@@ -178,10 +201,14 @@ public class DateUtils {
 	 * 日期：2017年9月29日
 	 */
 	public static String plusDays(String date, int day) {
-		
-		DateTime dateTime = new DateTime(date);
+		Date date1 = null;
+		try {
+			date1 = sdf.parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		DateTime dateTime = new DateTime(date1);
 		return dateTime.plusDays(day).toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
-		
 	}
 	
 	/**
@@ -209,7 +236,7 @@ public class DateUtils {
 	
 	/**
 	 * 功能描述：通过类型返回开始时期与结束时期
-	 * @param dateType	类型(today、yesterday、week、lastweek、month、lastmonth)
+	 * @param dayTag	类型(today、yesterday、week、lastweek、month、lastmonth)
 	 * @return
 	 * 返回类型：String
 	 * 创建人：zengcheng
@@ -263,22 +290,29 @@ public class DateUtils {
 		date[1] = endDate;
 		return date;
 	}
-	
+
+	/**
+	 * 功能描述：获取本周开始日期
+	 * @param date	日期
+	 * @return
+	 * 返回类型：String
+	 * 创建人：chen.xuebing
+	 * 日期：2018年5月13日
+	 */
+	public static String startOfWeek(String date) {
+
+		DateTime dateTime = new DateTime(date);
+		return format(DEFAULT_NORMAL_FORMATTER,dateTime.withDayOfWeek(1).toDate());
+
+	}
+
 	public static void main(String[] args) throws ParseException {
-		Date date = sdf.parse("2016-7-20 00:00:00");
-		System.out.println(getDayDiff(new Date(), date));
-		
-		DateTime dateTime = DateTime.now();
-		
-		System.out.println(dateTime.plusDays(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER));
-		
-		System.out.println(dateTime.plusWeeks(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER));
-		
-		System.out.println(dateTime.plusMonths(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER));
-		
-		System.out.println(dateTime.plusYears(-1).toString(DateUtils.DEFAULT_NORMAL_FORMATTER));
-		
-		
+
+		DateTime dateTime = new DateTime("2018-05-13");
+		System.out.println(format(DEFAULT_NORMAL_FORMATTER,dateTime.withDayOfWeek(1).toDate()));
+
+		System.out.println(getDayDiff("2018-05-13 00:00:00", "2018-05-9 12:37:25"));
+
 	}
 
 }

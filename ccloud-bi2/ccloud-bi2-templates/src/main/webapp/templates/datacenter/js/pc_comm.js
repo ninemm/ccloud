@@ -63,9 +63,9 @@ function setFilter(type) {
 
 	$("#start-date").val(moment(startDate).format('YYYY-MM-DD'));
 	$("#end-date").val(moment(endDate).format('YYYY-MM-DD'));
-	$.cookie(Utils.dateTypeCache, type, {expires: 1});
-	$.cookie(Utils.startDateCache, startDate, {expires: 1});
-	$.cookie(Utils.endDateCache, endDate, {expires: 1});
+	$.cookie(Utils.dateTypeCache, type, {expires: 0.125});
+	$.cookie(Utils.startDateCache, startDate, {expires: 0.125});
+	$.cookie(Utils.endDateCache, endDate, {expires: 0.125});
 
 	if(cityName.length != 0) {
 		renderCityMap({"name": cityName}, curProvName);
@@ -79,7 +79,7 @@ function setFilter(type) {
 $(document).on('click', '#getBrand span', function () {
 	$(this).addClass('red-button').siblings().removeClass('red-button');
 	brandId = $(this).data('id');
-	$.cookie(Utils.brandIdCache, brandId, {expires: 1});
+	$.cookie(Utils.brandIdCache, brandId, {expires: 0.125});
 
 	if(cityName.length != 0) {
 		renderCityMap({"name": cityName}, curProvName);
@@ -125,8 +125,8 @@ function initDatetimepicker(fieldId, format, minView, maxView, startView) {
 		$(this).datetimepicker('hide');
 		startDate = $("#start-date").val() + ' 00:00:00';
 		endDate =$("#end-date").val() + ' 23:59:59';
-		$.cookie(Utils.startDateCache, startDate, {expires: 1});
-		$.cookie(Utils.endDateCache, endDate, {expires: 1});
+		$.cookie(Utils.startDateCache, startDate, {expires: 0.125});
+		$.cookie(Utils.endDateCache, endDate, {expires: 0.125});
 
 		if(cityName.length != 0) {
 			renderCityMap({"name": cityName}, curProvName);
@@ -143,7 +143,7 @@ function initDatetimepicker(fieldId, format, minView, maxView, startView) {
 function selectDealer(selectDataArea) {
 	Utils.loading();
 	dataArea = selectDataArea;
-	$.cookie(Utils.dataAreaCache, dataArea, { expires: 1 });
+	$.cookie(Utils.dataAreaCache, dataArea, { expires: 0.125 });
 	$.ajax({
 		url:CPATH + '/pc/selectDealer',
 		type:"post",

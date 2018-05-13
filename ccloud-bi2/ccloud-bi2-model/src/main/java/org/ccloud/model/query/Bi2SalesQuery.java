@@ -19,7 +19,9 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import org.ccloud.Consts;
+import org.ccloud.utils.DateUtils;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -569,6 +571,10 @@ public class Bi2SalesQuery extends JBaseQuery {
 	// 订单数量
 	public List<Record> findOrderCountList(String[] dataArea, String provName, String cityName, String countryName,
 	                                       String startDate, String endDate,String[] brandId) {
+		int dayDiff = DateUtils.getDayDiff(endDate, startDate);
+		if (dayDiff < 7) {
+			startDate = DateUtils.plusDays(endDate, -7);
+		}
 
 		LinkedList<Object> params = new LinkedList<Object>();
 

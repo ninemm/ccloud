@@ -10,7 +10,7 @@ var dateType = $.cookie(Utils.dateTypeCache) == null ? 0 : $.cookie(Utils.dateTy
 $("#date-div").find(".date").eq(dateType).addClass("active-date");
 
 var startDate = $.cookie(Utils.startDateCache) == null ? moment().subtract(1, 'days').format('YYYY-MM-DD 00:00:00') : $.cookie(Utils.startDateCache);
-var endDate = $.cookie(Utils.endDateCache) == null ? moment().format('YYYY-MM-DD HH:mm:ss') : $.cookie(Utils.endDateCache);
+var endDate = $.cookie(Utils.endDateCache) == null ? moment().subtract(1, 'days').format('YYYY-MM-DD 23:59:59') : $.cookie(Utils.endDateCache);
 
 var dataArea = $.cookie(Utils.dataAreaCache);
 var brandId = $.cookie(Utils.brandIdCache);
@@ -32,26 +32,29 @@ function setFilter(type) {
 	dateType = type;
 	if (dateType == 0) {
 		startDate = moment().subtract(1, 'days').format('YYYY-MM-DD 00:00:00');
-		endDate = moment().format('YYYY-MM-DD HH:mm:ss');
+		endDate = moment().subtract(1, 'days').format('YYYY-MM-DD 23:59:59');
 	} else if (dateType == 1) {
-		startDate = moment().subtract(1, 'weeks').format('YYYY-MM-DD 00:00:00');
+		startDate = moment().format('YYYY-MM-DD 00:00:00');
 		endDate = moment().format('YYYY-MM-DD HH:mm:ss');
 	} else if (dateType == 2) {
-		startDate = moment().subtract(1, 'months').format('YYYY-MM-DD 00:00:00');
+		startDate = moment().startOf('isoWeek').format('YYYY-MM-DD 00:00:00');
 		endDate = moment().format('YYYY-MM-DD HH:mm:ss');
 	} else if (dateType == 3) {
+		startDate = moment().startOf('month').format('YYYY-MM-DD 00:00:00');
+		endDate = moment().format('YYYY-MM-DD HH:mm:ss');
+	} else if (dateType == 4) {
 		startDate = $("#start-date").val() + ' 00:00:00';
 		endDate =$("#end-date").val() + ' 23:59:59';
 
 		brandId = $("#combin-filter .filter-item .red-button").eq(0).data('id');
-		$.cookie(Utils.brandIdCache, brandId, {expires: 1});
+		$.cookie(Utils.brandIdCache, brandId, {expires: 0.125});
 	}
 
 	$("#start-date").val(moment(startDate).format('YYYY-MM-DD'));
 	$("#end-date").val(moment(endDate).format('YYYY-MM-DD'));
-	$.cookie(Utils.dateTypeCache, type, {expires: 1});
-	$.cookie(Utils.startDateCache, startDate, {expires: 1});
-	$.cookie(Utils.endDateCache, endDate, {expires: 1});
+	$.cookie(Utils.dateTypeCache, type, {expires: 0.125});
+	$.cookie(Utils.startDateCache, startDate, {expires: 0.125});
+	$.cookie(Utils.endDateCache, endDate, {expires: 0.125});
 }
 
 //共通展开收起
