@@ -38,9 +38,9 @@
 				}
 			}
 		});
-		if (userIds.length > 230) {// 不能超过七个人
+		if (userIds.length > 200) {// 不能超过六个人
 			$saveBtn.removeAttr("disabled");
-			layer.alert("不能超过七个审核人，请重新选择!", {icon: 2});
+			layer.alert("不能超过六个审核人，请重新选择!", {icon: 2});
 			return ;
 		}
 		if(parent.flg == 0){
