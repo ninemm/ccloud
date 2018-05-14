@@ -78,7 +78,7 @@ var headerStr =
 				'<div class="stat">' + 
 					'<p>制单人:{0}&nbsp;&nbsp;&nbsp;经手人:{1}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;送货人:' + 
 					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;收货人:</p>'+
-					'<span>地址:{2}  电话:{3}</span><span class="pageNum floatRight">1/1</span>' +
+					'<span>公司电话:{2}</span><span class="pageNum floatRight">1/1</span>' +
 				'</div>' + 
 			'</div>';
 
@@ -102,14 +102,7 @@ function queryPrintDetail(financePrint) {
                 var curDate = new Date().Format("yyyy-MM-dd hh:mm");
                 $.each(data.rows,
                 function(index, item) {
-					var f1 = 0;
-					var f2 = 0;
-					var l1 = 0;
-					var d1 = 0;
-					var d2 = 0;
 					var content = '<tbody>';
-					var content1 = "";
-					var content2 = "";
 					let saleMoney = 0;
 					let saleNum = 0;
 					let sumMoney = 0;
@@ -151,7 +144,7 @@ function queryPrintDetail(financePrint) {
 							}else{
 								content += $.format(contentStr,barCode,subitem.productName,convertRelate,subitem.smallUnit,totalNum,subitem.smallPrice,totalMoney.toFixed(2),bigNum)
 							}
-							if(len>5){
+							if(len>4){
 								if(item.customerKind == 100402){
 									saleMoney="";
 									salesAmount="";
@@ -218,11 +211,11 @@ function queryPrintDetail(financePrint) {
 					let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
                     
-                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}',placeOrderMan,"",warehousePhone);
+                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}',placeOrderMan,warehousePhone);
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 8;
+                    defaultPageSize = 7;
                 });
 
                 $("#print-content").html(batchPrintContent);
