@@ -151,17 +151,17 @@ function queryPrintDetail(financePrint) {
 										* subitem.smallPrice;
 								saleMoney = saleMoney + totalMoney;
                             }
-                            totalNum=subitem.bigCount+subitem.smallCount/subitem.convertRelate
+                            totalNum=subitem.bigCount;
                             saleNum=saleNum+totalNum;
-                            var productAmout = subitem.productAmout
-                            var convertRelate=""
+                            var productAmout = subitem.productAmout;
+                            var convertRelate="";
                             if(subitem.convertRelate!=null){
                             		convertRelate="1*"+	subitem.convertRelate;
                             }
                             if(isGift == 0){
-                            		content += $.format(contentStr, (idx + 1), subitem.productName, totalNum.toFixed(2), subitem.bigPrice, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,productAmout,subitem.bigUnit)
+                            		content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice.toFixed(2), subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,productAmout,subitem.bigUnit)
                             }else{
-                            		content += $.format(contentStr, (idx + 1), subitem.productName, totalNum, 0, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,totalMoney.toFixed(2),subitem.bigUnit,subitem.convertRelate)
+                            		content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, 0.00, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,totalMoney.toFixed(2),subitem.bigUnit,subitem.convertRelate)
                             }
                         });
 
