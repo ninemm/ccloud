@@ -185,7 +185,7 @@ function queryPrintDetail(financePrint) {
 
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
-                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', saleMoney.toFixed(2), warehousePhone, remark,printFootContext,item.sellerName,saleNum.toFixed(2),item.sellerPhone,placeOrderMan, placeOrderPhone);
+                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', saleMoney.toFixed(2), warehousePhone, remark,printFootContext,item.sellerName,saleNum,item.sellerPhone,placeOrderMan, placeOrderPhone);
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
