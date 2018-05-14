@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.jfinal.kit.Ret;
+import com.jfinal.log.Log;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -53,6 +54,8 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/customer")
 @RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerController extends BaseFrontController {
+
+	private Log log = Log.getLog(CustomerController.class);
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
@@ -423,7 +426,16 @@ public class CustomerController extends BaseFrontController {
 		
 		Customer customer = getModel(Customer.class);
 	    customer.setAddress(JsoupUtils.clear(customer.getAddress()));
-		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+
+		SellerCustomer sellerCustomer = null;
+		try {
+			sellerCustomer = getModel(SellerCustomer.class);
+		} catch (Exception e) {
+			log.error("===========error lng：" + getPara("lng"));
+			log.error("===========error lat：" + getPara("lat"));
+			log.error(e.getMessage(), e);
+		}
+
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
 		if(StrKit.notBlank(storeId)) {
