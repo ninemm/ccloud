@@ -3127,7 +3127,7 @@ public class SalesOrderQuery extends JBaseQuery {
 
 	//我的客户类型
 	public Page<SalesOrder> findByCustomerType1(int pageNumber, int pageSize, String startDate, String endDate,
-			String keyword, String userId, boolean ifGift) {
+			String keyword, String userId, boolean ifGift, String sort, String order) {
 		String select = "SELECT sp.custom_name,a.`name`, TRUNCATE(sum(a.product_count) / p.convert_relate,2)  productCountTotal ";
 		StringBuilder fromBuilder=new StringBuilder(" FROM( ");
 		if (keyword.equals("sok.biz_date")) {
@@ -3176,6 +3176,9 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY ct.id,srid.sell_product_id)a ");
 		fromBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.id=a.sell_product_id ");
 		fromBuilder.append(" LEFT JOIN cc_product p ON p.id = sp.product_id GROUP BY a.id,a.sell_product_id");
+		if (sort!=""&&null!=sort) {
+			fromBuilder.append(" order by "+sort+" "+order);
+		}
 		return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
 	}
 
