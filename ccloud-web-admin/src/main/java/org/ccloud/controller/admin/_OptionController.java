@@ -17,6 +17,8 @@ package org.ccloud.controller.admin;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.jfinal.aop.Before;
+import com.jfinal.kit.StrKit;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -30,7 +32,6 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
 
-import com.jfinal.aop.Before;
 
 @RouterMapping(url = "/admin/option", viewPath = "/WEB-INF/admin/option")
 @Before(ActionCacheClearInterceptor.class)
@@ -40,7 +41,9 @@ public class _OptionController extends JBaseController {
 	@RequiresPermissions(value={"/admin/option","/admin/all","/admin/option/seller"},logical=Logical.OR)
 	public void index() {
 		if("seller".equals(getPara())){
-			setAttr("customerTypeList", CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
+			String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+			if (StrKit.notBlank(dealerDataArea))
+				setAttr("customerTypeList", CustomerTypeQuery.me().findByDataArea(dealerDataArea));
 		}
 		render((getPara() == null ? "web" : getPara()) + ".html");
 	}

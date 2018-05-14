@@ -154,6 +154,8 @@ var applyHtml = $(".applyInfo").eq(0).html();
 function checkApply() {
 	var store = $(".applyInfo");
 	var check = false;
+	var $chechboxs = $('#customerList input[type=checkbox]:checked');
+	var length = $chechboxs.length;
 	store.each(function(index,obj){
 		var applyNum = parseInt($(obj).find("#apply_num").val());
 		var applyAmount = parseInt($(obj).find("#apply_amount").val());
@@ -164,7 +166,7 @@ function checkApply() {
 				check = false;
 				return false;
 			}
-			if (applyNum > numMax) {
+			if (applyNum * length > numMax) {
 				check = false;
 				return false;
 			}		
@@ -173,7 +175,7 @@ function checkApply() {
 			check = false;
 			return false;
 		}
-		if (applyAmount > amountMax) {
+		if (applyAmount * length > amountMax) {
 			check = false;
 			return false;
 		}

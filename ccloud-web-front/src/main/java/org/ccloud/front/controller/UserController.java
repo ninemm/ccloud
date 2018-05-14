@@ -1,13 +1,10 @@
 package org.ccloud.front.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import com.jfinal.weixin.sdk.api.QrcodeApi;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
@@ -20,7 +17,13 @@ import org.ccloud.message.MessageKit;
 import org.ccloud.model.Department;
 import org.ccloud.model.SmsCode;
 import org.ccloud.model.User;
-import org.ccloud.model.query.*;
+import org.ccloud.model.query.ActivityApplyQuery;
+import org.ccloud.model.query.CustomerVisitQuery;
+import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.SalesOrderQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.SmsCodeQuery;
+import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
@@ -37,6 +40,7 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.weixin.sdk.api.ApiResult;
+import com.jfinal.weixin.sdk.api.QrcodeApi;
 import com.jfinal.weixin.sdk.api.UserApi;
 
 /**
@@ -192,6 +196,7 @@ public class UserController extends BaseFrontController {
 	public void bind() {
 		
 		String openId = getSessionAttr(Consts.SESSION_WECHAT_OPEN_ID);
+		System.err.println(CookieUtils.get(this, Consts.SESSION_WECHAT_OPEN_ID));
 		ApiResult wxUserResult = UserApi.getUserInfo(openId);
 		if (wxUserResult != null) {
 			setAttr("avatar", wxUserResult.getStr("headimgurl"));
@@ -309,21 +314,15 @@ public class UserController extends BaseFrontController {
 					
 					for (User user : userList) {
 						user.setAvatar(wxUserResult.getStr("headimgurl"));
-						try {
-							if (StrKit.notBlank(wxUserResult.getStr("nickname"))) {
-								String nickname = URLEncoder.encode(wxUserResult.getStr("nickname"), "utf-8");
-								user.setNickname(nickname);
-							}
-						} catch (UnsupportedEncodingException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						String nickname = wxUserResult.getStr("nickname");
+						if (StrKit.notBlank(nickname)) {
+							user.setNickname(StringUtils.urlEncode(nickname));
 						}
-//						user.setNickname(wxUserResult.getStr("nickname"));
 						user.setWechatOpenId(openId);
 						if (!user.saveOrUpdate()) {
 							ret.set("message", "手机号绑定失败，请联系管理员");
 							return false;
-						}						
+						}
 					}
 					User user = userList.get(0);
 					
