@@ -249,6 +249,7 @@ public class SalesOrderQuery extends JBaseQuery {
 				DateUtils.DEFAULT_NORMAL_FORMATTER);
 		salesOrder.setDeliveryDate(deliveryDate);
 		salesOrder.setRemark(StringUtils.getArrayFirst(paraMap.get("remark")));
+		salesOrder.setActivityApplyId(StringUtils.getArrayFirst(paraMap.get("activity_id")));
 		salesOrder.setCreateDate(date);
 		salesOrder.setDeptId(deptId);
 		salesOrder.setDataArea(dataArea);

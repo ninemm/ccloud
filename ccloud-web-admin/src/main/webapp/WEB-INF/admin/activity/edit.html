@@ -341,18 +341,42 @@
 		}
 	}
 	
+	function checkNum() {
+		var store = $("#valueTable").find(".input-sm");
+		var check = false;
+		if (store.length == 0) {
+			check = true;
+			return check;
+		}
+		store.each(function(index,element){
+		  	var x = $(this).val();
+		  	if (!x) {
+				return false;
+		 	}
+	    	if (index == store.length-1) {
+	    		check = true;
+	    	}
+		});
+		return check;			
+	}
+	
 	function doSubmit(){
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		if($(".category").val()==101002 && list==""){
 			alert("投入类型不能为空！");
 			return;
 		}
+		
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
 		var listc = $("#customerType").select2("val");
 		var cIds = "";
 		if (listc != null && listc.length > 0) {
 			cIds = listc.toString();
+		}
+		if (!checkNum()) {
+			alert("请检查费用明细表单,有未填字段！");
+			return;			
 		}
 		var templateInfo = localStorage.getItem("ExecuteTemplate");
 		$form.ajaxSubmit({
@@ -566,7 +590,7 @@
 							<div class="col-sm-5 validata-box">
 								<label class="control-label col-sm-4">活动方案号:</label>
 								<div class="input-group col-sm-8">
-									<input class="form-control" readonly type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
+									<input class="form-control" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
 								</div>
 							</div>
 							<div class="col-sm-5 validata-box" >
@@ -628,12 +652,12 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<!-- <div class="col-sm-5 validata-box">
+							<div class="col-sm-5 validata-box">
 								<label class="control-label col-sm-4">每个客户参与次数：</label>
 								<div class="input-group col-sm-8">
 									<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
 								</div>
-							</div> -->
+							</div>
 							<!-- <div class="col-sm-5 validata-box">
 								<label class="control-label col-sm-4">时间限制：</label>
 								<div class="input-group col-sm-8">
@@ -648,14 +672,6 @@
 									<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
 								</div>
 							</div>
-							<div class="col-sm-5 validata-box investNum">
-								<label class="control-label col-sm-4">投入数量:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
-									&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
-									</select>
-								</div>
-							</div>
 						</div>
 						<div class="form-group">
 							<div class="col-sm-5 validata-box investAmount">
@@ -664,6 +680,14 @@
 									<input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
 								</div>
 							</div>
+							<div class="col-sm-5 validata-box investNum">
+								<label class="control-label col-sm-4">投入数量:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
+									&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
+									</select>
+								</div>
+							</div>							
 							<!--
 							<div class="col-sm-5 validata-box visitNum">
 								<label class="control-label col-sm-4">拜访次数：</label>
