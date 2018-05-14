@@ -341,18 +341,42 @@
 		}
 	}
 	
+	function checkNum() {
+		var store = $("#valueTable").find(".input-sm");
+		var check = false;
+		if (store.length == 0) {
+			check = true;
+			return check;
+		}
+		store.each(function(index,element){
+		  	var x = $(this).val();
+		  	if (!x) {
+				return false;
+		 	}
+	    	if (index == store.length-1) {
+	    		check = true;
+	    	}
+		});
+		return check;			
+	}
+	
 	function doSubmit(){
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		if($(".category").val()==101002 && list==""){
 			alert("投入类型不能为空！");
 			return;
 		}
+		
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
 		var listc = $("#customerType").select2("val");
 		var cIds = "";
 		if (listc != null && listc.length > 0) {
 			cIds = listc.toString();
+		}
+		if (!checkNum()) {
+			alert("请检查费用明细表单,有未填字段！");
+			return;			
 		}
 		var templateInfo = localStorage.getItem("ExecuteTemplate");
 		$form.ajaxSubmit({
