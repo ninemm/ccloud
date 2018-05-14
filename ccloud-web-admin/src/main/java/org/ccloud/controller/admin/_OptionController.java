@@ -16,6 +16,8 @@
 package org.ccloud.controller.admin;
 
 import com.jfinal.aop.Before;
+import com.jfinal.kit.StrKit;
+
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.ccloud.Consts;
@@ -41,7 +43,9 @@ public class _OptionController extends JBaseController {
 	@RequiresPermissions(value={"/admin/option","/admin/all","/admin/option/seller"},logical=Logical.OR)
 	public void index() {
 		if("seller".equals(getPara())){
-			setAttr("customerTypeList", CustomerTypeQuery.me().findByDataArea(getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
+			String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+			if (StrKit.notBlank(dealerDataArea))
+				setAttr("customerTypeList", CustomerTypeQuery.me().findByDataArea(dealerDataArea));
 		}
 		render((getPara() == null ? "web" : getPara()) + ".html");
 	}

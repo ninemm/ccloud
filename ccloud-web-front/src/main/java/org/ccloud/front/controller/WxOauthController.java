@@ -22,6 +22,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.StringUtils;
 import org.ccloud.wechat.WechatUserInterceptor;
 
 import com.alibaba.fastjson.JSON;
@@ -91,7 +92,9 @@ public class WxOauthController extends BaseFrontController {
 					ApiResult wxUserResult = UserApi.getUserInfo(openId);
 					if (wxUserResult.isSucceed()) {
 						user.setAvatar(wxUserResult.getStr("headimgurl"));
-						user.setNickname(wxUserResult.getStr("nickname"));
+						String nickname = wxUserResult.getStr("nickname");
+						if (StrKit.notBlank(nickname))
+							user.setNickname(StringUtils.urlEncode(nickname));
 						user.setWechatOpenId(openId);
 						
 						if (!user.saveOrUpdate()) {
