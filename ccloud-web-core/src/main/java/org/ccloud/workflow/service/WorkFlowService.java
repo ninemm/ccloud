@@ -259,7 +259,7 @@ public class WorkFlowService {
 	 */
 	public static Record getTaskId(String proc_inst_id) {
 		return Db.findFirst("SELECT * FROM act_ru_task t WHERE t.PROC_INST_ID_='" + proc_inst_id + "'");
-	}	
+	}
 
 	/***
 	 * 完成任务
@@ -276,7 +276,7 @@ public class WorkFlowService {
 	public int completeTask(String taskid, String comment, Map<String, Object> var) {
 		TaskService service = ActivitiPlugin.buildProcessEngine().getTaskService();
 		Record task = getTaskRecord(taskid);
-		if (null==task.getStr("INSID")) {
+		if (task ==null || null == task.getStr("INSID")) {
 			return 1;
 		}
 		String insid = task.getStr("INSID");

@@ -36,6 +36,7 @@
 	var customerInfoMap = ${customerInfoMap!}
 	var customerOptionList = ${customerOptionList!}
 	var customerTypeCodeMap = [];
+	$("#userId").select2();
 	//标志
 	var newTrIdx = 0;
 	
@@ -200,7 +201,6 @@
 	
 	function initCustomer(){
 		var $customerSelect = $("#customerId");
-
 		$customerSelect.select2({
 			data: customerOptionList,
 			width: "100%",
@@ -219,7 +219,27 @@
 
 	function customerChange(obj){
 		var customer = customerInfoMap[obj.val()].columns;
-
+		var userName= customer.userName;
+		var userId = customer.userId;
+		
+		var names = userName.split(',');
+		var ids = userId.split(',');
+		if (names.length > 0) {
+			var userMap = [];
+			for(var i = 0; i < names.length; i++) {
+				var users = {
+				        id: ids[i],
+				        text: names[i],
+				    };
+				 userMap.push(users);		
+			}
+			$("#userId").select2('destroy').empty(); 
+			$("#userId").select2({
+				data: userMap,
+				width: "100%",
+				language: "zh-CN"
+			});		
+		}
 		$("#contact").val(customer.contact);
 		$("#mobile").val(customer.mobile);
 		$("#customerName").val(customer.customer_name);
@@ -254,7 +274,20 @@
 				totalF();
 			}
 		);
-
+		userChange();
+	}
+	
+	function userChange() {
+		$("#activity_id").empty();
+		var customerId = $("#customerId").val();
+		var userId = $("#userId").val();
+		$.post('${CPATH}/admin/salesOrder/activityApplyById', { customerId: customerId, userId: userId },
+			function(data){
+				$.each(data, function(index, obj){
+					$("#activity_id").append("<option value='" + obj.id + "'>" + obj.title + "</option>");
+				});
+			}
+		);	
 	}
 	
 	function customerTypeChange(obj){
@@ -444,7 +477,8 @@
 			},
 			error : function() {
 				l.stop();
-				alert("信息提交错误");
+				location.href = "${CPATH}/admin/login";
+//				alert("信息提交错误");
 			}
 		});
 	}
@@ -590,6 +624,33 @@
 							</select>
 						</div>
 					</div>
+					<@shiro.hasPermission name="/admin/dealer/all">
+					<div class="form-group col-sm-12 validata-box" id="bizUser">
+						<label class="control-label col-sm-2">*业务员:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<input type="hidden" id="userName" name="userName" value="" >
+							<select id="userId" name="userId" class="form-control" onChange="userChange();">
+							</select>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*仓库:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select id="warehouse_id" name="warehouse_id" class="form-control">
+								<#list wareHouselist! as bean >
+									<option value="${bean.id!}">${(bean.name)!}</option>
+								</#list>							
+							</select>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">活动:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select id="activity_id" name="activity_id" class="form-control">
+							</select>
+						</div>
+					</div>
+					</@shiro.hasPermission>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">*联系人:</label>
 						<div class="input-group col-md-4 col-sm-10">

@@ -288,8 +288,10 @@
 								}, 1 * 1000 );
 			},
 			error : function() {
+							
 				l.stop();
-				alert("信息提交错误");
+				location.href = "${CPATH}/admin/login";
+//				alert("信息提交错误");
 			}
 		});
 	}
@@ -319,6 +321,7 @@
 		</div>
 		<form action="${CPATH}/admin/sellerCustomer/save" method="post" id="form" class="form-horizontal" >
 			<input type="hidden" name="sellerCustomer.id" value="${(sellerCustomer.id)!}">
+			<input type="hidden" name="sellerCustomer.customer_id" value="${(sellerCustomer.customer_id)!}">
 			<div class="box-body">
 			    <div class="form-group">
                     <div class="col-sm-5 validata-box">
@@ -351,7 +354,9 @@
 					<div class="col-sm-5 validata-box">
 						<label class="control-label col-sm-4">客户种类:</label>
 						<div class="input-group col-sm-8">
-							<select class="form-control input-sm" name="sellerCustomer.customer_kind">
+							<select class="form-control input-sm" name="sellerCustomer.customer_kind"
+									onfocus="this.defaultIndex=this.selectedIndex;"
+									onchange="this.selectedIndex=this.defaultIndex;">
 								${DICT_BOX('customer_kind', 'select', (sellerCustomer.customer_kind)!)}
 							</select>
 						</div>
