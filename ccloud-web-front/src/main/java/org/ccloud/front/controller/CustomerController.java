@@ -568,8 +568,24 @@ public class CustomerController extends BaseFrontController {
 			return ;
 		}
 
+		//审核后将message中是否阅读改为是
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Message message = MessageQuery.me().findByObjectIdAndToUserId(id, user.getId());
+		if (null != message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 		setAttr("sellerCustomer", sellerCustomer);
+
+		WorkFlowService workflowService = new WorkFlowService();
+		Record taskRecord = workflowService.getTaskRecord(taskId);
+		if (taskRecord == null) {
+			render("customer_detail.html");
+			return;
+		}
+
 		setAttr("taskId", taskId);
 
 		//（修复没审核时第二次不能进入审核详情的bug）
@@ -586,14 +602,13 @@ public class CustomerController extends BaseFrontController {
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
 
-		WorkFlowService workflowService = new WorkFlowService();
 		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
-		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
+		Object applyerUsername = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
 		String isEnable = workflowService.getTaskVariableByTaskId(taskId, "isEnable").toString();
 
-		if (applyer != null) {
-			User user = UserQuery.me().findUserByUsername(applyer.toString());
-			setAttr("applyer", user);
+		if (applyerUsername != null) {
+			User applyer = UserQuery.me().findUserByUsername(applyerUsername.toString());
+			setAttr("applyer", applyer);
 		}
 
 		if (customerVO != null) {
@@ -655,14 +670,6 @@ public class CustomerController extends BaseFrontController {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("导入附近客户");
 			setAttr("diffAttrList", diffAttrList);
-		}
-		
-		//审核后将message中是否阅读改为是
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
-		if (null!=message) {
-			message.setIsRead(Consts.IS_READ);
-			message.update();
 		}
 		
 		render("customer_review.html");
