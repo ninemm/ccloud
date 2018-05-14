@@ -118,6 +118,10 @@ public class WarehouseQuery extends JBaseQuery {
 	public List<Warehouse> findListBySellerId(String sellerId){
 		return DAO.doFind("seller_id = ?", sellerId);
 	}
+	
+	public List<Warehouse> findListBySellerIdAndUse(String sellerId){
+		return DAO.doFind("seller_id = ? and is_enabled = 1 order by is_default desc", sellerId);
+	}	
 
 	//经销商管理员登录查看所有的直营商仓库
 	public Page<Warehouse> paginateDataArea(int pageNumber, int pageSize, String keyword, String orderby,
