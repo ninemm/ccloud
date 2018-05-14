@@ -127,9 +127,11 @@
 			function(result){
 				if (result.errorCode > 0) {
 					toastr.error(result.message, '操作失败');
-				} else {
+				} else if(result.errorCode == 0) {
 					toastr.success(result.message, '操作成功');
 					$table.bootstrapTable('refresh');
+				}else{
+					location.href = "${CPATH}/admin/login";
 				}
 			}
 		);
@@ -174,6 +176,11 @@
 				$("#customer_type").html(strHtml);
 				var aa = $.cookie('customerType');
 				$("#customer_type").val(aa);
+			},
+			error : function() {
+				l.stop();
+				location.href = "${CPATH}/admin/login";
+//				alert("信息提交错误");
 			}
 		});
 	}
@@ -206,6 +213,10 @@
 							toastr.success(data.message, '操作成功');
 							$table.bootstrapTable('refresh');
 						}
+					},
+					error : function() {
+						location.href = "${CPATH}/admin/login";
+//						alert("信息提交错误");
 					}
 				});
 			}

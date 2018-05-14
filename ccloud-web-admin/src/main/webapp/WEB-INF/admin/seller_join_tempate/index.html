@@ -148,6 +148,10 @@
 						setTimeout( function(){
 						location.reload();
 								}, 2 * 1000 );
+					},
+					error: function (){
+						location.href = "${CPATH}/admin/login";
+//						alert("信息提交错误");
 					}
 				});
 			}
@@ -184,6 +188,10 @@
 				setTimeout( function(){
 						$tables.bootstrapTable('refresh');
 								}, 2 * 1000 );
+			},
+			error: function (){
+				location.href = "${CPATH}/admin/login";
+//				alert("信息提交错误");
 			}
 		});
 	}
