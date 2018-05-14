@@ -118,7 +118,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			int length = list.size();
 			String[] userIds = new String[length];
 			String[] realnames = new String[length];
-
+			String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 			for (int i = 0; i < length; i++) {
 				userIds[i] = list.get(i).getStr("user_id");
 				realnames[i] = list.get(i).getStr("realname");
@@ -127,8 +127,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("cUserIds", StrKit.join(userIds, ","));
 			setAttr("cUserNames", StrKit.join(realnames, ","));
 
-			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,
-					getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
+			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,dataArea));
 		}
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()
@@ -202,10 +201,14 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		boolean isChecked = (isCustomerReview != null && isCustomerReview) ? true : false;
 		//当是经销商管理员修改时
 		if(isSuperAdmin || isDealerAdmin || !isChecked) {
-			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
-
-			if (persiste != null) {
-				customer.setId(persiste.getId());
+			//销售商客户不新增基础客户
+			if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+				customer.setId(sellerCustomer.getCustomerId());
+			}else{
+				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+				if (persiste != null) {
+					customer.setId(persiste.getId());
+				}
 			}
 
 			String dest = "";
@@ -320,11 +323,15 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			map.put("customerVO", temp);
 
 		} else {
-			// 检查客户是否存在
-			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
-
-			if (persiste != null) {
-				customer.setId(persiste.getId());
+			//销售商客户不新增基础客户
+			if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+				customer.setId(sellerCustomer.getCustomerId());
+			}else{
+				// 检查客户是否存在
+				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+				if (persiste != null) {
+					customer.setId(persiste.getId());
+				}
 			}
 
 			if (!customer.saveOrUpdate()) {
@@ -819,7 +826,6 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			if (customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 
@@ -862,9 +868,18 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 				if(StrKit.notBlank(customerVO.getLocation()))
 					customer.setLocation(customerVO.getLocation());
 
-				if (persiste != null) {
-					customer.setId(persiste.getId());
-				} else customer.setId(null);
+				//销售商客户不新增基础客户
+				if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+					customer.setId(sellerCustomer.getCustomerId());
+				}else{
+					Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+					if (persiste != null) {
+						customer.setId(persiste.getId());
+					} else {
+						customer.setId(null);
+					}
+				}
+
 				updated = updated && customer.saveOrUpdate();
 
 				if (StrKit.notBlank(customerVO.getNickname()))

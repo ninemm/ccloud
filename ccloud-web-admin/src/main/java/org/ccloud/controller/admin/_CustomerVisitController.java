@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *      http://www.gnu.org/licenses/lgpl-3.0.txta
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -333,7 +333,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	}
 
 	public void queryCustomerType() {
-        String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
+        String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
         List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
         renderAjaxResultForSuccess("success",JSON.toJSON(typeList));
 	}

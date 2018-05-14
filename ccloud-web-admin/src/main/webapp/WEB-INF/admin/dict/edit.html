@@ -12,7 +12,8 @@ function doSubmit(){
 			}
 		},
 		error : function() {
-			alert("信息提交错误");
+			location.href = "${CPATH}/admin/login";
+//			alert("信息提交错误");
 		}
 	});
 }

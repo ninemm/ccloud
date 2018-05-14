@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.jfinal.kit.Ret;
+import com.jfinal.log.Log;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -53,6 +54,8 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/customer")
 @RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerController extends BaseFrontController {
+
+	private Log log = Log.getLog(CustomerController.class);
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
@@ -423,7 +426,16 @@ public class CustomerController extends BaseFrontController {
 		
 		Customer customer = getModel(Customer.class);
 	    customer.setAddress(JsoupUtils.clear(customer.getAddress()));
-		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+
+		SellerCustomer sellerCustomer = null;
+		try {
+			sellerCustomer = getModel(SellerCustomer.class);
+		} catch (Exception e) {
+			log.error("===========error lng：" + getPara("lng"));
+			log.error("===========error lat：" + getPara("lat"));
+			log.error(e.getMessage(), e);
+		}
+
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
 		if(StrKit.notBlank(storeId)) {
@@ -472,8 +484,7 @@ public class CustomerController extends BaseFrontController {
 
 				String waterFont1 = customer.getCustomerName();
 				String waterFont2 = user.getRealname() + DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//				String waterFont3 = sellerCustomer.getLocation();
-				String waterFont3 = "湖北省-武汉市-洪山区";
+				String waterFont3 = sellerCustomer.getLocation();
 				String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 
 				image.setSavePath(savePath.replace("\\", "/"));
@@ -568,8 +579,24 @@ public class CustomerController extends BaseFrontController {
 			return ;
 		}
 
+		//审核后将message中是否阅读改为是
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Message message = MessageQuery.me().findByObjectIdAndToUserId(id, user.getId());
+		if (null != message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 		setAttr("sellerCustomer", sellerCustomer);
+
+		WorkFlowService workflowService = new WorkFlowService();
+		Record taskRecord = workflowService.getTaskRecord(taskId);
+		if (taskRecord == null) {
+			render("customer_detail.html");
+			return;
+		}
+
 		setAttr("taskId", taskId);
 
 		//（修复没审核时第二次不能进入审核详情的bug）
@@ -586,14 +613,13 @@ public class CustomerController extends BaseFrontController {
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
 
-		WorkFlowService workflowService = new WorkFlowService();
 		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
-		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
+		Object applyerUsername = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
 		String isEnable = workflowService.getTaskVariableByTaskId(taskId, "isEnable").toString();
 
-		if (applyer != null) {
-			User user = UserQuery.me().findUserByUsername(applyer.toString());
-			setAttr("applyer", user);
+		if (applyerUsername != null) {
+			User applyer = UserQuery.me().findUserByUsername(applyerUsername.toString());
+			setAttr("applyer", applyer);
 		}
 
 		if (customerVO != null) {
@@ -655,14 +681,6 @@ public class CustomerController extends BaseFrontController {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("导入附近客户");
 			setAttr("diffAttrList", diffAttrList);
-		}
-		
-		//审核后将message中是否阅读改为是
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
-		if (null!=message) {
-			message.setIsRead(Consts.IS_READ);
-			message.update();
 		}
 		
 		render("customer_review.html");
@@ -730,7 +748,6 @@ public class CustomerController extends BaseFrontController {
 			if(customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 
@@ -773,9 +790,17 @@ public class CustomerController extends BaseFrontController {
 				if(StrKit.notBlank(customerVO.getLocation()))
 					customer.setLocation(customerVO.getLocation());
 
-				if (persiste != null) {
-					customer.setId(persiste.getId());
-				} else customer.setId(null);
+				//销售商客户不新增基础客户
+				if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+					customer.setId(sellerCustomer.getCustomerId());
+				}else{
+					Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+					if (persiste != null) {
+						customer.setId(persiste.getId());
+					} else {
+						customer.setId(null);
+					}
+				}
 				updated = updated && customer.saveOrUpdate();
 
 				if (StrKit.notBlank(customerVO.getNickname()))
@@ -1005,8 +1030,6 @@ public class CustomerController extends BaseFrontController {
 			return "公司账套中已存在该客户，请导入客户";
 		}
 		
-		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
-
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()
 				.trimResults()
@@ -1036,8 +1059,14 @@ public class CustomerController extends BaseFrontController {
 
 		customer.setLocation(sellerCustomer.getLocation());
 
-		if (persist != null) {
-			customer.setId(persist.getId());
+		//销售商客户不新增基础客户
+		if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+			customer.setId(sellerCustomer.getCustomerId());
+		}else{
+			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+			if (persiste != null) {
+				customer.setId(persiste.getId());
+			}
 		}
 
 		updated = customer.saveOrUpdate();

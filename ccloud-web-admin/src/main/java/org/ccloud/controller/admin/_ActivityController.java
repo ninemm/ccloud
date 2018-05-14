@@ -189,7 +189,11 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 			String speName = record.getStr("valueName");
 
 			productOptionMap.put("id", sellProductId);
-			productOptionMap.put("text", customName + "/" + speName);
+			if (StrKit.notBlank(speName)) {
+				productOptionMap.put("text", customName + "/" + speName);
+			} else {
+				productOptionMap.put("text", customName);
+			}
 
 			productOptionList.add(productOptionMap);
 		}
@@ -253,7 +257,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	    	activity.setInvestType(investTypes);
 	    }
 	    activity.setUnit(unit);
-	    activity.setJoinNum(1);
+	    activity.setJoinNum(activity.getJoinNum());
 		activity.setSellerId(sellerId);
 		activity.setAreaType(areaNames);
 		activity.setStartTime(sdate);
