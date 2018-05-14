@@ -107,12 +107,12 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
 		String wareHouseId = StringUtils.getArrayFirst(paraMap.get("warehouse_id"));
+		Map<String, Object> result = new HashMap<>();
 		if (StrKit.notBlank(wareHouseId)) {
-			
+			result = this.getEnoughOrNot(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId, wareHouseId);
 		} else {
-			
+			result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
 		}
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 
@@ -158,6 +158,51 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 		return true;
 	}
+	
+	private Map<String, Object> getEnoughOrNot(String productId, String sellerId, String sellerCode,
+			Integer productCount, int convert, String userId, String sellerProductId, String wareHouseId) {
+		Map<String, Object> result = new HashMap<>();
+		List<Map<String, String>> countList = new ArrayList<>();
+		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_SELLER_STORE_CHECK + sellerCode);
+		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
+		if (!isCheckStore) {
+			Map<String, String> map = new HashMap<>();
+			map.put("warehouse_id", wareHouseId);
+			map.put("productCount", productCount.toString());
+			countList.add(map);
+			result.put("status", "enough");
+			result.put("countList", countList);
+			return result;			
+		}
+		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
+		if (sellerProduct.getStoreCount().multiply(new BigDecimal(convert)).compareTo(new BigDecimal(productCount)) == -1) {
+			result.put("status", "notEnough");
+			result.put("countList", countList);
+			return result;
+		}
+
+		Record record = InventoryQuery.me().findProductStoreCountByWarehouseId(sellerProductId, wareHouseId);
+		if (record == null) {
+			result.put("status", "notEnough");
+			result.put("countList", countList);
+			return result;
+		}
+		BigDecimal defaultCount = record.getBigDecimal("balance_count").multiply(new BigDecimal(convert));
+		if (defaultCount.compareTo(new BigDecimal(productCount)) == 1
+				    || defaultCount.compareTo(new BigDecimal(productCount)) == 0) {
+			Map<String, String> map = new HashMap<>();
+			map.put("warehouse_id", record.getStr("warehouse_id"));
+			map.put("productCount", productCount.toString());
+			countList.add(map);
+			result.put("status", "enough");
+			result.put("countList", countList);
+			return result;
+		} else {
+			result.put("status", "notEnough");
+			result.put("countList", countList);		
+		}
+		return result;		
+	}	
 
 	private Map<String, Object> getWarehouseId(String productId, String sellerId, String sellerCode,
 	                                           Integer productCount, Integer convert, String userId, String sellerProductId) {

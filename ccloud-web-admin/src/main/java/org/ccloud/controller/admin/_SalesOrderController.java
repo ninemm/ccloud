@@ -44,6 +44,7 @@ import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.excel.ExcelUploadUtils;
+import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
@@ -338,6 +339,15 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		render("add.html");
 	}
+	
+	public void activityApplyById() {
+		String customerId = getPara("customerId");
+		String userId = getPara("userId");
+
+		List<Record> activityApplyList = ActivityApplyQuery.me().findBySellerCustomerIdAndUserId(customerId, userId);
+
+		renderJson(activityApplyList);
+	}	
 
 	public void customerTypeById() {
 		String customerId = getPara("customerId");

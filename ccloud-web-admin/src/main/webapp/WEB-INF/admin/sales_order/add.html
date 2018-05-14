@@ -201,7 +201,6 @@
 	
 	function initCustomer(){
 		var $customerSelect = $("#customerId");
-		console.log(customerOptionList);
 		$customerSelect.select2({
 			data: customerOptionList,
 			width: "100%",
@@ -275,7 +274,20 @@
 				totalF();
 			}
 		);
-
+		userChange();
+	}
+	
+	function userChange() {
+		$("#activity_id").empty();
+		var customerId = $("#customerId").val();
+		var userId = $("#userId").val();
+		$.post('${CPATH}/admin/salesOrder/activityApplyById', { customerId: customerId, userId: userId },
+			function(data){
+				$.each(data, function(index, obj){
+					$("#activity_id").append("<option value='" + obj.id + "'>" + obj.title + "</option>");
+				});
+			}
+		);	
 	}
 	
 	function customerTypeChange(obj){
@@ -616,7 +628,7 @@
 						<label class="control-label col-sm-2">*业务员:</label>
 						<div class="input-group col-md-4 col-sm-10">
 							<input type="hidden" id="userName" name="userName" value="" >
-							<select id="userId" name="userId" class="form-control">
+							<select id="userId" name="userId" class="form-control" onChange="userChange();">
 							</select>
 						</div>
 					</div>
@@ -627,6 +639,13 @@
 								<#list wareHouselist! as bean >
 									<option value="${bean.id!}">${(bean.name)!}</option>
 								</#list>							
+							</select>
+						</div>
+					</div>
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">活动:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select id="activity_id" name="activity_id" class="form-control">
 							</select>
 						</div>
 					</div>
