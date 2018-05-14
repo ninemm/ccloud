@@ -118,7 +118,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			int length = list.size();
 			String[] userIds = new String[length];
 			String[] realnames = new String[length];
-
+			String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 			for (int i = 0; i < length; i++) {
 				userIds[i] = list.get(i).getStr("user_id");
 				realnames[i] = list.get(i).getStr("realname");
@@ -127,8 +127,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			setAttr("cUserIds", StrKit.join(userIds, ","));
 			setAttr("cUserNames", StrKit.join(realnames, ","));
 
-			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,
-					getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString()));
+			setAttr("cTypeList", CustomerJoinCustomerTypeQuery.me().findCustomerTypeIdListBySellerCustomerId(id,dataArea));
 		}
 
 		List<CustomerType> customerTypeList = CustomerTypeQuery.me()

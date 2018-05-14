@@ -351,9 +351,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	public void customerTypeById() {
 		String customerId = getPara("customerId");
-
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
-				getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+				dataArea);
 		setAttr("customerTypeList", customerTypeList);
 		renderJson(customerTypeList);
 	}
