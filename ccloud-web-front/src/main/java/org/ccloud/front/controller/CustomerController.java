@@ -737,7 +737,6 @@ public class CustomerController extends BaseFrontController {
 			if(customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 
@@ -780,9 +779,17 @@ public class CustomerController extends BaseFrontController {
 				if(StrKit.notBlank(customerVO.getLocation()))
 					customer.setLocation(customerVO.getLocation());
 
-				if (persiste != null) {
-					customer.setId(persiste.getId());
-				} else customer.setId(null);
+				//销售商客户不新增基础客户
+				if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+					customer.setId(sellerCustomer.getCustomerId());
+				}else{
+					Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+					if (persiste != null) {
+						customer.setId(persiste.getId());
+					} else {
+						customer.setId(null);
+					}
+				}
 				updated = updated && customer.saveOrUpdate();
 
 				if (StrKit.notBlank(customerVO.getNickname()))
@@ -1012,8 +1019,6 @@ public class CustomerController extends BaseFrontController {
 			return "公司账套中已存在该客户，请导入客户";
 		}
 		
-		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
-
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()
 				.trimResults()
@@ -1043,8 +1048,14 @@ public class CustomerController extends BaseFrontController {
 
 		customer.setLocation(sellerCustomer.getLocation());
 
-		if (persist != null) {
-			customer.setId(persist.getId());
+		//销售商客户不新增基础客户
+		if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+			customer.setId(sellerCustomer.getCustomerId());
+		}else{
+			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+			if (persiste != null) {
+				customer.setId(persiste.getId());
+			}
 		}
 
 		updated = customer.saveOrUpdate();
