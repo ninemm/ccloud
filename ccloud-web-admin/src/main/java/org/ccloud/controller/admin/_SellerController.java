@@ -446,12 +446,13 @@ public class _SellerController extends JBaseCRUDController<Seller> {
 			int errCount = 0;
 			JSONArray jsonArray = JSONArray.parseArray(ds);
 			List<SellerProduct> imageList = jsonArray.toJavaList(SellerProduct.class);
+			String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 			for (SellerProduct sellerProduct : imageList) {
 				//前台传给后台的产品规格
 				  String cpsName = sellerProduct.getQrcodeUrl();
 				  SellerProduct issellerProducts = SellerProductQuery.me().findById(sellerProduct.getId());
 					if(issellerProducts==null){
-						List<SellerProduct> products = SellerProductQuery.me().checkSellerProduct(sellerProduct.getCustomName(), getSessionAttr(Consts.SESSION_SELLER_ID).toString(),cpsName);
+						List<SellerProduct> products = SellerProductQuery.me().checkSellerProduct(sellerProduct.getCustomName(), sellerId,cpsName);
 						if(products.size()>0) {
 							errCount++;
 							continue;

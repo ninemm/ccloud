@@ -44,7 +44,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 		return DAO.getCache(id, new IDataLoader() {
 			@Override
 			public Object load() {
-				StringBuilder sql = new StringBuilder("SELECT caa.*, cc.customer_name, DATE_FORMAT(ca.start_time, '%Y-%m-%d') as start_date, DATE_FORMAT(ca.end_time, '%Y-%m-%d') as end_date, " +
+				StringBuilder sql = new StringBuilder("SELECT caa.*, cc.customer_name, DATE_FORMAT(caa.start_date, '%y-%m-%d') as start, DATE_FORMAT(caa.end_date, '%Y-%m-%d') as end, " +
 						"d.name, ca.invest_type, cc.contact, cc.mobile, u.realname, DATE_FORMAT(caa.create_date, '%Y-%m-%d') as format_create_date, ca.invest_amount, ca.title, ca.code ");
 
 				sql.append("FROM cc_activity_apply caa ");
@@ -61,11 +61,19 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	}
 
-	public Page<ActivityApply> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_activity_apply` ");
-
+	public Page<ActivityApply> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String userId, String activityId) {
+		String select = "SELECT c.*,IFNULL(d.`name`,'商品营销') as investName,cu.customer_name,cu.contact,cu.mobile,cu.address,u.realname ";
+		StringBuilder fromBuilder = new StringBuilder("FROM cc_activity_apply c LEFT JOIN cc_activity a ON c.activity_id = a.id ");
+		fromBuilder.append(" LEFT JOIN dict d ON a.invest_type = d.`value` ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer cs ON cs.id = c.seller_customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_customer cu ON cu.id = cs.customer_id ");
+		fromBuilder.append(" LEFT JOIN user u ON u.id = c.biz_user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cu.customer_name", keyword, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.biz_user_id", userId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.activity_id", activityId, params, needWhere);
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -87,8 +95,8 @@ public class ActivityApplyQuery extends JBaseQuery {
 	}
 
 	public Page<Record> findList(int pageNumber, int pageSize, String dataArea, String category, String status, String startDate, String endDate, String keyword ){
-		String select = "SELECT caa.id,caa.activity_id, cc.customer_name, caa.`status`,caa.seller_customer_id,caa.apply_num,caa.apply_amount, DATE_FORMAT(ca.start_time,'%m-%d') as start_time, " +
-				"DATE_FORMAT(ca.end_time, '%m-%d') as end_time, ca.invest_type,ca.title, d.`name`, ca.invest_amount,ca.code,t1.name as expenseDetailName ";
+		String select = "SELECT caa.id,caa.activity_id, cc.customer_name, caa.`status`,caa.seller_customer_id,caa.apply_num,caa.apply_amount, DATE_FORMAT(caa.start_date,'%y-%m-%d') as start_time, " +
+				"DATE_FORMAT(caa.end_date, '%y-%m-%d') as end_time, ca.invest_type,ca.title, d.`name`, ca.invest_amount,ca.code,t1.name as expenseDetailName ";
 		LinkedList<Object> params = new LinkedList<Object>();
 
 		StringBuilder sql = new StringBuilder("FROM cc_activity_apply caa ");
@@ -215,5 +223,10 @@ public class ActivityApplyQuery extends JBaseQuery {
 	public List<Record> findBySellerCustomerIdAndUserId(String customerId, String userId) {
 		String sql = "select c.*, ca.title from cc_activity_apply c left join cc_activity ca on c.activity_id = ca.id where c.seller_customer_id = ? and c.biz_user_id = ? and c.status in (1, 4)";
 		return Db.find(sql, customerId, userId);
+	}
+
+	public List<Record> findAllUser(String dataArea) {
+		String sql = "SELECT u.id,u.realname FROM cc_activity_apply c LEFT JOIN `user` u ON c.biz_user_id = u.id where c.data_area like '" + dataArea + "' group by u.id";
+		return Db.find(sql);
 	}
 }
