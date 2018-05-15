@@ -455,7 +455,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
         		
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
-					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
+					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key, userId)) {
 						return false;
 					}
         		} else {
@@ -522,13 +522,16 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
-	private boolean start(String orderId, String customerName, String proc_def_key) {
+	private boolean start(String orderId, String customerName, String proc_def_key, String userId) {
 
 		WorkFlowService workflow = new WorkFlowService();
 
 		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		if (StrKit.notBlank(userId)) {
+			user = UserQuery.me().findById(userId);
+		}
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		
