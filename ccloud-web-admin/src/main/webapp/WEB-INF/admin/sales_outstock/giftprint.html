@@ -13,7 +13,18 @@
 	<link rel="stylesheet"  href="${CPATH}/static/layer/skin/layer.min.css">
 	<link rel="stylesheet"  href="${CPATH}/static/plugins/jquery/jquery-ui.css">
 </#macro>
+<#macro css>
+	
+table { 
+	border: 1px solid #444;
+}
 
+td, th {
+	border: 1px solid #444; 
+}
+
+	
+</#macro>
 <#macro script>
    var $pagesize = $("#pagesize");
 
@@ -27,8 +38,7 @@
 var headerInfo =
 	'<div class="header clear clearheader">' +
 	    '<div class="titleArea">' +
-			'<h1>{0}送货单</h1>' +
-			'<div style="width:500px;margin:0 auto;padding:0 200px; border-top:1px solid #444;" ></div>'+
+			'<h1>{0}送货单</h1>' + 
 		'</div>' +
 	'</div>';
 
