@@ -28,6 +28,9 @@
 		jQuery.mm.initDatetimepicker('form', '#deliveryDate', 'deliveryDate', 'yyyy-MM-dd', 2, 4, 2);
 		addProduct();
 		initCustomer();
+		<@shiro.hasPermission name="/admin/dealer/all">
+		storeChange();
+		</@shiro.hasPermission>	
 	});
 	var discount = 1;
 	var $form = $("#form");
@@ -219,6 +222,7 @@
 
 	function customerChange(obj){
 		var customer = customerInfoMap[obj.val()].columns;
+		<@shiro.hasPermission name="/admin/dealer/all">
 		var userName= customer.userName;
 		var userId = customer.userId;
 		
@@ -240,6 +244,7 @@
 				language: "zh-CN"
 			});		
 		}
+		</@shiro.hasPermission>
 		$("#contact").val(customer.contact);
 		$("#mobile").val(customer.mobile);
 		$("#customerName").val(customer.customer_name);
@@ -274,7 +279,9 @@
 				totalF();
 			}
 		);
+		<@shiro.hasPermission name="/admin/dealer/all">
 		userChange();
+		</@shiro.hasPermission>
 	}
 	
 	function userChange() {
@@ -286,6 +293,31 @@
 				$.each(data, function(index, obj){
 					$("#activity_id").append("<option value='" + obj.id + "'>" + obj.title + "</option>");
 				});
+			}
+		);	
+	}
+	
+	function storeChange() {
+		var clearForm = $("#tableBody tr:gt(0)");
+		clearForm.each(function(index,obj){
+		  	var indexNum = $(obj).attr("id").replace("tr", "");
+			$form.bootstrapValidator('removeField', 'bigPrice' + indexNum);
+			$form.bootstrapValidator('removeField', 'bigNum' + indexNum);
+			$form.bootstrapValidator('removeField', 'smallPrice' + indexNum);
+			$form.bootstrapValidator('removeField', 'smallNum' + indexNum);
+		
+		});		
+		$("#tableBody tr:gt(0)").remove(); 
+		var wareHouseId = $("#warehouse_id").val();
+		$.post('${CPATH}/admin/salesOrder/getProductListByWarehouseId', { wareHouseId: wareHouseId },
+			function(data){
+				productInfoMap = data.productInfoMap;
+				productOptionList = data.productOptionList;
+				if (productOptionList.length > 0) {
+					addProduct();
+				} else {
+					toastr.error('所选仓库没有商品','error');
+				}
 			}
 		);	
 	}
@@ -533,6 +565,18 @@
 		</div>
 		<form action="${CPATH}/admin/salesOrder/save" method="post" id="form" class="form-horizontal" >
 			<div class="box-body">
+				<@shiro.hasPermission name="/admin/dealer/all">
+					<div class="form-group col-sm-12 validata-box">
+						<label class="control-label col-sm-2">*仓库:</label>
+						<div class="input-group col-md-4 col-sm-10">
+							<select id="warehouse_id" name="warehouse_id" class="form-control" onChange="storeChange();">
+								<#list wareHouselist! as bean >
+									<option value="${bean.id!}">${(bean.name)!}</option>
+								</#list>							
+							</select>
+						</div>
+					</div>
+				</@shiro.hasPermission>			
 				<table id="table" class="table table-bordered table-hover text-center" width="100%">
 					<thead>
 						<tr>
@@ -548,7 +592,7 @@
 							<th width="7%">小计</th>
 						</tr>
 					</thead>
-					<tbody class="product">
+					<tbody class="product" id="tableBody">
 						<tr class="hide">
 							<td>
 								<a class="btn btn-danger btn-xs" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
@@ -633,16 +677,6 @@
 						<div class="input-group col-md-4 col-sm-10">
 							<input type="hidden" id="userName" name="userName" value="" >
 							<select id="userId" name="userId" class="form-control" onChange="userChange();">
-							</select>
-						</div>
-					</div>
-					<div class="form-group col-sm-12 validata-box">
-						<label class="control-label col-sm-2">*仓库:</label>
-						<div class="input-group col-md-4 col-sm-10">
-							<select id="warehouse_id" name="warehouse_id" class="form-control">
-								<#list wareHouselist! as bean >
-									<option value="${bean.id!}">${(bean.name)!}</option>
-								</#list>							
 							</select>
 						</div>
 					</div>
