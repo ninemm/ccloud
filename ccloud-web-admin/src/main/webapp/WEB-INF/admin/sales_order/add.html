@@ -222,6 +222,7 @@
 
 	function customerChange(obj){
 		var customer = customerInfoMap[obj.val()].columns;
+		<@shiro.hasPermission name="/admin/dealer/all">
 		var userName= customer.userName;
 		var userId = customer.userId;
 		
@@ -243,6 +244,7 @@
 				language: "zh-CN"
 			});		
 		}
+		</@shiro.hasPermission>
 		$("#contact").val(customer.contact);
 		$("#mobile").val(customer.mobile);
 		$("#customerName").val(customer.customer_name);
@@ -277,7 +279,9 @@
 				totalF();
 			}
 		);
+		<@shiro.hasPermission name="/admin/dealer/all">
 		userChange();
+		</@shiro.hasPermission>
 	}
 	
 	function userChange() {
