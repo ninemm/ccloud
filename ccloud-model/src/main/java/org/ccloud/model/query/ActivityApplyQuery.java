@@ -61,11 +61,17 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	}
 
-	public Page<ActivityApply> paginate(int pageNumber, int pageSize, String orderby) {
-		String select = "select * ";
-		StringBuilder fromBuilder = new StringBuilder("from `cc_activity_apply` ");
-
+	public Page<ActivityApply> paginate(int pageNumber, int pageSize, String keyword, String dataArea) {
+		String select = "SELECT c.*,IFNULL(d.`name`,'商品营销') as investName,cu.customer_name,cu.contact,cu.mobile,cu.address,u.realname ";
+		StringBuilder fromBuilder = new StringBuilder("FROM cc_activity_apply c LEFT JOIN cc_activity a ON c.activity_id = a.id ");
+		fromBuilder.append(" LEFT JOIN dict d ON a.invest_type = d.`value` ");
+		fromBuilder.append(" LEFT JOIN cc_seller_customer cs ON cs.id = c.seller_customer_id ");
+		fromBuilder.append(" LEFT JOIN cc_customer cu ON cu.id = cs.customer_id ");
+		fromBuilder.append(" LEFT JOIN user u ON u.id = c.biz_user_id ");
 		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cu.customer_name", keyword, params, needWhere);
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());

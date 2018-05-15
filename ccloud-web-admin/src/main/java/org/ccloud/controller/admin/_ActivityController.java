@@ -118,6 +118,22 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		renderJson(map);
 	}
 	
+	public void applyList() {
+		render("apply_list.html");
+	}
+	
+	public void getApplyList() {
+		String keyword = getPara("k");
+		if (StrKit.notBlank(keyword)) {
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Page<ActivityApply> page = ActivityApplyQuery.me().paginate(getPageNumber(), getPageSize(), keyword, dataArea);
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+		renderJson(map);
+	}		
+	
 	public void getOptions() {
 		String id = getPara("id");
 		List<Dict> dlist = DictQuery.me().findByCode(Consts.DICT_UNIT_CODE);
