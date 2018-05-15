@@ -30,10 +30,12 @@ public class ActivityTask implements ITask {
 	public void run() {
 		List<Activity> activitys = ActivityQuery.me().findAll();
 		for(Activity activity: activitys) {
-			Date endTime =activity.getEndTime();
-			if(endTime.before(new Date())) {
-				activity.setIsPublish(0);
-				activity.update();
+			if(activity.getEndTime() !=null) {
+				Date endTime =activity.getEndTime();
+				if(endTime.before(new Date())) {
+					activity.setIsPublish(0);
+					activity.update();
+				}
 			}
 		}
 	}
