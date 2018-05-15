@@ -68,8 +68,17 @@ $(function () {
 	$activity.empty();
 	addActivity();
 	doChange(activityId);
-	$("#startTime").calendar();
-	$("#endTime").calendar();
+	$("#startTime").calendar({
+			onChange: function(p, values, displayValues) {
+				console.log(values);
+				$("#startDate").val(values[0])
+			}
+ 		});
+	$("#endTime").calendar({
+			onChange: function(p, values, displayValues) {
+				$("#endDate").val(values[0])
+			}
+ 		});
 	 $("#expense_detail").select({
    		title: "选择明细",
 		multi: true,
@@ -394,6 +403,16 @@ function doChange(key){
     //---------------------------------------------提交表单------------------------------------------------------------------
     var flg = true;
     function doSubmit(){
+    	var start = $("#startDate").val();
+    	var end = $("#endDate").val();
+    	if((new Date(start.replace(/-/g,"\/"))) > (new Date(end.replace(/-/g,"\/")))){
+    		$.toptip('开始时间不能高于结束时间');
+    		return;
+    	}
+    	if(start == "" || end == ""){
+    		$.toptip('开始时间/结束时间不能为空！');
+    		return;
+    	}
         layer.open({
             type: 2,
             content: '保存中...'
@@ -458,7 +477,8 @@ function doChange(key){
 								开始日期
 								<span class="require"></span>
 							</span>
-							<input type="text" class="weui-input fr" id="startTime" readonly>
+							<input type="text" class="weui-input fr" name = "startTime" id="startTime" readonly>
+							<input type="hidden" class="weui-input fr" name = "startDate" id="startDate">
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
@@ -468,7 +488,8 @@ function doChange(key){
 								结束日期
 								<span class="require"></span>
 							</span>
-							<input type="text" class="weui-input fr" id="endTime" readonly>
+							<input type="text" class="weui-input fr" name = "endTime" id="endTime" readonly>
+							<input type="hidden" class="weui-input fr" name = "endDate" id="endDate" readonly>
 							<span class="weui-cell__ft"></span>
 						</div>
 					</div>

@@ -216,19 +216,19 @@ public abstract class BaseActivityApply<M extends BaseActivityApply<M>> extends 
 	public String getExpenseDetailId() {
 		return getStr("expense_detail_id");
 	}
-	public void setStartTime(java.util.Date startTime) {
-		set("start_time", startTime);
+	public void setStartDate(java.util.Date startDate) {
+		set("start_date", startDate);
 	}
 
-	public java.util.Date getStartTime() {
-		return get("start_time");
+	public java.util.Date getStartDate() {
+		return get("start_date");
 	}
 
-	public void setEndTime(java.util.Date endTime) {
-		set("end_time", endTime);
+	public void setEndDate(java.util.Date endDate) {
+		set("end_date", endDate);
 	}
 
-	public java.util.Date getEndTime() {
-		return get("end_time");
+	public java.util.Date getEndDate() {
+		return get("end_date");
 	}
 }
