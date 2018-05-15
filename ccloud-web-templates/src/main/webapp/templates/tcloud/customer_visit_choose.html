@@ -17,6 +17,14 @@
 
 
     $(function() {
+    	initWxConfig('${appId!}', '${timestamp!}', '${nonceStr!}', '${signature!}');
+    	
+    	 wxReadyGetLocation(
+            function(lng, lat, addComp, address) {
+                $("#lng").val(lng.toFixed(6));
+                $("#lat").val(lat.toFixed(6));
+            }
+        )
         //搜索框监听
         $(document).on("submit", ".weui-search-bar__form", function() {
 			combo();
@@ -44,17 +52,62 @@
 
     });
 
-        //筛选项获取
-        $("#userId").select({
-            title: "选择业务员",
-            items: ${userIds!}
-        });
+    //筛选项获取
+    $("#userId").select({
+        title: "选择业务员",
+        items: ${userIds!}
+    });
 
-        $("#customerTypeId").select({
-            title: "选择客户类型",
-            items: ${customerTypes!}
-        });
+    $("#customerTypeId").select({
+        title: "选择客户类型",
+        items: ${customerTypes!}
+    });
+    
+     var str = '';
+    var searchArea = ${searchArea!};
+    for(var i = 0; i < searchArea.length; i++)
+        if(i == 0) str = str + '<span class="red-button" data-id="' + searchArea[i].value + '">'+ searchArea[i].title + '</span>';
+        else str = str + '<span data-id="' + searchArea[i].value + '">'+ searchArea[i].title + '</span>';
+    $("#getDate").append(str);
+    
+    var paramData2 = function() {
+        return  {
+            "searchArea": $("#getDate").find(".red-button").data("id"),
+            "lng": $('#lng').val(),
+            "lat": $('#lat').val()
+        }
+    }
+	
+	function reset() {
+        $("#searchInput")[0].value = '';
+        $("#customerTypeId")[0].dataset.values = '';
+        $("#userId")[0].dataset.values = '';
+        $("#customerTypeId").val("客户类型");
+        $("#userId").val("业务员");
+    }
 
+	 function getAreaCustomer(){
+        reset();
+        pageNumber = 1;
+        $.ajax({
+            url:"${CPATH}/customer/getAreaCustomer",
+            type:"post",
+            data:paramData2(),
+            dataType:"json",
+            success:function(data) {
+                $(".infinite").destroyInfinite();
+                $(".weui-loadmore").hide();
+                loading = false;
+
+                $(".infinite")[0].scrollTop = 0;
+                $("#customerList").empty();
+                if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
+                $("#customerList").html(data.html);
+                pageNumber = 2;
+            }
+        });
+    }
+    
     var newHtml = $(".weui-panel").eq(0).html();
     var $loading = $("#loading");
     var $noMore = $("#noMore");
@@ -157,6 +210,8 @@
 	                        <input type="text" id="customerTypeId" class="weui-input" placeholder="客户类型"  readonly>
 	                        <i class="icon-sort-desc"></i>
 	                    </div>
+	                    <input type="hidden" name="lng" id="lng">
+                        <input type="hidden" name="lat" id="lat">
 	            </div>
 	            <div id="combin-filter-btn">
 	                <i class="icon-th-list"></i>
@@ -211,5 +266,16 @@
 	    </article>
     </div>
     <#include "_inc/_goback_bottom.html" />
+    <article id="combin-filter">
+        <div class="filter-item">
+            <h4 class="ft14">选择搜索范围</h4>
+            <div class="relative ft12" id="getDate">
+            </div>
+        </div>
+        <footer class="weui-footer weui-footer_fixed-bottom ft16 weui-flex">
+            <button class="white-button-no-border  cancel-search-btn weui-flex__item border-top-1px">取消</button>
+            <button class="red-button confirm-search-btn weui-flex__item" onclick="getAreaCustomer()">确定</button>
+        </footer>
+    </article>
 </div>
 </@layout>

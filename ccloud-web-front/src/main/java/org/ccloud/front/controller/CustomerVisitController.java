@@ -346,7 +346,8 @@ public class CustomerVisitController extends BaseFrontController {
 				
 		render("customer_visit_review.html");
 	}
-
+	
+	@Before(WechatJSSDKInterceptor.class)
 	public void visitCustomerChoose() {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -377,7 +378,16 @@ public class CustomerVisitController extends BaseFrontController {
 			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
+		List<Dict> nearByList = DictQuery.me().findDictByType("area_coverage");
+		List<Map<String, Object>> nearBy = new ArrayList<>();
+		for(Dict dict : nearByList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", dict.get("name"));
+			item.put("value", dict.get("value"));
+			nearBy.add(item);
+		}
 
+		setAttr("searchArea", JSON.toJSON(nearBy));
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("customer_visit_choose.html");
