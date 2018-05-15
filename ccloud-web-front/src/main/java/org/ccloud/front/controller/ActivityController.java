@@ -339,8 +339,10 @@ public class ActivityController extends BaseFrontController {
 	private String check(String activityId, String sellerCustomerId) {
 		Activity activity = ActivityQuery.me().findById(activityId);
 		//List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
-		if(activity.getStartTime().after(new Date())) {
-			return "活动还没有开始";
+		if(activity.getStartTime() != null) {
+			if(activity.getStartTime().after(new Date())) {
+				return "活动还没有开始";
+			}
 		}
 		/*if (activityApplies.size() >= activity.getTotalCustomerNum()) {
 			return "活动参与的人数已经达到上限";
