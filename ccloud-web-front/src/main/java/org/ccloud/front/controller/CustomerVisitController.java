@@ -36,6 +36,7 @@ import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.ExpenseDetailQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.ImageJson;
@@ -1048,17 +1049,49 @@ public class CustomerVisitController extends BaseFrontController {
 		renderJson(map);
 	}
 	
-	public void showActivity() {
-		String activityApplyId = getPara("activityApplyId");
-		Record activity = ActivityQuery.me().findByActivityApplyId(activityApplyId);
-		ExpenseDetail expenseDetail = new ExpenseDetail();
-		if(StrKit.notBlank(ActivityApplyQuery.me().findById(activityApplyId).getExpenseDetailId())) {
-			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(activityApplyId).getExpenseDetailId());
+	public void getAreaCustomer() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		Double dist = 100d;
+		String lon = getPara("lng");
+		String lat = getPara("lat");
+
+		if(StrKit.notBlank(getPara("searchArea"))) {
+			dist = Double.valueOf(getPara("searchArea", "100")).doubleValue();
+
+			BigDecimal latitude = new BigDecimal(lat);
+			BigDecimal longitude = new BigDecimal(lon);
+
+			List<Map<String, Object>> customerList = SellerCustomerQuery.me().queryCustomerNearby(dist, longitude, latitude, user.getId());
+			Map<String, Object> map = new HashMap<>();
+
+			StringBuilder html = new StringBuilder();
+			for (Map<String, Object> customer : customerList)
+			{
+				html.append("<div class=\"weui-panel weui-panel_access\">\n");
+				html.append("	<div class=\"weui-flex\">\n");
+				html.append("		<div class=\"weui-flex__item customer-info\" id =\"customerInfo\" >\n");
+				html.append("			<p class=\"ft14\" id=\"customerName\"> " + customer.get("customer_name").toString() + "</p>\n");
+				html.append("			<p class=\"gray\" id=\"contactP\">" + customer.get("contact").toString() + "/" + customer.get("mobile").toString() + "</p>\n");
+				html.append("			<input type=\"hidden\" id=\"sellerCustomerId\" value=\""+customer.get("id").toString()+"\">\n");
+				html.append("			<input type=\"hidden\" id=\"contact\" value=\""+customer.get("contact").toString()+"\">\n");
+				html.append("			<input type=\"hidden\" id=\"mobile\" value=\""+customer.get("mobile").toString()+"\">\n");
+				html.append("			<input type=\"hidden\" id=\"address\" value=\""+customer.get("prov_name").toString() + " " + customer.get("city_name").toString() + " " + customer.get("country_name").toString() + " " + customer.get("address").toString()+"\">\n");
+				html.append("		</div>\n");
+				html.append("	</div>\n");
+				html.append("		<p class=\"gray\">\n");
+				html.append("			 <span class=\"icon-map-marker ft16 green\"></span>\n");
+				html.append("			<span id=\"addressSpan\">"+customer.get("prov_name").toString() + " " + customer.get("city_name").toString() + " " + customer.get("country_name").toString() + " " + customer.get("address").toString() + "</span>\n");
+				html.append("		</p>\n");
+				html.append("</div>\n" );
+			}
+
+			map.put("html", html.toString());
+			map.put("totalRow", 9);
+			map.put("totalPage", 1);
+			renderJson(map);
+			return;
 		}
-		Map<String, Object> map = new HashMap<>();
-		map.put("activity", activity);
-		map.put("expenseDetail", expenseDetail);
-		renderJson(map);
 	}
 	
 }

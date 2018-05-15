@@ -35,6 +35,7 @@
 			combo();
 			return false;
 		}).on("click", "#searchCancel", function() {
+			$("#statusNear").val("0");
             combo();
         }).on("change", "#userId", function() {
             combo();
@@ -92,10 +93,11 @@
     }
 
 	 function getAreaCustomer(){
+	 	$("#statusNear").val("1");
         reset();
         pageNumber = 1;
         $.ajax({
-            url:"${CPATH}/customer/getAreaCustomer",
+            url:"${CPATH}/customerVisit/getAreaCustomer",
             type:"post",
             data:paramData2(),
             dataType:"json",
@@ -104,7 +106,6 @@
                 $(".weui-loadmore").hide();
                 loading = false;
 
-                $(".infinite")[0].scrollTop = 0;
                 $("#customerList").empty();
                 if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#customerList").html(data.html);
@@ -127,7 +128,7 @@
 
 
     function initCustomer() {
-
+		var id = $("#getDate").find(".red-button").data("id");
         $loading.show();
         $noMore.hide();
         layer.open({type: 2,content: '加载中'});
@@ -171,9 +172,12 @@
             return;
         }
         loading = true;
-
-        initCustomer();
-
+		var nearBy = $("#statusNear").val();
+		if(nearBy == 1){
+			getAreaCustomer();
+		}else{
+	        initCustomer();
+		}
     });
 
     function combo() {
@@ -217,6 +221,7 @@
 	                    </div>
 	                    <input type="hidden" name="lng" id="lng">
                         <input type="hidden" name="lat" id="lat">
+                        <input type="hidden" name="statusNear" id="statusNear" value="0">
 	            </div>
 	            <div id="combin-filter-btn">
 	                <i class="icon-th-list"></i>
@@ -234,25 +239,6 @@
                                 <input type="hidden" id="mobile" value="">
                                 <input type="hidden" id="address" value="">
                             </div>
-                            <!--<div class="weui-flex__item customer-href">
-                                <div class="weui-flex">
-                                    <a href="tel:${(customer.mobile)!}"class="weui-flex__item">
-                                        <p>
-                                            <i class="icon-phone green"></i>
-                                        </p>
-                                        <p>电话</p>
-                                    </a>
-                                    <a class="weui-flex__item" href="./customer_historyOrder.html?customer_id=${(customer.id)!}&customer_name=${(customer.customer_name)!}">
-                                        <p>
-                                            <i class="icon-file-text-o blue"></i>
-                                        </p>
-                                        <p>订单</p>
-                                    </a>
-                                    <a class="weui-flex__item relative" href="./customerDetail.html">
-                                        <i class="icon-chevron-right gray"></i>
-                                    </a>
-                                </div>
-                            </div>-->
                         </div>
                         <p class="gray">
                             <span class="icon-map-marker ft16 green"></span>
