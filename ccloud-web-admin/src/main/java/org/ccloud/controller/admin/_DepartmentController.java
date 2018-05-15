@@ -112,7 +112,7 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	public void save() {
 
 		final Department dept = getModel(Department.class);
-		if (!StringUtils.isNotBlank(dept.getId())) {
+		if (StringUtils.isBlank(dept.getId())) {
 			String parentDataArea = getPara("parentDataArea");
 			String dataArea = null;
 			List<Department> list = DepartmentQuery.me().findByParentId(dept.getParentId());
@@ -122,6 +122,12 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 				dataArea = parentDataArea + "001";
 			}
 			dept.setDataArea(dataArea);// 生成数据域	
+		} else {
+			Department parentDepartment = DepartmentQuery.me().findById(dept.getParentId());
+			if (dept.getId().equals(parentDepartment.getParentId())) {
+				renderAjaxResultForError("部门 不能相互为上级");
+				return;
+			}
 		}
 		if (StringUtils.isBlank(dept.getId())) {
 			dept.setIsParent(0);
