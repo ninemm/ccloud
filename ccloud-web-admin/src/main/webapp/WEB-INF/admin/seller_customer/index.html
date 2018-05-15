@@ -127,11 +127,9 @@
 			function(result){
 				if (result.errorCode > 0) {
 					toastr.error(result.message, '操作失败');
-				} else if(result.errorCode == 0) {
+				} else{
 					toastr.success(result.message, '操作成功');
 					$table.bootstrapTable('refresh');
-				}else{
-					location.href = "${CPATH}/admin/login";
 				}
 			}
 		);
@@ -177,10 +175,12 @@
 				var aa = $.cookie('customerType');
 				$("#customer_type").val(aa);
 			},
-			error : function() {
-				l.stop();
-				location.href = "${CPATH}/admin/login";
-//				alert("信息提交错误");
+			error : function(data) {
+				if(data.status == 200){
+					location.href = "${CPATH}/admin/login";
+				}else{
+					alert("信息提交错误");
+				}
 			}
 		});
 	}
@@ -214,9 +214,12 @@
 							$table.bootstrapTable('refresh');
 						}
 					},
-					error : function() {
-						location.href = "${CPATH}/admin/login";
-//						alert("信息提交错误");
+					error : function(data) {
+						if(data.status == 200){
+							location.href = "${CPATH}/admin/login";
+						}else{
+							alert("信息提交错误");
+						}
 					}
 				});
 			}
@@ -250,6 +253,13 @@
 						} else {
 							toastr.success(data.message, '操作成功');
 							$table.bootstrapTable('refresh');
+						}
+					},
+					error : function(data) {
+						if(data.status == 200){
+							location.href = "${CPATH}/admin/login";
+						}else{
+							alert("信息提交错误");
 						}
 					}
 				});
@@ -289,6 +299,13 @@
 							toastr.success(data.message, '操作成功');
 							$table.bootstrapTable('refresh');
 						}
+				},
+				error : function(data) {
+					if(data.status == 200){
+						location.href = "${CPATH}/admin/login";
+					}else{
+						alert("信息提交错误");
+					}
 				}
 			});
 	}
@@ -303,6 +320,13 @@
 				{
 					for (var i = 0; i < data.length; i++) {
 							$("#customerTypes").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
+					}
+				},
+				error : function(data) {
+					if(data.status == 200){
+						location.href = "${CPATH}/admin/login";
+					}else{
+						alert("信息提交错误");
 					}
 				}
 			});
