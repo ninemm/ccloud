@@ -445,9 +445,12 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 			}
 
 			//更新计划
-			BigDecimal bigProductCount = new BigDecimal(orderProductInfo.getBigCount()).add(new BigDecimal(orderProductInfo.getSmallCount()).divide(new BigDecimal(orderProductInfo.getConvertRelate()), 2, BigDecimal.ROUND_HALF_UP));
-			if (!updatePlans(order_user, orderProductInfo.getSellerProductId(), order_date, bigProductCount)) {
-				return false;
+			String isGift = detail.getStr("is_gift");
+			if("0".equals(isGift)) {
+				BigDecimal bigProductCount = new BigDecimal(orderProductInfo.getBigCount()).add(new BigDecimal(orderProductInfo.getSmallCount()).divide(new BigDecimal(orderProductInfo.getConvertRelate()), 2, BigDecimal.ROUND_HALF_UP));
+				if (!updatePlans(order_user, orderProductInfo.getSellerProductId(), order_date, bigProductCount)) {
+					return false;
+				}
 			}
 		}
 		

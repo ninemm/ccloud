@@ -170,11 +170,14 @@ function doSubmit(){
 						l.stop();
 								}, 1 * 1000 );
 		},
-		error : function() {
-			l.stop();
-			location.href = "${CPATH}/admin/login";
-//			alert("信息提交错误");
-		}
+		error : function(data) {
+				l.stop();
+				if(data.status == 200){
+					location.href = "${CPATH}/admin/login";
+				}else{
+					alert("信息提交错误");
+				}
+			}
 	});
 }
 
