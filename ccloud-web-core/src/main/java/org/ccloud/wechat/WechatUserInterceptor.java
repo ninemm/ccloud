@@ -38,8 +38,8 @@ public class WechatUserInterceptor implements Interceptor {
 	public void intercept(Invocation inv) {
 
 		Controller controller = inv.getController();
-		String userJson = inv.getController().getSessionAttr(Consts.SESSION_WECHAT_USER);
-		if (StringUtils.isNotBlank(userJson)) {
+		String userJsonObj = controller.getSessionAttr(Consts.SESSION_WECHAT_USER);
+		if (StringUtils.isNotBlank(userJsonObj)) {
 			inv.invoke();
 			return;
 		}
@@ -63,8 +63,6 @@ public class WechatUserInterceptor implements Interceptor {
 
 		String redirectUrl = request.getScheme() + "://" + request.getServerName() + "/wechat/callback?goto=" + toUrl;
 		redirectUrl = StringUtils.urlEncode(redirectUrl);
-
-//		System.out.println("redirectUrl====>" + redirectUrl);
 		
 		String url = AUTHORIZE_URL.replace("{redirecturi}", redirectUrl).replace("{appid}", appid.trim());
 		controller.redirect(url);

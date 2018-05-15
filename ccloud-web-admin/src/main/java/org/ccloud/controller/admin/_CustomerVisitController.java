@@ -333,7 +333,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	}
 
 	public void queryCustomerType() {
-        String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
+        String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
         List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
         renderAjaxResultForSuccess("success",JSON.toJSON(typeList));
 	}

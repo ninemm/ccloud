@@ -693,7 +693,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			fromBuilder.append(" and o.create_date <= ?");
 			params.add(endDate);
 		}
-
+		fromBuilder.append(" and so.status != " + Consts.SALES_ORDER_STATUS_CANCEL + " ");
 		fromBuilder.append(" order by o.create_date desc ");
 
 		if (params.isEmpty())

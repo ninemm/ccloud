@@ -122,7 +122,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String sort,String sortOrder, String customerType, String keyword1) {
+	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String sort,String sortOrder, String customerType, String keyword1,String status) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -143,6 +143,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		needWhere = appendIfNotEmpty(fromBuilder, "ct.id", customerType, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword1, params, needWhere);
+		if(StrKit.notBlank(status)) {
+			needWhere = appendIfNotEmpty(fromBuilder, "sc.is_enabled", status, params, needWhere);
+		}
 		fromBuilder.append("  GROUP BY sc.id ");
 		if(StrKit.notBlank(sort)) {
 			fromBuilder.append(" order by "+sort);
@@ -748,6 +751,18 @@ public class SellerCustomerQuery extends JBaseQuery {
 		sql.append("LEFT JOIN cc_seller_customer sc ON ujc.seller_customer_id = sc.id ");
 		sql.append("WHERE ujc.data_area LIKE ? AND sc.is_enabled = ? ");
 		return Db.queryLong(sql.toString(), dataArea, 1);
+	}
+
+	public List<Record> findListBySellerId(String sellerId) {
+		StringBuilder fromBuilder = new StringBuilder(
+				" select cs.id, cc.customer_name, cc.contact, cc.mobile, cc.prov_name, cc.city_name, cc.country_name, cc.address, GROUP_CONCAT(u.realname) as userName, GROUP_CONCAT(u.id) as userId");
+		fromBuilder.append(" from `cc_seller_customer` cs ");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cs.customer_id = cc.id ");
+		fromBuilder.append(" LEFT JOIN cc_user_join_customer ujc ON cs.id = ujc.seller_customer_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = ujc.user_id");
+		fromBuilder.append(" WHERE cs.is_enabled = 1 AND cs.seller_id = ?");
+		fromBuilder.append(" GROUP BY cs.id");
+		return Db.find(fromBuilder.toString(), sellerId);
 	}
 	
 }

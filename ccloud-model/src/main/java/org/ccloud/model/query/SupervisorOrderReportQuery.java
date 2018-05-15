@@ -38,12 +38,11 @@ public class SupervisorOrderReportQuery extends JBaseQuery {
 		fromBuilder.append("(SELECT u.id FROM `user` u WHERE u.id = cc.biz_user_id ");
 		fromBuilder.append("and u.data_area like ?) AND EXISTS");
 		params.add(dataArea);
-		boolean needWhere = true;
 		
 		fromBuilder.append("(SELECT os.status FROM cc_sales_order_status os WHERE ");
 		fromBuilder.append("os.status = cc.status and os.status != 1001 and os.status != 1002) ");
 		if (StrKit.notBlank(receiveType)&&!receiveType.equals("all")) {
-			needWhere = appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, needWhere);
+			appendIfNotEmpty(fromBuilder, "cc.receive_type", receiveType, params, false);
 		}
 		if (StrKit.notBlank(print)) {
 			if (StrKit.notBlank(startDate)) {

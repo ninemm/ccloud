@@ -181,9 +181,15 @@
         });
 
     })
-    
+    function iGetInnerText(testStr) {
+        var resultStr = testStr.replace(/\ +/g, ""); //去掉空格
+        return resultStr;
+    }
     function doSubmit() {
-
+		$("#customer_name").val(iGetInnerText($("#customer_name").val()));
+		$("#contact").val(iGetInnerText($("#contact").val()));
+		$("#mobile").val(iGetInnerText($("#mobile").val()));
+		$("#address").val(iGetInnerText($("#address").val()));
         var children = $("#uploaderFiles")[0].children;
         var oldPic=[];
         for(var i = 0; i < children.length; i++)

@@ -347,8 +347,10 @@ public class ActivityController extends BaseFrontController {
 		}*/
 		Customer customer = CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
 		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId);
-		if (applys.size() >= activity.getJoinNum()) {
-			return customer.getCustomerName()+"--该客户参与该活动的次数已经达到上限";
+		if (activity.getJoinNum() != null) {
+			if (applys.size() >= activity.getJoinNum()) {
+				return customer.getCustomerName()+"--该客户参与该活动的次数已经达到上限";
+			}			
 		}
 		/*List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId,expenseDetailId);
 		if (applys.size() >= activity.getJoinNum()) {

@@ -22,6 +22,7 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.shiro.CaptchaUsernamePasswordToken;
 import org.ccloud.utils.CookieUtils;
 import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.StringUtils;
 import org.ccloud.wechat.WechatUserInterceptor;
 
 import com.alibaba.fastjson.JSON;
@@ -46,15 +47,22 @@ public class WxOauthController extends BaseFrontController {
 		String openId = null;
 		String accessToken = null;
 		String gotoUrl = getPara("goto", Consts.INDEX_URL);
-		String wechatUserJson = getSessionAttr(Consts.SESSION_WECHAT_USER);
+		Object userJsonObj = getSession().getAttribute(Consts.SESSION_WECHAT_USER);
 		
-		if (StrKit.notBlank(wechatUserJson)) {
-			JSONObject userJson = JSON.parseObject(wechatUserJson);
-			accessToken = userJson.getString("access_token");
+		if (userJsonObj == null) {
+			renderText("您未关注公众号，请关注公众号‘慧经销’!");
+			return ;
+		}
+		
+		String wxUserJsonData = userJsonObj.toString();
+		if (StrKit.notBlank(wxUserJsonData)) {
+			
+			JSONObject userJson = JSON.parseObject(wxUserJsonData);
 			openId = userJson.getString("openid");
+			accessToken = userJson.getString("access_token");
 			
 			if (StrKit.notBlank(openId, accessToken)) {
-				CookieUtils.put(this, Consts.SESSION_WECHAT_ACCESS_TOKEN, accessToken);
+				CookieUtils.put(this, Consts.SESSION_WECHAT_ACCESS_TOKEN, accessToken, 7200);
 				CookieUtils.put(this, Consts.SESSION_WECHAT_OPEN_ID, openId);
 				setSessionAttr(Consts.SESSION_WECHAT_ACCESS_TOKEN, accessToken);
 				setSessionAttr(Consts.SESSION_WECHAT_OPEN_ID, openId);
@@ -84,7 +92,9 @@ public class WxOauthController extends BaseFrontController {
 					ApiResult wxUserResult = UserApi.getUserInfo(openId);
 					if (wxUserResult.isSucceed()) {
 						user.setAvatar(wxUserResult.getStr("headimgurl"));
-						user.setNickname(wxUserResult.getStr("nickname"));
+						String nickname = wxUserResult.getStr("nickname");
+						if (StrKit.notBlank(nickname))
+							user.setNickname(StringUtils.urlEncode(nickname));
 						user.setWechatOpenId(openId);
 						
 						if (!user.saveOrUpdate()) {

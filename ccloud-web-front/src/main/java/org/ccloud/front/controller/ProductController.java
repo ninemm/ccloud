@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.jfinal.log.Log;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -33,6 +34,8 @@ import com.jfinal.plugin.activerecord.Record;
  */
 @RouterMapping(url = "/product")
 public class ProductController extends BaseFrontController {
+
+	private Log log = Log.getLog(ProductController.class);
 
 	public void index() {
 		String refund = getPara("refund");
@@ -320,9 +323,16 @@ public class ProductController extends BaseFrontController {
 		if(getPara("dist")!=null)
 			dist = Double.valueOf(getPara("dist", "100")).doubleValue();
 
-
-		BigDecimal latitude = new BigDecimal(lat);
-		BigDecimal longitude = new BigDecimal(lon);
+		BigDecimal longitude = null;
+		BigDecimal latitude = null;
+		try {
+			longitude = new BigDecimal(lon);
+			latitude = new BigDecimal(lat);
+		} catch (Exception e) {
+			log.error("===========error lng：" + lon);
+			log.error("===========error lat：" + lat);
+			log.error(e.getMessage(), e);
+		}
 
 		List<Map<String, Object>> customerList = SellerCustomerQuery.me().queryCustomerNearby(dist, longitude, latitude, user.getId());
 		Map<String, Object> map = new HashMap<>();
