@@ -61,7 +61,7 @@ public class ActivityApplyQuery extends JBaseQuery {
 
 	}
 
-	public Page<ActivityApply> paginate(int pageNumber, int pageSize, String keyword, String dataArea) {
+	public Page<ActivityApply> paginate(int pageNumber, int pageSize, String keyword, String dataArea, String userId, String activityId) {
 		String select = "SELECT c.*,IFNULL(d.`name`,'商品营销') as investName,cu.customer_name,cu.contact,cu.mobile,cu.address,u.realname ";
 		StringBuilder fromBuilder = new StringBuilder("FROM cc_activity_apply c LEFT JOIN cc_activity a ON c.activity_id = a.id ");
 		fromBuilder.append(" LEFT JOIN dict d ON a.invest_type = d.`value` ");
@@ -72,6 +72,8 @@ public class ActivityApplyQuery extends JBaseQuery {
 		boolean needWhere = true;
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cu.customer_name", keyword, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.biz_user_id", userId, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "c.activity_id", activityId, params, needWhere);
 
 		if (params.isEmpty())
 			return DAO.paginate(pageNumber, pageSize, select, fromBuilder.toString());
@@ -221,5 +223,10 @@ public class ActivityApplyQuery extends JBaseQuery {
 	public List<Record> findBySellerCustomerIdAndUserId(String customerId, String userId) {
 		String sql = "select c.*, ca.title from cc_activity_apply c left join cc_activity ca on c.activity_id = ca.id where c.seller_customer_id = ? and c.biz_user_id = ? and c.status in (1, 4)";
 		return Db.find(sql, customerId, userId);
+	}
+
+	public List<Record> findAllUser(String dataArea) {
+		String sql = "SELECT u.id,u.realname FROM cc_activity_apply c LEFT JOIN `user` u ON c.biz_user_id = u.id where c.data_area like '" + dataArea + "' group by u.id";
+		return Db.find(sql);
 	}
 }
