@@ -123,6 +123,10 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 			}
 			dept.setDataArea(dataArea);// 生成数据域	
 		} else {
+			if (dept.getId().equals(dept.getParentId())) {
+				renderAjaxResultForError("不能选择自己为父部门");
+				return;				
+			}			
 			Department parentDepartment = DepartmentQuery.me().findById(dept.getParentId());
 			if (dept.getId().equals(parentDepartment.getParentId())) {
 				renderAjaxResultForError("部门 不能相互为上级");
