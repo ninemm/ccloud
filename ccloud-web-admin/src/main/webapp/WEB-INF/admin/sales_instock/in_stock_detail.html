@@ -330,7 +330,7 @@
 					totalAmount=totalAmount;
 				</@shiro.hasRole>	
 				<@shiro.lacksRole name="021">   
-					totalAmount = outstock.total_amount;
+					totalAmount = outstock.total_reject_amount;
 				</@shiro.lacksRole>	
 				totalC(totalAmount);				
 			}
