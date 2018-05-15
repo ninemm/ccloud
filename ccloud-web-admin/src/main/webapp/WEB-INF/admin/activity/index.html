@@ -87,7 +87,10 @@
       			},
       			{field: "start_time", title: "活动时间", align: "center", width: '10%',
       				formatter: function(value, row, rowIndex) {
-						var str = value.substring(0,10) +"至<br>"+ row.end_time.substring(0,10);
+      					var str = "";
+      					if(value != null ){
+							str = value.substring(0,10) +"至<br>"+ row.end_time.substring(0,10);
+      					}
 						return str;
    					},
       				edit:false

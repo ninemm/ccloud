@@ -151,9 +151,17 @@ function initActivity(activityList,flg){
 		var $newProductDetail = $type.find(".common:last");
 		$newProductDetail.find("#title").text(el.title);
 		if(flg){
-			$newProductDetail.find("#time").text(new Date(el.start_time).Format("yyyy-MM-dd") + ' ~ ' + new Date(el.end_time).Format("yyyy-MM-dd"));
+			if(el.start_time!=null){
+				$newProductDetail.find("#time").text(new Date(el.start_time).Format("yyyy-MM-dd") + ' ~ ' + new Date(el.end_time).Format("yyyy-MM-dd"));
+			}else{
+				$newProductDetail.find("#time").text("任意时间");
+			}
 		}else{
-			$newProductDetail.find("#time").text((el.start_time).substring(0,10) + ' ~ ' + (el.end_time).substring(0,10));
+			if(el.start_time!=null){
+				$newProductDetail.find("#time").text((el.start_time).substring(0,10) + ' ~ ' + (el.end_time).substring(0,10));
+			}else{
+				$newProductDetail.find("#time").text("任意时间");
+			}
 		}
 		$newProductDetail.find("#content").text(el.content);
 
