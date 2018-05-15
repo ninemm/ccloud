@@ -55,6 +55,7 @@ import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
 import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WarehouseQuery;
@@ -338,6 +339,38 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 
 		render("add.html");
+	}
+	
+	public void getProductListByWarehouseId() {
+		String wareHouseId = getPara("wareHouseId");
+		String sellerId = getSessionAttr("sellerId");
+		List<Record> productlist = SellerProductQuery.me().findListByWareHouseId(sellerId, wareHouseId);
+
+		Map<String, Object> productInfoMap = new HashMap<String, Object>();
+		List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
+
+		for (Record record : productlist) {
+			Map<String, String> productOptionMap = new HashMap<String, String>();
+
+			String sellProductId = record.getStr("id");
+			String customName = record.getStr("custom_name");
+			String speName = record.getStr("valueName");
+
+			productInfoMap.put(sellProductId, record);
+
+			productOptionMap.put("id", sellProductId);
+			if (StrKit.notBlank(speName)) {
+				productOptionMap.put("text", customName + "/" + speName);
+			} else {
+				productOptionMap.put("text", customName);
+			}
+
+			productOptionList.add(productOptionMap);
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("productInfoMap", JSON.toJSON(productInfoMap));
+		map.put("productOptionList", JSON.toJSON(productOptionList));
+		renderJson(map);
 	}
 	
 	public void activityApplyById() {
