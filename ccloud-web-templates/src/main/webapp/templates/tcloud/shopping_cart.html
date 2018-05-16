@@ -141,6 +141,7 @@ function initProduct(){
 			var $newProductDetail = $main.find(".common:last");
 			$newProductDetail.find("#productName").text(el.productName);
 			$newProductDetail.find("#valueName").text(el.valueName);
+			$newProductDetail.find("#categoryId").val(el.categoryId);
 	
 			$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
 			$newProductDetail.find("#smallPriceSpan").text(el.smallPriceSpan);
@@ -307,6 +308,7 @@ function initProductComposition(){
 
 		$newProductDetail.find("#compositionPrice").val(el.compositionPrice);
 		$newProductDetail.find("#compositionId").val(el.compositionId);
+		$newProductDetail.find("#comTotalCount").val(el.compositionCount);
 		
 		$newProductDetail.find("#compositionNum").val(el.compositionNum);
 		$newProductDetail.find("#compositionValueName").html(el.compositionValueName);
@@ -408,6 +410,7 @@ function getProduct($el){
 		bigUnitSpan : $el.find("#bigUnitSpan").text(),
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
 		stock : $el.find("#stock").text(),
+		categoryId : $el.find("#categoryId").val(),
 
 		bigCost : $el.find("#bigCost").val(),
 		smallCost : $el.find("#smallCost").val(),
@@ -462,8 +465,9 @@ function getComposition($el){
 		compositionId : $el.find("#compositionId").val(),
 
 		compositionNum : $el.find("#compositionNum").val(),
+		compositionCount : $el.find("#comTotalCount").val(),
 		
-		compositionValueName : $el.find("#compositionValueName").text(),
+		compositionValueName : $el.find("#compositionValueName").html(),
 		compositionSub : $el.find("#gift").html()
 	}
 }
@@ -492,6 +496,7 @@ function order(){
 				<input type="hidden" id="smallCost" value="">
 				<input type="hidden" id="bigAccountPrice" value="">
 				<input type="hidden" id="smallAccountPrice" value="">
+				<input type="hidden" id="categoryId" value="">
 				<nobr>
 					<p class="product_name" id="productName">
 						<!-- <span class="gift-tag">赠品</span> -->
@@ -578,6 +583,7 @@ function order(){
 			</div>
 			<div class="weui-panel weui-panel_access composition" style="display: none">
 				<input type="hidden" id="compositionId" value="">
+				<input type="hidden" id="comTotalCount" value="">
 				<nobr>
 					<p class="product_name" id="compositionName"></p>
 				</nobr>
@@ -598,8 +604,8 @@ function order(){
 					</div>
 					<#if isEdit>
 						<input type="number" class="street-value" id="compositionPrice" value="0">
-						<#else>
-							<input type="number" class="street-value" id="compositionPrice" value="0" readonly>
+					<#else>
+						<input type="number" class="street-value" id="compositionPrice" value="0" readonly>
 					</#if>
 					<i class="icon-trash-o fr ft30 gray"></i>
 				</div>

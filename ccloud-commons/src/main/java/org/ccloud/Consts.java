@@ -159,7 +159,8 @@ public class Consts {
 	public static final String RECEIVABLES_OBJECT_TYPE_SUPPLIER = "supplier"; //应收账款供应商类型
 
 	public static final String OPTION_SELLER_STORE_CHECK = "seller_store_check_";//经销商检查库存开关设置
-	public static final String OPTION_WEB_ORDER_PRICE_EDIT = "web_order_price_edit_";//下单修改价格开关设置
+	public static final String OPTION_WEB_ORDER_PRICE_EDIT = "web_order_price_edit_";//购物车修改价格开关设置
+	public static final String OPTION_WEB_ORDER_COMFIRM_PRICE_EDIT = "web_order_confirm_price_edit_";//下单修改价格开关设置
 	public static final String OPTION_WEB_ORDER_MIX_GIFT = "web_order_mix_gift_";//下单混合赠品开关设置
 	public static final String OPTION_WEB_PROCEDURE_REVIEW = "web_procedure_review_";//订单审核流程开关设置
 	public static final String OPTION_WEB_PROCEDURE_REVIEW_EDIT = "web_procedure_review_edit_";//订单审核修改开关设置

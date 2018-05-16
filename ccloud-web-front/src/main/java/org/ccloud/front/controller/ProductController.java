@@ -208,6 +208,10 @@ public class ProductController extends BaseFrontController {
 
 		setAttr("isMix", isMix);
 
+		Boolean isEdit = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_ORDER_COMFIRM_PRICE_EDIT + sellerCode);
+		isEdit = (isEdit != null && isEdit) ? true : false;
+
+		setAttr("isEdit", isEdit);
 		render("order.html");
 	}
 

@@ -12,7 +12,7 @@
 	</p>
 	<form action="${CPATH}/admin/option/save" method="POST" id="form">
 		<input type="hidden" name="ucode" value="${ucode}">
-		<#assign common = "seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}, web_member_number_limit_${(session.sellerCode)!}, web_proc_refund_${(session.sellerCode)!}"/>
+		<#assign common = "seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_confirm_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}, web_member_number_limit_${(session.sellerCode)!}, web_proc_refund_${(session.sellerCode)!}"/>
 		<#assign dataUpload = ""/>
 		<#list customerTypeList as customerType>
 			<#if customerType_index == 0>
@@ -40,11 +40,22 @@
 					</li>
 					<li class="jp-set-pad">
 						<div class="col-sm-3 ">
+							<div class="  jp-set-title-line jp-set-info ">购物车修改价格</div>
+						</div>
+						<div class="col-sm-9  jp-set-title-line">
+							<div class="col-sm-6 jp-table-distance-top ">
+								<label><input type="checkbox" value="true" name="web_order_price_edit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_order_price_edit_${(session.sellerCode)!}')}> 开启购物车修改价格功能 </label>
+							</div>
+						</div>
+						<div class="clr checkbox"></div>
+					</li>
+					<li class="jp-set-pad">
+						<div class="col-sm-3 ">
 							<div class="  jp-set-title-line jp-set-info ">下单修改价格</div>
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<label><input type="checkbox" value="true" name="web_order_price_edit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_order_price_edit_${(session.sellerCode)!}')}> 开启下单修改价格功能 </label>
+								<label><input type="checkbox" value="true" name="web_order_confirm_price_edit_${(session.sellerCode)!}" ${OPTION_CHECKED('web_order_confirm_price_edit_${(session.sellerCode)!}')}> 开启下单修改价格功能 </label>
 							</div>
 						</div>
 						<div class="clr checkbox"></div>
