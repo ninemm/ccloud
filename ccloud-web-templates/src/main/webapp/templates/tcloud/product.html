@@ -108,7 +108,12 @@ $(function() {
     }).on("click", ".operate:last-child", function () { //增加商品数量
       productChange($(this));
       
-    }).on('click', '#confirm-input', function () {
+    }).on("change", "#warehouse", function() {
+		warehouseId = $("#warehouse").data('values');
+    		setItemBykey("warehouseId", $("#warehouse").data('values'));
+    		removeItemBykey("productList");
+		changeInit();
+	}).on('click', '#confirm-input', function () {
       var val = parseFloat($currentInput.val());
       if(val < 0 || val == ""){
         $currentInput.val(0);
@@ -193,13 +198,12 @@ $(function() {
 			imgSwiper.destroy();
 		  }
 		});
-
 	});
-
+	
     firstInit();
     total();
 });
-
+var warehouseId='';
 var tag = '';
 var keyword = '';
 var newHtml = $(".common").eq(0).html();
@@ -208,7 +212,6 @@ var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
 var categoryId = '';
 var map = {};
-
 var pageNumber = 1;
 var pageSize = 10;
 var loading = false;
@@ -232,7 +235,7 @@ function changeInit(){
 
 	$sidebar.empty();
 	$menuRight.empty();
-	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword,'categoryId':categoryId}, 
+	Utils.ajax('${CPATH}/product/productList', {'tag' : tag, 'keyword' : keyword,'categoryId':categoryId,'warehouseId':warehouseId}, 
 		function(data){
 			layer.closeAll();
 			combo(data.productList, data.compositionList, data.goodsCategory);
@@ -254,6 +257,15 @@ function initTags(tags) {
 	$.each(tags, function (index, el) {
 		$tags.append("<div class='swiper-slide'>" + el + "</div>");
 	});
+	var wlist=${wlist!'1'};
+	if (wlist!=1){
+		wlist=${wlist!'1'};
+		$tags.append("<div style='float:right;margin-top:10px;' class='weui-flex__item select-area'><i style='float: right;' class='icon-sort-desc'></i><input type='text' id='warehouse' placeholder='仓库' style='border:0; background-color:transparent;font-size:15px;width: 100px;float: right;' readonly></div>");
+	 	$("#warehouse").select({
+	        title: "选择仓库",
+	        items: wlist
+	    })
+	}	
 	var mySwiper = new Swiper('.product-content .swiper-container', {
 		width: $('#sidebar').width(),
 	})
