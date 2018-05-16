@@ -141,6 +141,11 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	public void getDetail() {
 		String id = getPara("id");
 		setAttr("id", id);
+		SalesOrder salesOrder = SalesOrderQuery.me().findByOutStockId(id);
+		if (Consts.SALES_ORDER_STATUS_CANCEL == salesOrder.getStatus()) {
+			renderAjaxResultForError("订单已取消");
+			return;
+		}
 		render("out_stock_detail.html");
 	}
 
@@ -158,6 +163,15 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	public void renderPrintPage() {
+		String outstockId = getPara("stockOutId");
+		String[] outIds = outstockId.split(",");
+		for (String outId : outIds) {
+			SalesOrder salesOrder = SalesOrderQuery.me().findByOutStockId(outId);
+			if (Consts.SALES_ORDER_STATUS_CANCEL == salesOrder.getStatus()) {
+				renderAjaxResultForError("订单已取消");
+				return;
+			}
+		}
 		setAttr("outstockId", getPara("stockOutId"));
 		//是否是打印打印，财务打印的是成本价
 		setAttr("isFinancePrint", getPara("isFinancePrint"));
@@ -262,7 +276,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		// 检查批量出库提交上来单子是否有已出库的
 		boolean isStockOut = this.checkIsStockOut(outId);
 		if (!isStockOut) {
-			renderAjaxResultForError("批量出库失败,单子已有出库，请检查！");
+			renderAjaxResultForError("批量出库失败,单子已有出库或取消，请检查！");
 		} else {
 			boolean isSave = this.saveBatchStockOut(outId, StockDate, remark, user, sellerId, sellerCode, date);
 			if (isSave) {
@@ -534,11 +548,17 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		boolean isStockOut = true;
 		for (String s : outId) {
 			SalesOutstock salesOutstock = SalesOutstockQuery.me().findById(s);
+			SalesOrder salesOrder = SalesOrderQuery.me().findByOutStockId(s);
 			if (salesOutstock.getStatus().toString().equals("1000")) {
+				isStockOut = false;
+			}
+			if (Consts.SALES_ORDER_STATUS_CANCEL == salesOrder.getStatus()) {
 				isStockOut = false;
 			}
 		}
 		return isStockOut;
+		
+		
 	}
 
 	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",

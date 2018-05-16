@@ -70,16 +70,22 @@
 		var stock = $(".stock");
 		stock.each(function(index,element){
 			if(index==0){
-				return true
+				return true;
 			};
 			var x = $(this).val();
 			if(x==null||x==""){
 				toastr.error('调拨数量不能为空','操作失败');
 				buer=true;
-				
+				return false;
+			}
+			if(x==0){
+				toastr.error('调拨数量不能0','操作失败');
+				buer=true;
+				return false;
 			}
 		});
 		if(buer){
+			buer=false;
 			return;
 		}
 		$form.ajaxSubmit({
