@@ -27,7 +27,7 @@
 
 	function submit() {
         var userId = $("#user").data('values');
-		var money = parseInt($("#money").val());
+		var money = parseFloat($("#money").val());
 		var maxMoney = $("#maxMoney").val();
 		if (!userId) {
 			toastr.error('请选择收款人','操作失败');

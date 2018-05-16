@@ -249,6 +249,7 @@ public class SalesOrderQuery extends JBaseQuery {
 				DateUtils.DEFAULT_NORMAL_FORMATTER);
 		salesOrder.setDeliveryDate(deliveryDate);
 		salesOrder.setRemark(StringUtils.getArrayFirst(paraMap.get("remark")));
+		salesOrder.setActivityApplyId(StringUtils.getArrayFirst(paraMap.get("activity_id")));
 		salesOrder.setCreateDate(date);
 		salesOrder.setDeptId(deptId);
 		salesOrder.setDataArea(dataArea);
@@ -267,12 +268,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		salesOrder.setContact(StringUtils.getArrayFirst(paraMap.get("contact")));
 		salesOrder.setMobile(StringUtils.getArrayFirst(paraMap.get("mobile")));
 		salesOrder.setAddress(StringUtils.getArrayFirst(paraMap.get("address")));
-		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lat"))))
-			salesOrder.setLat(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lat"))));
-		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lng"))))
-			salesOrder.setLng(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lng"))));
-		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("location"))))
-			salesOrder.setLocation(StringUtils.getArrayFirst(paraMap.get("location")));
+//		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lat"))))
+//			salesOrder.setLat(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lat"))));
+//		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("lng"))))
+//			salesOrder.setLng(new BigDecimal(StringUtils.getArrayFirst(paraMap.get("lng"))));
+//		if (StrKit.notBlank(StringUtils.getArrayFirst(paraMap.get("location"))))
+//			salesOrder.setLocation(StringUtils.getArrayFirst(paraMap.get("location")));
 		salesOrder.setStatus(Consts.SALES_ORDER_STATUS_DEFAULT);// 待审核
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("receiveType"));
@@ -401,7 +402,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		receivables.saveOrUpdate();
 	}	
 
-	private SalesOrder findByOutStockId(String outStockId) {
+	public SalesOrder findByOutStockId(String outStockId) {
 		String sql = "SELECT cs.* FROM cc_sales_order cs LEFT JOIN cc_sales_order_join_outstock cj ON cs.id = cj.order_id where cj.outstock_id=? ";
 		return DAO.findFirst(sql, outStockId);
 	}

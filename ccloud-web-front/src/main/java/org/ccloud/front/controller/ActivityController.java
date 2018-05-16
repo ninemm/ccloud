@@ -3,6 +3,8 @@ package org.ccloud.front.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -209,6 +211,9 @@ public class ActivityController extends BaseFrontController {
 		String[] activity_ids = getParaValues("activity_id");
  		String[] applyNum = getParaValues("apply_num");
 		String[] applyAmount = getParaValues("apply_amount");
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
 		if(expenseDetailIds!=null) {
 			expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
 			for (String sellerCustomerId : sellerCustomerIdArray) {
@@ -230,6 +235,14 @@ public class ActivityController extends BaseFrontController {
 						activityApply.setBizUserId(user.getId());
 						activityApply.setApplyNum(new BigDecimal(applyNum[j]));
 						activityApply.setApplyAmount(new BigDecimal(applyAmount[j]));
+						try {
+							activityApply.setStartDate(formatter.parse(startDate));
+							activityApply.setEndDate(formatter.parse(endDate));
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 						activityApply.setNum(0);
 						activityApply.setContent(content);
 						
@@ -339,16 +352,20 @@ public class ActivityController extends BaseFrontController {
 	private String check(String activityId, String sellerCustomerId) {
 		Activity activity = ActivityQuery.me().findById(activityId);
 		//List<ActivityApply> activityApplies = ActivityApplyQuery.me().findByUserIdAndActivityId(activityId, userId);
-		if(activity.getStartTime().after(new Date())) {
-			return "活动还没有开始";
+		if(activity.getStartTime() != null) {
+			if(activity.getStartTime().after(new Date())) {
+				return "活动还没有开始";
+			}
 		}
 		/*if (activityApplies.size() >= activity.getTotalCustomerNum()) {
 			return "活动参与的人数已经达到上限";
 		}*/
 		Customer customer = CustomerQuery.me().findSellerCustomerId(sellerCustomerId);
 		List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId);
-		if (applys.size() >= activity.getJoinNum()) {
-			return customer.getCustomerName()+"--该客户参与该活动的次数已经达到上限";
+		if (activity.getJoinNum() != null) {
+			if (applys.size() >= activity.getJoinNum()) {
+				return customer.getCustomerName()+"--该客户参与该活动的次数已经达到上限";
+			}			
 		}
 		/*List<ActivityApply> applys = ActivityApplyQuery.me().findSellerCustomerIdAndActivityIdAndUserId(sellerCustomerId,activityId,userId,expenseDetailId);
 		if (applys.size() >= activity.getJoinNum()) {
@@ -597,17 +614,21 @@ public class ActivityController extends BaseFrontController {
 			if(StrKit.notBlank(apply.getStr("title"))) {
 				applyTitle = apply.getStr("title");
 			}
+			String startTime = "";
+			String endTime = "";
+			if(apply.getStr("start_time")!=null) startTime = apply.getStr("start_time");
+			if(apply.getStr("end_time")!=null) endTime = apply.getStr("end_time");
 			html.append("                            </span>\n" +
 					"                        </a>\n" +
 					"                       <div class=\"weui-cell__bd\" style=\"text-align:center;\">" +applyTitle+"  "+ expenseDetailName+ "</div>\n" +
 					"                        <div class=\"weui-flex\">\n" +
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>开始日期</p>\n" +
-					"                                <p>" + apply.getStr("start_time") + "</p>\n" +
+					"                                <p>" + startTime + "</p>\n" +
 					"                            </div>\n" +
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>结束日期</p>\n" +
-					"                                <p>" + apply.getStr("end_time") + "</p>\n" +
+					"                                <p>" +endTime + "</p>\n" +
 					"                            </div>\n" +
 					"                            <div class=\"weui-flex__item\">\n" +
 					"                                <p>活动类型</p>\n" +
