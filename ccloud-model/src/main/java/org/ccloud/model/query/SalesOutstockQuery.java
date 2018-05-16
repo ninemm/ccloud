@@ -794,11 +794,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 	
 	public Page<Record> paginateDowning(int pageNumber, int pageSize, String sellerId, String searchSn, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId, String carWarehouseId, String searchName) {
-		String select = "SELECT o.*, c.prov_name,c.city_name,c.country_name,c.address,c.customer_name,ct. NAME AS customerName,cso.id AS orderId,cso.order_sn,cso.create_date AS orderDate,cso.proc_inst_id AS procInstId,uu.realname AS bizName,t5.time,t4.product_count,t4.product_price,t4.tax_price,t4.bar_code,t4.big_unit,t4.custom_name,t4.small_unit,t4.convert_relate,t4.id AS productId,t4.product_sn,t4.valueName,op.create_date as printDate";
+		String select = "SELECT o.*, c.prov_name,c.city_name,c.country_name,c.address,c.customer_name,ct. NAME AS customerName,cso.id AS orderId,cso.order_sn,cso.create_date AS orderDate,cso.proc_inst_id AS procInstId,uu.realname AS bizName,t5.time,t4.product_count,t4.product_price,t4.is_gift,t4.tax_price,t4.bar_code,t4.big_unit,t4.custom_name,t4.small_unit,t4.convert_relate,t4.id AS productId,t4.product_sn,t4.valueName,op.create_date as printDate,ct.`name` as customerType";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
-		StringBuilder fromBuilder = new StringBuilder("from (SELECT cod.outstock_id,cod.id,cod.product_count,cod.product_price,cs.custom_name,cs.tax_price,cs.bar_code,p.big_unit,p.small_unit,p.convert_relate,p.id AS productId,p.product_sn,t3.valueName FROM cc_sales_outstock_detail cod ");
+		StringBuilder fromBuilder = new StringBuilder("from (SELECT cod.outstock_id,cod.id,cod.product_count,cod.product_price,cs.custom_name,cs.tax_price,cs.bar_code,p.big_unit,p.small_unit,p.convert_relate,p.id AS productId,p.product_sn,t3.valueName,cod.is_gift FROM cc_sales_outstock_detail cod ");
 		fromBuilder.append("LEFT JOIN cc_seller_product cs ON cs.id = cod.sell_product_id ");
 		fromBuilder.append("LEFT JOIN cc_product p ON p.id = cs.product_id ");
 		fromBuilder.append("LEFT JOIN (SELECT	sv.id,cv.product_set_id,GROUP_CONCAT(sv. NAME) AS valueName	 ");

@@ -639,20 +639,26 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	
 	public SalesOutstockExcel saveExcel(Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String comment) {
 		SalesOutstockExcel excel = new SalesOutstockExcel();
+		if ("0".equals(record.getStr("is_gift"))) {
+			excel.setIsGift("否");
+			excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
+			excel.setProductPrice(price.toString());
+		} else {
+			excel.setIsGift("是");
+			excel.setTotalAmount("0");
+			excel.setProductPrice("0");
+		}
 		excel.setProductName(record.getStr("custom_name"));
 		excel.setValueName(record.getStr("valueName"));
 		excel.setProductCount(count);
 		excel.setUnit(unit);
 		excel.setCreatconvertRelate(record.getStr("convert_relate") + record.getStr("small_unit") + "/"
 				+ record.getStr("big_unit"));
-		excel.setProductPrice(price.toString());
-		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
 		excel.setOutstockSn(record.getStr("outstock_sn"));
 		excel.setCustomer(customerInfo);
-		excel.setCustomerType(record.getStr("customer_name"));
+		excel.setCustomerType(record.getStr("customerType"));
 		excel.setContact(record.getStr("contact"));
 		excel.setMobile(record.getStr("mobile"));
-		excel.setProductPrice(price.toString());
 		excel.setSaveDate(saveDate);
 		excel.setCreateDate(createDate);
 		excel.setPrintDate(printDate);
@@ -676,11 +682,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			excel.setStatus("待出库");
 		} else {
 			excel.setStatus("已出库");
-		}
-		if ("0".equals(record.getStr("is_gift"))) {
-			excel.setIsGift("否");
-		} else {
-			excel.setIsGift("是");
 		}
 		excel.setBarCode(record.getStr("bar_code"));
 		excel.setCreateDate(record.getStr("create_date"));
