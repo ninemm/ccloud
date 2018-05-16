@@ -728,11 +728,13 @@ public class CustomerVisitController extends BaseFrontController {
 		String activityApplyId = getPara("activityApplyId");
 		Map<String, Object> map = new HashMap<>();
 		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findByActivityApplyId(activityApplyId);
-		String dict_type = expenseDetail.getFlowDictType();
 		boolean size = false;
-		String check_size = null;
-		if (dict_type.equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
-			size = true;
+		String check_size = null;		
+		if (expenseDetail != null) {
+			String dict_type = expenseDetail.getFlowDictType();
+			if (dict_type.equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
+				size = true;
+			}			
 		}
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		String orderList = String.valueOf(customerVisits.size()+1);
