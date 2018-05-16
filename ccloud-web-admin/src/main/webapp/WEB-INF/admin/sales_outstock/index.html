@@ -497,12 +497,14 @@ function orderDetail(id) {
     }
     
     function batchDown(){
-  		var keyword = $('#post-search-input').val();
+  		var searchSn = $('#searchSn').val();
+		var searchName = $('#searchName').val();
+		if (searchName) searchName = encodeURIComponent(searchName);
   		<@shiro.hasRole name="021">  
-			jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword+ "&tax=0");
+			jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&tax=0&searchSn="+searchSn+"&searchName="+searchName);
 		</@shiro.hasRole>	
 		<@shiro.lacksRole name="021">  
-			jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&k="+keyword+ "&tax=1");
+			jQuery.mm.down("${CPATH}/admin/salesOutstock/downloading?startDate=" + $('#startDate').val() + " 00:00:00" + "&endDate=" + $('#endDate').val() + " 23:59:59" + "&printStatus=" + $("#printStatus").val() + "&stockOutStatus="+$("#stockOutStatus").val() + "&tax=1&searchSn="+searchSn+"&searchName="+searchName);
 		</@shiro.lacksRole>	
     		
     }

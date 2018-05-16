@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.task.Comment;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.Logical;
@@ -47,7 +46,6 @@ import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
-import org.ccloud.workflow.service.WorkFlowService;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
@@ -549,7 +547,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		render("download.html");
 	}
 
-	@SuppressWarnings("deprecation")
 	@RequiresPermissions(value = { "/admin/salesOutstock/downloading", "/admin/dealer/all",
 			"/admin/all" }, logical = Logical.OR)
 	public void downloading() throws UnsupportedEncodingException {
@@ -574,9 +571,8 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
 		for (Record record : salesOutstckList) {
-			String outStockId = record.get("id");
 			//客户信息
-			String customerInfo = record.getStr("customer_name")+"," + record.get("prov_name")+record.get("city_name")+record.get("country_name")+record.get("address");
+			String customerInfo = record.getStr("customer_name")+"," + record.get("prov_name")+" " +record.get("city_name")+" " +record.get("country_name")+" "+record.get("address");
 			//下单日期
 			String saveDate =record.getStr("create_date").substring(0, 10); 
 			//下单时间
@@ -589,38 +585,32 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					dateComment += "第"+(i+1)+"次审核时间："+ completeDate[i].substring(0,completeDate[i].indexOf("."))+";";
 				}
 			}
-			List<Record> outstockDetail = SalesOutstockDetailQuery.me().findByOutstockId(outStockId);
-			for (Record re : outstockDetail) {
-				SalesOrder salesOrder = SalesOrderQuery.me().findOutOrderId(outStockId);
-				//打印时间
-				List<Record> outstockPrints = OutstockPrintQuery.me().findByOrderId(salesOrder.getId());
-				String printDate = "";
-				if(outstockPrints.size()>0) {
-					printDate =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(outstockPrints.get(0).get("create_date")) ;
-				}
-				BigDecimal creatconverRelate = new BigDecimal(re.getStr("convert_relate"));
-				BigDecimal bigPrice;
-				//0 税务人员   1  非税务人员
-				if (tax.equals("0")) {
-					 bigPrice = new BigDecimal(re.getStr("tax_price"));
-				}else {
-					 bigPrice = new BigDecimal(re.getStr("product_price"));
-				}
-				BigDecimal count = new BigDecimal(re.getStr("product_count"));
-				String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
-				String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";
-				BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
-				if(!bigCount.equals("0")) {
-					SalesOutstockExcel excel = new SalesOutstockExcel();
-					excel = saveExcel(re,record,bigPrice,bigCount,customerInfo,saveDate,createDate,printDate,re.getStr("big_unit"),dateComment);
-					excellist.add(excel);
-				}
-				if(!smallCount.equals("0")){
-					SalesOutstockExcel excel = new SalesOutstockExcel();
-					excel = saveExcel(re,record,smallPrice,smallCount,customerInfo,saveDate,createDate,printDate,re.getStr("small_unit"),dateComment);
-					excellist.add(excel);
-				}
-
+			//打印时间
+			String printDate = "";
+			if(StrKit.notBlank(record.getStr("printDate"))) {
+				printDate =record.getStr("printDate").substring(0, record.getStr("printDate").indexOf(".")) ;
+			}
+			BigDecimal creatconverRelate = new BigDecimal(record.getStr("convert_relate"));
+			BigDecimal bigPrice;
+			//0 税务人员   1  非税务人员
+			if (tax.equals("0")) {
+				 bigPrice = new BigDecimal(record.getStr("tax_price"));
+			}else {
+				 bigPrice = new BigDecimal(record.getStr("product_price"));
+			}
+			BigDecimal count = new BigDecimal(record.getStr("product_count"));
+			String bigCount = (count.intValue()) / (creatconverRelate.intValue()) + "";
+			String smallCount = (count.intValue()) % (creatconverRelate.intValue()) + "";
+			BigDecimal smallPrice = bigPrice.divide(creatconverRelate, 2, BigDecimal.ROUND_HALF_UP);
+			if(!bigCount.equals("0")) {
+				SalesOutstockExcel excel = new SalesOutstockExcel();
+				excel = saveExcel(record,bigPrice,bigCount,customerInfo,saveDate,createDate,printDate,record.getStr("big_unit"),dateComment);
+				excellist.add(excel);
+			}
+			if(!smallCount.equals("0")){
+				SalesOutstockExcel excel = new SalesOutstockExcel();
+				excel = saveExcel(record,smallPrice,smallCount,customerInfo,saveDate,createDate,printDate,record.getStr("small_unit"),dateComment);
+				excellist.add(excel);
 			}
 		}
 
@@ -647,19 +637,19 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		renderFile(new File(filePath.replace("\\", "/")));
 	}
 	
-	public SalesOutstockExcel saveExcel(Record re,Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String comment) {
+	public SalesOutstockExcel saveExcel(Record record,BigDecimal price,String count,String customerInfo,String saveDate,String createDate,String printDate,String unit,String comment) {
 		SalesOutstockExcel excel = new SalesOutstockExcel();
-		excel.setProductName(re.getStr("custom_name"));
-		excel.setValueName(re.getStr("valueName"));
+		excel.setProductName(record.getStr("custom_name"));
+		excel.setValueName(record.getStr("valueName"));
 		excel.setProductCount(count);
 		excel.setUnit(unit);
-		excel.setCreatconvertRelate(re.getStr("convert_relate") + re.getStr("small_unit") + "/"
-				+ re.getStr("big_unit"));
+		excel.setCreatconvertRelate(record.getStr("convert_relate") + record.getStr("small_unit") + "/"
+				+ record.getStr("big_unit"));
 		excel.setProductPrice(price.toString());
 		excel.setTotalAmount(price.multiply(new BigDecimal(count)).toString());
 		excel.setOutstockSn(record.getStr("outstock_sn"));
 		excel.setCustomer(customerInfo);
-		excel.setCustomerType(record.getStr("customerName"));
+		excel.setCustomerType(record.getStr("customer_name"));
 		excel.setContact(record.getStr("contact"));
 		excel.setMobile(record.getStr("mobile"));
 		excel.setProductPrice(price.toString());
@@ -687,12 +677,12 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		} else {
 			excel.setStatus("已出库");
 		}
-		if (re.get("is_gift").toString().equals("0")) {
+		if ("0".equals(record.getStr("is_gift"))) {
 			excel.setIsGift("否");
 		} else {
 			excel.setIsGift("是");
 		}
-		excel.setBarCode(re.getStr("bar_code"));
+		excel.setBarCode(record.getStr("bar_code"));
 		excel.setCreateDate(record.getStr("create_date"));
 		return excel;
 	}
