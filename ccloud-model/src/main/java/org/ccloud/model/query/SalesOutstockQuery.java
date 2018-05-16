@@ -794,7 +794,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	
 	public Page<Record> paginateDowning(int pageNumber, int pageSize, String sellerId, String searchSn, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId, String carWarehouseId, String searchName) {
-		String select = "SELECT o.*, c.prov_name,c.city_name,c.country_name,c.address,c.customer_name,ct. NAME AS customerName,cso.id AS orderId,cso.order_sn,cso.create_date AS orderDate,cso.proc_inst_id AS procInstId,uu.realname AS bizName,t5.time,t4.product_count,t4.product_price,t4.is_gift,t4.tax_price,t4.bar_code,t4.big_unit,t4.custom_name,t4.small_unit,t4.convert_relate,t4.id AS productId,t4.product_sn,t4.valueName,op.create_date as printDate,ct.`name` as customerType";
+		String select = "SELECT o.*, c.prov_name,c.city_name,c.country_name,c.address,c.customer_name,ct. NAME AS customerName,cso.id AS orderId,cso.order_sn,cso.create_date AS orderDate,cso.proc_inst_id AS procInstId,uu.realname AS bizName,t4.product_count,t4.product_price,t4.is_gift,t4.tax_price,t4.bar_code,t4.big_unit,t4.custom_name,t4.small_unit,t4.convert_relate,t4.id AS productId,t4.product_sn,t4.valueName,op.create_date as printDate,ct.`name` as customerType";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
@@ -804,7 +804,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN (SELECT	sv.id,cv.product_set_id,GROUP_CONCAT(sv. NAME) AS valueName	 ");
 		fromBuilder.append("FROM cc_goods_specification_value sv ");
 		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id ");
-		fromBuilder.append("GROUP BY cv.product_set_id) t3 ON t3.product_set_id = p.id) t4 ");
+		fromBuilder.append("GROUP BY cv.product_set_id) t3 ON t3.product_set_id = p.id where cod.data_area like '"+dataArea+"') t4 ");
 		fromBuilder.append("LEFT JOIN `cc_sales_outstock` o ON t4.outstock_id = o.id ");
 		fromBuilder.append("left join cc_seller_customer cs on o.customer_id = cs.id ");
 		fromBuilder.append("left join cc_customer c on c.id = cs.customer_id ");
@@ -813,8 +813,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
 		fromBuilder.append("LEFT JOIN cc_outstock_print op on op.order_id = cso.id ");
 		fromBuilder.append("LEFT JOIN `user` uu ON uu.id = cso.biz_user_id ");
-		fromBuilder.append("LEFT JOIN (select ahc.PROC_INST_ID_,GROUP_CONCAT(ahc.TIME_)as time from act_hi_comment ahc GROUP BY "
-				+ "ahc.PROC_INST_ID_ ORDER BY ahc.TIME_ ) t5 on t5.PROC_INST_ID_ = cso.proc_inst_id ");
 		if (StrKit.notBlank(status)) {
 			fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
 			fromBuilder.append("FROM cc_sales_outstock_detail cc LEFT JOIN (SELECT SUM(cr.reject_product_count) AS count, cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");

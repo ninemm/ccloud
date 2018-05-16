@@ -15,8 +15,6 @@ public class SalesOutstockExcel {
 	private String mobile;
 	@Excel(name = "业务员")
 	private String bizUser;
-	@Excel(name = "审核时间")
-	private String completeDate;
 	@Excel(name = "订单金额")
 	private String totalAmount;
 	@Excel(name = "付款方式")
@@ -172,12 +170,6 @@ public class SalesOutstockExcel {
 	}
 	public void setUnit(String unit) {
 		this.unit = unit;
-	}
-	public String getCompleteDate() {
-		return completeDate;
-	}
-	public void setCompleteDate(String completeDate) {
-		this.completeDate = completeDate;
 	}
 	
 	

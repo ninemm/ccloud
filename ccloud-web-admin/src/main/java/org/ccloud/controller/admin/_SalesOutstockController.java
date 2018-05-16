@@ -576,7 +576,10 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			//下单日期
 			String saveDate =record.getStr("create_date").substring(0, 10); 
 			//下单时间
-			String createDate = record.getStr("create_date");
+			String createDate = "";
+			if(StrKit.notBlank(record.getStr("create_date"))) {
+				createDate =record.getStr("create_date").substring(0, record.getStr("create_date").indexOf(".")) ;
+			}
 			//审核时间内容
 			String dateComment = "";
 			if(StrKit.notBlank(record.getStr("time"))) {
@@ -586,10 +589,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				}
 			}
 			//打印时间
-			String printDate = "";
-			if(StrKit.notBlank(record.getStr("printDate"))) {
-				printDate =record.getStr("printDate").substring(0, record.getStr("printDate").indexOf(".")) ;
-			}
+			String printDate = record.getStr("printDate");
 			BigDecimal creatconverRelate = new BigDecimal(record.getStr("convert_relate"));
 			BigDecimal bigPrice;
 			//0 税务人员   1  非税务人员
@@ -662,7 +662,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		excel.setSaveDate(saveDate);
 		excel.setCreateDate(createDate);
 		excel.setPrintDate(printDate);
-		excel.setCompleteDate(comment);
 		if (record.get("bizName") == null) {
 			excel.setBizUser("");
 		} else {
@@ -684,7 +683,6 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 			excel.setStatus("已出库");
 		}
 		excel.setBarCode(record.getStr("bar_code"));
-		excel.setCreateDate(record.getStr("create_date"));
 		return excel;
 	}
 	
