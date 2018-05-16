@@ -24,8 +24,10 @@ import org.ccloud.model.CustomerVisitJoinActivity;
 import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.Message;
+import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.excel.ExcelUploadUtils;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
@@ -36,6 +38,7 @@ import org.ccloud.model.query.DictQuery;
 import org.ccloud.model.query.ExpenseDetailQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.model.query.WxMessageTemplateQuery;
 import org.ccloud.model.vo.ImageJson;
@@ -56,6 +59,7 @@ import com.google.common.base.Splitter;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
+import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -63,6 +67,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/customerVisit")
 @RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerVisitController extends BaseFrontController {
+	private static final Log log = Log.getLog(CustomerVisitController.class);
 	
 	//库存详情
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
@@ -347,7 +352,8 @@ public class CustomerVisitController extends BaseFrontController {
 				
 		render("customer_visit_review.html");
 	}
-
+	
+	@Before(WechatJSSDKInterceptor.class)
 	public void visitCustomerChoose() {
 
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
@@ -378,7 +384,16 @@ public class CustomerVisitController extends BaseFrontController {
 			item.put("value", customerType.getId());
 			customerTypes.add(item);
 		}
+		List<Dict> nearByList = DictQuery.me().findDictByType("area_coverage");
+		List<Map<String, Object>> nearBy = new ArrayList<>();
+		for(Dict dict : nearByList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", dict.get("name"));
+			item.put("value", dict.get("value"));
+			nearBy.add(item);
+		}
 
+		setAttr("searchArea", JSON.toJSON(nearBy));
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
 		render("customer_visit_choose.html");
@@ -435,7 +450,19 @@ public class CustomerVisitController extends BaseFrontController {
 					//原图
 					String originalPath = qiniuUpload(pic);
 					//添加的水印内容
-					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+					String waterFont1 = "";
+					SellerCustomer sellerCustomer =  customerVisit.getSellerCustomer();
+					if (sellerCustomer != null) {
+						Customer customer = sellerCustomer.getCustomer();
+						if (customer != null) {
+							waterFont1 = customer.getCustomerName();
+						} else {
+							log.error("customer查询为空!customer_id:" + sellerCustomer.getCustomerId());
+						}
+					} else {
+						log.error("sellerCustomer查询为空!seller_customerId:" + customerVisit.getSellerCustomerId());
+					}
+					
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
 					String waterFont3 =  customerVisit.getLocation();
 //					String waterFont3 = "湖北省-武汉市-洪山区";
@@ -1039,17 +1066,49 @@ public class CustomerVisitController extends BaseFrontController {
 		renderJson(map);
 	}
 	
-	public void showActivity() {
-		String activityApplyId = getPara("activityApplyId");
-		Record activity = ActivityQuery.me().findByActivityApplyId(activityApplyId);
-		ExpenseDetail expenseDetail = new ExpenseDetail();
-		if(StrKit.notBlank(ActivityApplyQuery.me().findById(activityApplyId).getExpenseDetailId())) {
-			expenseDetail = ExpenseDetailQuery.me().findById(ActivityApplyQuery.me().findById(activityApplyId).getExpenseDetailId());
+	public void getAreaCustomer() {
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+
+		Double dist = 100d;
+		String lon = getPara("lng");
+		String lat = getPara("lat");
+
+		if(StrKit.notBlank(getPara("searchArea"))) {
+			dist = Double.valueOf(getPara("searchArea", "100")).doubleValue();
+
+			BigDecimal latitude = new BigDecimal(lat);
+			BigDecimal longitude = new BigDecimal(lon);
+
+			List<Map<String, Object>> customerList = SellerCustomerQuery.me().queryCustomerNearby(dist, longitude, latitude, user.getId());
+			Map<String, Object> map = new HashMap<>();
+
+			StringBuilder html = new StringBuilder();
+			for (Map<String, Object> customer : customerList)
+			{
+				html.append("<div class=\"weui-panel weui-panel_access\">\n");
+				html.append("	<div class=\"weui-flex\">\n");
+				html.append("		<div class=\"weui-flex__item customer-info\" id =\"customerInfo\" >\n");
+				html.append("			<p class=\"ft14\" id=\"customerName\"> " + customer.get("customer_name").toString() + "</p>\n");
+				html.append("			<p class=\"gray\" id=\"contactP\">" + customer.get("contact").toString() + "/" + customer.get("mobile").toString() + "</p>\n");
+				html.append("			<input type=\"hidden\" id=\"sellerCustomerId\" value=\""+customer.get("id").toString()+"\">\n");
+				html.append("			<input type=\"hidden\" id=\"contact\" value=\""+customer.get("contact").toString()+"\">\n");
+				html.append("			<input type=\"hidden\" id=\"mobile\" value=\""+customer.get("mobile").toString()+"\">\n");
+				html.append("			<input type=\"hidden\" id=\"address\" value=\""+customer.get("prov_name").toString() + " " + customer.get("city_name").toString() + " " + customer.get("country_name").toString() + " " + customer.get("address").toString()+"\">\n");
+				html.append("		</div>\n");
+				html.append("	</div>\n");
+				html.append("		<p class=\"gray\">\n");
+				html.append("			 <span class=\"icon-map-marker ft16 green\"></span>\n");
+				html.append("			<span id=\"addressSpan\">"+customer.get("prov_name").toString() + " " + customer.get("city_name").toString() + " " + customer.get("country_name").toString() + " " + customer.get("address").toString() + "</span>\n");
+				html.append("		</p>\n");
+				html.append("</div>\n" );
+			}
+
+			map.put("html", html.toString());
+			map.put("totalRow", 9);
+			map.put("totalPage", 1);
+			renderJson(map);
+			return;
 		}
-		Map<String, Object> map = new HashMap<>();
-		map.put("activity", activity);
-		map.put("expenseDetail", expenseDetail);
-		renderJson(map);
 	}
 	
 }

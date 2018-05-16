@@ -161,6 +161,14 @@ public abstract class BaseSalesRefundInstock<M extends BaseSalesRefundInstock<M>
 	public java.lang.String getInputUserId() {
 		return getStr("input_user_id");
 	}
+	
+	public void setUserId(java.lang.String userId) {
+		set("user_id", userId);
+	}
+
+	public java.lang.String getUserId() {
+		return getStr("user_id");
+	}
 
 	public void setStatus(java.lang.Integer status) {
 		set("status", status);

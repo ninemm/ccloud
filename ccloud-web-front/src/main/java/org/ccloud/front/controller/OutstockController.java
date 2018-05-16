@@ -187,7 +187,12 @@ public class OutstockController extends BaseFrontController {
 	}
 
 	private String doOutstock(String outstockId){
-
+		
+		SalesOrder salesOrder = SalesOrderQuery.me().findByOutStockId(outstockId);
+		if (Consts.SALES_ORDER_STATUS_CANCEL == salesOrder.getStatus()) {
+			return "订单已取消";
+		}
+		
 		Date date = new Date();
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
@@ -286,8 +291,6 @@ public class OutstockController extends BaseFrontController {
 				}
 			}
 		}
-
-		SalesOrder salesOrder = SalesOrderQuery.me().findByOutstockId(outstockId);
 
 		String customeId = salesOrder.getCustomerId();
 

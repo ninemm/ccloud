@@ -115,11 +115,10 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 	}
 
 	public boolean insert(Map<String, String[]> paraMap, String instockId, String instockSn, String sellerId,
-			String userId, Date date, String deptId, String dataArea, String outStockId, String sellerCode) {
+			String inputUserId, Date date, String deptId, String dataArea, String outStockId, String sellerCode) {
 		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_REFUND + sellerCode);
 		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
 		SalesRefundInstock salesRefundInstock = new SalesRefundInstock();
-		
 		salesRefundInstock.setId(instockId);
 		salesRefundInstock.setInstockSn(instockSn);
 		salesRefundInstock.setWarehouseId(StringUtils.getArrayFirst(paraMap.get("warehouseId")));
@@ -127,7 +126,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setCustomerId(StringUtils.getArrayFirst(paraMap.get("customerId")));
 		salesRefundInstock.setCustomerTypeId(StringUtils.getArrayFirst(paraMap.get("customerType")));
 		salesRefundInstock.setBizUserId(StringUtils.getArrayFirst(paraMap.get("biz_user_id")));
-		salesRefundInstock.setInputUserId(userId);
+		salesRefundInstock.setInputUserId(inputUserId);
 		if (isCheckStore) {
 			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
 		} else {
@@ -137,6 +136,8 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		String total = StringUtils.getArrayFirst(paraMap.get("total"));
 		String type = StringUtils.getArrayFirst(paraMap.get("paymentType"));
 		
+		String userId=SalesRefundInstockQuery.me().findOrderIdByOutstockId1(outStockId);
+		salesRefundInstock.setUserId(userId);
 		salesRefundInstock.setTotalRejectAmount(new BigDecimal(total));
 		salesRefundInstock.setPaymentType(StringUtils.isNumeric(type)? Integer.parseInt(type) : 0);
 		salesRefundInstock.setRemark(StringUtils.getArrayFirst(paraMap.get("remark")));
@@ -145,6 +146,11 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setDataArea(dataArea);
 		
 		return salesRefundInstock.save();
+	}
+
+	private String findOrderIdByOutstockId1(String outStockId) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT so.biz_user_id userId FROM cc_sales_order_join_outstock csojo LEFT JOIN cc_sales_order so ON so.id = csojo.order_id WHERE csojo.outstock_id = ?");
+		return Db.findFirst(fromBuilder.toString(), outStockId).getStr("userId");
 	}
 
 	public int batchDelete(String... ids) {
@@ -331,6 +337,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setCustomerTypeId(StringUtils.getArrayFirst(map.get("customerType")));
 		salesRefundInstock.setBizUserId(user.getId());
 		salesRefundInstock.setInputUserId(user.getId());
+		salesRefundInstock.setUserId(user.getId());
 		if (isCheckStore) {
 			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
 		} else {
@@ -347,7 +354,7 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		return salesRefundInstock;		
 	}
 
-	public SalesRefundInstock insertByApp(String instockId, Record record, String userId,
+	public SalesRefundInstock insertByApp(String instockId, Record record, String inputUserIdi,
 			String sellerId, String sellerCode, String paymentType, Date date, String remark) {
 		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_REFUND + sellerCode);
 		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
@@ -365,14 +372,15 @@ public class SalesRefundInstockQuery extends JBaseQuery {
 		salesRefundInstock.setCustomerId(record.getStr("customer_id"));
 		salesRefundInstock.setCustomerTypeId(record.getStr("customer_type_id"));
 		salesRefundInstock.setBizUserId(record.getStr("biz_user_id"));
-		salesRefundInstock.setInputUserId(userId);
+		salesRefundInstock.setInputUserId(inputUserIdi);
 		if (isCheckStore) {
 			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_DEFUALT);
 		} else {
 			salesRefundInstock.setStatus(Consts.SALES_REFUND_INSTOCK_PASS);
 		}
 		salesRefundInstock.setOutstockId(record.getStr("id"));
-		
+		String userId=SalesRefundInstockQuery.me().findOrderIdByOutstockId1(record.getStr("id"));
+		salesRefundInstock.setUserId(userId);
 		salesRefundInstock.setPaymentType(StringUtils.isNumeric(paymentType)? Integer.parseInt(paymentType) : 1);
 		salesRefundInstock.setCreateDate(date);
 		salesRefundInstock.setDeptId(record.getStr("dept_id"));

@@ -2,6 +2,7 @@ package org.ccloud.front.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -214,6 +215,25 @@ public class ActivityController extends BaseFrontController {
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
+		Activity activity = ActivityQuery.me().findById(activity_ids[0]);
+		DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd"); 
+			try {
+				if(activity.getStartTime() != null) {
+					if(format1.parse(startDate).before(activity.getStartTime())) {
+						renderAjaxResultForError("申请开始时间不可以低于活动开始时间");
+						return;
+					}
+				}
+				if(activity.getEndTime() != null) {
+					if(format1.parse(endDate).after(activity.getEndTime())) {
+						renderAjaxResultForError("申请结束时间不可以高于活动结束时间");
+						return;
+					}
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		if(expenseDetailIds!=null) {
 			expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
 			for (String sellerCustomerId : sellerCustomerIdArray) {
