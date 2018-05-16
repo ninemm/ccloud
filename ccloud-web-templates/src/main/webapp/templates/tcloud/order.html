@@ -259,6 +259,10 @@ $(function() {
 
 	function initCustomer(){
 		var customerInfo = getItemBykey("customerInfo");
+		var warehouseId = getItemBykey("warehouseId");
+		if (warehouseId) {
+			$("#warehouse_id").val(warehouseId);
+		}
 		if(customerInfo){
 			$("#sellerCustomerId").val(customerInfo.sellerCustomerId);
 			$("#customerName").val(customerInfo.customerName);
@@ -938,6 +942,7 @@ $(function() {
 									<input type="hidden" id="contact" value="">
 									<input type="hidden" id="mobile" value="">
 									<input type="hidden" id="address" value="">
+									<input type="hidden" id="warehouse_id" name="warehouse_id" value="">
 								</div>
 							</div>
 							<p class="gray">

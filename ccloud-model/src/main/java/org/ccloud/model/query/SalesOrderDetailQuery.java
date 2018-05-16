@@ -289,7 +289,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	@SuppressWarnings("unchecked")
 	public String insertForApp(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
-	                            String deptId, String dataArea, int index) {
+	                            String deptId, String dataArea, int index, String wareHouseId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String sellerProductId = paraMap.get("sellProductId")[index];
 		String convert = paraMap.get("convert")[index];
@@ -297,7 +297,6 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		String smallNum = paraMap.get("smallNum")[index];
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = paraMap.get("productId")[index];
-		String wareHouseId = StringUtils.getArrayFirst(paraMap.get("warehouse_id"));
 		Map<String, Object> result = new HashMap<>();
 		if (StrKit.notBlank(wareHouseId)) {
 			result = this.getEnoughOrNot(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId, wareHouseId);
@@ -353,7 +352,7 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	@SuppressWarnings("unchecked")
 	public String insertForAppGift(Map<String, String[]> paraMap, String orderId, String sellerId, String sellerCode, String userId, Date date,
-	                                String deptId, String dataArea, int index) {
+	                                String deptId, String dataArea, int index, String wareHouseId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String giftSellerProductId = paraMap.get("giftSellProductId")[index];
 		String convert = paraMap.get("giftConvert")[index];
@@ -368,7 +367,12 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		}
 
 		String productId = paraMap.get("giftProductId")[index];
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, giftSellerProductId);
+		Map<String, Object> result = new HashMap<>();
+		if (StrKit.notBlank(wareHouseId)) {
+			result = this.getEnoughOrNot(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, giftSellerProductId, wareHouseId);
+		} else {
+			result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, giftSellerProductId);
+		}
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 
@@ -420,14 +424,19 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 
 	@SuppressWarnings("unchecked")
 	public String insertForAppComposition(SellerProduct product, String orderId, String sellerId, String sellerCode, String id,
-	                                       Date date, String deptId, String dataArea, Integer number, String userId) {
+	                                       Date date, String deptId, String dataArea, Integer number, String userId, String wareHouseId) {
 		List<SalesOrderDetail> detailList = new ArrayList<>();
 		String sellerProductId = product.getId();
 		Integer convert = product.getInt("convert_relate");
 		double compositionCount = Double.valueOf(product.getStr("productCount"));
 		Integer productCount = (int) Math.round(compositionCount * number);
 		String productId = product.getProductId();
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId, sellerProductId);
+		Map<String, Object> result = new HashMap<>();
+		if (StrKit.notBlank(wareHouseId)) {
+			result = this.getEnoughOrNot(productId, sellerId, sellerCode, productCount, convert, userId, sellerProductId, wareHouseId);
+		} else {
+			result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, convert, userId, sellerProductId);
+		}			
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 
