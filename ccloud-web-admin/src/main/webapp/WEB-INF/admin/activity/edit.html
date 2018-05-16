@@ -275,16 +275,6 @@
 				notEmpty: { message: '活动编码不能为空' }
 			}
 		},
-		'startDate': {
-			validators: {
-				notEmpty: { message: '活动开始时间不能为空' }
-			}
-		},
-		'endDate': {
-			validators: {
-				notEmpty: { message: '活动结束时间不能为空' }
-			}
-		},
 		'activity.category': {
 			validators: {
 				notEmpty: { message: '活动类型不能为空' }
@@ -404,10 +394,13 @@
 					toastr.error(data.message,'操作失败');
 				}
 			},
-			error : function() {
+			error : function(data) {
 				l.stop();
-				location.href = "${CPATH}/admin/login";
-//				alert("信息提交错误");
+				if(data.status == 200){
+					location.href = "${CPATH}/admin/login";
+				}else{
+					alert("信息提交错误");
+				}
 			}
 		});
 	}

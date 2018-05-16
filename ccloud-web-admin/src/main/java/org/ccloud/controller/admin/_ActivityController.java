@@ -261,8 +261,12 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				}
 				setAttr("investTypeList",investTypeList);
 			}
-			setAttr("startDate",  DateFormatUtils.format(activity.getStartTime(), "yyyy-MM-dd"));
-			setAttr("endDate", DateFormatUtils.format(activity.getEndTime(), "yyyy-MM-dd"));
+			if(activity.getStartTime() != null) {
+				setAttr("startDate",  DateFormatUtils.format(activity.getStartTime(), "yyyy-MM-dd"));
+			}
+			if(activity.getEndTime() != null) {
+				setAttr("endDate", DateFormatUtils.format(activity.getEndTime(), "yyyy-MM-dd"));
+			}
 		}
 		
 		List<Record> productlist = SalesOrderQuery.me().findProductListBySeller(sellerId);

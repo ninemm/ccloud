@@ -402,7 +402,7 @@ public class SalesOrderQuery extends JBaseQuery {
 		receivables.saveOrUpdate();
 	}	
 
-	private SalesOrder findByOutStockId(String outStockId) {
+	public SalesOrder findByOutStockId(String outStockId) {
 		String sql = "SELECT cs.* FROM cc_sales_order cs LEFT JOIN cc_sales_order_join_outstock cj ON cs.id = cj.order_id where cj.outstock_id=? ";
 		return DAO.findFirst(sql, outStockId);
 	}
