@@ -97,18 +97,14 @@
 				stringLength: { max: 15, message: '联系人名称最大长度是15字符，请重新输入' }
 			}
 		},
-		'seller.jywx_open_id': {
-			validators: {
-				notEmpty: { message: '带*的企业微信号不能为空' },
-				stringLength: { max: 15, message: '企业微信号最大长度是15字符，请重新输入' }
-			}
-		},
+		<@shiro.hasPermission name="/admin/seller/edit,/admin/dealer/all">
 		'seller.seller_code': {
 			validators: {
 				notEmpty: { message: '销售编码不能为空' },
 				regexp:{regexp:/^[A-Z\d]{8}$/, message:'销售编码必须大写字母或数字，长度是8字符，请重新输入' }
 			}
 		},
+		</@shiro.hasPermission>
 		'seller.product_type_store': {
 			validators: {
 				notEmpty: { message: '产品类型不能为空' },
@@ -197,33 +193,40 @@
 					toastr.error(data.message,'操作失败');
 				}
 			},
-			error : function() {
+			error : function(data) {
 				l.stop();
-				alert("信息提交错误");
+				if(data.status == 200){
+					location.href = "${CPATH}/admin/login";
+				}else{
+					alert("信息提交错误");
+				}
 			}
 		});
 	}
 	
 	function changeCode(){
 		var code = $(".seller_code").val();
-		$.ajax({
-			url:"${CPATH}/admin/seller/checkCode",
-			type:"post",
-			dataType:"json",
-			data:{"code":code},
-			success:function(data)
-			{
-				if(data==true){
-					$("#checkWarn").show();
-					$("#checkWarn").css("color","red");
-					$("#checkWarn").css("font-size","12px");
-					flang=false;
-				}else{
-					flang=true;
-					$("#checkWarn").hide();
+		var oldCode = "${(seller.seller_code)!}";
+		if(code != oldCode){
+			$.ajax({
+				url:"${CPATH}/admin/seller/checkCode",
+				type:"post",
+				dataType:"json",
+				data:{"code":code},
+				success:function(data)
+				{
+					if(data==true){
+						$("#checkWarn").show();
+						$("#checkWarn").css("color","red");
+						$("#checkWarn").css("font-size","12px");
+						flang=false;
+					}else{
+						flang=true;
+						$("#checkWarn").hide();
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 </#macro>
 
@@ -253,23 +256,24 @@
 			<input type="hidden" name="seller.id" value="${(seller.id)!}">
 					<div class="box-body">
 						<div class="form-group col-sm-12 validata-box">
-								<label class="control-label col-sm-2">所属部门组织:</label>
-								<div class="input-group col-md-4 col-sm-10">
-									<div class="input-group">
-										<input type="hidden" name="dept_id" id="parent_id" value="${(seller.dept_id)!}">
-					                 	<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(seller.parent_name)!}">
-				                 		<div class="input-group-addon" id="_dept_tree" style="cursor:pointer;">
-				                 			<i class="fa fa-search"></i> 选择
-										</div>
-				                 	</div>
-				               	</div>
-							</div>
+							<label class="control-label col-sm-2">所属部门组织:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<div class="input-group">
+									<input type="hidden" name="dept_id" id="parent_id" value="${(seller.dept_id)!}">
+				                 	<input class="form-control input-sm" type="text" id="parent_name" name="parent_name" value="${(seller.parent_name)!}">
+			                 		<div class="input-group-addon" id="_dept_tree" style="cursor:pointer;">
+			                 			<i class="fa fa-search"></i> 选择
+									</div>
+			                 	</div>
+			               	</div>
+						</div>
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">销售商名称:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input class="form-control input-sm" type="text" name="seller.seller_name" value="${(seller.seller_name)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
+						<@shiro.hasPermission name="/admin/dealer/all">
 						<div class="form-group col-sm-12 validata-box">
 							<label class="control-label col-sm-2">销售商编码:</label>
 							<div class="input-group col-md-4 col-sm-10">
@@ -277,6 +281,16 @@
 								<span id="checkWarn">已经存在该编码，请重新输入</span>
 							</div>
 						</div>
+						</@shiro.hasPermission>
+						<@shiro.hasPermission name="/admin/all">
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">销售商编码:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<input class="form-control input-sm seller_code" type="text" onblur="changeCode()" name="seller.seller_code" value="${(seller.seller_code)!}">
+								<span id="checkWarn">已经存在该编码，请重新输入</span>
+							</div>
+						</div>
+						</@shiro.hasPermission>
 						<#if !(seller.id) ??>
 						<div class="form-group col-sm-12 validata-box">
 										<label class="control-label col-sm-2">*销售商类型:</label>
@@ -352,15 +366,9 @@
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">*企业微信号ID1:</label>
+							<label class="control-label col-sm-2">企业微信号ID:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<input class="form-control input-sm" type="text" name="seller.jywx_open_id" value="${(seller.jywx_open_id)!}" placeholder="1-25个任意字母数字">
-							</div>
-						</div>
-						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">企业微信号ID2:</label>
-							<div class="input-group col-md-4 col-sm-10">
-								<input class="form-control input-sm" type="text" name="seller.jpwx_open_id" value="${(seller.jpwx_open_id)!}" placeholder="1-25个任意字母数字">
 							</div>
 						</div>
 						<div class="form-group col-sm-12 validata-box">

@@ -8,6 +8,7 @@
  	<script src="${CPATH}/static/plugins/bootstrap-table/bootstrap-table-zh-CN.js"></script>
  	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 	<script src="${CPATH}/static/plugins/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
 	<!-- bootstrapvalidator -->
 	<script src="${CPATH}/static/plugins/bootstrapvalidator/bootstrapValidator.js"></script>
 
@@ -34,7 +35,11 @@
 		jQuery.mm.initValidator('#form', validatorFields)	
 		jQuery.mm.initEditTable('#_inventoryDetail_table', url, initParams, initFields(), null);
 		$("#search-submit").click(function() {
-			$table.bootstrapTable('refresh');
+			var validate = $('#form').data('bootstrapValidator');
+			validate.validate();
+			if (validate.isValid()){
+				$table.bootstrapTable('refresh');
+			}
 		});
 		$('#search').val("");
 		

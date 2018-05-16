@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.jfinal.log.Log;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -36,13 +37,15 @@ import org.ccloud.model.query.ActivityApplyQuery;
 @RouterMapping(url = "/product")
 public class ProductController extends BaseFrontController {
 
+	private Log log = Log.getLog(ProductController.class);
+
 	public void index() {
 		String refund = getPara("refund");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
 		
-		List<Record> compositionRecords = ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
+		List<Record> compositionRecords = new ArrayList<Record>();
 
 		List<Map<String, Object>> productList = new ArrayList<Map<String, Object>>();
 		List<Map<String, Object>> compositionList = new ArrayList<Map<String, Object>>();
@@ -57,6 +60,7 @@ public class ProductController extends BaseFrontController {
 				productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),goodsCategoryList.get(0).getStr("categoryId"),0,10);
 			} else {
 				productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",goodsCategoryList.get(0).getStr("categoryId"),0,10);
+				compositionRecords=ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
 			}
 		}
 		
@@ -88,14 +92,20 @@ public class ProductController extends BaseFrontController {
 		String tag = getPara("tag");
 		String categoryId = getPara("categoryId");
 		
-		List<Record> goodsCategory=GoodsCategoryQuery.me().findBySellerId(sellerId,tag);
-		
+		List<Record> goodsCategory = GoodsCategoryQuery.me().findBySellerId(sellerId,tag);
+		List<Record> compositionList = new ArrayList<>();
 		List<Record> productList = new ArrayList<>();
 		if (!StrKit.notBlank(categoryId)) {
 			categoryId=goodsCategory.get(0).getStr("categoryId");
 		}
-		productList=	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,0,10);
-		List<Record> compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword, tag);
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
+			productList = SellerProductQuery.me().findProductListForAppByCar(sellerId, keyword, tag,wlist.get(0).getId(),categoryId,0,10);
+		} else {
+			productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,0,10);
+			compositionList = ProductCompositionQuery.me().findDetailByProductId("", sellerId, keyword, tag);
+		}
 		Set<String> tagSet = new LinkedHashSet<String>();
 		for (Record record : productList) {
 			String tags = record.getStr("tags");
@@ -118,7 +128,14 @@ public class ProductController extends BaseFrontController {
 		String categoryId = getPara("categoryId");
 		Integer pageNumber = Integer.parseInt(getPara("pageNumber"))*Integer.parseInt(getPara("pageSize"));
 		Integer pageSize = Integer.parseInt(getPara("pageSize"));
-		List<Record> productList = 	SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,pageNumber,pageSize );
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		List<Record> productList =new ArrayList<>();
+		if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
+			productList = SellerProductQuery.me().findProductListForAppByCar(sellerId, keyword, tag,wlist.get(0).getId(),categoryId,pageNumber,pageSize);
+		} else {
+			productList = SellerProductQuery.me().findProductListForApp(sellerId, keyword, tag,categoryId,pageNumber,pageSize );
+		}
 		renderJson(productList);
 	}
 
@@ -308,9 +325,16 @@ public class ProductController extends BaseFrontController {
 		if(getPara("dist")!=null)
 			dist = Double.valueOf(getPara("dist", "100")).doubleValue();
 
-
-		BigDecimal latitude = new BigDecimal(lat);
-		BigDecimal longitude = new BigDecimal(lon);
+		BigDecimal longitude = null;
+		BigDecimal latitude = null;
+		try {
+			longitude = new BigDecimal(lon);
+			latitude = new BigDecimal(lat);
+		} catch (Exception e) {
+			log.error("===========error lng：" + lon);
+			log.error("===========error lat：" + lat);
+			log.error(e.getMessage(), e);
+		}
 
 		List<Map<String, Object>> customerList = SellerCustomerQuery.me().queryCustomerNearby(dist, longitude, latitude, user.getId());
 		Map<String, Object> map = new HashMap<>();

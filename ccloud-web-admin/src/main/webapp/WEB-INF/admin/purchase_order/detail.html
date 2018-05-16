@@ -169,7 +169,7 @@
 			rowTotal = Number(bigPrice) * Number(bigNum) + Number(smallPrice) * Number(smallNum);
 			rowTotal.toFixed(2);
 		}
-		$curTr.find(".rowTotal").text(rowTotal);
+		$curTr.find(".rowTotal").text(rowTotal.toFixed(2));
 		$curTr.find("#inputRowTotal").val(rowTotal);
 
 		totalF();
@@ -182,7 +182,7 @@
 			total += Number($(item).text());
 		});
 		total.toFixed(2);
-		$("#total").text(total);
+		$("#total").text(total.toFixed(2));
 		$("#inputTotal").val(total);
 	}
 
@@ -212,9 +212,13 @@
 						parent.refresh();
 								}, 1* 1000 );
 			},
-			error : function() {
+			error : function(data) {
 				l.stop();
-				alert("信息提交错误");
+				if(data.status == 200){
+					location.href = "${CPATH}/admin/login";
+				}else{
+					alert("信息提交错误");
+				}
 			}
 		});
 	}

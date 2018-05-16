@@ -78,8 +78,8 @@ $(function() {
         $(this).addClass("active").siblings().removeClass("active");
         var index = $(this).index();
      	$('.type').eq(index).show().siblings('.type').hide();
-
     }).on("click", ".product-content .swiper-slide", function () {
+        pageNumber = 1;
         $(this).addClass("active").siblings().removeClass("active");
 		tag = $(this).text();
 		categoryId='';
@@ -87,24 +87,21 @@ $(function() {
 			tag = '';
 		}
 		changeInit();
-		
     }).on("click", "[name='category']", function () {
+		pageNumber = 1;
 		$(this).addClass("active").siblings().removeClass("active");
     		categoryId = $(this).attr("id");
     		changeInit();
     }).on("click", "#searchCancel", function () {
-    	keyword = $(this).val();
+    		keyword = $(this).val();
 		changeInit();
 	}).on("click", "#searchClear", function () {
-	keyword = $(this).val();
-	changeInit();
-		
+		keyword = $(this).val();
+		changeInit();
     }).on("click", "#shoppingCart", function () {
-    	shoppingCart();
-    	
+   	 	shoppingCart();
     }).on("click", "#placeOrder", function () {
-    	order();
-    	
+    		order();
     }).on("click", ".operate:first-child", function () { //减少商品数量
       productChange($(this));
       
@@ -211,6 +208,13 @@ var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
 var categoryId = '';
 var map = {};
+
+var pageNumber = 1;
+var pageSize = 10;
+var loading = false;
+var $endNode = null;
+var $loadmore = $(".weui-loadmore");
+
 function firstInit(){
 	var tags = ${tags!};
 	initTags(tags);
@@ -237,7 +241,7 @@ function changeInit(){
 }
 
 function combo(productList, compositionList,goodsCategory){
-	initProduct(productList,goodsCategory);
+	initProduct(productList,goodsCategory,compositionList);
 	initComposition(compositionList);
 	productNum();
 	compositionNum();
@@ -255,12 +259,12 @@ function initTags(tags) {
 	})
 }
 
-function initProduct(productList,goodsCategory){
+function initProduct(productList,goodsCategory,compositionList){
 	$.each(goodsCategory, function(index, el) {
 		map[el.categoryId] = 0;
 		if(categoryId==''){
 			$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-			$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
+			$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
 			categoryId=el.categoryId;
 		}else{
 			if(categoryId != el.categoryId){
@@ -268,11 +272,14 @@ function initProduct(productList,goodsCategory){
 				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
 			}else{
 				$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-				$menuRight.append("<div class='type' id='" + el.categoryId + "' > </div>")
+				$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
 			}
 		}
 	});
-	
+	if(compositionList.length > 0) {
+		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'></span> </li>");
+		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
+	}
 	var $type = $menuRight.find("#"+categoryId);
 	$.each(productList, function(index, el) {
 		$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
@@ -314,6 +321,10 @@ function initProduct(productList,goodsCategory){
 		$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
 		$newProductDetail.find("#product_sn").val(el.product_sn);
 	});
+	$menuRight.append("<div class='weui-loadmore'><span class='weui-loadmore__tips'>正在加载</span></div>");
+	if(productList.length < pageSize){
+    		$(".weui-loadmore__tips").html("已加载全部")
+    }
 }
 
 function productNum(){
@@ -329,11 +340,6 @@ function productNum(){
 var compositionHtml = $(".composition").eq(0).html();
 function initComposition(compositionList){
 	map['composition']=0;
-	if(compositionList.length > 0) {
-		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'></span> </li>");
-		$menuRight.append("<div class='type' id='composition' style='display:none'> </div>");
-	}
-	
 	var parentId = '';
 	var totalCount = 0;
 	$.each(compositionList, function(index, el) {
@@ -624,6 +630,81 @@ function order(){
 	window.location.href = '${CPATH}/product/order';
 }
 
+ 	//监听滚动
+    $(".infinite").infinite().on("infinite", function() {
+    		if($(".weui-loadmore__tips").text()=='已加载全部'){
+    			return;
+    		}
+    		var self = this;
+        $endNode = $(".weui-panel_access:last");
+        $loadmore = $(self).find(".weui-loadmore");
+        if ($loadmore) $loadmore.show();
+        if (loading) return ;
+        loading = true;
+        $.ajax({
+            type: "post",
+            url: "${CPATH}/product/pageProduct",
+            data:  {'tag' : tag, 'keyword' : keyword,'categoryId':categoryId,'pageNumber': pageNumber, 'pageSize': pageSize},
+            dataType: "json",
+            success:function(data) {
+               	if(data.length < pageSize){
+               		$(".weui-loadmore__tips").html("已加载全部")
+               	}
+                if ($loadmore) $loadmore.show();
+                if (data.length >= pageNumber) {
+                    $endNode.after(data.html);
+                }
+                if (data.length == pageNumber) {
+                    $(".infinite").destroyInfinite();
+                    $loadmore.hide();
+                }
+                pageNumber++;
+                loading = false;
+                var $type = $menuRight.find("#"+categoryId);
+				$.each(data, function(index, el) {
+					$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
+					var $newProductDetail = $type.find(".common:last");
+					$newProductDetail.find("#productName").text(el.custom_name);
+					$newProductDetail.find("#valueName").text(el.valueName);
+					$newProductDetail.find("#categoryId").val(categoryId);
+					var bigPrice = el.price;
+					var convert = el.convert_relate;
+					var smallPrice = (bigPrice / convert).toFixed(2);
+			
+					var bigCost = el.cost;
+					var smallCost = (bigCost / convert).toFixed(2);
+					var bigAccountPrice = el.account_price;
+					var smallAccountPrice = (bigAccountPrice / convert).toFixed(2);
+			
+					$newProductDetail.find("#bigPriceSpan").text('￥' + bigPrice);
+					$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
+					$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
+					$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
+					$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
+			
+					$newProductDetail.find("#bigCost").val(bigCost);
+					$newProductDetail.find("#smallCost").val(smallCost);
+					$newProductDetail.find("#bigAccountPrice").val(bigAccountPrice);
+					$newProductDetail.find("#smallAccountPrice").val(smallAccountPrice);
+			
+					$newProductDetail.find("#bigPrice").val(bigPrice);
+					$newProductDetail.find("#smallPrice").val(smallPrice);
+					$newProductDetail.find("#bigUnit").val(el.big_unit);
+					$newProductDetail.find("#smallUnit").val(el.small_unit);
+					$newProductDetail.find("#sellProductId").val(el.sell_product_id);
+					$newProductDetail.find("#productId").val(el.product_id);
+					$newProductDetail.find("#convert").val(el.convert_relate);
+			
+					$newProductDetail.find("#description").val(el.description);
+			
+					$newProductDetail.find("#image").attr("src", getImageUrl(el.product_image_list_store, el.product_sn));
+					$newProductDetail.find("#product_image_list_store").val(el.product_image_list_store);
+					$newProductDetail.find("#product_sn").val(el.product_sn);
+				});
+            }
+        });
+    });
+ 
 </#macro>
 
 <@layout>
@@ -659,7 +740,7 @@ function order(){
 							</ul>
 						</div>
 					</aside>
-					<article class="menu-right">
+					<article class="menu-right infinite">
 						<div class="" style="display: none">
 							<section class="product_detail weui-panel weui-panel_access common">
 								<div>

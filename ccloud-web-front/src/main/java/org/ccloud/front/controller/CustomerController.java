@@ -8,8 +8,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.jfinal.kit.Ret;
+import com.jfinal.log.Log;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -25,6 +28,7 @@ import org.ccloud.model.vo.ImageJson;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.ImageUtils;
+import org.ccloud.utils.JsoupUtils;
 import org.ccloud.wechat.WechatJSSDKInterceptor;
 import org.ccloud.workflow.service.WorkFlowService;
 import org.joda.time.DateTime;
@@ -50,6 +54,8 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/customer")
 @RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerController extends BaseFrontController {
+
+	private Log log = Log.getLog(CustomerController.class);
 
 	@Before(WechatJSSDKInterceptor.class)
 	public void index() {
@@ -419,7 +425,17 @@ public class CustomerController extends BaseFrontController {
 		List<ImageJson> list = Lists.newArrayList();
 		
 		Customer customer = getModel(Customer.class);
-		SellerCustomer sellerCustomer = getModel(SellerCustomer.class);
+	    customer.setAddress(JsoupUtils.clear(customer.getAddress()));
+
+		SellerCustomer sellerCustomer = null;
+		try {
+			sellerCustomer = getModel(SellerCustomer.class);
+		} catch (Exception e) {
+			log.error("===========error lng：" + getPara("lng"));
+			log.error("===========error lat：" + getPara("lat"));
+			log.error(e.getMessage(), e);
+		}
+
 		sellerCustomer.setIsChecked(0);
 		String storeId = getPara("storeId");
 		if(StrKit.notBlank(storeId)) {
@@ -564,8 +580,24 @@ public class CustomerController extends BaseFrontController {
 			return ;
 		}
 
+		//审核后将message中是否阅读改为是
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		Message message = MessageQuery.me().findByObjectIdAndToUserId(id, user.getId());
+		if (null != message) {
+			message.setIsRead(Consts.IS_READ);
+			message.update();
+		}
+
 		SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(id);
 		setAttr("sellerCustomer", sellerCustomer);
+
+		WorkFlowService workflowService = new WorkFlowService();
+		Record taskRecord = workflowService.getTaskRecord(taskId);
+		if (taskRecord == null) {
+			render("customer_detail.html");
+			return;
+		}
+
 		setAttr("taskId", taskId);
 
 		//（修复没审核时第二次不能进入审核详情的bug）
@@ -582,14 +614,13 @@ public class CustomerController extends BaseFrontController {
 		String custTypeNames = Joiner.on(",").skipNulls().join(custTypeNameList);
 		setAttr("custTypeNames", custTypeNames);
 
-		WorkFlowService workflowService = new WorkFlowService();
 		Object customerVO = workflowService.getTaskVariableByTaskId(taskId, "customerVO");
-		Object applyer = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
+		Object applyerUsername = workflowService.getTaskVariableByTaskId(taskId, "applyUsername");
 		String isEnable = workflowService.getTaskVariableByTaskId(taskId, "isEnable").toString();
 
-		if (applyer != null) {
-			User user = UserQuery.me().findUserByUsername(applyer.toString());
-			setAttr("applyer", user);
+		if (applyerUsername != null) {
+			User applyer = UserQuery.me().findUserByUsername(applyerUsername.toString());
+			setAttr("applyer", applyer);
 		}
 
 		if (customerVO != null) {
@@ -651,14 +682,6 @@ public class CustomerController extends BaseFrontController {
 			List<String> diffAttrList = new ArrayList<>();
 			diffAttrList.add("导入附近客户");
 			setAttr("diffAttrList", diffAttrList);
-		}
-		
-		//审核后将message中是否阅读改为是
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Message message=MessageQuery.me().findByObjectIdAndToUserId(id,user.getId());
-		if (null!=message) {
-			message.setIsRead(Consts.IS_READ);
-			message.update();
 		}
 		
 		render("customer_review.html");
@@ -726,7 +749,6 @@ public class CustomerController extends BaseFrontController {
 			if(customerVO != null) {
 
 				Customer customer = CustomerQuery.me().findById(sellerCustomer.getCustomerId());
-				Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customerVO.getCustomerName(), customerVO.getMobile());
 
 				if (StrKit.notBlank(customerVO.getAreaCode())) {
 
@@ -769,9 +791,17 @@ public class CustomerController extends BaseFrontController {
 				if(StrKit.notBlank(customerVO.getLocation()))
 					customer.setLocation(customerVO.getLocation());
 
-				if (persiste != null) {
-					customer.setId(persiste.getId());
-				} else customer.setId(null);
+				//销售商客户不新增基础客户
+				if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+					customer.setId(sellerCustomer.getCustomerId());
+				}else{
+					Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+					if (persiste != null) {
+						customer.setId(persiste.getId());
+					} else {
+						customer.setId(null);
+					}
+				}
 				updated = updated && customer.saveOrUpdate();
 
 				if (StrKit.notBlank(customerVO.getNickname()))
@@ -991,13 +1021,16 @@ public class CustomerController extends BaseFrontController {
 
 		boolean updated;
 
+		
+		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
+		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
 		// 查看客户库是否存在这个客户
-		Customer persist = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
-
-		if (persist != null && sellerCustomer.getId() == null) {
-			return "该客户已存在，请导入";
+		boolean isSellerCustomerExist = CustomerJoinCorpQuery.me().findByMobileAndCustNameInSellerId(customer.getMobile(), customer.getCustomerName(), corpSellerId);
+		if (isSellerCustomerExist && sellerCustomer.getId() == null) {
+			return "公司账套中已存在该客户，请导入客户";
 		}
-
+		
 		List<String> areaCodeList = Splitter.on(",")
 				.omitEmptyStrings()
 				.trimResults()
@@ -1027,8 +1060,14 @@ public class CustomerController extends BaseFrontController {
 
 		customer.setLocation(sellerCustomer.getLocation());
 
-		if (persist != null) {
-			customer.setId(persist.getId());
+		//销售商客户不新增基础客户
+		if(StrKit.notBlank(sellerCustomer.getCustomerId())&& Consts.CUSTOMER_KIND_SELLER.equals(sellerCustomer.getCustomerKind())) {
+			customer.setId(sellerCustomer.getCustomerId());
+		}else{
+			Customer persiste = CustomerQuery.me().findByCustomerNameAndMobile(customer.getCustomerName(), customer.getMobile());
+			if (persiste != null) {
+				customer.setId(persiste.getId());
+			}
 		}
 
 		updated = customer.saveOrUpdate();
@@ -1038,7 +1077,6 @@ public class CustomerController extends BaseFrontController {
 		}
 
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 
 		sellerCustomer.setSellerId(sellerId);
 		sellerCustomer.setCustomerId(customer.getId());
@@ -1084,9 +1122,6 @@ public class CustomerController extends BaseFrontController {
 			return "操作失败";
 		}
 
-		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
-		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
-
 		CustomerJoinCorpQuery.me().deleteByCustomerIdAndSellerId(customer.getId(), corpSellerId);
 		CustomerJoinCorp customerJoinCorp = new CustomerJoinCorp();
 		customerJoinCorp.setCustomerId(customer.getId());
@@ -1127,7 +1162,7 @@ public class CustomerController extends BaseFrontController {
 
 		List<Department>  departmentList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
 		String corpSellerId = departmentList.get(departmentList.size()-1).getStr("seller_id");
-		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area");
+		String dealerDataArea = departmentList.get(departmentList.size()-1).getStr("data_area") + "%";
 		
 		Page<Record> customerList = SellerCustomerQuery.me()._findImportCustomer(getPageNumber(), getPageSize(), dataArea, customerName, corpSellerId, dealerDataArea);
 		Map<String, Object> map = new HashMap<>();
@@ -1275,7 +1310,7 @@ public class CustomerController extends BaseFrontController {
 		Map<String, Object> map = Maps.newHashMap();
 
 		String isUpdate = "";
-		if (isChecked)
+		if (isChecked != null && isChecked)
 			 isUpdate = startProcess(sellerCustomerId, map, 2);
 
 		if (StrKit.isBlank(isUpdate)) renderAjaxResultForSuccess("操作成功");

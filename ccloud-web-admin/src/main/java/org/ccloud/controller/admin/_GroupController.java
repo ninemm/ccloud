@@ -361,12 +361,14 @@ if (StrKit.notBlank(keyword)) setAttr("k", keyword);
 		String id = getPara("groupId");
 		String[] ids = getParaValues("userIds[]");
 		List<UserGroupRel> saveList = new ArrayList<>();
-		for (int i = 0; i < ids.length; i++) {
-			UserGroupRel userGroupRel = new UserGroupRel();
-			userGroupRel.setId(StrKit.getRandomUUID());
-			userGroupRel.setGroupId(id);
-			userGroupRel.setUserId(ids[i]);
-			saveList.add(userGroupRel);
+		if(ids !=null) {
+			for (int i = 0; i < ids.length; i++) {
+				UserGroupRel userGroupRel = new UserGroupRel();
+				userGroupRel.setId(StrKit.getRandomUUID());
+				userGroupRel.setGroupId(id);
+				userGroupRel.setUserId(ids[i]);
+				saveList.add(userGroupRel);
+			}
 		}
 		UserGroupRelQuery.me().deleteByGroupId(id);
 		Db.batchSave(saveList, saveList.size());

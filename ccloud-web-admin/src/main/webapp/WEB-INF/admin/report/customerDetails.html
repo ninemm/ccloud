@@ -28,13 +28,14 @@ datetimepicker.min.css">
 	var $table = $("#_customerDetailsReport_table");
 	var $tableGift = $("#_customerDetailsReportGift_table");
 	var url = '${CPATH}/admin/report/customerDetailsReportList';
+	var urlGift = '${CPATH}/admin/report/customerDetailsGiftReportList';
 
 	$(function() {
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
 		jQuery.mm.initEditTableExport3('#_customerDetailsReport_table',url, initParams,  initFields(), null,null,"销售详情（客户）");
-		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',url, initGiftParams, initFieldsGift(), null,null,"赠品详情（客户）");
+		jQuery.mm.initEditTableExport4('#_customerDetailsReportGift_table',urlGift, initParams, initFieldsGift(), null,null,"赠品详情（客户）");
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');
@@ -43,50 +44,52 @@ datetimepicker.min.css">
 	var initParams = function(params) {
 		
 		var keyword = $('#status  option:selected').val();
+		var customerName = $('#customerName').val();
 		if(keyword == ""){
-			keyword = "order";
+			keyword = "so.create_date";
 		}
 		if (keyword) keyword = encodeURIComponent(keyword);
+		if (customerName) customerName = encodeURIComponent(customerName);
 		var param = {
 			k: keyword,
 			user_id: $('#user_id').find("option:selected").val(),
 			startDate: $('#startDate').val() + " 00:00:00",
 			endDate: $('#endDate').val() + " 23:59:59",
-			productNames: $('#productNames').val(),
-			isGift: "0",
+			customerName: customerName,
 			sortName:params
 		};
 		return param;
 	};
 	
-	
-	var initGiftParams = function(params) {
-		
-		var keyword = $('#status  option:selected').val();
-		if(keyword == ""){
-			keyword = "order";
-		}
-		if (keyword) keyword = encodeURIComponent(keyword);
-		var param = {
-			k: keyword,
-			user_id: $('#user_id').find("option:selected").val(),
-			startDate: $('#startDate').val() + " 00:00:00",
-			endDate: $('#endDate').val() + " 23:59:59",
-			productNames: $('#productNames').val(),
-			isGift: "1",
-			sortName:params
-		};
-		return param;
-	};
-	
-	$("#search-submit").click(function() {
+	function orderTime(){
+		$('#post-search-input').val("so.create_date");
 		var validate = $('#form').data('bootstrapValidator');
 		validate.validate();
 		if (validate.isValid()){
 			$table.bootstrapTable('refresh');
 			$tableGift.bootstrapTable('refresh');
 		}
-	});
+	};
+	
+	function prints(){
+		$('#post-search-input').val("so.print_time");
+		var validate = $('#form').data('bootstrapValidator');
+		validate.validate();
+		if (validate.isValid()){
+			$table.bootstrapTable('refresh');
+			$tableGift.bootstrapTable('refresh');
+		}
+	};
+	
+	function complete(){
+		$('#post-search-input').val("sok.biz_date");
+		var validate = $('#form').data('bootstrapValidator');
+		validate.validate();
+		if (validate.isValid()){
+			$table.bootstrapTable('refresh');
+			$tableGift.bootstrapTable('refresh');
+		}
+	};
 	
 	var initFields = function() {
 		var fields =
@@ -143,7 +146,6 @@ datetimepicker.min.css">
 <section class="content">
 	<div class="row content-row">
     	<form class="form-horizontal" role="form" id="form">
-    			<input id="productNames" value="${productNames!}" type="hidden">
 			<div class="form-group">
 				<div class="col-sm-4">
 					<label class="control-label col-sm-4">业务员:</label>
@@ -177,14 +179,20 @@ datetimepicker.min.css">
 					<div class="col-sm-8 input-group input-group-sm">
 						<select class="form-control" name="status" id="status">
 							<option value="">--请选择--</option>
-							<option value="order">已下单</option>
-							<option value="print">已打印</option>
-							<option value="outstock">已出库</option>
+							<option value="so.create_date">已下单</option>
+							<option value="so.print_time">已打印</option>
+							<option value="sok.biz_date">已出库</option>
 						</select>
 					</div>
 				</div>
+                <div class="col-sm-4">
+                    <label class="control-label col-sm-4">客户名称:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+                        <input id="customerName" class="form-control" type="text" value="${customerName!}" name="customerName" placeholder="客户名称">
+                    </div>
+                </div>				
 				<div class="col-md-4" style="text-align:center;">
-					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+					<input onclick="prints()" class="btn btn-sm btn-primary btn-flat" type="button" value="查询">
 				</div>
 			</div>
 		</form>

@@ -327,7 +327,7 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		detail.setId(StrKit.getRandomUUID());
 		detail.setRefundInstockId(orderId);
 		detail.setSellProductId(giftSellerProductId);
-		
+		detail.setProductCount(productCount);
 		BigDecimal productAmount = new BigDecimal(0);
 		String productPrice = paraMap.get("giftBigPrice")[index];
 		if ("bigUnit".equals(giftUnit)) {
@@ -388,9 +388,10 @@ public class SalesRefundInstockDetailQuery extends JBaseQuery {
 		return map;
 	}
 	public SalesRefundInstockDetail findByInstockId(String instockDetailId) {
-		String sql = "SELECT SUM(sd.reject_amount) as rejectAmount,sd.refund_instock_id " + 
+		String sql = "SELECT SUM(sd.reject_amount) as rejectAmount,sd.refund_instock_id,sri.total_reject_amount " + 
 				"from cc_sales_refund_instock_detail sd " + 
-				"WHERE sd.refund_instock_id = '"+instockDetailId+"' " + 
+				"LEFT JOIN cc_sales_refund_instock sri on sri.id = sd.refund_instock_id " + 
+				"WHERE sd.refund_instock_id = '"+instockDetailId+"' "+ 
 				"GROUP BY sd.refund_instock_id ";
 		return DAO.findFirst(sql);
 	}

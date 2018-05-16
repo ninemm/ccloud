@@ -42,7 +42,9 @@ import org.ccloud.model.Message;
 import org.ccloud.model.SalesOrder;
 import org.ccloud.model.Seller;
 import org.ccloud.model.User;
+import org.ccloud.model.Warehouse;
 import org.ccloud.model.excel.ExcelUploadUtils;
+import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.MessageQuery;
 import org.ccloud.model.query.OptionQuery;
@@ -52,8 +54,11 @@ import org.ccloud.model.query.OutstockPrintQuery;
 import org.ccloud.model.query.SalesOrderDetailQuery;
 import org.ccloud.model.query.SalesOrderQuery;
 import org.ccloud.model.query.SalesOutstockQuery;
+import org.ccloud.model.query.SellerCustomerQuery;
+import org.ccloud.model.query.SellerProductQuery;
 import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.UserQuery;
+import org.ccloud.model.query.WarehouseQuery;
 import org.ccloud.model.vo.SalesOrderExcel;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
@@ -271,9 +276,6 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		String sellerId = getSessionAttr("sellerId");
-		if (user == null || StrKit.isBlank(sellerId)) {
-			// TODO
-		}
 
 		List<Record> productlist = SalesOrderQuery.me().findProductListBySeller(sellerId);
 
@@ -290,13 +292,23 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 			productInfoMap.put(sellProductId, record);
 
 			productOptionMap.put("id", sellProductId);
-			productOptionMap.put("text", customName + "/" + speName);
+			if (StrKit.notBlank(speName)) {
+				productOptionMap.put("text", customName + "/" + speName);
+			} else {
+				productOptionMap.put("text", customName);
+			}
 
 			productOptionList.add(productOptionMap);
 		}
 
-		List<Record> customerList = SalesOrderQuery.me().findCustomerListByUser(user.getId());
-
+		boolean isDealerAdmin = SecurityUtils.getSubject().isPermitted("/admin/dealer/all");
+		List<Record> customerList = new ArrayList<>();
+		if (isDealerAdmin) {
+			customerList = SellerCustomerQuery.me().findListBySellerId(sellerId);
+		} else {
+			customerList = SalesOrderQuery.me().findCustomerListByUser(user.getId());
+		}
+		List<Warehouse> wareHouselist = WarehouseQuery.me().findListBySellerIdAndUse(sellerId);
 		Map<String, Object> customerInfoMap = new HashMap<String, Object>();
 		List<Map<String, String>> customerOptionList = new ArrayList<Map<String, String>>();
 
@@ -319,6 +331,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		setAttr("isCheckStore", isCheckStore);
 		setAttr("productInfoMap", JSON.toJSON(productInfoMap));
 		setAttr("productOptionList", JSON.toJSON(productOptionList));
+		setAttr("wareHouselist", wareHouselist);
 
 		setAttr("customerInfoMap", JSON.toJSON(customerInfoMap));
 		setAttr("customerOptionList", JSON.toJSON(customerOptionList));
@@ -327,12 +340,53 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 		render("add.html");
 	}
+	
+	public void getProductListByWarehouseId() {
+		String wareHouseId = getPara("wareHouseId");
+		String sellerId = getSessionAttr("sellerId");
+		List<Record> productlist = SellerProductQuery.me().findListByWareHouseId(sellerId, wareHouseId);
+
+		Map<String, Object> productInfoMap = new HashMap<String, Object>();
+		List<Map<String, String>> productOptionList = new ArrayList<Map<String, String>>();
+
+		for (Record record : productlist) {
+			Map<String, String> productOptionMap = new HashMap<String, String>();
+
+			String sellProductId = record.getStr("id");
+			String customName = record.getStr("custom_name");
+			String speName = record.getStr("valueName");
+
+			productInfoMap.put(sellProductId, record);
+
+			productOptionMap.put("id", sellProductId);
+			if (StrKit.notBlank(speName)) {
+				productOptionMap.put("text", customName + "/" + speName);
+			} else {
+				productOptionMap.put("text", customName);
+			}
+
+			productOptionList.add(productOptionMap);
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("productInfoMap", JSON.toJSON(productInfoMap));
+		map.put("productOptionList", JSON.toJSON(productOptionList));
+		renderJson(map);
+	}
+	
+	public void activityApplyById() {
+		String customerId = getPara("customerId");
+		String userId = getPara("userId");
+
+		List<Record> activityApplyList = ActivityApplyQuery.me().findBySellerCustomerIdAndUserId(customerId, userId);
+
+		renderJson(activityApplyList);
+	}	
 
 	public void customerTypeById() {
 		String customerId = getPara("customerId");
-
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
 		List<Record> customerTypeList = SalesOrderQuery.me().findCustomerTypeListByCustomerId(customerId,
-				getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString());
+				dataArea);
 		setAttr("customerTypeList", customerTypeList);
 		renderJson(customerTypeList);
 	}
@@ -369,10 +423,18 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         		// 销售订单：SO + 100000(机构编号或企业编号6位) + A(客户类型) + 171108(时间) + 100001(流水号)
         		String orderSn = "SO" + sellerCode + StringUtils.getArrayFirst(paraMap.get("customerTypeCode"))
         				+ DateUtils.format("yyMMdd", date) + OrderSO;
-
-        		if(!SalesOrderQuery.me().insert(paraMap, orderId, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
-        				user.getDataArea())) {
-        			return false;
+        		String userId = StringUtils.getArrayFirst(paraMap.get("userId"));
+        		if (StrKit.notBlank(userId)) {
+        			User newUser = UserQuery.me().findById(userId);
+            		if(!SalesOrderQuery.me().insert(paraMap, orderId, orderSn, sellerId, newUser.getId(), date, newUser.getDepartmentId(),
+            				newUser.getDataArea())) {
+            			return false;
+            		}        			
+        		} else {
+            		if(!SalesOrderQuery.me().insert(paraMap, orderId, orderSn, sellerId, user.getId(), date, user.getDepartmentId(),
+            				user.getDataArea())) {
+            			return false;
+            		}        			
         		}
 
         		while (productNum > count) {
@@ -393,7 +455,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
         		String proc_def_key = StringUtils.getArrayFirst(paraMap.get("proc_def_key"));
         		
         		if (isStartProc && StrKit.notBlank(proc_def_key)) {
-					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key)) {
+					if (!start(orderId, StringUtils.getArrayFirst(paraMap.get("customerName")), proc_def_key, userId)) {
 						return false;
 					}
         		} else {
@@ -460,18 +522,21 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 
 	}
 	
-	private boolean start(String orderId, String customerName, String proc_def_key) {
+	private boolean start(String orderId, String customerName, String proc_def_key, String userId) {
 
 		WorkFlowService workflow = new WorkFlowService();
 
 		SalesOrder salesOrder = SalesOrderQuery.me().findById(orderId);
 
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		if (StrKit.notBlank(userId)) {
+			user = UserQuery.me().findById(userId);
+		}
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		
 		Map<String, Object> param = Maps.newHashMap();
-		param.put(Consts.WORKFLOW_APPLY_USER, user);
+		param.put(Consts.WORKFLOW_APPLY_USERNAME, user.getUsername());
 		param.put(Consts.WORKFLOW_APPLY_SELLER_ID, sellerId);
 		param.put(Consts.WORKFLOW_APPLY_SELLER_CODE, sellerCode);
 		param.put("customerName", customerName);
@@ -607,7 +672,7 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		
 		Map<String, Object> var = Maps.newHashMap();
 		var.put("pass", pass);
-		var.put(Consts.WORKFLOW_APPLY_COMFIRM, user);
+		var.put(Consts.WORKFLOW_APPLY_COMFIRM_USERNAME, user.getUsername());
 		
 		//是否改价格
 		if (pass == 1 && edit == 1) {

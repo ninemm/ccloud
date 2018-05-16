@@ -82,7 +82,7 @@ public class SellerProductQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId,String sta,String sellerProductIds) {
+	public Page<SellerProduct> paginate_sel(int pageNumber, int pageSize,String keyword,String userId,String sta,String sellerProductIds,String categoryId) {
 		String select = "SELECT csp.*,cgc.name as cgc_name,cp.name as productName, csp.custom_name,csp.store_count,csp.price,cp.big_unit,cp.small_unit,cp.convert_relate,csp.is_enable, csp.order_list ,GROUP_CONCAT(distinct cgs.`name` order by css.id) AS cps_name";
 		StringBuilder fromBuilder = new StringBuilder("from cc_seller_product csp LEFT JOIN cc_product cp ON  csp.product_id = cp.id LEFT JOIN cc_product_goods_specification_value cpg ON  cp.id = cpg.product_set_id "
 				+ " LEFT JOIN cc_goods_specification_value cgs ON cpg.goods_specification_value_set_id = cgs.id "
@@ -100,6 +100,9 @@ public class SellerProductQuery extends JBaseQuery {
 		}
 		if(sta.equals("1") && !sellerProductIds.equals("")) {
 			fromBuilder.append(" and csp.id  not in ("+sellerProductIds+")");
+		}
+		if(StrKit.notBlank(categoryId)) {
+			fromBuilder.append(" and cgc.id  = '"+categoryId+"' ");
 		}
 		fromBuilder.append(" GROUP BY csp.id ORDER BY csp.is_enable desc,csp.order_list,cgs.name,css.name ");
 		
@@ -247,7 +250,15 @@ public class SellerProductQuery extends JBaseQuery {
 		stringBuilder.append(" LEFT JOIN cc_product p ON sp.product_id =p.id ");
 		stringBuilder.append(" WHERE s.id = ?");
 		return  Db.find(stringBuilder.toString(), sellerId);
-		
+	}
+	
+	public List<Record> findConvertRelate1(String sellerId) {
+		StringBuilder stringBuilder = new StringBuilder("SELECT sp.custom_name,p.convert_relate,p.id ");
+		stringBuilder.append(" FROM cc_seller s  ");
+		stringBuilder.append(" LEFT JOIN cc_seller_product sp ON sp.seller_id=s.id ");
+		stringBuilder.append(" LEFT JOIN cc_product p ON sp.product_id =p.id ");
+		stringBuilder.append(" WHERE s.id = ? GROUP BY p.id");
+		return  Db.find(stringBuilder.toString(), sellerId);
 	}
 	
 	public SellerProduct findbyCustomerNameAndSellerIdAndProductId(String customName,String sellerId) {
@@ -266,7 +277,7 @@ public class SellerProductQuery extends JBaseQuery {
 				+ " p.convert_relate, p.product_sn, p.big_unit, p.small_unit, p.description, t1.valueName,"
 				+ " g.`name` AS goodsName, g.product_image_list_store, gc.`id` AS categoryId, gc.`name` AS categoryName, gt.`id` as typeId, gt.`name` as typeName, ");
 		fromBuilder.append(" IFNULL((SELECT i.balance_count FROM cc_inventory_detail i where i.sell_product_id = sp.id and i.warehouse_id = ? order by i.create_date desc limit 1),0) as store_count");
-		fromBuilder.append(" FROM cc_seller_product sp JOIN cc_product p ON sp.product_id = p.id ");
+		fromBuilder.append(" FROM cc_inventory i JOIN cc_product p ON i.product_id = p.id LEFT JOIN cc_seller_product sp ON sp.product_id = p.id ");
 		fromBuilder.append(" LEFT JOIN (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv.`name`) AS valueName FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id ) t1 ON t1.product_set_id = p.id ");
 		fromBuilder.append(" JOIN cc_goods g ON p.goods_id = g.id JOIN cc_goods_category gc ON g.goods_category_id = gc.id JOIN cc_goods_type gt on g.goods_type_id = gt.id ");
 		fromBuilder.append(" WHERE sp.is_enable = 1 AND sp.is_gift = 0");
@@ -276,6 +287,7 @@ public class SellerProductQuery extends JBaseQuery {
 		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, false);
 		appendIfNotEmptyWithLike(fromBuilder, "sp.custom_name", keyword, params, false);
 		appendIfNotEmpty(fromBuilder, "gc.id", categoryId, params, false);
+		appendIfNotEmpty(fromBuilder, "i.warehouse_id", wareHouseId, params, false);
 		if (StrKit.notBlank(tag)) {
 			fromBuilder.append(" AND FIND_IN_SET(?, sp.tags)");
 			params.add(tag);
@@ -325,6 +337,11 @@ public class SellerProductQuery extends JBaseQuery {
 		String sql ="SELECT sp.custom_name FROM cc_seller_product sp WHERE sp.seller_id =?";
 		return Db.find(sql,sellerId);
 	}
+	
+	public List<Record> findCustomNameBySellerId1(String sellerId) {
+		String sql ="SELECT sp.custom_name FROM cc_seller_product sp LEFT JOIN cc_product p ON sp.product_id=p.id WHERE sp.seller_id =? GROUP BY p.id";
+		return Db.find(sql,sellerId);
+	}
 
 //	public List<Record> findCustomNameByDataArea(String dataArea) {
 //		String sql ="SELECT sp.custom_name , sp.seller_id FROM cc_seller_product sp WHERE sp.seller_id IN( SELECT cs.id FROM department d LEFT JOIN cc_seller cs ON cs.dept_id = d.id WHERE d.data_area LIKE ?)";
@@ -334,5 +351,33 @@ public class SellerProductQuery extends JBaseQuery {
 	public List<Record> findCustomNameByDataArea(String dataArea) {
 		String sql ="SELECT sp.custom_name , sp.seller_id FROM cc_seller_product sp WHERE sp.seller_id IN( SELECT cs.id FROM department d LEFT JOIN cc_seller cs ON cs.dept_id = d.id WHERE d.data_area LIKE ?)";
 		return Db.find(sql,dataArea+"%");
+	}
+	
+	public List<Record> findByUserId(String userId){
+		StringBuilder fromBuilder = new StringBuilder(" SELECT cgc. NAME AS cgc_name,cgc.id");
+		fromBuilder.append(" FROM	cc_seller_product csp ");
+		fromBuilder.append(" LEFT JOIN cc_product cp ON csp.product_id = cp.id ");
+		fromBuilder.append(" LEFT JOIN cc_seller cs ON cs.id = csp.seller_id ");
+		fromBuilder.append(" LEFT JOIN USER u ON u.department_id = cs.dept_id ");
+		fromBuilder.append(" LEFT JOIN cc_goods cg ON cg.id = cp.goods_id ");
+		fromBuilder.append(" LEFT JOIN cc_goods_category cgc ON cgc.id = cg.goods_category_id ");
+		fromBuilder.append(" WHERE	cs.is_enabled = 1 AND u.id = '"+userId+"' GROUP BY cgc. NAME ORDER BY cgc.id ");
+		return Db.find(fromBuilder.toString());
+	}
+
+	public List<Record> findListByWareHouseId(String sellerId, String wareHouseId) {
+		StringBuilder fromBuilder = new StringBuilder(" SELECT sg.tax_price, sg.id, sg.product_id, sg.custom_name, IFNULL(SUM(c.in_count), 0) - IFNULL(SUM(c.out_count), 0) AS store_count,sg.account_price, sg.price, sg.warehouse_id, t1.valueName, p.big_unit, p.small_unit, p.convert_relate ");
+		fromBuilder.append(" FROM cc_inventory_detail c LEFT JOIN cc_seller_product sg ON c.sell_product_id = sg.id");
+		fromBuilder.append(" LEFT JOIN cc_product p ON sg.product_id = p.id ");
+		fromBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sg.product_id ");
+		fromBuilder.append(" WHERE sg.is_enable = 1 and sg.is_gift = 0 ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(fromBuilder, "sg.seller_id", sellerId, params, false);
+		appendIfNotEmpty(fromBuilder, "c.warehouse_id", wareHouseId, params, false);
+
+		fromBuilder.append(" GROUP BY c.sell_product_id ");
+		fromBuilder.append(" ORDER BY sg.order_list ");
+		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 }

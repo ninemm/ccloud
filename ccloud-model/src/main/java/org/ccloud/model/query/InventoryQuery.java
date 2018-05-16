@@ -178,13 +178,13 @@ public class InventoryQuery extends JBaseQuery {
 		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT * FROM ( ");
 		defaultSqlBuilder.append("(SELECT cu.warehouse_id,IFNULL(t1.balance_count,0) as balance_count,cw.type,cw.is_default,cu.user_id ");
 		defaultSqlBuilder.append("FROM cc_user_join_warehouse cu LEFT JOIN cc_warehouse cw ON cw.id = cu.warehouse_id LEFT JOIN ( ");
-		defaultSqlBuilder.append("SELECT cc.balance_count, cc.warehouse_id,cc.sell_product_id FROM cc_inventory_detail cc WHERE cc.sell_product_id = ? order by cc.create_date desc limit 1 ");
+		defaultSqlBuilder.append("SELECT IFNULL(SUM(cc.in_count), 0) - IFNULL(SUM(cc.out_count), 0) AS balance_count, cc.warehouse_id,cc.sell_product_id FROM cc_inventory_detail cc WHERE cc.sell_product_id = ? GROUP BY cc.warehouse_id ");
 		defaultSqlBuilder.append(") t1 on t1.warehouse_id = cu.warehouse_id ");
-		defaultSqlBuilder.append("WHERE cu.user_id = ?) ");
+		defaultSqlBuilder.append("WHERE cu.user_id = ? AND cw.is_enabled = 1) ");
 		defaultSqlBuilder.append("UNION ALL ");
 		defaultSqlBuilder.append("(SELECT cc.warehouse_id,IFNULL(SUM(cc.in_count), 0) - IFNULL(SUM(cc.out_count), 0) AS balance_count,cw.type,cw.is_default,null as user_id FROM cc_inventory_detail cc ");
 		defaultSqlBuilder.append("LEFT JOIN cc_warehouse cw ON cw.id = cc.warehouse_id WHERE cc.sell_product_id = ? ");
-		defaultSqlBuilder.append("AND cw.type != 2 GROUP BY cc.warehouse_id) ");
+		defaultSqlBuilder.append("AND cw.type != 2 AND cw.is_enabled = 1 GROUP BY cc.warehouse_id) ");
 		defaultSqlBuilder.append(") store ORDER BY store.user_id desc, store.type desc, store.is_default desc ");
 		return Db.find(defaultSqlBuilder.toString(), sellerProductId, userId, sellerProductId);
 	}
@@ -286,6 +286,11 @@ public class InventoryQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cs.custom_name", search, params, needWhere);
 		fromBuilder.append("GROUP BY cc.warehouse_id, cc.sell_product_id ORDER BY cc.create_date desc");
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+	public Record findProductStoreCountByWarehouseId(String sellerProductId, String wareHouseId) {
+		StringBuilder defaultSqlBuilder = new StringBuilder("SELECT cc.balance_count FROM cc_inventory_detail cc WHERE cc.sell_product_id = ? and cc.warehouse_id = ? order by cc.create_date desc limit 1 ");
+		return Db.findFirst(defaultSqlBuilder.toString(), sellerProductId, wareHouseId);
 	}
 
 }

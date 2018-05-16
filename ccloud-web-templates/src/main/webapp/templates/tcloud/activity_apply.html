@@ -64,11 +64,21 @@
 <#macro script_import>
 </#macro>
 <#macro script>
-	var customerNum = 0;
 $(function () {
 	$activity.empty();
 	addActivity();
 	doChange(activityId);
+	$("#startTime").calendar({
+			onChange: function(p, values, displayValues) {
+				console.log(values);
+				$("#startDate").val(values[0])
+			}
+ 		});
+	$("#endTime").calendar({
+			onChange: function(p, values, displayValues) {
+				$("#endDate").val(values[0])
+			}
+ 		});
 	 $("#expense_detail").select({
    		title: "选择明细",
 		multi: true,
@@ -111,36 +121,11 @@ $(function () {
 	}).on("click", "#confirm", function() {
 		confirm();
 	}).on("click", "#apply", function() {
-		var flang = true;
 		if (!flg) {
             return;
         }
 		if ($(".activity-item").length == 0) {
 			$.toptip("请添加活动", 'warning');
-			return;
-		}
-		$("input[name='apply_amount']").each(function(index,item){
-			$this = $(item);
-			//检验申请金额
-			var money = $this.parent().find("#ableMoney").text();
-			var inputMoney = $this.val();
-			money = money.substring(1,money.length-1);
-			if(parseInt(money) < customerNum*parseInt(inputMoney)){
-				flang = false;
-			}
-			//检查申请数量
-			var applyNum = $this.parent().parent().parent().find("#ableNum").text();
-			if(applyNum!=null){
-				applyNum = applyNum.substring(1,applyNum.length-1);
-				var inputNum = $this.parent().parent().parent().find("#apply_num").val();
-				alert(parseInt(applyNum)+"---"+ customerNum*parseInt(inputNum));
-				if(parseInt(applyNum) < customerNum*parseInt(inputNum)){
-				flang = false;
-			}
-			}
-		})
-		if(flang == false){
-			$.toptip("申请量大于剩余量或申请量为空", 'warning');
 			return;
 		}
 		if ($("#sellerCustomerId").val() == "") {
@@ -180,6 +165,8 @@ var applyHtml = $(".applyInfo").eq(0).html();
 function checkApply() {
 	var store = $(".applyInfo");
 	var check = false;
+	var $chechboxs = $('#customerList input[type=checkbox]:checked');
+	var length = $chechboxs.length;
 	store.each(function(index,obj){
 		var applyNum = parseInt($(obj).find("#apply_num").val());
 		var applyAmount = parseInt($(obj).find("#apply_amount").val());
@@ -190,7 +177,7 @@ function checkApply() {
 				check = false;
 				return false;
 			}
-			if (applyNum > numMax) {
+			if (applyNum * length > numMax) {
 				check = false;
 				return false;
 			}		
@@ -199,7 +186,7 @@ function checkApply() {
 			check = false;
 			return false;
 		}
-		if (applyAmount > amountMax) {
+		if (applyAmount * length > amountMax) {
 			check = false;
 			return false;
 		}
@@ -211,7 +198,6 @@ function checkApply() {
 }
 
 function getSurplusInfo(ids,titles) {
-	var investType = $("#investType").val();
 	defaultInfo();
 	var titles = titles.split(",");
 	$.get('${CPATH}/activity/getSurplusInfo?ids=' + ids,
@@ -224,19 +210,9 @@ function getSurplusInfo(ids,titles) {
             	$newApply.find("#detailName").html(titles[index]); 
 				if (el.num == null) {
 					$newApply.find(".num").hide();
-				}else if(investType == "101104"){
-					$newApply.find(".num").hide();
-					$newApply.find("#apply_num").val("1");
-					$newApply.find("#maxNum").val(el.num);
-					$newApply.find("#ableNum").html("("+el.num+")");
 				}else {
 					$newApply.find("#maxNum").val(el.num);
 					$newApply.find("#ableNum").html("("+el.num+")");
-				}
-				if (el.area) {
-					$newApply.find(".area").show();
-				} else {
-					$newApply.find(".area").hide();
 				}
 				$newApply.find("#maxAmount").val(el.amount);
 				$newApply.find("#ableMoney").html("("+el.amount+")");
@@ -279,9 +255,6 @@ function changeEvent(activity,$obj){
 	$obj.find("#activityId").val(activity.id);
 	$obj.find("#visitNum").val(activity.visit_num);
 	$obj.find("#isLimit").val(activity.is_limit);
-	$obj.find("#investType").val(activity.invest_type);
-	$obj.find("#startTime").val(new Date(activity.start_time).Format("yyyy-MM-dd"));
-	$obj.find("#endTime").val(new Date(activity.end_time).Format("yyyy-MM-dd"));
 	if (activity.customerTypeName != null && activity.customerTypeName != "") {
 		$obj.find("#customerTypeName").val(activity.customerTypeName);
 	} else {
@@ -406,7 +379,6 @@ function doChange(key){
 	var customerInfoHtml = $section.html();
 	function confirm(){
 		$section.empty();
-		customerNum = 0;
 		var $chechboxs = $('#customerList input[type=checkbox]:checked');
 		if( $chechboxs.length == 0) {
 			$section.append(customerInfoHtml);
@@ -422,7 +394,7 @@ function doChange(key){
 				$customerInfo.find(".mobile").text($customer.find("#mobile").val());
 				$customerInfo.find("#sellerCustomerName").val(customerName);
 				$customerInfo.find("#sellerCustomerId").val($el.val());
-				customerNum++;
+				
 			});
 		}
 		closeCombinSearch();
@@ -431,6 +403,16 @@ function doChange(key){
     //---------------------------------------------提交表单------------------------------------------------------------------
     var flg = true;
     function doSubmit(){
+    	var start = $("#startDate").val();
+    	var end = $("#endDate").val();
+    	if((new Date(start.replace(/-/g,"\/"))) > (new Date(end.replace(/-/g,"\/")))){
+    		$.toptip('开始时间不能高于结束时间');
+    		return;
+    	}
+    	if(start == "" || end == ""){
+    		$.toptip('开始时间/结束时间不能为空！');
+    		return;
+    	}
         layer.open({
             type: 2,
             content: '保存中...'
@@ -484,11 +466,9 @@ function doChange(key){
 				<section class="weui-panel weui-panel_access activity-detail-item ft14">
 					<div class="weui-cell weui-cell_access select-area">
 						<input type="text" class="weui-input activity-item" id="title" readonly placeholder="请选择活动项目">
-						<input type="hidden" name="activity_id" id="activityId"/>
-						<input type="hidden" name="visit_num" id="visitNum"/>
-						<input type="hidden" name="li_limit" id="isLimit"/>
-						<input type="hidden" name="investType" id="investType"/>
-						<input type="hidden" name="sellerCustomerNum" id="sellerCustomerNum"/>
+						<input type="hidden" name="activity_id" id="activityId">
+						<input type="hidden" name="visit_num" id="visitNum">
+						<input type="hidden" name="li_limit" id="isLimit">
 						<i class="icon-sort-desc"></i>
 					</div>
 					<div class="weui-cell weui-cell_access">
@@ -497,7 +477,9 @@ function doChange(key){
 								开始日期
 								<span class="require"></span>
 							</span>
-							<input type="text" class="weui-input fr" id="startTime" readonly>
+							<input type="text" class="weui-input fr" name = "startTime" id="startTime" readonly>
+							<input type="hidden" class="weui-input fr" name = "startDate" id="startDate">
+							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
@@ -506,7 +488,9 @@ function doChange(key){
 								结束日期
 								<span class="require"></span>
 							</span>
-							<input type="text" class="weui-input fr" id="endTime" readonly>
+							<input type="text" class="weui-input fr" name = "endTime" id="endTime" readonly>
+							<input type="hidden" class="weui-input fr" name = "endDate" id="endDate" readonly>
+							<span class="weui-cell__ft"></span>
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">
@@ -589,15 +573,6 @@ function doChange(key){
 									<input type="hidden" id="maxAmount">
 								</div>
 							</div>
-							<div class="weui-cell weui-cell_access area" style="display:none;">
-								<div class="weui-cell__bd">
-									<span>
-										申请尺寸
-										<span class="require"></span>
-									</span>
-									<input type="tel" class="weui-input fr" id="apply_area" name="apply_area" value="1*1*1" placeholder="请填写尺寸(n*n*n)" required>
-								</div>
-							</div>							
 						</div>
 					</div>
 					<div class="weui-cell weui-cell_access">

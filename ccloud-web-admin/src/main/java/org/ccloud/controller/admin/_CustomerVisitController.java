@@ -45,6 +45,7 @@ import javax.swing.ImageIcon;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.jfinal.kit.Kv;
+import com.jfinal.kit.PathKit;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
@@ -92,6 +93,8 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
+		String startDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		setAttr("startDate", startDate);
 		render("customer_visit.html");
 	}
 
@@ -116,6 +119,11 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         	customerType = StringUtils.urlDecode(customerType);
             setAttr("customerType", customerType);
         }
+        
+        String createDate = getPara("createDate");
+        if (StrKit.notBlank(createDate)) {
+            setAttr("createDate", createDate);
+        }        
 
         String status = getPara("status");
         if(StrKit.notBlank(status)) {
@@ -127,7 +135,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         	bizUser = StringUtils.urlDecode(bizUser);
         	setAttr("bizUser", bizUser);
 		}
-        Page<CustomerVisit> page = CustomerVisitQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser);
+        Page<CustomerVisit> page = CustomerVisitQuery.me().paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser, createDate);
         Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
         renderJson(map);
 	}
@@ -180,7 +188,8 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 	public void image() {
 
-		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
+		String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 
 		Map<String, Object> all = new HashMap<>();
 		all.put("text", "全部");
@@ -198,7 +207,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		}
 		setAttr("customerType", JSON.toJSON(customerTypeList));
 
-		List<Record> nameList = SellerCustomerQuery.me().findName(getSessionAttr(Consts.SESSION_SELECT_DATAAREA).toString(), null);
+		List<Record> nameList = SellerCustomerQuery.me().findName(selectDataArea, null);
 		List<Map<String, Object>> customerList = new ArrayList<>();
 		customerList.add(all);
 
@@ -221,7 +230,21 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			item.put("text", questionType.getName());
 			questionTypeList.add(item);
 		}
-
+		
+		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByDataArea(selectDataArea);
+		List<Map<String, Object>> userList = new ArrayList<>();
+		userList.add(all);
+		for(CustomerVisit customerVisit:customerVisits) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", customerVisit.getStr("user_id"));
+			item.put("text", customerVisit.getStr("realname"));
+			userList.add(item);
+		}
+		setAttr("userList", JSON.toJSON(userList));
+		
+		String startDate = DateTime.now().toString(DateUtils.DEFAULT_NORMAL_FORMATTER);
+		setAttr("startDate", startDate);
+		
 		setAttr("questionType", JSON.toJSON(questionTypeList));
 		render("image.html");
 	}
@@ -253,8 +276,13 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 
 		String id = getPara("id");
-		String taskId = getPara("taskId");
-
+		String proc_inst_id = getPara("proc_inst_id");
+		Record record = WorkFlowService.getTaskId(proc_inst_id);
+		if (record == null) {
+			renderAjaxResultForError("未查询到TASKID");
+			return;			
+		}
+		String taskId = record.getStr("ID_");
 		String commentDesc = getPara("comment");
 
 		CustomerVisit customerVisit = CustomerVisitQuery.me().findById(id);
@@ -309,7 +337,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	}
 
 	public void queryCustomerType() {
-        String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA).toString();
+        String typeDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
         List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(typeDataArea);
         renderAjaxResultForSuccess("success",JSON.toJSON(typeList));
 	}
@@ -344,6 +372,7 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
         String status = getPara("status");
         String bizUser = getPara("bizUser");
         String filePath = "";
+        String startDate = getPara("startDate");
 
 		if (StrKit.notBlank(customerType)) {
 			filePath = filePath + customerType;
@@ -375,10 +404,20 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 			keyword = StringUtils.urlDecode(keyword);
 			setAttr("k", keyword);
 		}
+		
+		if (StrKit.notBlank(keyword)) {
+			filePath = filePath + keyword;
+			keyword = StringUtils.urlDecode(keyword);
+			setAttr("k", keyword);
+		}
+		
+		if (StrKit.notBlank(startDate)) {
+			setAttr("startDate", startDate);
+		}
         
-        List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser);
+        List<Record> visitList = CustomerVisitQuery.me().exportVisit(keyword, selectDataArea, customerType, questionType, "id", "cc_v.create_date desc", status,bizUser, startDate);
         try {
-			exportExcel(visitList, filePath);
+			exportExcel(visitList, filePath, startDate, bizUser);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -387,9 +426,16 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void exportExcel(List<Record> dataList, String filePath) throws IOException {
-
+	public void exportExcel(List<Record> dataList, String filePath, String startDate, String bizUser) throws IOException {
+		if (StrKit.notBlank(bizUser) && dataList.size() > 0) {
+			String userName = dataList.get(0).getStr("visit_user");
+			filePath = userName + filePath;
+		}
+		if (StrKit.notBlank(startDate)) {
+			filePath = startDate + filePath;
+		}
 		filePath = filePath +  "客户拜访记录.xls";
+		
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		FileOutputStream fileOut = null;
@@ -542,10 +588,12 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");
 		String questionType = getPara("question_type");
+		String userId = getPara("user_id");
+		String startDate = getPara("startDate");		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
+		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea, userId, startDate);
 		if(imageList.size() == 0) renderAjaxResultForError();
 		else renderAjaxResultForSuccess();
 	}
@@ -555,21 +603,32 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 		String customerType = getPara("customer_type");
 		String customerName = getPara("customer_name");
 		String questionType = getPara("question_type");
+		String userId = getPara("user_id");
+		String startDate = getPara("startDate");		
 		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
 		String domain = OptionQuery.me().findByKey("cdn_domain").getOptionValue();
-		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea);
+		List<Record> imageList = CustomerVisitQuery.me()._findPhoto(customerType, customerName, questionType, selectDataArea, dealerDataArea, userId, startDate);
 
 		String zipFileName = "拜访图片.zip";
+		if (StrKit.notBlank(userId)) {
+			String userName = imageList.get(0).getStr("visit_user");
+			zipFileName = userName + zipFileName;
+		}
+		
+		if (StrKit.notBlank(startDate)) {
+			zipFileName = startDate + zipFileName;
+		}
 
 		if(StrKit.notBlank(customerName)) zipFileName = SellerCustomerQuery.me().findById(customerName).getCustomer().getCustomerName() + zipFileName;
 		if(StrKit.notBlank(customerType)) zipFileName = customerType + zipFileName;
-		zipFileName = URLEncoder.encode(zipFileName, "UTF-8");
+		zipFileName = PathKit.getWebRootPath() + "/" + URLEncoder.encode(zipFileName, "UTF-8");
 
 		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName));
 
 		List<File> fileList = new ArrayList<>();
+		List<String> deleteList = new ArrayList<>();
 		for(Record record : imageList) {
 
 			String photo = record.getStr("photo");
@@ -580,31 +639,38 @@ public class _CustomerVisitController extends JBaseCRUDController<CustomerVisit>
 
 			int k = 1;
 			for(String savePath : photoList){
-
 				List<ImageJson> list = JSON.parseArray(savePath, ImageJson.class);
 
 				for (int i = 0; i < list.size(); i++){
 					ImageJson image = list.get(i);
 
 					String fileName = image.getSavePath();
-					String filePath = DateUtils.dateToStr(record.getDate("create_date"), "yyyy-MM-dd" )
+					String filePath = PathKit.getWebRootPath() + "/" + DateUtils.dateToStr(record.getDate("create_date"), DateUtils.DEFAULT_FILE_NAME_TWO_FORMATTER)
 							+ record.getStr("realname") + "拜访" + record.getStr("customer_name")
 							+  "图片" + k + ".jpg";
 
 					fileList.add(getImage(domain, fileName, filePath));
+					deleteList.add(filePath);
 					 k++;
 				}
 			}
 		}
-
 		File[] files = fileList.toArray(new File[fileList.size()]);
 		zipFile(files, "", zos);
 
 		zos.flush();
 		zos.close();
-
+		this.deleteImageCache(deleteList);
 		renderFile(new File(zipFileName));
+	}
 
+	private void deleteImageCache(List<String> filePath) {
+		for (String savePath : filePath) {
+			File file = new File(savePath);
+			if (file.exists() && file.isFile()) {
+				file.delete();
+			}			
+		}
 	}
 
 	private File getImage(String domain, String fileName, String filePath) throws Exception {

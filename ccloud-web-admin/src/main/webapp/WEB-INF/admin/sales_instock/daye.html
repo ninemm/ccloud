@@ -1,0 +1,374 @@
+<#include "../_inc/_layer_layout.html"/>
+
+<#macro script_import>
+	<script src="${CPATH}/static/plugins/jquery/jquery-1.9.1.min.js"></script>
+	<script src="${CPATH}/static/plugins/jquery/jquery-ui.js"></script>
+	<script src="${CPATH}/static/layer/layer.min.js"></script>
+	<script src="${CPATH}/static/plugins/jquery/jquery.all.print.table.js"></script>
+
+</#macro>
+
+<#macro css_import>
+	<link rel="stylesheet"  href="${CPATH}/static/print/print.css">
+	<link rel="stylesheet"  href="${CPATH}/static/layer/skin/layer.min.css">
+	<link rel="stylesheet"  href="${CPATH}/static/plugins/jquery/jquery-ui.css">
+</#macro>
+
+<#macro script>
+   var $pagesize = $("#pagesize");
+
+   $(function() {
+    var ids = '${inStockId!}';
+	queryPrintDetail();
+	initEvent();
+});
+
+var headerInfo =
+	'<div class="header clear clearheader">' +
+	    '<div class="titleArea">' +
+			'<h1>{0}退货单</h1>' +
+		'</div>' +
+	'</div>';
+
+var headerStr =
+	'<table class="printContent clearcontent">' +
+		'<thead>' +
+		'<tr>' +
+			'<td class="text-center width8">退货单号</td>' +
+			'<td class="width16">{0}</td>' +
+			'<td class="text-center width8">退货时间</td>' +
+			'<td colspan="2">{1}</td>' +
+			'<td class="text-center width8">制单时间</td>' +
+			'<td colspan="2">{2}</td>' +
+		'</tr>' +
+		'<tr>' +
+			'<td class="text-center width8">客户信息</td>' +
+			'<td colspan="3" class="text-left">{3},{6}</td>' +
+			'<td colspan="2" class="text-center width8">客户/电话</td>' +
+			'<td colspan="3" class="text-left">{4},{5}</span></td>' +
+		'</tr>' +
+		'<tr>' +
+			'<td class="text-center">配送信息</td>' +
+			'<td colspan="3" class="text-left">{9}</td>' +
+			'<td colspan="2" class="text-center">业务员/电话</td>' +
+			'<td colspan="2" class="text-left"><span>{7}({8})</span></td>' +
+		'</tr>' +
+		'<tr>' +
+			'<td class="center2">序号</td>' +
+			'<td class="center2">产品名称</td>' +
+			'<td>件数</td>' +
+			'<td>瓶数</td>' +
+			'<td style="width:10%">件单价</td>' +
+			'<td style="width:10%">瓶单价</td>' +
+			'<td class="center2">退货价格</td>' +
+			'<td class="center2">条码</td>' +
+		'</tr>' +
+	'</thead>';
+
+		var contentStr = '<tr>' +
+			'<td class="center2">{0}</td>' +
+			'<td >{1}{7}</td>' +
+			'<td class="center2">{2}</td>' +
+			'<td class="center2">{4}</td>' +
+			'<td class="center2">{3}</td>' +
+			'<td class="center2">{5}</td>' +
+			'<td class="center2">{8}</td>' +
+			'<td colspan="2" class="center2">{6}</td>' +
+			'</tr>';
+
+		var footerStr =
+			'<div class="signatureArea clearfooter">' +
+				'<div class="stat">' + 
+					'<span class="">应收合计：{0} ({1} 元)</span><span class="pageNum floatRight">1/1</span>' + 
+				'</div>' + 
+				'<div class="stat">' +
+					'<div><span>联系电话：{2}</span><span class="sign" >客户欠款确认:</span></div>' +
+				'</div>' +
+				'<div style="text-align: left; width: inherit; font-size: 10px; line-height: 12px;">' +
+					'<span class="width200">备注：{3}</span><span style="float: right;">{4}</span>' +
+				'</div>' +
+			'</div>';
+
+
+function queryPrintDetail() {
+
+    var batchPrintContent = '';
+    var headerContent = null;
+    var footerContent = null;
+    var headerInfoContent = null;
+    $.ajax({
+        url: "${CPATH}/admin/salesInstock/getPrintInfo",
+        data: {
+            "inStockId": '${inStockId!}'
+        },
+        dataType: "json",
+        async: false,
+        success: function(data) {
+            if (data && data.rows) {
+                var curDate = new Date().Format("yyyy-MM-dd hh:mm");
+                $.each(data.rows, function(index, stockInPrintInfo) {
+                     var f1 = 0;
+				     var f2 = 0;
+                     var l1 = 0;
+                     var d1 = 0;
+				     var d2 = 0;
+                     var content = '<tbody>';
+                     var content1 = "";
+				     var content2 = "";
+                     let saleMoney = 0;    
+                     item =  stockInPrintInfo.printInfo                 
+                     if (stockInPrintInfo.ProductInfos) {
+                        $.each(stockInPrintInfo.ProductInfos,
+                        function(idx, subitem) {
+                            len =  stockInPrintInfo.ProductInfos.length;
+                            l1 = len;
+                            if (idx < 6) {
+                            d1 = idx;
+                            let barCode = subitem.bar_code;
+                            if (!barCode) barCode = '无';
+                            let totalMoney = 0;
+                            let cBigAmount = subitem.bigCount
+							if (cBigAmount == 0) {
+								cBigAmount = '';
+							}
+							let cSmallAmount = subitem.smallCount;
+							if (cSmallAmount == 0) {
+								cSmallAmount = '';
+							}
+                            let isGift = subitem.is_gift;
+                            if (isGift != 0) {
+                                isGift = '(赠品)';
+                            } else {
+                                isGift = "";
+                                totalMoney = subitem.bigCount
+										* subitem.big_Price
+										+ subitem.smallCount
+										* subitem.small_price;
+										saleMoney = saleMoney + totalMoney;
+                            }
+                            f1 = f1 + totalMoney;
+                            content1 += $.format(contentStr, (idx + 1), subitem.custom_name, cBigAmount, subitem.big_Price + '元', cSmallAmount, subitem.small_price + '元', barCode, isGift,totalMoney+ '元')
+                         }
+                        
+                            if (5<idx && idx<12) {
+                            d2 = idx;
+                            let barCode = subitem.bar_code;
+                            if (!barCode) barCode = '无';
+                            let cBigAmount = subitem.bigCount
+							if (cBigAmount == 0) {
+								cBigAmount = '';
+							}
+							let cSmallAmount = subitem.smallCount;
+							if (cSmallAmount == 0) {
+								cSmallAmount = '';
+							}
+                            let totalMoney = 0;
+                            let isGift = subitem.is_gift;
+                            if (isGift != 0) {
+                                isGift = '(赠品)';
+                            } else {
+                                isGift = "";
+                                totalMoney = subitem.bigCount
+										* subitem.big_Price
+										+ subitem.smallCount
+										* subitem.small_price;
+								saleMoney = saleMoney + totalMoney;
+                            }
+                            f2 = f2 + totalMoney;
+                            content2 += $.format(contentStr, (idx + 1), subitem.custom_name, cBigAmount, subitem.big_Price + '元', cSmallAmount, subitem.small_price + '元', barCode, isGift,totalMoney+ '元')
+                          }
+                        });
+                     
+                     
+                     
+                     if (d2 == 11 && l1 > 12) {
+						content2 += $.format(contentStr, '', '本页合计金额：','','', '', '',
+								'', '',  f2.toFixed(2) + '元','');
+					} else if (5 < d2) {
+						for (let i = l1; i < 12; i++) {
+							content2 += $.format(contentStr, (i + 1), '','', '',
+									 '', '', '', '', '', '');
+						}
+						content2 += $.format(contentStr, '', '本页合计金额：','','', '', '',
+								'', '',  f2.toFixed(2) + '元','');
+					}
+
+					if (d1 == 6) {
+						content1 += $.format(contentStr, '', '本页合计金额：','','', '', '',
+								'', '',  f1.toFixed(2) + '元','');
+					} else if (d1 < 6) {
+						for (let i = l1; i < 6; i++) {
+							content1 += $.format(contentStr, (i + 1), '','', '',
+									'', '', '', '', '');
+						}
+						content1 += $.format(contentStr, '', '本页合计金额：','','', '', '',
+								'', '',  f1.toFixed(2) + '元','');
+					}
+                     
+    
+                    }
+                    
+                    var c = '</tbody></table>';
+				    c = content1 + content2;
+
+                    headerInfoContent = $.format(headerInfo, '总部', '退');
+
+                   let placeOrderMan = item.realname;
+                    let placeOrderPhone = item.mobile ;
+                    let warehousePhone = item.warehousePhone;
+                    let remark = item.remark;
+                    if (!warehousePhone) warehousePhone = '无';
+                    if (!remark) remark = '';
+                    let placeOrderTime = new Date(item.returnOrderTime).Format("yyyy-MM-dd hh:mm");;
+
+                    headerContent = $.format(headerStr, item.instock_sn, placeOrderTime, curDate, item.customer_name, item.ccontact, item.cmobile, item.delivery_address, placeOrderMan, placeOrderPhone, item.warehouseName);
+
+                    let printFootContext = item.printFootContext;
+                    if (!printFootContext) printFootContext = '';
+                    var salesAmount = DX(saleMoney);
+                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
+                    batchPrintContent += headerInfoContent + headerContent + c
+						+ footerContent;
+
+                    defaultPageSize = 7;
+                });
+
+                $("#print-content").html(batchPrintContent);
+                rowNumber(defaultPageSize);
+
+                $pagesize.spinner({
+                    min: 1
+                }).spinner("value", defaultPageSize);
+          }
+        }
+    });
+}
+
+
+$.format = function(source, params) {
+    if (arguments.length == 1) return function() {
+        var args = $.makeArray(arguments);
+        args.unshift(source);
+        return $.format.apply(this, args);
+    };
+    if (arguments.length > 2) {
+        params = $.makeArray(arguments).slice(1);
+    }
+    if (params.constructor != Array) {
+        params = [params];
+    }
+    $.each(params,
+    function(i, n) {
+        source = source.replace(new RegExp("\\{" + i + "\\}", "g"), n);
+    });
+    return source;
+};
+
+
+function initEvent() {
+    $("#preview").click(function() {
+
+        $("#print-content .header").not(".clearheader").remove();
+        $("#print-content .printContent").not(".clearcontent").remove();
+        $("#print-content .signatureArea").not(".clearfooter").remove();
+        $("#print-content .pageBreak").remove();
+
+        var pagesize = $pagesize.val();
+        if (pagesize != null || pagesize != "") {
+            rowNumber(Number(pagesize));
+            return;
+        }
+        rowNumber(defaultPageSize);
+    });
+}
+
+function DX(n) {
+    if (!/^(0|[1-9]\d*)(\.\d+)?$/.test(n))
+        return "数据非法";
+    var unit = "仟佰拾亿仟佰拾万仟佰拾元角分", str = "";
+        n += "00";
+    var p = n.indexOf('.');
+    if (p >= 0)
+        n = n.substring(0, p) + n.substr(p+1, 2);
+        unit = unit.substr(unit.length - n.length);
+    for (var i=0; i < n.length; i++)
+        str += '零壹贰叁肆伍陆柒捌玖'.charAt(n.charAt(i)) + unit.charAt(i);
+    return str.replace(/零(仟|佰|拾|角)/g, "零").replace(/(零)+/g, "零").replace(/零(万|亿|元)/g, "$1").replace(/(亿)万|壹(拾)/g, "$1$2").replace(/^元零?|零分/g, "").replace(/元$/g, "元整");
+}
+
+function rowNumber(pageSize){
+	$(".printContent").printTable({
+		 mode          : "rowNumber",
+		 header        : ".clearheader",
+		 footer        : ".clearfooter",
+		 content       : ".clearcontent",
+		 pageNumStyle  : "第#p页/共#P页",
+		 pageNumClass  : ".pageNum",
+		 pageSize      : pageSize
+	});
+}
+
+$("#print").click(function() {
+
+    if (window.confirm('确认打印吗(订单状态会变为已打印)?')) {
+    $.ajax({
+     url: "${CPATH}/admin/salesInstock/recordPrintInfo",
+        data: {
+            "inStockId": '${inStockId!}'
+        },
+        dataType: "json",
+        async: false,
+        success: function(data) {
+          if (data.result == 200) {
+			window.print();
+		  } else {
+		alert("记录打印日志出错，请联系管理员!");
+			}
+        }
+    })
+    }
+});
+
+
+Date.prototype.Format = function (fmt) { //author: meizz 
+    var o = {
+        "M+": this.getMonth() + 1, //月份 
+        "d+": this.getDate(), //日 
+        "h+": this.getHours(), //小时 
+        "m+": this.getMinutes(), //分 
+        "s+": this.getSeconds(), //秒 
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+        "S": this.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+
+
+function getStockIdArray() {
+
+    var stockIdList = new Array();
+    var stockIds = ids.split(",");
+    for (index in stockIds) {
+        stockIdList.push(Number(stockIds[index]));
+    }
+    return stockIdList;
+}
+
+</#macro>
+
+
+<@layout>
+<div id="content-body">
+	<div id="action-buttons" class="noPrint">
+		<span>每页打印商品数量：<input type="text" id="pagesize" style="width:40px;height: 25px"></span>
+		<input type="button" value="分页预览" class="btn" id="preview" >
+		<input type="button" value="打印" class="btn" id="print">
+	</div>
+	<div id="print-content">
+
+	</div>
+</div>
+</@layout>

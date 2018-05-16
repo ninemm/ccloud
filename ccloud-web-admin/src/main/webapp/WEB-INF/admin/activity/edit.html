@@ -237,7 +237,7 @@
 			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');		
 		} else if (choose == 101105) {
 			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">渠道</th><th id="name2">赠送产品</th><th id="name3">投入数量</th><th id="name4">申请金额</th>');
-			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1" style = "width:60px;"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1" style = "width:60px;"></td><tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');
 			$(".needs").select2();
 			$(".product").select2({
 				data: ${productOptionList},
@@ -249,7 +249,7 @@
 			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_gift', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item2[]" id="item2_1"></td><tr>');			
 		} else if (choose == 101107) {
 			$("#expendHead").append('<tr><th width="2%"></th><th id="name1">费用类型</th><th id="name2">产品</th><th id="name3">申请金额</th></tr>');
-			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" style = "width:100px;">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><tr>');
+			$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]">${DICT_BOX('feeType_name_SA', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><tr>');
 			$(".product").select2({
 				data: ${productOptionList},
 				width: "100%",
@@ -275,24 +275,9 @@
 				notEmpty: { message: '活动编码不能为空' }
 			}
 		},
-		'startDate': {
-			validators: {
-				notEmpty: { message: '活动开始时间不能为空' }
-			}
-		},
-		'endDate ': {
-			validators: {
-				notEmpty: { message: '活动结束时间不能为空' }
-			}
-		},
 		'activity.category': {
 			validators: {
 				notEmpty: { message: '活动类型不能为空' }
-			}
-		},
-		'activity.join_num': {
-			validators: {
-				notEmpty: { message: '客户参与数不能为空' }
 			}
 		},
 		'activity.area_type': {
@@ -346,18 +331,42 @@
 		}
 	}
 	
+	function checkNum() {
+		var store = $("#valueTable").find(".input-sm");
+		var check = false;
+		if (store.length == 0) {
+			check = true;
+			return check;
+		}
+		store.each(function(index,element){
+		  	var x = $(this).val();
+		  	if (!x) {
+				return false;
+		 	}
+	    	if (index == store.length-1) {
+	    		check = true;
+	    	}
+		});
+		return check;			
+	}
+	
 	function doSubmit(){
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		if($(".category").val()==101002 && list==""){
 			alert("投入类型不能为空！");
 			return;
 		}
+		
 		$("#areaCodes").val($city.data('citypicker').getCode());
 		$("#areaNames").val($city.data('citypicker').getVal());
 		var listc = $("#customerType").select2("val");
 		var cIds = "";
 		if (listc != null && listc.length > 0) {
 			cIds = listc.toString();
+		}
+		if (!checkNum()) {
+			alert("请检查费用明细表单,有未填字段！");
+			return;			
 		}
 		var templateInfo = localStorage.getItem("ExecuteTemplate");
 		$form.ajaxSubmit({
@@ -385,9 +394,13 @@
 					toastr.error(data.message,'操作失败');
 				}
 			},
-			error : function() {
+			error : function(data) {
 				l.stop();
-				alert("信息提交错误");
+				if(data.status == 200){
+					location.href = "${CPATH}/admin/login";
+				}else{
+					alert("信息提交错误");
+				}
 			}
 		});
 	}
@@ -465,7 +478,7 @@
 				} else if (choose == 101104) {
 					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm" name="item1[]" onChange="showType(this)" id="feeTypeId">${DICT_BOX('feeType_name_display', 'select')}</select></td><td><select class="form-control input-sm" name="item2[]">${DICT_BOX('display_publish', 'select')}</select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');		
 				} else if (choose == 101105) {
-					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1" style = "width:60px;"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');
+					$(InputsWrapper).append('<tr><td><a href="#" class="btn btn-danger btn-xs removeclass"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td><td><input type="hidden" name="expenseIds[]" value=""><select class="form-control input-sm needs" name="item1[]">${DICT_BOX('channel_define', 'select')}</select></td><td><select class="form-control input-sm product" name="item2[]"></select></td><td><input class="form-control input-sm" type="text" name="item3[]" id="item3_1"></td><td><input class="form-control input-sm" type="text" name="item4[]" id="item4_1"></td><tr>');
 					$(".needs").select2();
 					$(".product").select2({
 						data: ${productOptionList},
@@ -571,7 +584,7 @@
 							<div class="col-sm-5 validata-box">
 								<label class="control-label col-sm-4">活动方案号:</label>
 								<div class="input-group col-sm-8">
-									<input class="form-control" readonly type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
+									<input class="form-control" type="text" name="activity.plan_code" value="${(activity.plan_code)!}">
 								</div>
 							</div>
 							<div class="col-sm-5 validata-box" >
@@ -634,7 +647,7 @@
 						</div>
 						<div class="form-group">
 							<div class="col-sm-5 validata-box">
-								<label class="control-label col-sm-4">客户参与数：</label>
+								<label class="control-label col-sm-4">每个客户参与次数：</label>
 								<div class="input-group col-sm-8">
 									<input class="form-control" type="text" name="activity.join_num" value="${(activity.join_num)!}">
 								</div>
@@ -647,18 +660,10 @@
 									</select>
 								</div>
 							</div> -->
-							<!-- <div class="col-sm-5 validata-box">
+							<div class="col-sm-5 validata-box">
 								<label class="control-label col-sm-4">名额：</label>
 								<div class="input-group col-sm-8">
 									<input class="form-control" type="text" name="activity.total_customer_num" value="${(activity.total_customer_num)!}">
-								</div>
-							</div> -->
-							<div class="col-sm-5 validata-box investNum">
-								<label class="control-label col-sm-4">投入数量:</label>
-								<div class="input-group col-sm-8">
-									<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
-									&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
-									</select>
 								</div>
 							</div>
 						</div>
@@ -669,6 +674,14 @@
 									<input class="form-control" type="text" name="activity.invest_amount" value="${(activity.invest_amount)!}">
 								</div>
 							</div>
+							<div class="col-sm-5 validata-box investNum">
+								<label class="control-label col-sm-4">投入数量:</label>
+								<div class="input-group col-sm-8">
+									<input class="form-control" type="text" name="activity.invest_num" value="${(activity.invest_num)!}" style="width:67%;">
+									&nbsp;<select id="unit" name="unit" class="form-control" style="width: 30%;float: none;">
+									</select>
+								</div>
+							</div>							
 							<!--
 							<div class="col-sm-5 validata-box visitNum">
 								<label class="control-label col-sm-4">拜访次数：</label>
@@ -824,7 +837,7 @@
 						<tr>
 							<th width="2%"></th>
 							<th width="5%">行号</th>
-							<th width="10%">步骤<font size = "1" color = "red">（*填写数字）</font></th>
+							<th width="10%">步骤</th>
 							<th width="50%">执行说明</th>
 							<!-- <th width="30%">模板配置</th> -->
 						</tr>
@@ -841,7 +854,7 @@
 							</td>
 							<td>
 								<div class = "validata-box" style="padding-left:35%;">
-									<input class="form-control input-sm" type="text" id="orderList" style="width:60px;text-align:center;" name="orderList" >
+									<input class="form-control input-sm" type="text" id="orderList" style="width:40%;text-align:center;" name="orderList" >
 								</div>
 							</td>
 							</td>

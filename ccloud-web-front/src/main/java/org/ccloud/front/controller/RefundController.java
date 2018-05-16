@@ -263,7 +263,22 @@ public class RefundController extends BaseFrontController{
 		String orderId = getPara("id");
 		Integer pass = getParaToInt("pass", 1);
 		SalesRefundInstockQuery.me().updateConfirm(orderId, pass == 1 ? Consts.SALES_REFUND_INSTOCK_PASS : Consts.SALES_REFUND_INSTOCK_REFUSE, new Date(), user.getId());
-
+		if(pass == 1) {
+			Record refund = SalesRefundInstockQuery.me().findMoreById(orderId);
+    		String customerId = refund.getStr("customer_id");
+    		String refundSn = refund.getStr("instock_sn");
+    		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(orderId);
+    		if (!PayablesQuery.me().insert(refund, new Date())) {
+    			renderAjaxResultForError("订单审核失败");
+    			return ;
+    		}
+    		for (Record record : refundDetail) {
+				if (!PayablesDetailQuery.me().insert(record, customerId, refundSn, new Date())) {
+					renderAjaxResultForError("订单审核失败");
+					return;
+				}
+			}
+		}
 		renderAjaxResultForSuccess("订单审核成功");
 	}
 	
