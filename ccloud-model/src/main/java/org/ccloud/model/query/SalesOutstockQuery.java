@@ -791,5 +791,35 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
-	
+
+	public Page<Record> cusCntBySellproduct(int pageNumber, int pageSize, long cusCount, String dataArea, String startDate, String endDate,String sort,String order) {
+		String select = "select sp.custom_name, (count(DISTINCT so.customer_id)) as count, TRUNCATE((count(DISTINCT so.customer_id)) / "+ cusCount + ",2) as coverage";
+		StringBuilder fromBuilder = new StringBuilder(" from cc_sales_outstock so ");
+		fromBuilder.append(" join cc_sales_outstock_detail sod on so.id =sod.outstock_id ");
+		fromBuilder.append(" join cc_seller_product sp on sod.sell_product_id = sp.id ");
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, true);
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and so.biz_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and so.biz_date <= ? ");
+			params.add(endDate);
+		}
+
+		fromBuilder.append(" group by sod.sell_product_id ");
+
+		if (StrKit.isBlank(sort)) {
+			fromBuilder.append(" order by count desc ");
+		}else {
+			fromBuilder.append("order by "+sort+" "+order);
+		}
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
 }

@@ -15,12 +15,7 @@ import org.ccloud.model.SalesOrder;
 import org.ccloud.model.Seller;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
-import org.ccloud.model.query.InventoryDetailQuery;
-import org.ccloud.model.query.SalesOrderQuery;
-import org.ccloud.model.query.SellerProductQuery;
-import org.ccloud.model.query.SellerQuery;
-import org.ccloud.model.query.UserQuery;
-import org.ccloud.model.query.WarehouseQuery;
+import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.StringUtils;
@@ -649,5 +644,28 @@ public class _ReportController extends JBaseController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		List<Record> list = SalesOrderQuery.me().findByCustomerDetail1(startDate,endDate,keyword, userId,sellerId,true,dataArea, customerName);
 		renderJson(list);
+	}
+
+	public void productCoverage() {
+		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+		setAttr("startDate", date);
+		setAttr("endDate", date);
+
+		render("productCoverage.html");
+	}
+
+	public void productCoverageList() {
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sort = getPara("sortName[sort]");
+		String order = getPara("sortName[order]");
+
+		long customerCount = SellerCustomerQuery.me().findCustomerCount(selectDataArea);
+		Page<Record> page = SalesOutstockQuery.me().cusCntBySellproduct(getPageNumber(), getPageSize(), customerCount, selectDataArea, startDate, endDate, sort, order);
+
+		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
+
+		renderJson(map);
 	}
 }
