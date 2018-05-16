@@ -196,7 +196,7 @@
                 $(".weui-loadmore").hide();
                 loading = false;
 
-                //$(".infinite")[0].scrollTop = 0;
+                $(".infinite")[0].scrollTop = 0;
                 $("#customerList").empty();
                 if(data.html.length == 0) data.html = data.html +'<div class="weui-loadmore weui-loadmore_line"><span class="weui-loadmore__tips">暂无数据</span></div>';
                 $("#customerList").html(data.html);
