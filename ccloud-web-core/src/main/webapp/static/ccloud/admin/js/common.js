@@ -482,7 +482,7 @@ jQuery.mm = {
 			detailView: true,//父子表
 			//classes: 'table-no-bordered',
 			cache: false,					// 是否使用缓存
-			queryParams: {parentId: parentId},		// 传递参数
+			queryParams: {parentId: parentId, size:100},		// 传递参数
 			sidePagination: 'server', 		//分页方式：client客户端分页，server服务端分页（*）
 			undefinedText: '',
 			columns: fields,

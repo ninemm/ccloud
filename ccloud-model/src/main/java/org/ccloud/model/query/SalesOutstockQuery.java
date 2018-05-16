@@ -181,7 +181,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String sellerId, String searchSn, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId, String carWarehouseId, String searchName) {
-		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName,cso.id as orderId,cso.order_sn,cso.create_date as orderDate ,uu.realname as bizName ";
+		String select = "select o.*,  c.prov_name,c.city_name,c.country_name,c.address, c.customer_name,u.realname,ct.name as customerName,cso.id as orderId,cso.order_sn,cso.create_date as orderDate,cso.proc_inst_id as procInstId ,uu.realname as bizName ";
 		if (StrKit.notBlank(status)) {
 			select = select + ",t2.refundCount, t2.outCount ";
 		}
@@ -765,11 +765,6 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
-	public List<SalesOutstock> findListByOrderId(String id) {
-		String sql = "select co.* from cc_sales_outstock co LEFT JOIN cc_sales_order_join_outstock coo on coo.outstock_id = co.id where coo.order_id = ?";
-		return DAO.find(sql, id);
-	}
-
 	public List<Record> findOutUserList(String sellerId, String startDate, String endDate, Integer status, Integer stockOutStatus) {
 		StringBuilder fromBuilder = new StringBuilder("SELECT u.realname, u.id FROM cc_sales_outstock o ");
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cj on cj.outstock_id = o.id ");
@@ -806,6 +801,101 @@ public class SalesOutstockQuery extends JBaseQuery {
 			return Db.find(fromBuilder.toString());
 
 		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+	
+	public Page<Record> paginateDowning(int pageNumber, int pageSize, String sellerId, String searchSn, String startDate, 
+			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId, String carWarehouseId, String searchName) {
+		String select = "SELECT o.*, c.prov_name,c.city_name,c.country_name,c.address,c.customer_name,ct. NAME AS customerName,cso.id AS orderId,cso.order_sn,cso.create_date AS orderDate,cso.proc_inst_id AS procInstId,uu.realname AS bizName,t4.product_count,t4.product_price,t4.is_gift,t4.tax_price,t4.bar_code,t4.big_unit,t4.custom_name,t4.small_unit,t4.convert_relate,t4.id AS productId,t4.product_sn,t4.valueName,op.create_date as printDate,ct.`name` as customerType";
+		if (StrKit.notBlank(status)) {
+			select = select + ",t2.refundCount, t2.outCount ";
+		}
+		StringBuilder fromBuilder = new StringBuilder("from (SELECT cod.outstock_id,cod.id,cod.product_count,cod.product_price,cs.custom_name,cs.tax_price,cs.bar_code,p.big_unit,p.small_unit,p.convert_relate,p.id AS productId,p.product_sn,t3.valueName,cod.is_gift FROM cc_sales_outstock_detail cod ");
+		fromBuilder.append("LEFT JOIN cc_seller_product cs ON cs.id = cod.sell_product_id ");
+		fromBuilder.append("LEFT JOIN cc_product p ON p.id = cs.product_id ");
+		fromBuilder.append("LEFT JOIN (SELECT	sv.id,cv.product_set_id,GROUP_CONCAT(sv. NAME) AS valueName	 ");
+		fromBuilder.append("FROM cc_goods_specification_value sv ");
+		fromBuilder.append("RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id ");
+		fromBuilder.append("GROUP BY cv.product_set_id) t3 ON t3.product_set_id = p.id where cod.data_area like '"+dataArea+"') t4 ");
+		fromBuilder.append("LEFT JOIN `cc_sales_outstock` o ON t4.outstock_id = o.id ");
+		fromBuilder.append("left join cc_seller_customer cs on o.customer_id = cs.id ");
+		fromBuilder.append("left join cc_customer c on c.id = cs.customer_id ");
+		fromBuilder.append("left join cc_customer_type ct on ct.id = o.customer_type_id ");
+		fromBuilder.append("left join cc_sales_order_join_outstock sojo on sojo.outstock_id = o.id ");
+		fromBuilder.append("LEFT JOIN cc_sales_order cso ON cso.id = sojo.order_id ");
+		fromBuilder.append("LEFT JOIN cc_outstock_print op on op.order_id = cso.id ");
+		fromBuilder.append("LEFT JOIN `user` uu ON uu.id = cso.biz_user_id ");
+		if (StrKit.notBlank(status)) {
+			fromBuilder.append("left join (SELECT cc.id, cc.outstock_id, IFNULL(SUM(cc.product_count),0) as outCount, IFNULL(SUM(t1.count), 0) AS refundCount ");
+			fromBuilder.append("FROM cc_sales_outstock_detail cc LEFT JOIN (SELECT SUM(cr.reject_product_count) AS count, cr.outstock_detail_id FROM cc_sales_refund_instock_detail cr ");
+			fromBuilder.append("LEFT JOIN cc_sales_refund_instock ci ON ci.id = cr.refund_instock_id where ci.`status` not in (?,?) ");
+			fromBuilder.append("GROUP BY cr.outstock_detail_id ) t1 ON cc.id = t1.outstock_detail_id GROUP BY cc.outstock_id ) t2 on t2.outstock_id = o.id ");
+		}
+
+		LinkedList<Object> params = new LinkedList<Object>();
+		if (StrKit.notBlank(status)) {
+			params.add(Consts.SALES_REFUND_INSTOCK_CANCEL);
+			params.add(Consts.SALES_REFUND_INSTOCK_REFUSE);
+		}
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "cso.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.outstock_sn", searchSn, params, needWhere);
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", searchName, params, needWhere);
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1");
+		}
+
+		if (StrKit.notBlank(carWarehouseId)) {
+			fromBuilder.append(" and o.warehouse_id= ?");
+			params.add(carWarehouseId);
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+		
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		if (StrKit.notBlank(printStatus)) {
+			fromBuilder.append(" and o.is_print = ?");
+			params.add(printStatus);
+		}
+
+		if (StrKit.notBlank(stockOutStatus)) {
+			fromBuilder.append(" and o.status = ?");
+			params.add(stockOutStatus);
+		}
+		if (StrKit.notBlank(salesmanId)) {
+			fromBuilder.append(" and cso.biz_user_id = ?");
+			params.add(salesmanId);
+		}
+		if (StrKit.notBlank(carWarehouseId)) {
+			fromBuilder.append(" and o.warehouse_id= ?");
+			params.add(carWarehouseId);
+		}
+		if (StrKit.notBlank(status)) {
+			fromBuilder.append(" and o.status != ? and outCount > refundCount");
+			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
+		}		
+
+		fromBuilder.append(" and cso.status != " + Consts.SALES_ORDER_STATUS_CANCEL + " ");
+
+		if (sort == "" || null == sort) {
+			fromBuilder.append("order by " + "o.create_date desc");
+		} else {
+			fromBuilder.append("order by " + sort + " " + order);
+		}
+
+		if (params.isEmpty())
+			return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString());
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 	
 }

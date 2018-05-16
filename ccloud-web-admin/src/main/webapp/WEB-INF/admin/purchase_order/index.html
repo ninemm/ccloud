@@ -220,6 +220,11 @@
 	})
 	
 	function addProduct(){
+		var supplier = $("#supplierId").val();
+		if(supplier == ""){
+			toastr.error('未选择供应商！');
+			return;
+		}
 		 var supplierId=$("#supplierId").find("option:selected").val();
 		 if(supplierId == ""){
 		 	toastr.error('请选择供应商!');
@@ -234,6 +239,11 @@
 	}
 	
 	function passWarehouse(){
+		var warehouse = $("#warehouseId").val();
+		if(warehouse == ""){
+			toastr.error('未选择入伙仓库！');
+			return;		
+		}
 		var status = $("#purchaseOrderStatus").val();
 		var id = $("#purchaseOrderId").val();
 		var butStatus = $("#buttonStatus").val();
@@ -309,7 +319,7 @@
 				<div class="col-sm-4">
 					<label class="control-label col-sm-5">开始时间:</label>
 					<div class="col-sm-7 input-group input-group-sm">
-						<input id="startDate" class="form-control" value="${startDate!}" name="startDate" placeholder="开始日期" >
+						<input id="startDate" class="form-control" value="${startDate!}"  name="startDate" placeholder="开始日期" >
 					</div>
 				</div>
 				<div class="col-sm-4">
