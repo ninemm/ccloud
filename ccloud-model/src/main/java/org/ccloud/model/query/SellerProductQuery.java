@@ -353,4 +353,20 @@ public class SellerProductQuery extends JBaseQuery {
 		fromBuilder.append(" WHERE	cs.is_enabled = 1 AND u.id = '"+userId+"' GROUP BY cgc. NAME ORDER BY cgc.id ");
 		return Db.find(fromBuilder.toString());
 	}
+
+	public List<Record> findListByWareHouseId(String sellerId, String wareHouseId) {
+		StringBuilder fromBuilder = new StringBuilder(" SELECT sg.tax_price, sg.id, sg.product_id, sg.custom_name, IFNULL(SUM(c.in_count), 0) - IFNULL(SUM(c.out_count), 0) AS store_count,sg.account_price, sg.price, sg.warehouse_id, t1.valueName, p.big_unit, p.small_unit, p.convert_relate ");
+		fromBuilder.append(" FROM cc_inventory_detail c LEFT JOIN cc_seller_product sg ON c.sell_product_id = sg.id");
+		fromBuilder.append(" LEFT JOIN cc_product p ON sg.product_id = p.id ");
+		fromBuilder.append(" LEFT JOIN  (SELECT sv.id, cv.product_set_id, GROUP_CONCAT(sv. NAME) AS valueName FROM cc_goods_specification_value sv ");
+		fromBuilder.append(" RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1 on t1.product_set_id = sg.product_id ");
+		fromBuilder.append(" WHERE sg.is_enable = 1 and sg.is_gift = 0 ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		appendIfNotEmpty(fromBuilder, "sg.seller_id", sellerId, params, false);
+		appendIfNotEmpty(fromBuilder, "c.warehouse_id", wareHouseId, params, false);
+
+		fromBuilder.append(" GROUP BY c.sell_product_id ");
+		fromBuilder.append(" ORDER BY sg.order_list ");
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
 }

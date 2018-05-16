@@ -245,9 +245,12 @@
 					setTimeout( function(){location.reload();}, 2 * 1000 );
 				}
 			},
-			error : function() {
-				location.href = "${CPATH}/admin/login";
-//				alert("信息提交错误");
+			error : function(data) {
+				if(data.status == 200){
+					location.href = "${CPATH}/admin/login";
+				}else{
+					alert("信息提交错误");
+				}
 			}
 		});
 		}

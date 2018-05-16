@@ -297,7 +297,13 @@ public class SalesOrderDetailQuery extends JBaseQuery {
 		String smallNum = paraMap.get("smallNum")[index];
 		Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
 		String productId = paraMap.get("productId")[index];
-		Map<String, Object> result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
+		String wareHouseId = StringUtils.getArrayFirst(paraMap.get("warehouse_id"));
+		Map<String, Object> result = new HashMap<>();
+		if (StrKit.notBlank(wareHouseId)) {
+			result = this.getEnoughOrNot(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId, wareHouseId);
+		} else {
+			result = this.getWarehouseId(productId, sellerId, sellerCode, productCount, Integer.parseInt(convert), userId, sellerProductId);
+		}		
 		String status = result.get("status").toString();
 		List<Map<String, String>> list = (List<Map<String, String>>) result.get("countList");
 
