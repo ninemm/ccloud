@@ -672,7 +672,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 				activity.setCategory(Consts.ACTIVITY_CATEGORY_CODE);
 				String[] value = getAreaType(qyExpense.getExpenseName());
 				activity.setInvestType(DictQuery.me().findbyName(value[0]).getValue());
-				activity.setAreaType("湖北省-武汉市-武昌区");
+				activity.setAreaType(value[1]);
+//				activity.setAreaType("湖北省-武汉市-武昌区");
 				activity.setInvestAmount(new BigDecimal(qyExpense.getApplyAmount()));
 				activity.setProcCode(qyExpense.getFlowNo());
 				activity.setProcId(qyExpense.getFlowID());
