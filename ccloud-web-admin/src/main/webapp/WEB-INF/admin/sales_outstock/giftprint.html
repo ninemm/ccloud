@@ -13,16 +13,18 @@
 	<link rel="stylesheet"  href="${CPATH}/static/layer/skin/layer.min.css">
 	<link rel="stylesheet"  href="${CPATH}/static/plugins/jquery/jquery-ui.css">
 </#macro>
-
 <#macro css>
-	td, th  {
-		padding:3px 0;
-	} 
-	.signatureArea {
-	   font-size: 15px;
-	}
-</#macro>
+	
+table { 
+	border: 1px solid #444;
+}
 
+td, th {
+	border: 1px solid #444; 
+}
+
+	
+</#macro>
 <#macro script>
    var $pagesize = $("#pagesize");
 
@@ -36,7 +38,7 @@
 var headerInfo =
 	'<div class="header clear clearheader">' +
 	    '<div class="titleArea">' +
-			'<span style="font-size:17px; font-weight:bolder;">{0}送货单</span>' +
+			'<h1>{0}送货单</h1>' + 
 		'</div>' +
 	'</div>';
 
@@ -47,54 +49,54 @@ var headerStr =
 			'<td class="text-center width8">发货单号</td>' +
 			'<td class="width8">{0}</td>' +
 			'<td class="text-center width8">下单时间</td>' +
-			'<td colspan="3" class="width8">{1}</td>' +
+			'<td colspan="2" class="width8">{1}</td>' +
 			'<td class="text-center width8">制单时间</td>' +
-			'<td colspan="3">{2}</td>' +
+			'<td colspan="2">{2}</td>' +
 		'</tr>' +
 		'<tr>' +
 			'<td class="text-center width8">客户信息</td>' +
-			'<td colspan="5" class="text-left" style="font-size: 15px;">{3},{6}</td>' +
-			'<td class="text-center">配送信息</td>' +
-			'<td colspan="2" class="text-left" style="font-size: 15px;">{9}</td>' +
+			'<td colspan="3" class="text-left">{3},{6}</td>' +
+			'<td colspan="2" class="text-center width8">客户/电话</td>' +
+			'<td colspan="3" class="text-left">{4},{5}</span></td>' +
 		'</tr>' +
 		'<tr>' +
-			'<td colspan="1" class="text-center width8">客户/电话</td>' +
-			'<td colspan="3" class="text-left" style="font-size: 15px;">{4},{5}</span></td>' +
+			'<td class="text-center">配送信息</td>' +
+			'<td colspan="3" class="text-left">{9}</td>' +
 			'<td colspan="2" class="text-center">业务员/电话</td>' +
-			'<td colspan="3" class="text-left" style="font-size: 15px;"><span>{7}({8})</span></td>' +
+			'<td colspan="2" class="text-left"><span>{7}({8})</span></td>' +
 		'</tr>' +
 		'<tr>' +
 			'<td class="center2">序号</td>' +
-			'<td colspan="2" class="center2">产品名称</td>' +
-			'<td>件数</td>' +
-			'<td>瓶数</td>' +
+			'<td style="width:30%">产品名称</td>' +
+			'<td style="width:6%">件数</td>' +
+			'<td style="width:6%">瓶数</td>' +
 			'<td style="width:10%">件单价</td>' +
 			'<td style="width:10%">瓶单价</td>' +
 			'<td style="width:10%">购货价格</td>' +
-			'<td style="width:10%" class="center2">条码</td>' +
+			'<td colspan="3" class="center2">条码</td>' +
 		'</tr>' +
 	'</thead>';
 
 		var contentStr = '<tr>' +
 			'<td class="center2">{0}</td>' +
-			'<td colspan="2" style="font-size: 15px;">{1}{7}</td>' +
+			'<td >{1}{7}</td>' +
 			'<td class="center2"><span style="font-weight:700;">{2}</span></td>' +
 			'<td class="center2"><span style="font-weight:700;">{4}</span></td>' +
 			'<td class="center2">{3}</td>' +
 			'<td class="center2">{5}</td>' +
 			'<td class="center2">{8}</td>' +
-			'<td class="center2">{6}</td>' +
+			'<td colspan="2" class="center2">{6}</td>' +
 			'</tr>';
 
 		var footerStr =
 			'<div class="signatureArea clearfooter">' +
 				'<div class="stat">' + 
-					'<span class="">应收合计：{0} ({1} 元)</span>' + 
+					'<span class="">应收合计：{0} ({1} 元)</span><span class="pageNum floatRight">1/1</span>' + 
 				'</div>' + 
 				'<div class="stat">' +
 					'<div><span>联系电话：{2}</span><span class="sign" >收货单位签字盖章</span></div>' +
 				'</div>' +
-				'<div style="text-align: left; width: inherit; line-height: 12px;">' +
+				'<div style="text-align: left; width: inherit; font-size: 10px; line-height: 12px;">' +
 					'<span class="width200">备注：{3}</span><span style="float: right;">{4}</span>' +
 				'</div>' +
 			'</div>';
@@ -128,10 +130,14 @@ function queryPrintDetail(financePrint) {
                             if (!barCode) barCode = '无';
                             let totalMoney = 0;
                             let isGift = subitem.isgift;
+                         	var bigPrice= "";
+                         	var smallPrice= "";
                             if (isGift != 0) {
                                 isGift = '(赠品)';
                             } else {
                                 isGift = "";
+								smallPrice = subitem.smallPrice + '元';
+								bigPrice = subitem.bigPrice + '元';
                                 totalMoney = subitem.bigCount
 										* subitem.bigPrice
 										+ subitem.smallCount
@@ -139,15 +145,11 @@ function queryPrintDetail(financePrint) {
 										saleMoney = saleMoney + totalMoney;
                             }
                             var productAmout = subitem.productAmout
-                            if(financePrint == 0){
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,productAmout+ '元')
-                            }else{
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
-                            }
+                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, bigPrice, subitem.smallCount, smallPrice , barCode, isGift,totalMoney+ '元')
                         });
 
                         let len = item.orderProductInfos.length;
-                        for (let i = len; i < 5; i++) {
+                        for (let i = len; i < 6; i++) {
                             content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
                         }
                     }
@@ -172,7 +174,7 @@ function queryPrintDetail(financePrint) {
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 5;
+                    defaultPageSize = 6;
                 });
 
                 $("#print-content").html(batchPrintContent);

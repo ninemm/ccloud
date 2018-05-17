@@ -1,28 +1,31 @@
 <#include "../_inc/_layer_layout.html"/>
 
 <#macro script_import>
-	<!-- <script src="${CPATH}/static/plugins/jquery/jquery-1.9.1.min.js"></script> -->
 	<script src="${CPATH}/static/plugins/jquery/jquery-ui.js"></script>
 	<script src="${CPATH}/static/layer/layer.min.js"></script>
 	<script src="${CPATH}/static/plugins/jquery/jquery.all.print.table.js"></script>
 
 </#macro>
-
+<#macro css>
+	.signatureArea {
+	   font-size: 13px;
+	}
+</#macro>
 <#macro css_import>
 	<link rel="stylesheet"  href="${CPATH}/static/print/print.css">
 	<link rel="stylesheet"  href="${CPATH}/static/layer/skin/layer.min.css">
 	<link rel="stylesheet"  href="${CPATH}/static/plugins/jquery/jquery-ui.css">
 </#macro>
-
 <#macro css>
-	td, th  {
-		padding:3px 0;
-	} 
-	.signatureArea {
-	   font-size: 15px;
-	}
-</#macro>
+table { 
+	border: 1px solid #444;
+}
 
+td, th {
+	border: 1px solid #444; 
+}
+	
+</#macro>
 <#macro script>
    var $pagesize = $("#pagesize");
 
@@ -36,7 +39,20 @@
 var headerInfo =
 	'<div class="header clear clearheader">' +
 	    '<div class="titleArea">' +
-			'<span style="font-size:17px; font-weight:bolder;">{0}送货单</span>' +
+			'<h1>{0}送货单</h1>' +
+		'</div>' +
+		'<div>' +
+			'<span style="float:left;font-size:13px;">客户:{1} {6}</span>' +
+			'<span style="float:right;font-size:13px;">发货单号:{2}</span>' +
+		'</div>' +
+		'<div style="clear:both;"></div>'+
+		'<div>' +
+			'<span  style="float:left;font-size:13px;">发货仓库 : {3}&nbsp;&nbsp;&nbsp;录单日期 : {4}</span>' +
+			'<span  style="float:right;font-size:13px;">白联仓库 红莲结算 黄联财会 其他随货同行</span>' +
+		'</div>' +
+		'<div style="clear:both;"></div>'+
+		'<div>' +
+			'<span style="float:left;font-size:13px;">备注:{5}</span>' +
 		'</div>' +
 	'</div>';
 
@@ -44,59 +60,35 @@ var headerStr =
 	'<table class="printContent clearcontent">' +
 		'<thead>' +
 		'<tr>' +
-			'<td class="text-center width8">发货单号</td>' +
-			'<td class="width8">{0}</td>' +
-			'<td class="text-center width8">下单时间</td>' +
-			'<td colspan="3" class="width8">{1}</td>' +
-			'<td class="text-center width8">制单时间</td>' +
-			'<td colspan="3">{2}</td>' +
-		'</tr>' +
-		'<tr>' +
-			'<td class="text-center width8">客户信息</td>' +
-			'<td colspan="5" class="text-left" style="font-size: 15px;">{3},{6}</td>' +
-			'<td class="text-center">配送信息</td>' +
-			'<td colspan="2" class="text-left" style="font-size: 15px;">{9}</td>' +
-		'</tr>' +
-		'<tr>' +
-			'<td colspan="1" class="text-center width8">客户/电话</td>' +
-			'<td colspan="3" class="text-left" style="font-size: 15px;">{4},{5}</span></td>' +
-			'<td colspan="2" class="text-center">业务员/电话</td>' +
-			'<td colspan="3" class="text-left" style="font-size: 15px;"><span>{7}({8})</span></td>' +
-		'</tr>' +
-		'<tr>' +
-			'<td class="center2">序号</td>' +
-			'<td colspan="2" class="center2">产品名称</td>' +
-			'<td>件数</td>' +
-			'<td>瓶数</td>' +
-			'<td style="width:10%">件单价</td>' +
-			'<td style="width:10%">瓶单价</td>' +
-			'<td style="width:10%">购货价格</td>' +
-			'<td style="width:10%" class="center2">条码</td>' +
+			'<td >条码</td>' +
+			'<td >商品名称</td>' +
+			'<td >规格</td>' +
+			'<td >单位</td>' +
+			'<td >数量</td>' +
+			'<td >单价</td>' +
+			'<td >金额</td>' +
+			'<td >件数</td>' +
 		'</tr>' +
 	'</thead>';
 
 		var contentStr = '<tr>' +
-			'<td class="center2">{0}</td>' +
-			'<td colspan="2" style="font-size: 15px;">{1}{7}</td>' +
-			'<td class="center2"><span style="font-weight:700;">{2}</span></td>' +
-			'<td class="center2"><span style="font-weight:700;">{4}</span></td>' +
-			'<td class="center2">{3}</td>' +
-			'<td class="center2">{5}</td>' +
-			'<td class="center2">{8}</td>' +
-			'<td class="center2">{6}</td>' +
+			'<td >{0}</td>' +
+			'<td >{1}</td>' +
+			'<td >{2}</td>' +
+			'<td >{3}</td>' +
+			'<td >{4}</td>' +
+			'<td >{5}</td>' +
+			'<td >{6}</td>' +
+			'<td >{7}</td>' +
 			'</tr>';
 
 		var footerStr =
 			'<div class="signatureArea clearfooter">' +
 				'<div class="stat">' + 
-					'<span class="">应收合计：{0} ({1} 元)</span>' + 
+					'<p>制单人:{0}&nbsp;&nbsp;&nbsp;经手人:{1}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;送货人:' + 
+					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;收货人:</p>'+
+					'<span>公司电话:{2}</span><span class="pageNum floatRight">1/1</span>' +
 				'</div>' + 
-				'<div class="stat">' +
-					'<div><span>联系电话：{2}</span><span class="sign" >收货单位签字盖章</span></div>' +
-				'</div>' +
-				'<div style="text-align: left; width: inherit; line-height: 12px;">' +
-					'<span class="width200">备注：{3}</span><span style="float: right;">{4}</span>' +
-				'</div>' +
 			'</div>';
 
 
@@ -119,42 +111,102 @@ function queryPrintDetail(financePrint) {
                 var curDate = new Date().Format("yyyy-MM-dd hh:mm");
                 $.each(data.rows,
                 function(index, item) {
-                    var content = '<tbody>';
-                     let saleMoney = 0;
-                    if (item.orderProductInfos) {
-                        $.each(item.orderProductInfos,
-                        function(idx, subitem) {
-                            let barCode = subitem.barCode;
-                            if (!barCode) barCode = '无';
-                            let totalMoney = 0;
-                            let isGift = subitem.isgift;
-                            if (isGift != 0) {
-                                isGift = '(赠品)';
-                            } else {
-                                isGift = "";
-                                totalMoney = subitem.bigCount
-										* subitem.bigPrice
-										+ subitem.smallCount
-										* subitem.smallPrice;
-										saleMoney = saleMoney + totalMoney;
-                            }
-                            var productAmout = subitem.productAmout
-                            if(financePrint == 0){
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,productAmout+ '元')
-                            }else{
-                            content += $.format(contentStr, (idx + 1), subitem.productName, subitem.bigCount, subitem.bigPrice + '元', subitem.smallCount, subitem.smallPrice + '元', barCode, isGift,totalMoney+ '元')
-                            }
-                        });
-
-                        let len = item.orderProductInfos.length;
-                        for (let i = len; i < 5; i++) {
-                            content += $.format(contentStr, (i + 1), '', '', '', '', '', '', '', '', '');
-                        }
-                    }
-                    content += '</tbody></table>';
-
-                    headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", '送');
-
+					var content = '<tbody>';
+					let saleMoney = 0;
+					let saleNum = 0;
+					let sumMoney = 0;
+					let sumNum = 0;
+					let len=0;
+					if (item.orderProductInfos) {
+						$.each(item.orderProductInfos, function(idx, subitem) {
+							saleMoney += subitem.bigCount * subitem.bigPrice + subitem.smallCount * subitem.smallPrice;
+							saleNum += subitem.bigCount*subitem.convertRelate+subitem.smallCount;
+						})
+					}
+					var salesAmount = jQuery.mm.digitUppercase(saleMoney);
+					if (item.orderProductInfos) {
+						$.each(item.orderProductInfos, function(idx, subitem) {
+							len = len+1;
+							let barCode = subitem.barCode;
+							if (!barCode) barCode = '无';
+							let totalMoney = 0;
+							let totalNum = 0;
+							var convertRelate="";
+							var smallPrice=subitem.smallPrice
+							if(subitem.convertRelate!=null){
+								convertRelate="1*"+	subitem.convertRelate;
+							}
+							if (subitem.isgift == 0) {
+								totalMoney = subitem.bigCount * subitem.bigPrice + subitem.smallCount * subitem.smallPrice;
+								sumMoney = sumMoney+totalMoney;
+							}else{
+								smallPrice="";
+							}
+							totalNum = subitem.bigCount*subitem.convertRelate+subitem.smallCount;
+							sumNum = sumNum+totalNum;
+							var bigNum="";
+							if(subitem.bigCount != 0){
+								bigNum=subitem.bigCount+subitem.bigUnit
+							}
+							if(subitem.smallCount != 0){
+								bigNum=bigNum+subitem.smallCount+subitem.smallUnit
+							}
+							if(item.customerKind == 100402){
+                              	content += $.format(contentStr,barCode,subitem.productName,convertRelate,subitem.smallUnit,totalNum,"","",bigNum)
+							}else{
+								content += $.format(contentStr,barCode,subitem.productName,convertRelate,subitem.smallUnit,totalNum,smallPrice,totalMoney.toFixed(2),bigNum)
+							}
+							if(len>4){
+								if(item.customerKind == 100402){
+									saleMoney="";
+									salesAmount=""; 
+									sumMoney="";
+									salesAmount;
+								}
+								content = content+
+								'<tr>' +
+									'<td colspan="4">本页小计</td>' +
+									'<td >'+sumNum+'</td>' +
+									'<td ></td>' +
+									'<td >'+sumMoney+'</td>' +
+									'<td ></td>' +
+								'</tr>'+
+								'<tr>' +
+									'<td colspan="4">合计:'+salesAmount+'</td>' +
+									'<td >'+saleNum+'</td>' +
+									'<td ></td>' +
+									'<td >'+saleMoney+'</td>' +
+									'<td ></td>' +
+								'</tr>';
+								'</tbody></table>';
+								len=0;
+								sumNum=0;
+								sumMoney=0;
+							}
+						})
+					}
+                    if(item.customerKind == 100402){
+						saleMoney="";
+						salesAmount=""; 
+						sumMoney="";
+						salesAmount;
+					}
+					content = content+
+					'<tr>' +
+						'<td colspan="4">本页小计</td>' +
+						'<td >'+sumNum+'</td>' +
+						'<td ></td>' +
+						'<td >'+sumMoney+'</td>' +
+						'<td ></td>' +
+					'</tr>'+
+					'<tr>' +
+						'<td colspan="4">合计:'+salesAmount+'</td>' +
+						'<td >'+saleNum+'</td>' +
+						'<td ></td>' +
+						'<td >'+saleMoney+'</td>' +
+						'<td ></td>' +
+					'</tr>';
+					'</tbody></table>';
                     let placeOrderMan = item.placeOrderMan;
                     let placeOrderPhone = item.placeOrderPhone;
                     let warehousePhone = item.warehousePhone;
@@ -163,16 +215,17 @@ function queryPrintDetail(financePrint) {
                     if (!remark) remark = '';
                     let placeOrderTime = new Date(item.placeOrderTime).Format("yyyy-MM-dd hh:mm");;
 
-                    headerContent = $.format(headerStr, item.outstockSn, placeOrderTime, curDate, item.customerName, item.customerContacts, item.customerPhone, item.deliveryAddress, placeOrderMan, placeOrderPhone, item.warehouseName);
-
-                    let printFootContext = item.printFootContext;
+                    headerInfoContent = $.format(headerInfo, (item.sellerName != null) ? item.sellerName: "", item.customerName,item.outstockSn,item.warehouseName,placeOrderTime,remark,item.deliveryAddress );
+                
+                    headerContent = $.format(headerStr, item.outstockSn, placeOrderTime, curDate, item.customerName, item.customerContacts, item.customerPhone, item.deliveryAddress, remark, placeOrderPhone, item.warehouseName);
+					let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
-                    var salesAmount = jQuery.mm.digitUppercase(saleMoney);
-                    footerContent = $.format(footerStr, salesAmount, saleMoney, warehousePhone, remark,printFootContext);
+                    
+                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}',placeOrderMan,warehousePhone);
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 
-                    defaultPageSize = 5;
+                    defaultPageSize = 7;
                 });
 
                 $("#print-content").html(batchPrintContent);
