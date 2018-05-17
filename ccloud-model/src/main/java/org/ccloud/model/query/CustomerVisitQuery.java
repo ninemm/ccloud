@@ -538,4 +538,9 @@ public class CustomerVisitQuery extends JBaseQuery {
 		return DAO.find(fromBuilder.toString(), id, Consts.CUSTOMER_VISIT_STATUS_REJECT);
 	}
 	
+	public int findIntByActivityApplyId(String activityApplyId){
+		String sql = "select count(1) from cc_customer_visit where active_apply_id = '"+activityApplyId+"' and status not in (100103) ORDER BY create_date desc";
+		return Db.queryInt(sql);
+	}
+	
 }

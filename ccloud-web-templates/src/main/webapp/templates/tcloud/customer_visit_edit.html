@@ -145,79 +145,13 @@
 							title: "选择活动",
 							multi: false,
 							items: JSON.parse(data.activityRecords),
-							onClose: function(obj) {
-							    var activityIds = obj.data.values;
+							onChange: function(obj){
+								console.log(obj);
+							    var activityIds = obj.values;
 							    $('#activity_apply_id').val(activityIds);
 							  	var activityApplyId = $('#activity_apply_id').val();
 								if(activityApplyId){
-									$.ajax({
-								        url: "${CPATH}/customerVisit/getActivityExecute",
-								        data: {
-								            "activityApplyId": activityApplyId
-								        },
-								        dataType: "json",
-								        success: function(data) {
-								        		var activityExecute = data.activityExecute;
-								        		var size = data.size;
-								        		if (size) {
-								        			$("#size").show();
-								        			if (data.check_size) {
-								        				$("#check_size").val(data.check_size);
-								        				$("#check_size").attr("readonly","readonly");
-								        			}
-								        			has_size = 1;
-								        		} else {
-								        			$("#check_size").val("");
-								        			$("#check_size").removeAttr("readonly");
-								        			$("#size").hide();
-								        			has_size = 0;
-								        		}
-								        		
-								        		if(activityExecute.length>0){
-									        		
-								        			$(".imageActivityExecute").hide();
-								        			$(".imgeInfo").hide();
-								        			var imageLists = data.imgeLists;
-								        			var domain = data.domain;
-								        			$(".imgeActivity").html("");
-								        			if(imageLists!=null){
-									        			numImage = imageLists.length;
-								        			}
-								        			var maxOrderList = data.maxOrderList;
-								        			for(var i = 0 ; i < activityExecute.length ; i++){
-								        				if(maxOrderList == i){
-									        				var html = "";
-									        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
-							                                	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
-						                                	html +='</ul>'
-							                                	+'<div class="weui-uploader__input-box">'
-							                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" capture="camera">'
-							                                   	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
-							                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
-							                                	+'</div></div></div>';
-							                                	$("#activity_execute_id").val(activityExecute[i].id);
-															 	$(".imgeActivity").append(html);
-														        $(".photoType").select({
-															        title: "请选择照片类型",
-															        multi: false,
-															        items: [{
-																	       	title: "现场照片", value: "ScenePhoto"
-																	       },{
-																	       	title: "签名照片", value: "SignPhoto"
-																	       },{
-																	       	title: "赠品照片", value: "GiftPhoto"
-																	       },{
-																	       	title: "验收照片", value: "ExecutePhoto"
-																	       }],
-															        onChange: function(obj) {
-														                $('#uploaderInput').click();
-															        }
-															    });															 
-								        				}
-								        			}
-								        		}
-								        }
-							        });
+									changeActivity(activityApplyId);
 								}
 							}
 						});
@@ -225,7 +159,92 @@
 		        }
 	        });
 		}
-
+		function changeActivity(applyId){
+			$.ajax({
+		        url: "${CPATH}/customerVisit/getActivityExecute",
+		        data: {
+		            "activityApplyId": applyId
+		        },
+		        dataType: "json",
+		        success: function(data) {
+		        		var activityExecute = data.activityExecute;
+		        		var size = data.size;
+		        		if (size) {
+		        			$("#size").show();
+		        			if (data.check_size) {
+		        				$("#check_size").val(data.check_size);
+		        				$("#check_size").attr("readonly","readonly");
+		        			}
+		        			has_size = 1;
+		        		} else {
+		        			$("#check_size").val("");
+		        			$("#check_size").removeAttr("readonly");
+		        			$("#size").hide();
+		        			has_size = 0;
+		        		}
+		        		
+		        		if(activityExecute != null){
+			        		
+		        			$(".imageActivityExecute").hide();
+		        			$(".imgeActivity").html("");
+	        				var html = "";
+	        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute.orderList+'"/>'+activityExecute.remark+'<div class="weui-uploader__bd">'
+                               	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
+                              	html +='</ul>'
+                               	+'<div class="weui-uploader__input-box">'
+                                  	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" capture="camera">'
+                                  	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
+                                   +'<input type="hidden" name="pic" id="pic" class="pic">'
+                               	+'</div></div></div>';
+                               	$("#activity_execute_id").val(activityExecute.id);
+							 	$(".imgeActivity").append(html);
+						        $(".photoType").select({
+							        title: "请选择照片类型",
+							        multi: false,
+							        items: [{
+									       	title: "现场照片", value: "ScenePhoto"
+									       },{
+									       	title: "签名照片", value: "SignPhoto"
+									       },{
+									       	title: "赠品照片", value: "GiftPhoto"
+									       },{
+									       	title: "验收照片", value: "ExecutePhoto"
+									       }],
+							        onChange: function(obj) {
+						                $('#uploaderInput').click();
+							        }
+							    });															 
+		        			}else{
+		        				$(".imageActivityExecute").hide();
+			        			$(".imgeActivity").html("");
+		        				var html = "";
+		        				html +='<div class="weui-uploader__hd"><p class="weui-uploader__title">附件图片</p></div>';
+                              	html +='<div class="weui-uploader__input-box">'
+                                  	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" capture="camera">'
+                                  	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
+                                   +'<input type="hidden" name="pic" id="pic" class="pic">'
+                               	+'</div></div></div>';
+							 	$(".imgeActivity").append(html);
+						        $(".photoType").select({
+							        title: "请选择照片类型",
+							        multi: false,
+							        items: [{
+									       	title: "现场照片", value: "ScenePhoto"
+									       },{
+									       	title: "签名照片", value: "SignPhoto"
+									       },{
+									       	title: "赠品照片", value: "GiftPhoto"
+									       },{
+									       	title: "验收照片", value: "ExecutePhoto"
+									       }],
+							        onChange: function(obj) {
+						                $('#uploaderInput').click();
+							        }
+							    });					
+		        			}
+		        }
+	        });
+		}
         var index; //第几张图片
         var uploadIndex;
         var $uploaderFiles ;
@@ -273,10 +292,10 @@
         //    return false;
         //}
 
-        if($("#location").val().length==0) { 
+        /*if($("#location").val().length==0) { 
              $.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); 
              return false;
-         }
+         }*/
         
         if(imageArr.length == 0){
         	 $.toptip('照片不能为空', 3000, 'error'); 
@@ -299,10 +318,10 @@
             return false;
         }
 
-        if($.trim($("#location").val()).length==0) {
+        /*if($.trim($("#location").val()).length==0) {
             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
             return false;
-        }
+        }*/
 
         $.confirm("您确定要新增补录吗？","新增补录", function() {
             doNoSubmit();
