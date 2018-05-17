@@ -36,6 +36,7 @@ import org.ccloud.model.TransferBillDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.DepartmentQuery;
+import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.query.SellerProductQuery;
@@ -99,6 +100,7 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 	public void edit() {
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String userId = user.getId();
 		if (id != null) {
 			TransferBill transferBill = TransferBillQuery.me().findById(id);
@@ -118,6 +120,8 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 			}
 			setAttr("slist", list);
 		}
+		List<Record> goodsCategoryList=GoodsCategoryQuery.me().findBySellerId(sellerId,"");
+		setAttr("goodsCategory", goodsCategoryList);
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(userId);
 		setAttr("wlist", wlist);
 		List<User> ulist = UserQuery.me().findUserList(userId);
@@ -174,11 +178,11 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					String[] factIndex = map.get("factIndex");
 					for (int i = 1; i < factIndex.length; i++) {
 						TransferBillDetail transferBillDetail = getModel(TransferBillDetail.class);
-						String productId = StringUtils
-								.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] + "].product_id"));
-						String productCount = StringUtils
-								.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] + "].product_count"));
-
+						String productId = StringUtils.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] + "].product_id"));
+						String productCount = StringUtils.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] + "].product_count"));
+						if (productCount.equals("0")) {
+							break;
+						}
 						transferBillDetail.setSellerProductId(productId);
 						transferBillDetail.setProductCount(new BigDecimal(productCount));
 						transferBillDetail.setTransferBillId(transferBill.getId());
@@ -211,6 +215,9 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 								.getArrayFirst(map.get("transferBillDetailList[" + i + "].product_id"));
 						String productCount = StringUtils
 								.getArrayFirst(map.get("transferBillDetailList[" + i + "].product_count"));
+						if (productCount.equals("0")) {
+							break;
+						}
 						transferBillDetail.setSellerProductId(productId);
 						transferBillDetail.setProductCount(new BigDecimal(productCount));
 						transferBillDetail.setTransferBillId(transferBill.getId());
