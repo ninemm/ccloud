@@ -78,11 +78,6 @@
 				buer=true;
 				return false;
 			}
-			if(x==0){
-				toastr.error('调拨数量不能0','操作失败');
-				buer=true;
-				return false;
-			}
 		});
 		if(buer){
 			buer=false;
@@ -254,6 +249,49 @@ function addTr(tid, productList, optionArr) {
      });  
 }
 
+	function selectGoodsCategory(){
+		var warehouse_id = $("#from_warehouse_id").val();
+		var goodsCategory_id = $("#goodsCategory_id").val();
+		 if(warehouse_id == "" || warehouse_id == null || warehouse_id == undefined){
+		    return;
+		}
+		$('#dataTable tbody').find("tr:gt(0)").remove();
+		$.ajax({
+			url: "${CPATH}/admin/stockTaking/getProductInfo",
+			data:{"warehouse_id":warehouse_id,"goodsCategory_id":goodsCategory_id},
+			dataType: "json",
+			success: function(data) {
+				if(data!=""){
+					 for(var i=0; i<data.length; i++){
+					 	addTr("#dataTable", pList, pOptionArr);
+					 	var sellerProductId = data[i].sellerProductId;
+						var obj=$('#dataTable tbody').find("tr:last>td>select.pro-slc2"); 
+						obj.val(sellerProductId).trigger("change");
+						productChange(obj,sellerProductId);
+					}
+				}
+			}
+		});
+	}
+	
+	function productChange(obj,key){
+		 var result = pMap[key];   
+	     var cgoodsCode = result.sellerProductId;
+	     var cgoodsName = result.name;
+	     var cspecification = result.specificationValue;
+	     var cbig_unit = result.bigUnit;
+	     var balance_count = result.balance_count == null ? "暂未盘点":result.balance_count;
+	     var $tr = obj.parent().parent();
+	     
+	     $tr.find("td>#goodsCode").val(cgoodsCode);
+	     $tr.find("td>#goodsName").html(cgoodsName); 
+	     $tr.find("td>#specification").text(cspecification);
+	     $tr.find("td>#big_unit").text(cbig_unit);
+	     $tr.find("td>#balance_count").text(balance_count); 
+	     $tr.find("td>#stock").val(0); 
+	
+	}
+
 </#macro>
 
 <@layout active_id=p child_active_id=c>
@@ -290,19 +328,30 @@ function addTr(tid, productList, optionArr) {
 		                 	<input  type="hidden" name="transferBill.status" value="${(transferBill.status)!}">
 		               	</div>
 					</div>
-					
+					<#if !(transferBill.id) ??>
+						<div class="form-group col-sm-12 validata-box">
+							<label class="control-label col-sm-2">分类:</label>
+							<div class="input-group col-md-4 col-sm-10">
+								<select class="form-control input-sm"  id="goodsCategory_id" onchange=selectGoodsCategory()>
+									<option value="">--全部--</option>
+									<#list (goodsCategory)! as goodsCategory >
+										<option value="${goodsCategory.categoryId}">${(goodsCategory.categoryName)!}</option>
+									</#list>
+								</select>
+			               	</div>
+						</div>			
+					</#if>
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">调出仓库:</label>
 						<div class="input-group col-md-4 col-sm-10">
-							<select class="form-control input-sm" name="transferBill.from_warehouse_id" id="from_warehouse_id">
+							<select class="form-control input-sm" name="transferBill.from_warehouse_id" id="from_warehouse_id" onchange=selectGoodsCategory()>
 								<option value="">--请选择--</option>
 								<#list (wlist)! as warehouse >
 									<option value="${warehouse.id}" <#if transferBill?? && warehouse.id == transferBill.from_warehouse_id>selected="selected"</#if>>${(warehouse.name)!}</option>
 								</#list>
 							</select>
 		               	</div>
-					</div>					
-			
+					</div>			
 					<div class="form-group col-sm-12 validata-box">
 						<label class="control-label col-sm-2">调入仓库:</label>
 						<div class="input-group col-md-4 col-sm-10">
