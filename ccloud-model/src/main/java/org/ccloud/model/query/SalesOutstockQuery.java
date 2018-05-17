@@ -792,14 +792,12 @@ public class SalesOutstockQuery extends JBaseQuery {
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> cusCntBySellproduct(int pageNumber, int pageSize, long cusCount, String dataArea, String startDate, String endDate,String sort,String order) {
-		String select = "select sp.custom_name, (count(DISTINCT so.customer_id)) as count, TRUNCATE((count(DISTINCT so.customer_id)) / "+ cusCount + " * 100, 2) as coverage";
-		StringBuilder fromBuilder = new StringBuilder(" from cc_sales_outstock so ");
-		fromBuilder.append(" join cc_sales_outstock_detail sod on so.id =sod.outstock_id ");
-		fromBuilder.append(" join cc_seller_product sp on sod.sell_product_id = sp.id ");
-
+	public Page<Record> cusCntBySellproduct(int pageNumber, int pageSize, long cusCount, String sellerId, String startDate, String endDate,String sort,String order) {
+		String select = "select sp.custom_name, (count(DISTINCT so.customer_id)) as count, TRUNCATE((count(DISTINCT so.customer_id)) / "+ cusCount + " * 100, 2) as coverage, " + cusCount + " as cusCount";
+		StringBuilder fromBuilder = new StringBuilder(" from cc_seller_product sp  ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock_detail sod on sp.id = sod.sell_product_id  ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock so on sod.outstock_id  = so.id ");
 		LinkedList<Object> params = new LinkedList<Object>();
-		appendIfNotEmptyWithLike(fromBuilder, "so.data_area", dataArea, params, true);
 
 		if (StrKit.notBlank(startDate)) {
 			fromBuilder.append(" and so.biz_date >= ? ");
@@ -811,7 +809,9 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(endDate);
 		}
 
-		fromBuilder.append(" group by sod.sell_product_id ");
+		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, true);
+
+		fromBuilder.append(" group by sp.id ");
 
 		if (StrKit.isBlank(sort)) {
 			fromBuilder.append(" order by count desc ");

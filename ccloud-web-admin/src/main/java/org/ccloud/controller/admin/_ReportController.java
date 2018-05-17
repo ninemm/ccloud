@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.ccloud.Consts;
 import org.ccloud.core.JBaseController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
@@ -18,8 +20,6 @@ import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
-import org.ccloud.utils.DataAreaUtil;
-import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -28,6 +28,7 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import org.joda.time.DateTime;
+
 
 @RouterMapping(url = "/admin/report", viewPath = "/WEB-INF/admin/report")
 @Before(ActionCacheClearInterceptor.class)
@@ -660,27 +661,38 @@ public class _ReportController extends JBaseController {
 		renderJson(list);
 	}
 
+	@RequiresPermissions(value = {"/admin/report/productCoverage", "/admin/dealer/all"})
 	public void productCoverage() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		DateTime dateTime = new DateTime();
 		setAttr("startDate", DateFormatUtils.format(dateTime.withDayOfMonth(1).toDate(), "yyyy-MM-dd"));
 		setAttr("endDate", date);
 
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
-		setAttr("customerCount",SellerCustomerQuery.me().findCustomerCount(selectDataArea));
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		List<Seller> sellers = new ArrayList<>();
+		if (StrKit.notBlank(sellerId)) {
+			Seller seller = SellerQuery.me().findById(sellerId);
+			Subject subject = SecurityUtils.getSubject();
+			if (subject.isPermitted("/admin/all") || subject.isPermitted("/admin/manager")) {
+				sellers = SellerQuery.me().findByDataArea(seller.getStr("data_area") + "%");
+			} else {
+				sellers = SellerQuery.me().findByDataArea(seller.getStr("data_area"));
+			}
+		}
+		setAttr("sellers", sellers);
 
 		render("productCoverage.html");
 	}
 
 	public void productCoverageList() {
-		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
+		String sellerId = StrKit.isBlank(getPara("sellerId")) ? (String) getSessionAttr(Consts.SESSION_SELLER_ID) : getPara("sellerId");
 
-		long customerCount = getParaToLong("k");
-		Page<Record> page = SalesOutstockQuery.me().cusCntBySellproduct(getPageNumber(), getPageSize(), customerCount, selectDataArea, startDate, endDate, sort, order);
+		long customerCount = SellerCustomerQuery.me()._findBySellerId(sellerId);
+		Page<Record> page = SalesOutstockQuery.me().cusCntBySellproduct(getPageNumber(), getPageSize(), customerCount, sellerId, startDate, endDate, sort, order);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 
