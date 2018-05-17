@@ -244,10 +244,10 @@
             return false;
         }*/
         
-<!--         if($("#location").val().length==0) { -->
-<!--             $.toptip('定位地址不能为空,请刷新定位', 1000, 'error'); -->
-<!--             return false; -->
-<!--         } -->
+        if($("#location").val().length==0) {
+            $.toptip('定位地址不能为空,请刷新定位', 1000, 'error');
+            return false;
+        }
         
         var has_size = '${has_size!}';
         if(has_size == '1' && $("#check_size").val().length==0) {
