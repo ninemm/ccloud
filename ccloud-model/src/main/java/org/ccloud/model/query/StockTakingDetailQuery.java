@@ -24,7 +24,6 @@ import java.util.Map;
 import org.ccloud.model.StockTakingDetail;
 import org.ccloud.model.vo.ProductInfo;
 import org.ccloud.model.vo.StockTakingInfo;
-import org.ccloud.utils.StringUtils;
 
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
