@@ -617,7 +617,7 @@ public class _ReportController extends JBaseController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID).toString();
 		//我的客户卖出商品详情
 		List<Record> list = SalesOrderQuery.me().findByCustomerDetail1(startDate,endDate,keyword, userId,sellerId,false,dataArea, customerName);
-		List<Record> list1=SalesOrderQuery.me().findMoney(startDate,endDate,keyword, userId, customerName);
+		List<Record> list1=SalesOrderQuery.me().findMoney(startDate,endDate,keyword, userId, sellerId, dataArea, customerName);
 		for (Record record : list) {
 			String customerId=record.getStr("id");
 			for (Record record1 : list1) {
