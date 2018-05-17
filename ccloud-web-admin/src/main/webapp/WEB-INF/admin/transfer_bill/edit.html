@@ -195,8 +195,15 @@ $("#from_warehouse_id").change(function(){
     }
 })
 
-
-
+$("#goodsCategory_id").change(function(){
+    var fromWarehouseId = $("#from_warehouse_id").val();
+    initProduct(fromWarehouseId);
+    var $tbody = $("#dataTable tbody");
+    var $tr = $tbody.find("tr");
+    for(var i = 1; i < $tr.length; i ++) {
+    		$tr[i].remove();
+    }
+})
 
 function addNew() {
     //添加商品验证，是否选择一个调出仓库

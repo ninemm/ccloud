@@ -144,6 +144,11 @@
 	    initProduct(fromWarehouseId);
 	})
 	
+	$("#goodsCategory_id").change(function(){
+	    var fromWarehouseId = $("#warehouse_id").val();
+	    initProduct(fromWarehouseId);
+	})
+	
 	function addNew() {
 	   //添加商品验证，是否选择一个盘点仓库
 	    var fromWarehouseId = $("#warehouse_id").val();
