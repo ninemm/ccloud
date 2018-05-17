@@ -1108,4 +1108,29 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		excel.setCreateDate(record.get("create_date").toString());
 		return excel;
 	}
+
+	//业务员筛选
+	public void initUser() {
+
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sellerId = getPara("sellerId");
+		Integer status = getParaToInt("status");
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> userList = new ArrayList<>();
+		userList.add(all);
+		List<Record> list = SalesOrderQuery.me().findUserList(dataArea, sellerId, startDate, endDate, status);
+		for (Record record : list) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.getStr("realname"));
+			item.put("value", record.getStr("id"));
+			userList.add(item);
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("userList", userList);
+		renderJson(map);
+	}
 }

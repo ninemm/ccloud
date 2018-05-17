@@ -3394,4 +3394,39 @@ public class SalesOrderQuery extends JBaseQuery {
 		    		fromBuilder.append(" AND sri.create_date <= '"+endDate+"' GROUP BY sri.seller_id )a GROUP BY a.id");
 	        return Db.find(fromBuilder.toString(), params.toArray());
 	}
- }
+
+	public List<Record> findUserList(String dataArea, String sellerId, String startDate, String endDate, Integer status) {
+		StringBuilder fromBuilder = new StringBuilder("SELECT distinct u.realname, u.id FROM cc_sales_order o ");
+		fromBuilder.append("LEFT JOIN `user` u on o.biz_user_id = u.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+		boolean needWhere = true;
+
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.seller_id", sellerId, params, needWhere);
+
+		if (needWhere) {
+			fromBuilder.append(" where 1 = 1 ");
+		}
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and o.create_date >= ?");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and o.create_date <= ?");
+			params.add(endDate);
+		}
+
+		if(status != null && status != -1) {
+			fromBuilder.append(" and o.status = ? ");
+			params.add(status);
+		}
+
+		if (params.isEmpty())
+			return Db.find(fromBuilder.toString());
+
+		return Db.find(fromBuilder.toString(), params.toArray());
+	}
+
+}

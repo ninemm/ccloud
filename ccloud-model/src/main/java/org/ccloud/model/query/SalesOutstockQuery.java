@@ -771,7 +771,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(status);
 		} 
 		if(stockOutStatus != null) {
-			fromBuilder.append(" and o.status != ? ");
+			fromBuilder.append(" and o.status = ? ");
 			params.add(stockOutStatus);
 		}
 
