@@ -152,6 +152,7 @@ datetimepicker.min.css">
 					<div class="col-sm-8 input-group input-group-sm">
 						<select class="form-control" name="user_id" id="user_id">
 							<option value="">--请选择--</option>
+							<option value="all">全部</option>
 							<#list (ulist)! as user >
 								<option value="${user.id}" <#if user.id == userId!>selected</#if> >${(user.realname)!}</option>
 							</#list>

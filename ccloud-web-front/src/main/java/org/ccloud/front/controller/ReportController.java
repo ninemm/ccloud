@@ -728,11 +728,11 @@ public class ReportController extends BaseFrontController {
 		public void customerInfoCount() {
 			String dayTag = getPara("dayTag");
 			String sellerId = getSessionAttr("sellerId");
-			List<SellerCustomer> sellerCustomers = SellerCustomerQuery.me()._findBySellerId(sellerId); 
+			long customerCount = SellerCustomerQuery.me()._findBySellerId(sellerId);
 			int customerVisitCount =  CustomerVisitQuery.me()._findBySellerId(sellerId,dayTag);
 			
 			Map<String, Object> item = new HashMap<>();
-			item.put("customerCount", sellerCustomers.size());
+			item.put("customerCount", customerCount);
 			item.put("customerVisitCount",customerVisitCount);
 			renderJson(item);
 		}
@@ -743,7 +743,7 @@ public class ReportController extends BaseFrontController {
 			//已拜访客户
 			int customerVisitNum = CustomerVisitQuery.me().findBySellerId(sellerId,dayTag);
 			//总客户数
-			int customerNum = SellerCustomerQuery.me()._findBySellerId(sellerId).size();
+			long customerNum = SellerCustomerQuery.me()._findBySellerId(sellerId);
 			List<Map<String, Object>> customeVisitList = new ArrayList<>();
 			for(int i = 0 ; i < 2 ; i++) {
 				Map<String, Object> item = new HashMap<>();
