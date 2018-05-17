@@ -74,75 +74,48 @@
 
 
 
-    	var orderListNum = parseInt(${(orderListNum)!});
         var activityApplyId = "${(customerVisit.active_apply_id)!}";
         var listI = ${(list)!'1'};
        	var html = "";
        	var _domain = "${(domain)!}";
+       	var activityExecute = ${(activityExecute)!'1'};
        	if(activityApplyId!=""){
-			$.ajax({
-		        url: "${CPATH}/customerVisit/getActivityExecute",
-		        data: {
-		            "activityApplyId": "${(customerVisit.active_apply_id)!}"
-		        },
-		        dataType: "json",
-		        success: function(data) {
-		        		if(data!=null){
-			        		var imgeList = data.imgeLists;
-			        		var domain = data.domain;
-			        		var activityExecute = data.activityExecute;
-		        			$(".imageActivityExecute").hide();
-		        			$(".imgeInfo").hide();
-		        			numImage = imgeList.length;
-		        			if(activityExecute.length>0){
-			        			for(var i = 0 ; i < (orderListNum+1) ; i++){
-				        				html +='<div><input id="orderList" type="hidden" value="'+activityExecute[i].orderList+'"/>'+activityExecute[i].remark+'<div class="weui-uploader__bd">'
-			                               	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
-			                          if(imgeList != 1){
-				                           for(var j = 0 ; j < imgeList.length ; j++){
-				                            	if(imgeList[j].orderList == activityExecute[i].orderList){
-					                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
-				                           			imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imgeList[j].savePath,"photoType":imgeList[j].photoType});
-				                            	}
-				                            	if(i == orderListNum && imgeList[j].orderList == activityExecute[orderListNum].orderList){
-				                            		newImage++;
-				                            	}
-				                            }
-			                          }
-			                          if((i+1)>orderListNum){
-			                          	html +='</ul><div class="weui-uploader__input-box">'
-			                               	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/jpg,image/png,image/jpeg">'
-			                               	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
-			                               	+'</div></div></div>';
-			                          }else{
-			                          	numI++;
-			                          	html +='</ul></div></div>';
-			                          }
-			        			}
-		        			}else{
-		        				html +='<div class="weui-uploader__hd">'
-				                       +'<p class="weui-uploader__title">附件图片</p>'
-				                       +'</div>'
-				                       +'<div class="weui-uploader__bd imageActivityExecute">'
-				                       +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
-					            if(imgeList != 1){
-					                for(var i = 0 ; i < imgeList.length ; i++){
-					                	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[i].savePath+')"></li>';
-							            imageArr.push({"pic":imgeList[i].originalPath, "picname":imgeList[i].imgName,"orderList":"0","savepath":imgeList[i].savePath,"photoType":imgeList[i].photoType});
-					                }
-					            }
-				                html +='</ul>'
-				                       +'<div class="weui-uploader__input-box">'
-				                       +'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/jpg,image/png,image/jpeg">'
-				                       +'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
-				                       +'</div>'
-				                       +'</div>';
-		        			}
-		        			$(".imgeActivity").html("");
-		        			$(".imgeActivity").append(html);
-		        		}
-		        }
-	        });
+				if(activityExecute != 1){
+	 				html +='<div><input id="orderList" type="hidden" value="'+activityExecute.orderList+'"/>'+activityExecute.remark+'<div class="weui-uploader__bd">'
+	                       	+'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles" >';
+	                  if(listI != 1){
+	                    for(var j = 0 ; j < listI.length ; j++){
+	                     	if(listI[j].orderList == activityExecute.orderList){
+	                      	html += '<li class="weui-uploader__file " style="background-image:url('+_domain+'/'+listI[j].savePath+')"></li>';
+	                    			imageArr.push({"pic":listI[j].originalPath, "picname":listI[j].imgName,"orderList":activityExecute.orderList,"savepath":listI[j].savePath,"photoType":listI[j].photoType});
+	                     	}
+	                     }
+	                  }
+	                  	html +='</ul><div class="weui-uploader__input-box">'
+	                       	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/jpg,image/png,image/jpeg">'
+	                       	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
+	                       	+'</div></div></div>';
+				}else{
+					html +='<div class="weui-uploader__hd">'
+	                 +'<p class="weui-uploader__title">附件图片</p>'
+	                 +'</div>'
+	                 +'<div class="weui-uploader__bd imageActivityExecute">'
+	                 +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
+	       if(listI != 1){
+	           for(var i = 0 ; i < imgeList.length ; i++){
+	           	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+listI[i].savePath+')"></li>';
+	         imageArr.push({"pic":listI[i].originalPath, "picname":listI[i].imgName,"orderList":"0","savepath":listI[i].savePath,"photoType":listI[i].photoType});
+	           }
+	       }
+	          html +='</ul>'
+	                 +'<div class="weui-uploader__input-box">'
+	                 +'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/jpg,image/png,image/jpeg">'
+	                 +'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
+	                 +'</div>'
+	                 +'</div>';
+			}
+			$(".imgeActivity").html("");
+			$(".imgeActivity").append(html);
         }else{
       				html +='<div class="weui-uploader__hd">'
                        +'<p class="weui-uploader__title">附件图片</p>'
