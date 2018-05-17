@@ -793,7 +793,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 	}
 
 	public Page<Record> cusCntBySellproduct(int pageNumber, int pageSize, long cusCount, String dataArea, String startDate, String endDate,String sort,String order) {
-		String select = "select sp.custom_name, (count(DISTINCT so.customer_id)) as count, TRUNCATE((count(DISTINCT so.customer_id)) / "+ cusCount + ",2) as coverage";
+		String select = "select sp.custom_name, (count(DISTINCT so.customer_id)) as count, TRUNCATE((count(DISTINCT so.customer_id)) / "+ cusCount + " * 100, 2) as coverage";
 		StringBuilder fromBuilder = new StringBuilder(" from cc_sales_outstock so ");
 		fromBuilder.append(" join cc_sales_outstock_detail sod on so.id =sod.outstock_id ");
 		fromBuilder.append(" join cc_seller_product sp on sod.sell_product_id = sp.id ");

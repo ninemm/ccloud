@@ -26,18 +26,15 @@
 		jQuery.mm.initDatetimepicker('form', '#startDate', 'startDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initDatetimepicker('form', '#endDate', 'endDate', 'yyyy-MM-dd', 2, 4, 2);
 		jQuery.mm.initValidator('#form', validatorFields);
-		jQuery.mm.initEditTableExport('#_productCoverage_table',url, initParams, initFields(), null,null,"产品覆盖率");
+		jQuery.mm.initEditTableExport('#_productCoverage_table',url, initParams, initFields(), null,null,"产品覆盖率（终端总数:" + ${customerCount!} + "个）");
 		$('button[title^=Export]').html('导出').attr('class','btn btn-sm btn-primary btn-flat');
 		$('button[title^=Export]').html('导出').css('border-radius',0);
 		$('button[title^=Export]').html('导出').css('margin-top','2px');
 	});
 
 	var initParams = function(params) {
-		var keyword = $('#status  option:selected').val();
-		if(keyword == ""){
-			keyword = "so.create_date";
-		}
-		if (keyword) keyword = encodeURIComponent(keyword);
+		var keyword = ${customerCount!};
+
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
@@ -61,7 +58,7 @@
 		var fields =
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
       			{field: "custom_name", title: "商品名称", align: "center",  edit:false ,sortable: true},
-      			{field: "count", title: "覆盖终端数", align: "center",  edit:false ,sortable: true},
+      			{field: "count", title: "终端覆盖数（终端总数:" + ${customerCount!} + "个）", align: "center",  edit:false ,sortable: true},
       			{field: "coverage", title: "覆盖率", align: "center",  edit:false ,sortable: true, formatter: function (value, row, index) { return value + "%"; }}
    			];
    		return fields;

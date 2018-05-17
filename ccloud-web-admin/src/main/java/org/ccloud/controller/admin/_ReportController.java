@@ -18,6 +18,8 @@ import org.ccloud.model.Warehouse;
 import org.ccloud.model.query.*;
 import org.ccloud.route.RouterMapping;
 import org.ccloud.route.RouterNotAllowConvert;
+import org.ccloud.utils.DataAreaUtil;
+import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -25,6 +27,7 @@ import com.jfinal.aop.Before;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import org.joda.time.DateTime;
 
 @RouterMapping(url = "/admin/report", viewPath = "/WEB-INF/admin/report")
 @Before(ActionCacheClearInterceptor.class)
@@ -659,8 +662,12 @@ public class _ReportController extends JBaseController {
 
 	public void productCoverage() {
 		String date = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		setAttr("startDate", date);
+		DateTime dateTime = new DateTime();
+		setAttr("startDate", DateFormatUtils.format(dateTime.withDayOfMonth(1).toDate(), "yyyy-MM-dd"));
 		setAttr("endDate", date);
+
+		String selectDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		setAttr("customerCount",SellerCustomerQuery.me().findCustomerCount(selectDataArea));
 
 		render("productCoverage.html");
 	}
@@ -672,7 +679,7 @@ public class _ReportController extends JBaseController {
 		String sort = getPara("sortName[sort]");
 		String order = getPara("sortName[order]");
 
-		long customerCount = SellerCustomerQuery.me().findCustomerCount(selectDataArea);
+		long customerCount = getParaToLong("k");
 		Page<Record> page = SalesOutstockQuery.me().cusCntBySellproduct(getPageNumber(), getPageSize(), customerCount, selectDataArea, startDate, endDate, sort, order);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
