@@ -24,8 +24,10 @@ import org.ccloud.model.CustomerVisitJoinActivity;
 import org.ccloud.model.Dict;
 import org.ccloud.model.ExpenseDetail;
 import org.ccloud.model.Message;
+import org.ccloud.model.SellerCustomer;
 import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
+import org.ccloud.model.excel.ExcelUploadUtils;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
 import org.ccloud.model.query.ActivityQuery;
@@ -57,6 +59,7 @@ import com.google.common.base.Splitter;
 import com.jfinal.aop.Before;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
+import com.jfinal.log.Log;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
@@ -64,6 +67,7 @@ import com.jfinal.plugin.activerecord.tx.Tx;
 @RouterMapping(url = "/customerVisit")
 @RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
 public class CustomerVisitController extends BaseFrontController {
+	private static final Log log = Log.getLog(CustomerVisitController.class);
 	
 	//库存详情
 	@RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
@@ -445,7 +449,19 @@ public class CustomerVisitController extends BaseFrontController {
 					//原图
 					String originalPath = qiniuUpload(pic);
 					//添加的水印内容
-					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
+					String waterFont1 = "";
+					SellerCustomer sellerCustomer =  customerVisit.getSellerCustomer();
+					if (sellerCustomer != null) {
+						Customer customer = sellerCustomer.getCustomer();
+						if (customer != null) {
+							waterFont1 = customer.getCustomerName();
+						} else {
+							log.error("customer查询为空!customer_id:" + sellerCustomer.getCustomerId());
+						}
+					} else {
+						log.error("sellerCustomer查询为空!seller_customerId:" + customerVisit.getSellerCustomerId());
+					}
+					
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
 					String waterFont3 =  customerVisit.getLocation();
 //					String waterFont3 = "湖北省-武汉市-洪山区";

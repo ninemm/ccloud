@@ -481,6 +481,8 @@ $("#newCustomerBoard").on("click",function(){
                             <li>
                                 <span>${bean.createTime!}</span>
                                 <a href="${CPATH}/admin/salesOrder/audit?id=${bean.id!}&taskId=${bean.taskId!}&assignee=${bean.assignee}" target="_parent">${bean.orderSn!}</a>
+                                &nbsp;
+                                <span>${bean.realname!}</span>
                             </li>
                             </#list>
                             <#else>

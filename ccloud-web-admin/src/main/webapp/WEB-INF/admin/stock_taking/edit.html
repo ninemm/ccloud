@@ -325,9 +325,9 @@
 							<a class="btn btn-danger btn-xs removeTr" data-toggle="modal" data-target="#deleteBackProModal" onclick="deleteTr(this)"><span class="glyphicon glyphicon-remove"></span></a>
 							</td>
 							<td class="text-left">
-								<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].seller_product_id"  value="${list.sellerProductId}" />
-								<input type="text" id="goodsName" name="goodsName"  value="${list.customName}" disabled="disabled"/>
-							   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index}"/>
+								<input type="hidden" id="goodsCode" name="stockTakingList[${list_index}].seller_product_id"  value="${list.sellerProductId!}" />
+								<input type="text" id="goodsName" name="goodsName"  value="${list.customName!}" disabled="disabled"/>
+							   <input type="hidden"  id="factIndex" name="factIndex" value="${list_index!}"/>
 							</td>
 							<td>
 								<input name="specification" id="specification" value="${list.specificationValue!}" disabled="disabled"></input>
@@ -339,7 +339,7 @@
 								<input name="balance_count" id="balance_count" value="${list.balance_count!}" disabled="disabled"></input>
 							</td>
 							<td>
-							<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount}" />
+							<input type="text" id="stock" class="stock" name="stockTakingList[${list_index}].product_count"  value="${list.productCount!}" />
 							</td>
 							<td class="text-left">
 								<input type="text"  class="remarks" id="remarks" name="stockTakingList[${list_index}].remark" value="${list.remark!}">
