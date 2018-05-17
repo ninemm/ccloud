@@ -73,9 +73,24 @@
 				return true;
 			};
 			var x = $(this).val();
-			if(x==null||x==""){
-				toastr.error('调拨数量不能为空','操作失败');
+			var y = $(this).parent().parent().find('#balance_count').text();
+			if(y=="暂未盘点"){
+				y=0;
+			}
+			if(x*1>y*1){
+				toastr.error('第'+index+'行调拨数量不能操过库存数量','操作失败');
 				buer=true;
+				return false;
+			}
+			if(x==null||x==""){
+				toastr.error('第'+index+'行调拨数量不能为空','操作失败');
+				buer=true;
+				return false;
+			}
+			var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+			if (!reg.test(x)) {
+				toastr.error('第'+index+'行请正确输入的数量','操作失败');
+				buer = true;
 				return false;
 			}
 		});
