@@ -65,23 +65,23 @@ var headerStr =
 			'<td style="visibility: hidden; ">&nbsp;</td>'+
 		'</tr>' +
 		'<tr>' +
-			'<td colspan="2" style="text-align:left;width: 100px;font-size: 14px;">货品名称</td>' +
+			'<td colspan="2" style="text-align:left;width: 90px;font-size: 14px;">货品名称</td>' +
 			'<td style="font-size: 14px;width: 50px;">规格</td>' +
 			'<td style="font-size: 14px;width: 30px;">单位</td>' +
 			'<td style="font-size: 14px;width: 30px;">数量</td>' +
-			'<td style="font-size: 14px;width: 40px;">单价</td>' +
+			'<td style="font-size: 14px;width: 50px;">单价</td>' +
 			'<td style="font-size: 14px;width: 50px;">货款</td>' +
 			'<td style="visibility: hidden; ">&nbsp;</td>'+
 		'</tr>' +
 	'</thead>';
 
 		var contentStr = '<tr>' +
-			'<td colspan="2" style="text-align:left;width: 100px;font-size: 14px;">{1}</td>' +
-			'<td style="font-size: 14px;width: 50px;">{7}</td>' +
-			'<td style="font-size: 14px;width: 30px;">{9}</td>' +
-			'<td style="font-size: 14px;width: 30px;">{2}</td>' +
-			'<td style="font-size: 14px;width: 40px;">{3}</td>' +
-			'<td style="font-size: 14px;width: 50px;">{8}</td>' +
+			'<td colspan="2" style="text-align:left;width: 90px;font-size: 14px;">{1}</td>' +
+			'<td style="font-size: 14px;width: 50px;">{2}</td>' +
+			'<td style="font-size: 14px;width: 30px;">{3}</td>' +
+			'<td style="font-size: 14px;width: 30px;">{4}</td>' +
+			'<td style="font-size: 14px;width: 50px;">{5}</td>' +
+			'<td style="font-size: 14px;width: 50px;">{6}</td>' +
 			'<td style="visibility: hidden; width: 1px;">&nbsp;</td>'+
 			'</tr>';
 
@@ -102,7 +102,7 @@ var headerStr =
 				'<span class="width200" style="font-size: 14px;">公司名称：{5}</span>'+
 			'</div>' +
 			'<div class="stat">' +
-				'<span style="font-size: 14px">公司电话: 027-84769588;&nbsp;15727025122</span>' +
+				'<span style="font-size: 14px">公司电话: 027-84769588</span>' +
 			'</div>' +
 			'<div class="stat">' +
 				'<span style="font-size: 14px;">业务员:{8} 电话:{9} </span>' +
@@ -140,29 +140,31 @@ function queryPrintDetail(financePrint) {
                             if (!barCode) barCode = '无';
                             let totalMoney = 0;
                             let totalNum = 0;
-                            let isGift = subitem.isgift;
+                           	var Unit="";
+                           	var Price = 0;
+                            let isGift = subitem.isgift; 
+                            if(subitem.smallCount != 0){
+                            		totalNum = subitem.bigCount*subitem.convertRelate+subitem.smallCount;
+                            		Unit = subitem.smallUnit;
+                            		Price = subitem.smallPrice;
+                            }else{
+                            		totalNum = subitem.bigCount;
+                            		Unit = subitem.bigUnit;
+                            		Price = subitem.bigPrice;
+                            }
                             if (isGift != 0) {
-                                isGift = '(赠品)';
+                           		Price=0;
                             } else {
-                                isGift = "";
                                 totalMoney = subitem.bigCount
 										* subitem.bigPrice
 										+ subitem.smallCount
 										* subitem.smallPrice;
 								saleMoney = saleMoney + totalMoney;
                             }
-                            totalNum=subitem.bigCount+subitem.smallCount/subitem.convertRelate
-                            saleNum=saleNum+totalNum;
-                            var productAmout = subitem.productAmout
-                            var convertRelate=""
-                            if(subitem.convertRelate!=null){
-                            		convertRelate="1*"+	subitem.convertRelate;
-                            }
-                            if(isGift == 0){
-                            		content += $.format(contentStr, (idx + 1), subitem.productName, totalNum.toFixed(2), subitem.bigPrice, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,productAmout,subitem.bigUnit)
-                            }else{
-                            		content += $.format(contentStr, (idx + 1), subitem.productName, totalNum, 0, subitem.smallCount, subitem.smallPrice + '元',subitem.valueName,convertRelate,totalMoney.toFixed(2),subitem.bigUnit,subitem.convertRelate)
-                            }
+                            saleNum=saleNum+subitem.bigCount;
+                            var convertRelate="1*"+	subitem.convertRelate;
+                            
+                            content += $.format(contentStr, (idx + 1), subitem.productName,convertRelate,Unit,totalNum,Price,totalMoney.toFixed(2))
                         });
 
                         let len = item.orderProductInfos.length;
@@ -185,7 +187,7 @@ function queryPrintDetail(financePrint) {
 
                     let printFootContext = item.printFootContext;
                     if (!printFootContext) printFootContext = '';
-                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', saleMoney.toFixed(2), warehousePhone, remark,printFootContext,item.sellerName,saleNum.toFixed(2),item.sellerPhone,placeOrderMan, placeOrderPhone);
+                    footerContent = $.format(footerStr, '${(session._logined_user.realname)!}', saleMoney.toFixed(2), warehousePhone, remark,printFootContext,item.sellerName,saleNum,item.sellerPhone,placeOrderMan, placeOrderPhone);
 
                     batchPrintContent += headerInfoContent + headerContent + content + footerContent;
 

@@ -94,9 +94,9 @@
 	var initFields = function() {
 		var fields =
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-				{field: "cname", title: "直营商名称", align: "center",  edit:false},
-      			{field: "spname", title: "商品名称", align: "center",  edit:false},
-      			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false}
+				{field: "cname", title: "直营商名称", align: "center",  edit:false,sortable: true},
+      			{field: "spname", title: "商品名称", align: "center",  edit:false,sortable: true},
+      			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false,sortable: true}
    			];
    		return fields;
 	}
@@ -104,9 +104,9 @@
 	var initFieldsGift = function() {
 		var fields =
 			[ 	{title: "序号", align: "center", edit:false, formatter: function (value, row, index) { return index+1; } },
-				{field: "cname", title: "直营商名称", align: "center",  edit:false},
-      			{field: "spname", title: "商品名称", align: "center",  edit:false},
-      			{field: "productCountTotal", title: "数量(件)", align: "center",  edit:false}
+				{field: "cname", title: "直营商名称", align: "center",  edit:false,sortable: true},
+      			{field: "spname", title: "商品名称", align: "center",  edit:false,sortable: true},
+      			{field: "productCountTotal", title: "数量(件)", align: "center", edit:false,sortable: true}
    			];
    		return fields;
 	}
