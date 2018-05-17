@@ -102,8 +102,8 @@
 	                 +'<div class="weui-uploader__bd imageActivityExecute">'
 	                 +'<ul class="weui-uploader__files uploaderFiles" id="uploaderFiles">';
 	       if(listI != 1){
-	           for(var i = 0 ; i < imgeList.length ; i++){
-	           	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+listI[i].savePath+')"></li>';
+	           for(var i = 0 ; i < listI.length ; i++){
+	           	html += '<li class="weui-uploader__file " style="background-image:url('+_domain+'/'+listI[i].savePath+')"></li>';
 	         imageArr.push({"pic":listI[i].originalPath, "picname":listI[i].imgName,"orderList":"0","savepath":listI[i].savePath,"photoType":listI[i].photoType});
 	           }
 	       }
