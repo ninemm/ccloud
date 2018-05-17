@@ -250,8 +250,9 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String activityId = getPara("activity");
 		String status = getPara("status");
+		String salesmanId = getPara("salesman");//业务员Id
 
-		Page<Record> page = SalesOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, dataArea, activityId, status);
+		Page<Record> page = SalesOrderQuery.me().paginate(getPageNumber(), getPageSize(), keyword, startDate, endDate, sellerId, dataArea, activityId, status, salesmanId);
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", page.getList());
 		renderJson(map);
@@ -966,9 +967,10 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		String sellerId = getPara("sellerId");
 		String activityId = getPara("activity");
 		String status = getPara("status");
+		String salesmanId = getPara("salesman");
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\sales_outstock\\"
 				+ "销售订单.xlsx";
-		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId, status);
+		Page<Record> page = SalesOrderQuery.me().paginate(1, Integer.MAX_VALUE, keyword, startDate, endDate, sellerId, dataArea, activityId, status, salesmanId);
 		List<Record> salesOderList = page.getList();
 		
 		List<SalesOrderExcel> excellist = Lists.newArrayList();
@@ -1107,5 +1109,30 @@ public class _SalesOrderController extends JBaseCRUDController<SalesOrder> {
 		excel.setActivity(activity);
 		excel.setCreateDate(record.get("create_date").toString());
 		return excel;
+	}
+
+	//业务员筛选
+	public void initUser() {
+
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		String startDate = getPara("startDate");
+		String endDate = getPara("endDate");
+		String sellerId = getPara("sellerId");
+		Integer status = getParaToInt("status");
+		Map<String, Object> all = new HashMap<>();
+		all.put("title", "全部");
+		all.put("value", "");
+		List<Map<String, Object>> userList = new ArrayList<>();
+		userList.add(all);
+		List<Record> list = SalesOrderQuery.me().findUserList(dataArea, sellerId, startDate, endDate, status);
+		for (Record record : list) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", record.getStr("realname"));
+			item.put("value", record.getStr("id"));
+			userList.add(item);
+		}
+		Map<String, Object> map = new HashMap<>();
+		map.put("userList", userList);
+		renderJson(map);
 	}
 }

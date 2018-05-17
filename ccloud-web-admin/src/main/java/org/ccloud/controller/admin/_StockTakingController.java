@@ -33,6 +33,7 @@ import org.ccloud.model.StockTaking;
 import org.ccloud.model.StockTakingDetail;
 import org.ccloud.model.User;
 import org.ccloud.model.Warehouse;
+import org.ccloud.model.query.GoodsCategoryQuery;
 import org.ccloud.model.query.InventoryDetailQuery;
 import org.ccloud.model.query.InventoryQuery;
 import org.ccloud.model.query.SellerProductQuery;
@@ -83,6 +84,7 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 		//判断当前是新增  还是  修改
 		String id = getPara("id");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
+		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String userId = user.getId();
 		if (id != null) {
 			StockTaking stockTaking = StockTakingQuery.me().findById(id);
@@ -90,6 +92,8 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 			setAttr("stockTaking", stockTaking);
 			setAttr("ilist", ilist);
 		}
+		List<Record> goodsCategoryList=GoodsCategoryQuery.me().findBySellerId(sellerId,"");
+		setAttr("goodsCategory", goodsCategoryList);
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(userId);
 		setAttr("wlist", wlist);
 		List<User> ulist = UserQuery.me().findUserList(userId);
@@ -425,8 +429,9 @@ public class _StockTakingController extends JBaseCRUDController<StockTaking> {
 
 	public void getProductInfo() {
 		String  warehouseId = getPara("warehouse_id");
+		String  goodsCategoryId = getPara("goodsCategory_id");
 		String seller_id=getSessionAttr("sellerId").toString();
-		List<Record>list=StockTakingDetailQuery.me().findByWarehouseIdAndSellerId(warehouseId,seller_id);
+		List<Record>list=StockTakingDetailQuery.me().findByWarehouseIdAndSellerId(warehouseId,seller_id,goodsCategoryId);
 		renderJson(list);
 	}
 }

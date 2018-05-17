@@ -771,7 +771,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(status);
 		} 
 		if(stockOutStatus != null) {
-			fromBuilder.append(" and o.status != ? ");
+			fromBuilder.append(" and o.status = ? ");
 			params.add(stockOutStatus);
 		}
 
@@ -791,7 +791,38 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
-	
+
+	public Page<Record> cusCntBySellproduct(int pageNumber, int pageSize, long cusCount, String sellerId, String startDate, String endDate,String sort,String order) {
+		String select = "select sp.custom_name, (count(DISTINCT so.customer_id)) as count, TRUNCATE((count(DISTINCT so.customer_id)) / "+ cusCount + " * 100, 2) as coverage, " + cusCount + " as cusCount";
+		StringBuilder fromBuilder = new StringBuilder(" from cc_seller_product sp  ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock_detail sod on sp.id = sod.sell_product_id  ");
+		fromBuilder.append(" LEFT JOIN cc_sales_outstock so on sod.outstock_id  = so.id ");
+		LinkedList<Object> params = new LinkedList<Object>();
+
+		if (StrKit.notBlank(startDate)) {
+			fromBuilder.append(" and so.biz_date >= ? ");
+			params.add(startDate);
+		}
+
+		if (StrKit.notBlank(endDate)) {
+			fromBuilder.append(" and so.biz_date <= ? ");
+			params.add(endDate);
+		}
+
+		appendIfNotEmpty(fromBuilder, "sp.seller_id", sellerId, params, true);
+
+		fromBuilder.append(" group by sp.id ");
+
+		if (StrKit.isBlank(sort)) {
+			fromBuilder.append(" order by count desc ");
+		}else {
+			fromBuilder.append("order by "+sort+" "+order);
+		}
+
+		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
+	}
+
+
 	public Page<Record> paginateDowning(int pageNumber, int pageSize, String sellerId, String searchSn, String startDate, 
 			String endDate, String printStatus, String stockOutStatus, String status, String dataArea,String order,String sort,String salesmanId, String carWarehouseId, String searchName) {
 		String select = "SELECT o.*, c.prov_name,c.city_name,c.country_name,c.address,c.customer_name,ct. NAME AS customerName,cso.id AS orderId,cso.order_sn,cso.create_date AS orderDate,cso.proc_inst_id AS procInstId,uu.realname AS bizName,t4.product_count,t4.product_price,t4.is_gift,t4.tax_price,t4.bar_code,t4.big_unit,t4.custom_name,t4.small_unit,t4.convert_relate,t4.id AS productId,t4.product_sn,t4.valueName,op.create_date as printDate,ct.`name` as customerType";

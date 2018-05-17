@@ -189,6 +189,11 @@ public class RefundController extends BaseFrontController{
         		if (!salesRefundInstock.save()) {            	
         			return false;
         		}
+        		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_REFUND + sellerCode);
+        		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
+        		if(!isCheckStore) {
+        			savePayables(instockId);
+        		}
             	return true;
             }
         });
@@ -301,7 +306,7 @@ public class RefundController extends BaseFrontController{
 			renderAjaxResultForError(result);
 		}		
 	}
-
+	//自由退货
 	private String saveRefund(final Map<String, String[]> paraMap, final User user, 
 			final String sellerId, final String sellerCode, final Warehouse warehouse) {
 		final String[] result = {""};
@@ -311,7 +316,6 @@ public class RefundController extends BaseFrontController{
 				
 				String orderId = StrKit.getRandomUUID();
 				Date date = new Date();
-
 				SalesRefundInstock salesRefundInstock =  SalesRefundInstockQuery.me()
 						.insertAppByUser(orderId, paraMap, user, sellerId, sellerCode, date, warehouse);
 				BigDecimal totalRejectAmount = new BigDecimal(0);
@@ -376,10 +380,32 @@ public class RefundController extends BaseFrontController{
         		if (!salesRefundInstock.save()) {            	
         			return false;
         		}				
+        		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_REFUND + sellerCode);
+        		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;	
+        		if(!isCheckStore) {
+        			savePayables(orderId);
+        		}
 				return true;
 			}
 		});
 		return result[0];
+	}
+	//退货生成应付账款
+	public void savePayables(String orderId) {
+		Record refund = SalesRefundInstockQuery.me().findMoreById(orderId);
+		String customerId = refund.getStr("customer_id");
+		String refundSn = refund.getStr("instock_sn");
+		List<Record> refundDetail = SalesRefundInstockDetailQuery.me().findByRefundId(orderId);
+		if (!PayablesQuery.me().insert(refund, new Date())) {
+			renderAjaxResultForError("订单审核失败");
+			return ;
+		}
+		for (Record record : refundDetail) {
+			if (!PayablesDetailQuery.me().insert(record, customerId, refundSn, new Date())) {
+				renderAjaxResultForError("订单审核失败");
+				return;
+			}
+		}
 	}
 
 }
