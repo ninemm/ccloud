@@ -181,8 +181,8 @@ public class StockTakingDetailQuery extends JBaseQuery {
 	 	fromBuilder.append(" balance_count , cstd.product_count  productCount , cstd.remark remark FROM cc_stock_taking cst LEFT JOIN cc_stock_taking_detail cstd ON cstd.stock_taking_id = cst.id");
 	 	fromBuilder.append(" LEFT JOIN cc_seller_product csp ON csp.id = cstd.seller_product_id LEFT JOIN( SELECT sv.id , cv.product_set_id , GROUP_CONCAT(sv. NAME) AS valueName ");
 	 	fromBuilder.append(" FROM cc_goods_specification_value sv RIGHT JOIN cc_product_goods_specification_value cv ON cv.goods_specification_value_set_id = sv.id GROUP BY cv.product_set_id) t1");
-	 	fromBuilder.append(" ON t1.product_set_id = csp.product_id LEFT JOIN cc_product cp ON cp.id = csp.product_id LEFT JOIN( SELECT i.balance_count , i.sell_product_id FROM cc_inventory_detail i WHERE i.warehouse_id = ? ");
-	 	fromBuilder.append(" GROUP BY i.sell_product_id ORDER BY i.create_date DESC) t2 ON t2.sell_product_id = csp.id WHERE cst.id = ? and cstd.seller_product_id is not null");
+	 	fromBuilder.append(" ON t1.product_set_id = csp.product_id LEFT JOIN cc_product cp ON cp.id = csp.product_id LEFT JOIN( SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id  ");
+	 	fromBuilder.append(" FROM cc_inventory_detail c WHERE c.warehouse_id =? GROUP BY c.sell_product_id) t2 ON t2.sell_product_id = csp.id WHERE cst.id = ? and cstd.seller_product_id is not null");
 	 	return Db.find(fromBuilder.toString(),warehouse_id, id);
 	}
 }
