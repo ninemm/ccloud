@@ -443,8 +443,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -807,8 +807,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -885,8 +885,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -924,7 +924,7 @@ public class CustomerVisitController extends BaseFrontController {
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		if(StrKit.notBlank(customerVisit.getStr("active_apply_id")) && StrKit.notBlank(customerVisit.getStr("activity_execute_id"))) {
 			ActivityExecute activityExecute = ActivityExecuteQuery.me().findById(customerVisit.getStr("activity_execute_id"));
-			setAttr("activityExecute",activityExecute);
+			setAttr("activityExecute",JSON.toJSON(activityExecute));
 		}
 		setAttr("list",JSON.toJSON(list));
 		setAttr("domain",OptionQuery.me().findValue("cdn_domain"));
@@ -1018,8 +1018,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
