@@ -61,6 +61,7 @@ $(function() {
 
 	$(document).on("submit", ".weui-search-bar__form", function() {
 		keyword = $("#searchInput").val();
+		categoryId='';
 		changeInit();
 		return false;
 	}).on("click", "#searchCancel", function() {
@@ -261,20 +262,38 @@ function initTags(tags) {
 
 function initProduct(productList,goodsCategory,compositionList){
 	$.each(goodsCategory, function(index, el) {
-		map[el.categoryId] = 0;
-		if(categoryId==''){
-			$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-			$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
-			categoryId=el.categoryId;
-		}else{
-			if(categoryId != el.categoryId){
-				$sidebar.append("<li name='category' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
+		map[el.categoryId] = 0; 
+		if( keyword!='' && categoryId=='' ){
+			if(categoryId==''){
+				$sidebar.append("<li style='background: #f3f5f7;'  name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+				$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
+				categoryId=el.categoryId;
 			}else{
+				if(categoryId != el.categoryId){
+					$sidebar.append("<li style='background: #f3f5f7;' name='category' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+					$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
+				}else{
+					$sidebar.append("<li style='background: #f3f5f7;' name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+					$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
+				}
+			}
+		
+		}else{
+			if(categoryId==''){
 				$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
 				$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
+				categoryId=el.categoryId;
+			}else{
+				if(categoryId != el.categoryId){
+					$sidebar.append("<li name='category' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+					$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
+				}else{
+					$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+					$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
+				}
 			}
 		}
+		
 	});
 	if(compositionList.length > 0) {
 		$sidebar.append("<li id='composition'> 活动商品 <span class='goods-num'></span> </li>");
