@@ -653,7 +653,8 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 		String[] date = DateUtils.getStartDateAndEndDateByType("month");
 		List<Expense> expenseList = new ArrayList<>();
 		if (StrKit.isBlank(startDate) && startDate.equals("")) {
-			expenseList = MidDataUtil.getExpensesInfo(date[0], date[1], "1", Consts.GET_MID_DATA_TOTALROW);
+			String end = date[1].split(" ")[0];
+			expenseList = MidDataUtil.getExpensesInfo(date[0], end, "1", Consts.GET_MID_DATA_TOTALROW);
 		} else {
 			expenseList = MidDataUtil.getExpensesInfo(startDate, endDate, "1", Consts.GET_MID_DATA_TOTALROW);
 		}
