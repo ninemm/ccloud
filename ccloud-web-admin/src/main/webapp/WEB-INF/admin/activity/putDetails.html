@@ -65,12 +65,14 @@
 		var fields =
 			[	
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
+				<#if show??>
 				{field: "checkbox", title: '<input class="jp-common-pad " id="dataItem" onclick="checkAll(this)" title="全选" type="checkbox">', align: "center", width: '2%', 
 					formatter: function(value, row, rowIndex) {
 						return '<input class="jp-common-pad" name="dataItem" type="checkbox" value="' + row.activityApplyId+'"><input  class="jp-common-pad" name="dataItem1" type="hidden" value="'+ row.status+'">';
 					},
 					edit:false
 				},
+				</#if>
 				{field: "customer_name", title: "终端名称", align: "center", width: '10%', edit:false},
 				{field: "proc_code", title: "流程编号", align: "center", width: '9%',
       			formatter: function(value, row, rowIndex) {
@@ -203,11 +205,13 @@
                 </div>
              </div>
             <div>
+            	<#if show??>
 	            <div class="jp-left">
 					<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="auditReimbursement()"><i class="fa fa-plus"></i>加入核销</button>
 				</div>
+				</#if>
            		<div class="jp-right">
-                		<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+               		<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
                 </div>
             </div>
 		</div>

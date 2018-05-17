@@ -192,10 +192,27 @@
 						                                	html +='</ul>'
 							                                	+'<div class="weui-uploader__input-box">'
 							                                   	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/*" capture="camera">'
+							                                   	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
 							                                    +'<input type="hidden" name="pic" id="pic" class="pic">'
 							                                	+'</div></div></div>';
 							                                	$("#activity_execute_id").val(activityExecute[i].id);
-															 $(".imgeActivity").append(html);
+															 	$(".imgeActivity").append(html);
+														        $(".photoType").select({
+															        title: "请选择照片类型",
+															        multi: false,
+															        items: [{
+																	       	title: "现场照片", value: "ScenePhoto"
+																	       },{
+																	       	title: "签名照片", value: "SignPhoto"
+																	       },{
+																	       	title: "赠品照片", value: "GiftPhoto"
+																	       },{
+																	       	title: "验收照片", value: "ExecutePhoto"
+																	       }],
+															        onChange: function(obj) {
+														                $('#uploaderInput').click();
+															        }
+															    });															 
 								        				}
 								        			}
 								        		}

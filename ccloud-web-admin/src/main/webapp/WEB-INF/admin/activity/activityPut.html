@@ -81,7 +81,7 @@
 				}, edit:false},
       			{field: "putNum", title: "投放数量", align: "center", width: '5%',
       			formatter: function(value, row, rowIndex) {
-					var url1 = '${CPATH}/admin/activity/putDetails?id=' + row.id;
+					var url1 = '${CPATH}/admin/activity/putDetails?id=' + row.id + '&investType=' + row.investType;
 					var strHtml = '<a href="' + url1 + '">'+row.putNum+'</a>';
 					return strHtml;
 				},

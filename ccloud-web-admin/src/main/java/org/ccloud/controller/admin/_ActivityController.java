@@ -864,6 +864,10 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 	//活动投放明细
 	public void putDetails() {
 		String id = getPara("id");
+		String investType = getPara("investType");
+		if (StrKit.notBlank(investType) && !investType.equals("null")) {
+			setAttr("show", "show");
+		}
 		setAttr("id", id);
 		render("putDetails.html");
 	}
