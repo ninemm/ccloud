@@ -110,8 +110,8 @@ $(function() {
       
     }).on("change", "#warehouse", function() {
 		warehouseId = $("#warehouse").data('values');
-    		setItemBykey("warehouseId", $("#warehouse").data('values'));
-    		removeItemBykey("productList");
+   		setItemBykey("warehouseId", $("#warehouse").data('values'));
+   		removeItemBykey("productList");
 		changeInit();
 	}).on('click', '#confirm-input', function () {
       var val = parseFloat($currentInput.val());

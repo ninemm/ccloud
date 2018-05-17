@@ -727,7 +727,7 @@ $(function() {
 					removeItemBykey("productList");
 					removeItemBykey("compositionList");
 					removeItemBykey("customerInfo");
-					
+					removeItemBykey("warehouseId");
 					$.modal({
 						title: data.message,
 						buttons: [
@@ -866,6 +866,7 @@ $(function() {
 					<input type="hidden" id="lng" name="lng" value="">
 					<input type="hidden" id="lat" name="lat" value="">
 					<input type="hidden" id="location" name="location" value="">
+					<input type="hidden" id="warehouse_id" name="warehouse_id" value="">
 					<div class="weui-cell">
 						<div class="weui-cell__bd">
 							<!-- <div class="order-customer-info-title">
@@ -1144,7 +1145,6 @@ $(function() {
 									<input type="hidden" id="contact" value="">
 									<input type="hidden" id="mobile" value="">
 									<input type="hidden" id="address" value="">
-									<input type="hidden" id="warehouse_id" name="warehouse_id" value="">
 								</div>
 							</div>
 							<p class="gray">
