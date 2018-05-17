@@ -72,7 +72,13 @@
 					edit:false
 				},
 				{field: "customer_name", title: "终端名称", align: "center", width: '10%', edit:false},
-				{field: "proc_code", title: "流程编号", align: "center", width: '9%', edit:false},
+				{field: "proc_code", title: "流程编号", align: "center", width: '9%',
+      			formatter: function(value, row, rowIndex) {
+					if (value == null || value == '') {
+						value = "无";
+					}
+					return value;
+				}, edit:false},
 				{field: "investType", title: "投入类型", align: "center", width: '9%', edit:false},
 				{field: "customer_type_ids", title: "终端类型", align: "center", width: '10%', edit:false},
 				{field: "executeNum", title: "执行次数", align: "center", width: '10%', 

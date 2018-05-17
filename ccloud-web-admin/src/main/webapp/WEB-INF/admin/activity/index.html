@@ -63,9 +63,9 @@
 			[
 				{field: "id", title: "ID", align: "center", visible:false, edit:false},
       			{field: "code", title: "活动编号", align: "center", visible:false, edit:false},
-      			{field: "title", title: "活动标题", align: "center", width: '20%', edit:false},
-      			{field: "activityCategory", title: "活动类型", align: "center", width: '3%', edit:false},
-      			{field: "customer_type", title: "客户类型", align: "center", width: '20%',
+      			{field: "title", title: "活动标题", align: "center", width: '15%', edit:false},
+      			{field: "activityCategory", title: "活动类型", align: "center", width: '10%', edit:false},
+      			{field: "customer_type", title: "客户类型", align: "center", width: '10%',
    					formatter: function(value, row, rowIndex) {
    						if (value == null || value == '') {
    							return '不限';
@@ -90,6 +90,8 @@
       					var str = "";
       					if(value != null ){
 							str = value.substring(0,10) +"至<br>"+ row.end_time.substring(0,10);
+      					} else {
+      						str = "不限"
       					}
 						return str;
    					},
@@ -102,7 +104,7 @@
    					},
    					edit: false
    				},  
-   				{field: "join_num", title: "每个客户参与数", align: "center", width: '3%',
+   				{field: "join_num", title: "客户参与数", align: "center", width: '3%',
    					formatter: function(value, row, rowIndex) {
    						if (value == null) {
    							return '不限';

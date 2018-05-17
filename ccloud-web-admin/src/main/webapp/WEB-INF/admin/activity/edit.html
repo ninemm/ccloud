@@ -351,10 +351,29 @@
 	}
 	
 	function doSubmit(){
+		var validateResult = $form.data('bootstrapValidator').validate().isValid();
+		if(validateResult === false){
+			backToFirstPage();
+			return;
+		}
+		
 		var l = Ladda.create( document.querySelector( '#do_submit' ) );
 		if($(".category").val()==101002 && list==""){
+			backToFirstPage();
 			alert("投入类型不能为空！");
 			return;
+		}
+		
+		var startDateStr = $('#startDate').val();
+		var endDateStr = $('#endDate').val();
+		if(startDateStr != '' && endDateStr != ''){
+			var startTime = strToTime(startDateStr);
+			var endTime = strToTime(endDateStr);
+			if(startTime > endTime){
+				backToFirstPage();
+				alert("活动开始时间不能晚于结束时间");
+				return;
+			}
 		}
 		
 		$("#areaCodes").val($city.data('citypicker').getCode());
@@ -522,6 +541,25 @@
 		templateList = localStorage.getItem("template");
 		layer.closeAll();
 	}
+	
+	// 把字符串转化为时间戳
+	function strToTime(str){
+		var date = str+' 00:00:00';
+		date = date.substring(0,19);    
+		date = date.replace(/-/g,'/'); 
+		return new Date(date).getTime();
+	}
+	
+	// 回到第一页
+	function backToFirstPage(){
+		if(!$('#myTab li:first').hasClass('active')){
+			$('#myTab .active').removeClass('active');
+			$('#myTab li:first').addClass('active');
+			
+			$('#B').removeClass('active in')
+			$('#A').addClass('active in')
+		}
+	}	
 </#macro>
 
 <@layout active_id=p child_active_id=c>

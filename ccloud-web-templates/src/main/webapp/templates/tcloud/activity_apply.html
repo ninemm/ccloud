@@ -70,7 +70,6 @@ $(function () {
 	doChange(activityId);
 	$("#startTime").calendar({
 			onChange: function(p, values, displayValues) {
-				console.log(values);
 				$("#startDate").val(values[0])
 			}
  		});
@@ -261,7 +260,11 @@ function changeEvent(activity,$obj){
 		$obj.find("#customerTypeName").val("不限");
 	}
 	$obj.find("#areaType").text(activity.area_type);
-	$obj.find("#joinNum").text("每个客户可以参加" + activity.join_num + "次");
+	if(typeof activity.join_num === 'undefined'){
+		$obj.find("#joinNum").text("每个客户参加本活动的次数不限");
+	}else{
+		$obj.find("#joinNum").text("每个客户可以参加" + activity.join_num + "次");
+	}	
 	$obj.find("#content").text(activity.content);
 	
 }
@@ -405,6 +408,14 @@ function doChange(key){
     function doSubmit(){
     	var start = $("#startDate").val();
     	var end = $("#endDate").val();
+    	var expense = $('#expense_detail_id').length;
+    	if (expense > 0) {
+    		var detailsIds = $('#expense_detail_id').val();
+	    	if(!detailsIds){
+	    		$.toptip('请选择费用明细');
+	    		return;
+	    	}    		
+    	}
     	if((new Date(start.replace(/-/g,"\/"))) > (new Date(end.replace(/-/g,"\/")))){
     		$.toptip('开始时间不能高于结束时间');
     		return;
@@ -418,42 +429,42 @@ function doChange(key){
             content: '保存中...'
         });
 
-		$("#form").ajaxSubmit({
-			beforeSubmit: function() {
-				flg = false;
-				return true
-			},
-			type : "post",
-			dataType : "json",
-			success : function(data) {
-				layer.closeAll();
-				if (data.errorCode == 0) {
+<!-- 		$("#form").ajaxSubmit({ -->
+<!-- 			beforeSubmit: function() { -->
+<!-- 				flg = false; -->
+<!-- 				return true -->
+<!-- 			}, -->
+<!-- 			type : "post", -->
+<!-- 			dataType : "json", -->
+<!-- 			success : function(data) { -->
+<!-- 				layer.closeAll(); -->
+<!-- 				if (data.errorCode == 0) { -->
 		
-					$.modal({
-						title: data.message,
-						buttons: [
-							{ text: "查看申请", className: "default", onClick: function(){
-								location.href = "${CPATH}/activity/applyList";
-							}
-						},
-							{ text: "继续申请", className: "primary", onClick: function(){
-								location.href = '${CPATH}/activity';
-							}
-						},
-						]
-					});
+<!-- 					$.modal({ -->
+<!-- 						title: data.message, -->
+<!-- 						buttons: [ -->
+<!-- 							{ text: "查看申请", className: "default", onClick: function(){ -->
+<!-- 								location.href = "${CPATH}/activity/applyList"; -->
+<!-- 							} -->
+<!-- 						}, -->
+<!-- 							{ text: "继续申请", className: "primary", onClick: function(){ -->
+<!-- 								location.href = '${CPATH}/activity'; -->
+<!-- 							} -->
+<!-- 						}, -->
+<!-- 						] -->
+<!-- 					}); -->
 			
-				} else {
-					$.toptip(data.message, 'error');
-				}
-				flg = true;
-			},
-			error : function() {
-				layer.closeAll();
-				alert("信息提交错误");
-				flg = true;
-			}
-		});
+<!-- 				} else { -->
+<!-- 					$.toptip(data.message, 'error'); -->
+<!-- 				} -->
+<!-- 				flg = true; -->
+<!-- 			}, -->
+<!-- 			error : function() { -->
+<!-- 				layer.closeAll(); -->
+<!-- 				alert("信息提交错误"); -->
+<!-- 				flg = true; -->
+<!-- 			} -->
+<!-- 		}); -->
     }
 
 </#macro>

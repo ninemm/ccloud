@@ -176,7 +176,11 @@ function initActivity(activityList,flg){
 			$newProductDetail.find("#surplusNum").text(el.surplus_num);
 		}
 		$newProductDetail.find("#surplusNum").text(el.surplus_num);
-		$newProductDetail.find("#joinNum").text("每个客户可以参加" + el.join_num + "次");
+		if(typeof el.join_num === 'undefined'){
+			$newProductDetail.find("#joinNum").text("每个客户可以参加本活动的次数不限");
+		}else{
+			$newProductDetail.find("#joinNum").text("每个客户可以参加" + el.join_num + "次");
+		}		
 
 		$newProductDetail.find("#image").attr("src", getImageUrl(el.image_list_store, el.code));
 	});
