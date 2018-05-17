@@ -79,10 +79,10 @@ public class PayablesQuery extends JBaseQuery {
 			}
 			fromBuilder.append(" AND r.dept_id = '"+deptId+"' GROUP BY cs.id ");
 		}else {
-			select = " SELECT  r.obj_id AS id  , t1.customerTypeNames,CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END AS name , sum(pd.pay_amount) pay_amount, IFNULL(sum(cp.act_amount),0) act_amount , (IFNULL(sum(pd.pay_amount),0)-IFNULL(sum(cp.act_amount),0)) balance_amount ";
+			select = " SELECT  r.obj_id AS id  , t1.customerTypeNames,CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END AS name , sum(pd.pay_amount) pay_amount, IFNULL(t.act_amount,0) act_amount , (IFNULL(sum(pd.pay_amount),0)-IFNULL(t.act_amount,0)) balance_amount ";
 			fromBuilder = new StringBuilder(" FROM cc_payables_detail pd");
-			fromBuilder.append(" LEFT JOIN cc_payment cp ON cp.ref_sn=pd.ref_sn ");
 			fromBuilder.append(" LEFT JOIN cc_payables AS r ON pd.object_id=r.obj_id ");
+			fromBuilder.append(" LEFT JOIN (SELECT cp.payables_detail_id , SUM(cp.act_amount) as act_amount from cc_payment cp where cp.data_area LIKE '001013001%' GROUP BY cp.payables_detail_id) t ON t.payables_detail_id= r.id ");
 			fromBuilder.append(" inner JOIN (SELECT c1.id, c1.customer_id, ct.id AS customer_type_id, GROUP_CONCAT(ct.NAME) AS customerTypeNames FROM cc_seller_customer c1 INNER JOIN cc_customer_join_customer_type cjct ON c1.id =cjct.seller_customer_id INNER JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
 			if(!("0".equals(id)) && id != null){
 				fromBuilder.append(" WHERE cjct.customer_type_id = '"+ id+"'");
