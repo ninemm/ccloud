@@ -117,8 +117,8 @@
 					toastr.error(data.message,'操作失败');
 				}
 				setTimeout( function(){
-							l.stop();
-									}, 1 * 1000 );
+							window.history.back(-1);
+									}, 1500 );
 			},
 			error : function(data) {
 				l.stop();
@@ -146,9 +146,10 @@
          var productList = new Array();
          var productOptionArr = new Array();
          var productMap = new Map();
+         var goodsCategory_id = $("#goodsCategory_id").val();
          $.ajax({
 				url: "${CPATH}/admin/stockTaking/getProductInfo",
-				data:{"warehouse_id":warehouse_id},
+				data:{"warehouse_id":warehouse_id,"goodsCategory_id":goodsCategory_id},
 				dataType: "json",
 				async: false,
 				success: function(data) {
@@ -345,7 +346,7 @@ function addTr(tid, productList, optionArr) {
 					</div>
 					<#if !(transferBill.id) ??>
 						<div class="form-group col-sm-12 validata-box">
-							<label class="control-label col-sm-2">分类:</label>
+							<label class="control-label col-sm-2">商品分类:</label>
 							<div class="input-group col-md-4 col-sm-10">
 								<select class="form-control input-sm"  id="goodsCategory_id" onchange=selectGoodsCategory()>
 									<option value="">--全部--</option>
