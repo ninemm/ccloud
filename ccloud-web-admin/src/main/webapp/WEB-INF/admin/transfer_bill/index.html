@@ -62,10 +62,13 @@
 				{field: "action", title: "操作", align: "center", width: '20%',
 				formatter: function(value, row, rowIndex) {
 					var url = '${CPATH}/admin/transferBill/edit?id=' + row.id + '&c=${c}&p=${p}';
-					var strHtml = '<a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a>';
+					var strHtml = '';
 					if(row.status == 0){
-	                  strHtml = strHtml +  ' <a href="javascript:void(0);" class="btn btn-xs btn-danger btn-flat" onclick="del(\''+row.id+'\')">删除</a>' + ' <a href="javascript:void(0);" class="btn btn-xs btn-info btn-flat" onclick="enable(\''+row.id+'\'' + ',1' + ')">提交</a>';
-					}					
+	                  strHtml = strHtml +  ' <a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a><a href="javascript:void(0);" class="btn btn-xs btn-danger btn-flat" onclick="del(\''+row.id+'\')">删除</a>' + ' <a href="javascript:void(0);" class="btn btn-xs btn-info btn-flat" onclick="enable(\''+row.id+'\'' + ',1' + ')">提交</a>';
+					}else{
+					  strHtml = strHtml + ' <a href="' + url + '" class="btn btn-xs bg-olive btn-flat">查看</a>'
+					}
+								
 					return strHtml;
 				},
 				edit:false
