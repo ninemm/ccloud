@@ -66,7 +66,7 @@ public class SalesOrderQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,
-			String sellerId, String dataArea, String activityId, String status) {
+			String sellerId, String dataArea, String activityId, String status, String salesmamId) {
 		String select = "";
 		if(StrKit.notBlank(activityId)) {
 			select = "select o.*, c.customer_name,t1.title, c.prov_name,c.city_name,c.country_name,c.address,c.contact as ccontact, c.mobile as cmobile,ct.`name` as customerTypeName,u.realname ";
@@ -91,9 +91,11 @@ public class SalesOrderQuery extends JBaseQuery {
 			fromBuilder.append(") t2 on t2.id = o.id ");
 		}
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "o.data_area", dataArea, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "o.biz_user_id", salesmamId, params, needWhere);
 
 		if (needWhere) {
 			fromBuilder.append(" where 1 = 1");
+			needWhere = false;
 		}
 		
 		if (StrKit.notBlank(status) && !status.equals("-1")) {
