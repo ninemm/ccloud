@@ -93,11 +93,9 @@ public class ProductController extends BaseFrontController {
 		List<Record> goodsCategory = GoodsCategoryQuery.me().findBySellerId(sellerId,tag);
 		List<Record> compositionList = new ArrayList<>();
 		List<Record> productList = new ArrayList<>();
-		
-		if (StrKit.isBlank(keyword)&&StrKit.isBlank(categoryId)) {
+		if (!StrKit.notBlank(categoryId)) {
 			categoryId=goodsCategory.get(0).getStr("categoryId");
 		}
-		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
 		if (wlist.size() > 0 && wlist.get(0).getType().equals(Consts.WAREHOUSE_TYPE_CAR)) {
