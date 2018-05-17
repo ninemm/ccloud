@@ -17,7 +17,6 @@ import org.ccloud.message.Actions;
 import org.ccloud.message.MessageKit;
 import org.ccloud.model.ActivityApply;
 import org.ccloud.model.ActivityExecute;
-import model.ActivityExecuteTemplate;
 import org.ccloud.model.Customer;
 import org.ccloud.model.CustomerType;
 import org.ccloud.model.CustomerVisit;
@@ -29,7 +28,6 @@ import org.ccloud.model.User;
 import org.ccloud.model.WxMessageTemplate;
 import org.ccloud.model.query.ActivityApplyQuery;
 import org.ccloud.model.query.ActivityExecuteQuery;
-import model.query.ActivityExecuteTemplateQuery;
 import org.ccloud.model.query.ActivityQuery;
 import org.ccloud.model.query.CustomerJoinCustomerTypeQuery;
 import org.ccloud.model.query.CustomerTypeQuery;
@@ -61,6 +59,9 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+
+import model.ActivityExecuteTemplate;
+import model.query.ActivityExecuteTemplateQuery;
 
 @RouterMapping(url = "/customerVisit")
 @RequiresPermissions(value = { "/admin/customerVisit", "/admin/dealer/all" }, logical = Logical.OR)
@@ -792,7 +793,9 @@ public class CustomerVisitController extends BaseFrontController {
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
 				String orderList = obj.getString("orderList");
+				String photoType = obj.getString("photoType");
 				ImageJson image = new ImageJson();
+				image.setPhotoType(photoType);
 				image.setImgName(picname);
 				image.setOrderList(orderList);
 				if(pic.length() == 32) {
@@ -868,7 +871,9 @@ public class CustomerVisitController extends BaseFrontController {
 				String pic = obj.getString("pic");
 				String picname = obj.getString("picname");
 				String orderList = obj.getString("orderList");
+				String photoType = obj.getString("photoType");
 				ImageJson image = new ImageJson();
+				image.setPhotoType(photoType);
 				image.setImgName(picname);
 				image.setOrderList(orderList);
 				if(pic.length() == 32) {

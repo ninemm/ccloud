@@ -58,10 +58,11 @@
                         $.alert("最多上传三张图片");
                         return false;
                     }
+                    var photoType = $("#photoType").data("values");
                     if($("#activity_title").val()!=null){
-                        imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":$this.parent().parent().parent().find("#orderList").val()});
+                        imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":$this.parent().parent().parent().find("#orderList").val(),"photoType":photoType});
                     }else{
-                        imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":"0"});
+                        imageArr.push({"pic":rst.base64, "picname":rst.origin.name,"orderList":"0","photoType":photoType});
                     }
                     var str = '<li class="weui-uploader__file " style="background-image:url('+rst.base64+')"></li>';
                     $this.parent().prev().append(str);
@@ -78,7 +79,6 @@
         var listI = ${(list)!'1'};
        	var html = "";
        	var _domain = "${(domain)!}";
-       	console.log(activityApplyId);
        	if(activityApplyId!=""){
 			$.ajax({
 		        url: "${CPATH}/customerVisit/getActivityExecute",
@@ -102,7 +102,7 @@
 				                           for(var j = 0 ; j < imgeList.length ; j++){
 				                            	if(imgeList[j].orderList == activityExecute[i].orderList){
 					                            	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[j].savePath+')"></li>';
-				                           			imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imgeList[j].savePath});
+				                           			imageArr.push({"pic":imgeList[j].originalPath, "picname":imgeList[j].imgName,"orderList":activityExecute[i].orderList,"savepath":imgeList[j].savePath,"photoType":imgeList[j].photoType});
 				                            	}
 				                            	if(i == orderListNum && imgeList[j].orderList == activityExecute[orderListNum].orderList){
 				                            		newImage++;
@@ -112,6 +112,7 @@
 			                          if((i+1)>orderListNum){
 			                          	html +='</ul><div class="weui-uploader__input-box">'
 			                               	+'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/jpg,image/png,image/jpeg">'
+			                               	+'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
 			                               	+'</div></div></div>';
 			                          }else{
 			                          	numI++;
@@ -127,12 +128,13 @@
 					            if(imgeList != 1){
 					                for(var i = 0 ; i < imgeList.length ; i++){
 					                	html += '<li class="weui-uploader__file " style="background-image:url('+domain+'/'+imgeList[i].savePath+')"></li>';
-							            imageArr.push({"pic":imgeList[i].originalPath, "picname":imgeList[i].imgName,"orderList":"0","savepath":imgeList[i].savePath});
+							            imageArr.push({"pic":imgeList[i].originalPath, "picname":imgeList[i].imgName,"orderList":"0","savepath":imgeList[i].savePath,"photoType":imgeList[i].photoType});
 					                }
 					            }
 				                html +='</ul>'
 				                       +'<div class="weui-uploader__input-box">'
 				                       +'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/jpg,image/png,image/jpeg">'
+				                       +'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
 				                       +'</div>'
 				                       +'</div>';
 		        			}
@@ -150,18 +152,36 @@
 	            if(listI != 1){
 	                for(var i = 0 ; i < listI.length ; i++){
 	                	html += '<li class="weui-uploader__file " style="background-image:url('+_domain+'/'+listI[i].savePath+')"></li>';
-			            imageArr.push({"pic":listI[i].originalPath, "picname":listI[i].imgName,"orderList":"0","savepath":listI[i].savePath});
+			            imageArr.push({"pic":listI[i].originalPath, "picname":listI[i].imgName,"orderList":"0","savepath":listI[i].savePath,"photoType":listI[i].photoType});
 	                }
 	            }
                 html +='</ul>'
                        +'<div class="weui-uploader__input-box">'
                        +'<input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/jpg,image/png,image/jpeg">'
+                       +'<input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">'
                        +'</div>'
                        +'</div>';
                      $(".imgeActivity").html("");
       				$(".imgeActivity").append(html);
 			        			
         }
+        
+        $(".photoType").select({
+	        title: "请选择照片类型",
+	        multi: false,
+	        items: [{
+			       	title: "现场照片", value: "ScenePhoto"
+			       },{
+			       	title: "签名照片", value: "SignPhoto"
+			       },{
+			       	title: "赠品照片", value: "GiftPhoto"
+			       },{
+			       	title: "验收照片", value: "ExecutePhoto"
+			       }],
+	        onChange: function(obj) {
+                $('#uploaderInput').click();
+	        }
+	    });        
 
         var index; //第几张图片
         var $uploaderFiles ;
@@ -186,15 +206,11 @@
 
         //删除图片  删除图片的代码也贴出来。
         $(document).on("click",".weui-gallery__del",function() { //这部分刚才放错地方了，放到$(function(){})外面去了
-        	console.log(_index);
-        	console.log(newImage);
-        	console.log(imageArr);
         	
             $uploaderFiles.find("li").eq(index).remove();
             $uploaderFiles.parent().parent().find('.weui-uploader__info').text($uploaderFiles.children.length + '/' + count);
             imageArr.splice(_index-newImage, 1);
             $(".pic").val(JSON.stringify(imageArr));
-            console.log(imageArr);
         });
 
     });
@@ -425,7 +441,7 @@
                     <div class="weui-cell__hd" id="refresh"><span class="icon-refresh ft16 gray" onclick="refreshLocation()"></span></div>
                 </div>
             </section>
-            <section class="weui-cells weui-cells_form">
+            <section class="weui-cells weui-cells_form select-area">
                 <div class="weui-cell">
                     <div class="weui-cell__bd">
                         <div class="weui-uploader imgeActivity">
@@ -436,6 +452,7 @@
                                 <ul class="weui-uploader__files uploaderFiles" id="uploaderFiles"></ul>
                                 <div class="weui-uploader__input-box">
                                     <input id="uploaderInput" class="weui-uploader__input uploaderInput" type="file" accept="image/jpg,image/png,image/jpeg">
+                                    <input type="text" name="photoType" class="weui-uploader__input photoType" id="photoType">
                                 </div>
                             </div>
                         </div>
