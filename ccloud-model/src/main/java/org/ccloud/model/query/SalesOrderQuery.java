@@ -2913,7 +2913,12 @@ public class SalesOrderQuery extends JBaseQuery {
 			}else {
 				fromBuilder.append(" and sokd.is_gift=0 ");
 			}
-			fromBuilder.append(" AND so.biz_user_id = '"+userId+"'");
+			if("all".equals(userId)){
+				fromBuilder.append(" AND so.seller_id = '"+sellerId+"'");
+				fromBuilder.append(" AND so.data_area like '"+dataArea+"'");
+			}else{
+				fromBuilder.append(" AND so.biz_user_id = '"+userId+"'");
+			}
 			fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
 			fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"' GROUP BY sc.id,sokd.sell_product_id");
 		}else {
@@ -2928,7 +2933,12 @@ public class SalesOrderQuery extends JBaseQuery {
 			}else {
 				fromBuilder.append(" and sd.is_gift=0 ");
 			}
-			fromBuilder.append(" AND so.biz_user_id = '"+userId+"'");
+			if("all".equals(userId)){
+				fromBuilder.append(" AND so.seller_id = '"+sellerId+"'");
+				fromBuilder.append(" AND so.data_area like '"+dataArea+"'");
+			}else{
+				fromBuilder.append(" AND so.biz_user_id = '"+userId+"'");
+			}
 			fromBuilder.append(" AND "+ keyword+" >= '"+startDate+"'");
 			fromBuilder.append(" AND "+ keyword+" <= '"+endDate+"' GROUP BY sc.id,sd.sell_product_id");
 		}
@@ -2942,7 +2952,12 @@ public class SalesOrderQuery extends JBaseQuery {
 		}else {
 			fromBuilder.append(" and srid.is_gift=0 ");
 		}
-		fromBuilder.append(" AND sri.user_id = '"+userId+"'");
+		if("all".equals(userId)){
+			fromBuilder.append(" AND sri.seller_id = '"+sellerId+"'");
+			fromBuilder.append(" AND sri.data_area like '"+dataArea+"'");
+		}else{
+			fromBuilder.append(" AND sri.user_id = '"+userId+"'");
+		}
 		fromBuilder.append(" AND sri.create_date >= '"+startDate+"'");
 		fromBuilder.append(" AND sri.create_date <= '"+endDate+"'");
 		fromBuilder.append(" GROUP BY sc.Id,srid.sell_product_id)a GROUP BY a.id,a.sell_product_id) b ");
