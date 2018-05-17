@@ -929,12 +929,14 @@ public class CustomerVisitController extends BaseFrontController {
 		String orderList = getPara("orderList");
 		CustomerVisit cv = CustomerVisitQuery.me().findByActivityApplyIdAndOrderList(activityApplyId, orderList);
 		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findByActivityApplyId(activityApplyId);
-		String dict_type = expenseDetail.getFlowDictType();
 		String has_size = "0";
-		String check_size = null;
-		if (dict_type.equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
-			has_size = "1";
-		}		
+		String check_size = null;		
+		if (expenseDetail != null) {
+			String dict_type = expenseDetail.getFlowDictType();
+			if (dict_type.equals(Consts.FLOW_DICT_TYPE_NAME_AD)) {
+				has_size = "1";
+			}				
+		}
 		List<CustomerVisit> customerVisits = CustomerVisitQuery.me().findByActivityApplyId(activityApplyId);
 		if(customerVisits.size()>0) {
 			check_size = customerVisits.get(0).getCheckSize();

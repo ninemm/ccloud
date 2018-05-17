@@ -220,6 +220,7 @@ public class ActivityController extends BaseFrontController {
 		String[] applyAmount = getParaValues("apply_amount");
 		String startDate = getPara("startDate");
 		String endDate = getPara("endDate");
+		String[] applyArea = getParaValues("apply_area");
 		SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
 		if(expenseDetailIds!=null) {
 			expenseDetailIds = getParaValues("expense_detail_id")[0].split(",");
@@ -242,6 +243,7 @@ public class ActivityController extends BaseFrontController {
 						activityApply.setBizUserId(user.getId());
 						activityApply.setApplyNum(new BigDecimal(applyNum[j]));
 						activityApply.setApplyAmount(new BigDecimal(applyAmount[j]));
+						activityApply.setApplyArea(applyArea[j]);
 						try {
 							activityApply.setStartDate(formatter.parse(startDate));
 							activityApply.setEndDate(formatter.parse(endDate));
@@ -294,6 +296,7 @@ public class ActivityController extends BaseFrontController {
 					activityApply.setContent(content);
 					activityApply.setApplyNum(new BigDecimal(applyNum[0]));
 					activityApply.setApplyAmount(new BigDecimal(applyAmount[0]));
+					activityApply.setApplyArea(applyArea[0]);
 					
 					if (startProc != null && startProc) {
 						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_WAIT);

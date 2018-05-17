@@ -652,7 +652,7 @@ public class _ActivityController extends JBaseCRUDController<Activity> {
 //		List<QyExpense> expenseList = QyExpenseQuery.me().findTextData();//测试数据
 		String[] date = DateUtils.getStartDateAndEndDateByType("month");
 		List<Expense> expenseList = new ArrayList<>();
-		if (StrKit.isBlank(startDate)) {
+		if (StrKit.isBlank(startDate) && startDate.equals("")) {
 			expenseList = MidDataUtil.getExpensesInfo(date[0], date[1], "1", Consts.GET_MID_DATA_TOTALROW);
 		} else {
 			expenseList = MidDataUtil.getExpensesInfo(startDate, endDate, "1", Consts.GET_MID_DATA_TOTALROW);
