@@ -35,6 +35,7 @@ import org.ccloud.core.JBaseCRUDController;
 import org.ccloud.core.interceptor.ActionCacheClearInterceptor;
 import org.ccloud.model.SalesRefundInstock;
 import org.ccloud.model.User;
+import org.ccloud.model.query.OptionQuery;
 import org.ccloud.model.query.PayablesDetailQuery;
 import org.ccloud.model.query.PayablesQuery;
 import org.ccloud.model.query.SalesOutstockDetailQuery;
@@ -193,7 +194,11 @@ public class _SalesRefundController extends JBaseCRUDController<SalesRefundInsto
 			}
 
 		}
-
+		Boolean checkStore = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_PROC_REFUND + sellerCode);
+		boolean isCheckStore = (checkStore != null && checkStore == true) ? true : false;
+		if(!isCheckStore) {
+			passSalesRefund(instockId,Consts.SALES_REFUND_INSTOCK_PASS);
+		}
 		renderAjaxResultForSuccess();
 
 	}
