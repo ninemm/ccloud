@@ -726,9 +726,9 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.queryLong(sql.toString(), procInstId);
 	}
 
-	public List<SellerCustomer> _findBySellerId(String sellerId){
-		String sql = "select * from cc_seller_customer where seller_id = '"+sellerId+"' and is_enabled = 1";
-		return DAO.find(sql);
+	public long _findBySellerId(String sellerId){
+		String sql = "select count(1) from cc_seller_customer where seller_id = '"+sellerId+"' and is_enabled = 1";
+		return Db.queryLong(sql);
 	}
 
 	public int getMySellerNum(String selectDataArea) {

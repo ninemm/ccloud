@@ -200,7 +200,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		
 		//审核通过，生成对应的应付账款
 		//应付账款汇总
-		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(purchaseOrder.getSupplierId(),Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER);
+		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(purchaseOrder.getSupplierId(),Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER,user.getDepartmentId());
 		if(payables==null){
 			Payables payable = new Payables();
 			payable.setId(StrKit.getRandomUUID());
@@ -359,7 +359,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		
 		//审核通过，生成对应的应付账款
 		//应付账款汇总
-		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(order.getSupplierId(),Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER);
+		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(order.getSupplierId(),Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER,user.getDepartmentId());
 		if(payables==null){
 			Payables payable = new Payables();
 			payable.setId(StrKit.getRandomUUID());
