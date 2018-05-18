@@ -383,22 +383,23 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				continue;
 			}
 			sellerProductInfo = new SellerProductInfo();
-			sellerProductInfo.setPurchaseInstockDetailId(record.get("id").toString());
-			sellerProductInfo.setPurchaseOrderDetailId(record.get("purchase_order_detail_id").toString());
+			sellerProductInfo.setPurchaseInstockDetailId(record.getStr("id"));
+			sellerProductInfo.setPurchaseOrderDetailId(record.getStr("purchase_order_detail_id"));
 			ls.add(sellerProductInfo.getPurchaseOrderDetailId());
-			sellerProductInfo.setWarehouseId(record.get("warehouse_id").toString());
-			sellerProductInfo.setProductName(record.get("productName").toString());
-			sellerProductInfo.setBigUnit(record.get("big_unit").toString());
-			sellerProductInfo.setSmallUnit(record.get("small_unit").toString());
-			sellerProductInfo.setProductCount(record.get("product_count").toString());
-			sellerProductInfo.setConvertRelate(record.get("convert_relate").toString());
-			if(record.get("cps_name") != null) {
-				sellerProductInfo.setCpsName(record.get("cps_name").toString());
+
+			sellerProductInfo.setWarehouseId(record.getStr("warehouse_id"));
+			sellerProductInfo.setProductName(record.getStr("productName"));
+			sellerProductInfo.setBigUnit(record.getStr("big_unit"));
+			sellerProductInfo.setSmallUnit(record.getStr("small_unit"));
+			sellerProductInfo.setProductCount(record.getStr("product_count"));
+			sellerProductInfo.setConvertRelate(record.getStr("convert_relate"));
+			if(StrKit.notBlank(record.getStr("cps_name"))) {
+				sellerProductInfo.setCpsName(record.getStr("cps_name"));
 			}
 			List<SellerProduct> product = new ArrayList<>();
 			SellerProduct sellerProduct = new SellerProduct();
-			sellerProduct.setId(record.get("seller_product_id").toString());
-			sellerProduct.setCustomName(record.get("custom_name").toString());
+			sellerProduct.setId(record.getStr("seller_product_id"));
+			sellerProduct.setCustomName(record.getStr("custom_name"));
 			sellerProduct.setStoreCount(record.getBigDecimal("storeCount"));
 			product.add(sellerProduct);
 			sellerProductInfo.setList(product);
@@ -415,8 +416,8 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			if (sellerProductInfo.getPurchaseOrderDetailId().equals(id)) {
 				List<SellerProduct> product = sellerProductInfo.getList();
 				SellerProduct sellerProduct = new SellerProduct();
-				sellerProduct.setId(record.get("seller_product_id").toString());
-				sellerProduct.setCustomName(record.get("custom_name").toString());
+				sellerProduct.setId(record.getStr("seller_product_id"));
+				sellerProduct.setCustomName(record.getStr("custom_name"));
 				sellerProduct.setStoreCount(record.getBigDecimal("storeCount"));
 				product.add(sellerProduct);
 				sellerProductInfo.setList(product);
@@ -439,23 +440,21 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 				continue;
 			}
 			purchaseInstockDetailInfo = new PurchaseInstockDetailInfo();
-			purchaseInstockDetailInfo.setPurchaseInstockDetailId(record.get("id").toString());
-			purchaseInstockDetailInfo.setPurchaseOrderDetailId(record.get("purchase_order_detail_id").toString());
+			purchaseInstockDetailInfo.setPurchaseInstockDetailId(record.getStr("id"));
+			purchaseInstockDetailInfo.setPurchaseOrderDetailId(record.getStr("purchase_order_detail_id"));
 			ls.add(purchaseInstockDetailInfo.getPurchaseOrderDetailId());
-			purchaseInstockDetailInfo.setWarehouseId(record.get("warehouse_id").toString());
-			purchaseInstockDetailInfo.setProductName(record.get("productName").toString());
-			purchaseInstockDetailInfo.setBigUnit(record.get("big_unit").toString());
-			purchaseInstockDetailInfo.setSmallUnit(record.get("small_unit").toString());
-			purchaseInstockDetailInfo.setProductCount(record.get("product_count").toString());
-			purchaseInstockDetailInfo.setConvertRelate(record.get("convert_relate").toString());
-			if(record.get("cps_name") != null) {
-				purchaseInstockDetailInfo.setCpsName(record.get("cps_name").toString());
-			}
+			purchaseInstockDetailInfo.setWarehouseId(record.getStr("warehouse_id"));
+			purchaseInstockDetailInfo.setProductName(record.getStr("productName"));
+			purchaseInstockDetailInfo.setBigUnit(record.getStr("big_unit"));
+			purchaseInstockDetailInfo.setSmallUnit(record.getStr("small_unit"));
+			purchaseInstockDetailInfo.setProductCount(record.getStr("product_count"));
+			purchaseInstockDetailInfo.setConvertRelate(record.getStr("convert_relate"));
+			purchaseInstockDetailInfo.setCpsName(record.getStr("cps_name"));
 			List<PurchaseSeller> product = new ArrayList<>();
 			PurchaseSeller purchaseSeller = new PurchaseSeller();
-			purchaseSeller.setSellerProductId(record.get("seller_product_id").toString());
-			purchaseSeller.setCustomName(record.get("custom_name").toString());
-			purchaseSeller.setPrivateCount(Integer.parseInt(record.get("product_count").toString()));
+			purchaseSeller.setSellerProductId(record.getStr("seller_product_id"));
+			purchaseSeller.setCustomName(record.getStr("custom_name"));
+			purchaseSeller.setPrivateCount(Integer.parseInt(record.getStr("product_count")));
 			product.add(purchaseSeller);
 			purchaseInstockDetailInfo.setList(product);
 			sProduct.add(purchaseInstockDetailInfo);
@@ -471,9 +470,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 			if (purchaseInstockDetailInfo.getPurchaseOrderDetailId().equals(id)) {
 				List<PurchaseSeller> product = purchaseInstockDetailInfo.getList();
 				PurchaseSeller purchaseSeller = new PurchaseSeller();
-				purchaseSeller.setSellerProductId(record.get("seller_product_id").toString());
-				purchaseSeller.setCustomName(record.get("custom_name").toString());
-				purchaseSeller.setPrivateCount(Integer.parseInt(record.get("product_count").toString()));
+				purchaseSeller.setSellerProductId(record.getStr("seller_product_id"));
+				purchaseSeller.setCustomName(record.getStr("custom_name"));
+				purchaseSeller.setPrivateCount(Integer.parseInt(record.getStr("product_count")));
 				product.add(purchaseSeller);
 				purchaseInstockDetailInfo.setList(product);
 			}

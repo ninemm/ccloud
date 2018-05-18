@@ -104,4 +104,9 @@ public class PurchaseOrderDetailQuery extends JBaseQuery {
 				+ " cpid.seller_product_id = ?";
 		return DAO.findFirst(sql, sellerProductId);
 	}
+	
+	public int findBySize(String purchaseOrderId) {
+		String sql  = "select count(1) from cc_purchase_order_detail where purchase_order_id = '"+purchaseOrderId+"' ";
+		return Db.queryInt(sql);
+	}
 }

@@ -78,7 +78,7 @@
 				y=0;
 			}
 			if(x*1>y*1){
-				toastr.error('第'+index+'行调拨数量不能操过库存数量','操作失败');
+				toastr.error('第'+index+'行调拨数量不能超过库存数量','操作失败');
 				buer=true;
 				return false;
 			}
@@ -89,7 +89,7 @@
 			}
 			var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
 			if (!reg.test(x)) {
-				toastr.error('第'+index+'行请正确输入的数量','操作失败');
+				toastr.error('第'+index+'行输入正确的数量','操作失败');
 				buer = true;
 				return false;
 			}
