@@ -48,6 +48,26 @@
 		margin-top:-.75rem;
 		left: .5rem;
 	}
+	.subscript{  
+        color: #fff;  
+        height: 22px;  
+        width: 92px;  
+        position: absolute;  
+        right: -30px;  
+        top: 6px;
+        text-align: center;  
+        line-height: 22px;  
+        font-family: "黑体";  
+        background-color: #e6292f;  
+        -moz-transform:rotate(45deg);  
+        -webkit-transform:rotate(45deg);  
+        -o-transform:rotate(45deg);  
+        -ms-transform:rotate(45deg);  
+        transform:rotate(45deg);  
+      }  
+    .secPos{
+    	position: relative;
+    	}
 </#macro>
 <#macro script_import>
 	<script type='text/javascript' src="${CTPATH}/js/swiper.min.js"></script>
@@ -302,7 +322,7 @@ function initProduct(productList,goodsCategory,compositionList){
 	}
 	var $type = $menuRight.find("#"+categoryId);
 	$.each(productList, function(index, el) {
-		$type.append("<section class='product_detail weui-panel weui-panel_access common' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
+		$type.append("<section class='product_detail weui-panel weui-panel_access common secPos' id='" + el.sell_product_id + "'>" + newHtml + "</section>");
 		var $newProductDetail = $type.find(".common:last");
 		$newProductDetail.find("#productName").text(el.custom_name);
 		$newProductDetail.find("#valueName").text(el.valueName);
@@ -322,7 +342,8 @@ function initProduct(productList,goodsCategory,compositionList){
 		$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
 		var stock = '库存：' + el.store_count + el.big_unit;
 		if(el.store_count <= storeWarningNum){
-			stock = '<span style="color: #e51c23">库存：' + el.store_count + el.big_unit + '</span>';
+			stock = '<span style="color: #e6292f; font-weight: 600;">库存：' + el.store_count + el.big_unit + '</span>';
+			$newProductDetail.append("<div class='subscript'>预警</div>");
 		}
 		$newProductDetail.find("#stock").html(stock);
 
@@ -706,7 +727,8 @@ function order(){
 					$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
 					var stock = '库存：' + el.store_count + el.big_unit;
 					if(el.store_count <= storeWarningNum){
-						stock = '<span style="color: #e51c23">库存：' + el.store_count + el.big_unit + '</span>';
+						stock = '<span style="color: #e6292f; font-weight: 600;">库存：' + el.store_count + el.big_unit + '</span>';
+						$newProductDetail.append("<div class='subscript'>预警</div>");
 					}
 					$newProductDetail.find("#stock").html(stock);
 			
