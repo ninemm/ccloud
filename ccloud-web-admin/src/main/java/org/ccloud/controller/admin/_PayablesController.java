@@ -137,7 +137,12 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String pay_amount = getPara("pay_amount");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//通过客户Id找到应收账款主表ID
-		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type);
+		Payables payables = new Payables();
+		if(ref_type.equals(Consts.BIZ_TYPE_INSTOCK)) {
+			payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type,user.getDepartmentId());
+		}else {
+			payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type);
+		}
 //		PurchaseInstock purchaseInstock = PurchaseInstockQuery.me().findBySn(ref_sn);
 		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		Page<Payment> page = PaymentQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,deptDataArea);
@@ -178,7 +183,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 			public boolean run() throws SQLException{
 				
 				Payment payment = new Payment();
-				String payables_id = StrKit.getRandomUUID();
+				String payment_id = StrKit.getRandomUUID();
 				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 				String act_amount = getPara("act_amount");
 				String ref_sn = getPara("ref_sn");
@@ -186,7 +191,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 				String pay_user_id = getPara("pay_user");
 				Date date = new Date();
 				
-				payment.set("id", payables_id);
+				payment.set("id", payment_id);
 				payment.set("payables_detail_id", getPara("bill_id"));
 				payment.set("act_amount", act_amount);
 				payment.set("biz_date", getPara("biz_date"));

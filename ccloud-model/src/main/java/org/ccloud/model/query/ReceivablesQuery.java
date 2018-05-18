@@ -54,7 +54,7 @@ public class ReceivablesQuery extends JBaseQuery {
 		String select;
 		StringBuilder fromBuilder;
 		LinkedList<Object> params = new LinkedList<Object>();
-		select = " SELECT r.object_id AS id, t1.customerTypeNames, c.customer_name AS name, IFNULL(r.receive_amount,0) receive_amount , IFNULL(r.act_amount, 0) act_amount , IFNULL(rd.balance_amount , 0) balance_amount  ";
+		select = " SELECT r.object_id AS id, t1.customerTypeNames, c.customer_name AS name, IFNULL(r.receive_amount,0) receive_amount , IFNULL(r.act_amount, 0) act_amount , IFNULL(r.balance_amount , 0) balance_amount  ";
 		fromBuilder = new StringBuilder(" FROM `cc_receivables` AS r inner JOIN (SELECT c1.id, c1.customer_id,ct.id as customer_type_id, GROUP_CONCAT(ct. NAME) AS customerTypeNames FROM cc_seller_customer c1 inner JOIN cc_customer_join_customer_type cjct ON c1.id = cjct.seller_customer_id inner JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
 		fromBuilder.append(" WHERE 1=1 ");
 		if(!("0".equals(id)) && id != null){
@@ -63,7 +63,6 @@ public class ReceivablesQuery extends JBaseQuery {
 		fromBuilder.append(" and c1.seller_id = ? GROUP BY c1.id ) t1 ON r.object_id = t1.id ");
 		params.add(sellerId);
 		fromBuilder.append(" inner JOIN `cc_customer` AS c ON c.id = t1.customer_id ");
-		fromBuilder.append(" JOIN cc_receivables_detail rd ON rd.object_id=r.object_id ");
 		appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
 		if(!keyword.equals("")) {
 			fromBuilder.append(" and c.customer_name like '%"+keyword+"%' ");

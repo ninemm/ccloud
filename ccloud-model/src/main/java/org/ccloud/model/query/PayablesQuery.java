@@ -76,8 +76,7 @@ public class PayablesQuery extends JBaseQuery {
 			fromBuilder.append(" AND r.dept_id = '"+deptId+"' GROUP BY cs.id ) x WHERE id is not null ");
 		}else {
 			select = " SELECT  r.obj_id AS id  , t1.customerTypeNames,CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END AS name , IFNULL(r.pay_amount,0) pay_amount, IFNULL(r.act_amount,0) act_amount , IFNULL(r.balance_amount,0) balance_amount ";
-			fromBuilder = new StringBuilder(" FROM cc_payables_detail pd");
-			fromBuilder.append(" LEFT JOIN cc_payables AS r ON pd.object_id=r.obj_id ");
+			fromBuilder = new StringBuilder(" FROM cc_payables r");
 			fromBuilder.append(" inner JOIN (SELECT c1.id, c1.customer_id, ct.id AS customer_type_id, GROUP_CONCAT(ct.NAME) AS customerTypeNames FROM cc_seller_customer c1 INNER JOIN cc_customer_join_customer_type cjct ON c1.id =cjct.seller_customer_id INNER JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
 			if(!("0".equals(id)) && id != null){
 				fromBuilder.append(" WHERE cjct.customer_type_id = '"+ id+"'");
@@ -142,6 +141,11 @@ public class PayablesQuery extends JBaseQuery {
 	
 	public Payables findByObjIdAndDeptId(String objId, String objType) {
 		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"' ";
+		return DAO.findFirst(select);
+	}
+	
+	public Payables findByObjIdAndDeptId(String objId, String objType,String deptId) {
+		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"' and dept_id = '"+deptId+"' ";
 		return DAO.findFirst(select);
 	}
 	

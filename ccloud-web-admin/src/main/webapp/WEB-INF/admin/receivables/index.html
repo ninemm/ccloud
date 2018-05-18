@@ -227,10 +227,8 @@
 	}
 	function batchDown(){
 		var keyword = $('#search').val();
-		var startDate = $('#startDate').val();
-		var	endDate = $('#endDate').val();
 		if (keyword) keyword = encodeURIComponent(keyword);
-		location.href = "${CPATH}/admin/receivables/downloading?customerTypeId=" + cusType+"&keyword="+keyword+"&startDate="+startDate+"&endDate="+endDate;
+		jQuery.mm.down("${CPATH}/admin/receivables/downloading?customerTypeId=" + cusType+"&keyword="+keyword);
 	}
 
 	/* function detailMoney(ref_sn,ref_type,object_id,balance_amount){
