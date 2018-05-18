@@ -180,8 +180,8 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 						TransferBillDetail transferBillDetail = getModel(TransferBillDetail.class);
 						String productId = StringUtils.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] + "].product_id"));
 						String productCount = StringUtils.getArrayFirst(map.get("transferBillDetailList[" + factIndex[i] + "].product_count"));
-						if (productCount.equals("0")) {
-							break;
+						if ("0".equals(productCount)||null==productCount) {
+							continue;
 						}
 						transferBillDetail.setSellerProductId(productId);
 						transferBillDetail.setProductCount(new BigDecimal(productCount));
@@ -211,12 +211,10 @@ public class _TransferBillController extends JBaseCRUDController<TransferBill> {
 					int loopEnd = 1;
 					for (int i = 0; i < factIndex.length; i++) {
 						TransferBillDetail transferBillDetail = getModel(TransferBillDetail.class);
-						String productId = StringUtils
-								.getArrayFirst(map.get("transferBillDetailList[" + i + "].product_id"));
-						String productCount = StringUtils
-								.getArrayFirst(map.get("transferBillDetailList[" + i + "].product_count"));
-						if (productCount.equals("0")) {
-							break;
+						String productId = StringUtils .getArrayFirst(map.get("transferBillDetailList[" + i + "].product_id"));
+						String productCount = StringUtils .getArrayFirst(map.get("transferBillDetailList[" + i + "].product_count"));
+						if (("0".equals(productCount)||null==productCount)) {
+							continue;
 						}
 						transferBillDetail.setSellerProductId(productId);
 						transferBillDetail.setProductCount(new BigDecimal(productCount));
