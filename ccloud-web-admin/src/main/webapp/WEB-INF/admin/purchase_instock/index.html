@@ -92,6 +92,12 @@
 					},
 					edit: false
 				},
+				{field: "", title: "采购单号", align: "center", width: '10%',
+					formatter: function(value, row, rowIndex) {
+						return '<a href="#" onclick="orderDetail(\''+row.purchaseOrderId+'\')" >'+row.porder_sn +'</a>';
+					},
+					edit: false
+				},
 				{field: "supplierName", title: "供应商名称", align: "center", width: '8%', edit:false},
 				{field: "total_amount", title: "订单总额", align: "center", width: '5%', 
 				 formatter: function(value, row, index){
@@ -227,6 +233,16 @@
 	function refresh(){
 		layer.closeAll();
 		location.reload();
+	}
+	
+	function orderDetail(id){
+		var url = '${CPATH}/admin/purchaseOrder/detail/?purchaseOrderId='+id;
+		layer.open({
+			title:"采购订单详细",
+			type: 2,
+			area: ['70%', '80%'],
+			content: url
+		});
 	}
 
 </#macro>
