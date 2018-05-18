@@ -66,7 +66,13 @@
 	var initFields = function() {
 		var fields =
 			[	
-				{field: "proc_code", title: "流程编号", align: "center", width: '10%', edit:false},
+				{field: "proc_code", title: "流程编号", align: "center", width: '10%',
+      			formatter: function(value, row, rowIndex) {
+					if (value == null || value == '') {
+						value = "无";
+					}
+					return value;
+				}, edit:false},
 				{field: "investType", title: "投入类型", align: "center", width: '10%', edit:false},
 				{field: "customer_name", title: "终端名称", align: "center", width: '10%', edit:false},
 				{field: "address", title: "终端地址", align: "center", width: '10%', edit:false},
