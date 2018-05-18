@@ -94,7 +94,7 @@
 				},
 				{field: "", title: "采购单号", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
-						return row.porder_sn;
+						return '<a href="#" onclick="orderDetail(\''+row.purchaseOrderId+'\')" >'+row.porder_sn +'</a>';
 					},
 					edit: false
 				},
@@ -233,6 +233,16 @@
 	function refresh(){
 		layer.closeAll();
 		location.reload();
+	}
+	
+	function orderDetail(id){
+		var url = '${CPATH}/admin/purchaseOrder/detail/?purchaseOrderId='+id;
+		layer.open({
+			title:"采购订单详细",
+			type: 2,
+			area: ['70%', '80%'],
+			content: url
+		});
 	}
 
 </#macro>

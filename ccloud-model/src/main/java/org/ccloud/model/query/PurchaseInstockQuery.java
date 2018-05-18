@@ -48,7 +48,7 @@ public class PurchaseInstockQuery extends JBaseQuery {
 	}
 
 	public Page<Record> paginate(int pageNumber, int pageSize, String keyword, String startDate, String endDate,String deptId,String dataArea) {
-		String select = "select i.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName,po.porder_sn ";
+		String select = "select i.*, CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS supplierName,po.porder_sn,po.id as purchaseOrderId ";
 		StringBuilder fromBuilder = new StringBuilder("from `cc_purchase_instock` i ");
 		fromBuilder.append(" LEFT JOIN cc_purchase_order_join_instock poji on poji.purchase_instock_id = i.id ");
 		fromBuilder.append(" LEFT JOIN cc_purchase_order po on po.id  = poji.purchase_order_id ");

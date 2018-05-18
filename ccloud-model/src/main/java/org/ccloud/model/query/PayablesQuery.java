@@ -147,8 +147,8 @@ public class PayablesQuery extends JBaseQuery {
 		return DAO.findFirst(select);
 	}
 	
-	public Payables findByObjIdAndDeptId(String objId, String objType,String deptId) {
-		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"' and dept_id = '"+deptId+"' ";
+	public Payables findByObjIdAndDeptId(String objId, String objType) {
+		String select = "select * from cc_payables where obj_id= '"+objId+"' and obj_type= '"+objType+"' ";
 		return DAO.findFirst(select);
 	}
 	
