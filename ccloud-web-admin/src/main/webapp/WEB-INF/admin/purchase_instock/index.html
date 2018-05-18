@@ -92,6 +92,12 @@
 					},
 					edit: false
 				},
+				{field: "", title: "采购单号", align: "center", width: '10%',
+					formatter: function(value, row, rowIndex) {
+						return row.porder_sn;
+					},
+					edit: false
+				},
 				{field: "supplierName", title: "供应商名称", align: "center", width: '8%', edit:false},
 				{field: "total_amount", title: "订单总额", align: "center", width: '5%', 
 				 formatter: function(value, row, index){
