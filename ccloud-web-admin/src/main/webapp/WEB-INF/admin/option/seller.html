@@ -1,5 +1,10 @@
 <#include "../_inc/_layout.html"/> 
-<#include "_option_script.html"/> 
+<#include "_option_script.html"/>
+<#macro css>
+input[type="number"] {
+	width: 100%;
+}
+</#macro>
 <@layout active_id=p child_active_id=c>
 <section class="content-header">
 	<h1>经销商定制化服务</h1>
@@ -12,7 +17,7 @@
 	</p>
 	<form action="${CPATH}/admin/option/save" method="POST" id="form">
 		<input type="hidden" name="ucode" value="${ucode}">
-		<#assign common = "seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_confirm_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}, web_member_number_limit_${(session.sellerCode)!}, web_proc_refund_${(session.sellerCode)!}"/>
+		<#assign common = "seller_store_check_${(session.sellerCode)!},web_order_price_edit_${(session.sellerCode)!},web_order_confirm_price_edit_${(session.sellerCode)!},web_order_mix_gift_${(session.sellerCode)!},web_procedure_review_${(session.sellerCode)!},web_procedure_review_edit_${(session.sellerCode)!},web_proc_customer_review_${(session.sellerCode)!},web_proc_customer_visit_${(session.sellerCode)!},web_proc_activity_apply_${(session.sellerCode)!}, web_proc_refund_${(session.sellerCode)!}"/>
 		<#assign dataUpload = ""/>
 		<#list customerTypeList as customerType>
 			<#if customerType_index == 0>
@@ -136,14 +141,26 @@
                             </div>
                         </div>
                         <div class="clr checkbox"></div>
-                    </li>                    
+                    </li>
+					<li class="jp-set-pad">
+						<div class="col-sm-3 ">
+							<div class="  jp-set-title-line jp-set-info ">库存预警数量</div>
+						</div>
+						<div class="col-sm-9  jp-set-title-line">
+							<div class="col-sm-6 jp-table-distance-top ">
+								<input class="form-control input-md" type="number" name="seller_store_warning_num_${(session.sellerCode)!}" value="${OPTION('seller_store_warning_num_${(session.sellerCode)!}')!}">
+							</div>
+							<p>如：少于30件则库存为红色显示</p>
+						</div>
+						<div class="clr"></div>
+					</li>
 					<li class="jp-set-pad">
 						<div class="col-sm-3 ">
 							<div class="  jp-set-title-line jp-set-info ">商品数量审核</div>
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<input class="form-control input-md" type="text" name="web_proc_num_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_num_limit_${(session.sellerCode)!}')!}">
+								<input class="form-control input-md" type="number" name="web_proc_num_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_num_limit_${(session.sellerCode)!}')!}">
 							</div>
 							<p>如：超过10件开启审核流程</p>
 						</div>
@@ -155,7 +172,7 @@
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<input class="form-control input-md" type="text" name="web_proc_price_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_price_limit_${(session.sellerCode)!}')!}">
+								<input class="form-control input-md" type="number" name="web_proc_price_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_price_limit_${(session.sellerCode)!}')!}">
 							</div>
 							<p>如：超过5000元开启审核流程</p>
 						</div>
@@ -167,7 +184,7 @@
                         </div>
                         <div class="col-sm-9  jp-set-title-line">
                             <div class="col-sm-6 jp-table-distance-top ">
-                               <input class="form-control input-md" type="text" name="web_proc_plans_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_plans_limit_${(session.sellerCode)!}')!}">
+                               <input class="form-control input-md" type="number" name="web_proc_plans_limit_${(session.sellerCode)!}" value="${OPTION('web_proc_plans_limit_${(session.sellerCode)!}')!}">
                             </div>
                             <p>如：26 （每个月计划开始时间）  </p>
                         </div>
@@ -179,7 +196,7 @@
 						</div>
 						<div class="col-sm-9  jp-set-title-line">
 							<div class="col-sm-6 jp-table-distance-top ">
-								<input class="form-control input-md" type="text" name="web_member_number_limit_${(session.sellerCode)!}" value="${OPTION('web_member_number_limit_${(session.sellerCode)!}')!}">
+								<input class="form-control input-md" type="number" name="web_member_number_limit_${(session.sellerCode)!}" value="${OPTION('web_member_number_limit_${(session.sellerCode)!}')!}">
 							</div>
 							<p>如：单个产品数量超过10件不能下单</p>
 						</div>
