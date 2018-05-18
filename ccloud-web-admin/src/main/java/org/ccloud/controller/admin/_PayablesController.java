@@ -236,7 +236,11 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		for (Record record : payablesList) {
 		
 			payablesExcel excel = new payablesExcel();
-			excel.setCustomerType(record.getStr("customerTypeNames"));
+			if(StrKit.isBlank(record.getStr("customerTypeNames"))) {
+				excel.setCustomerType("供应商");
+			}else {
+				excel.setCustomerType(record.getStr("customerTypeNames"));
+			}
 			excel.setCustomerName(record.getStr("name"));
 			excel.setPayAmount(record.getBigDecimal("pay_amount"));
 			excel.setActAmount(record.getBigDecimal("act_amount"));

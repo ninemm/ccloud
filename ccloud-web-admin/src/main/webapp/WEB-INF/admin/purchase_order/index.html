@@ -70,7 +70,11 @@
 				},
 				{field: "", title: "同步货单号", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
-						return row.stock_out_sn;
+						if(row.stock_out_sn == null){
+							return '无';
+						}else{
+							return row.stock_out_sn;
+						}
 					},
 					edit: false
 				},
