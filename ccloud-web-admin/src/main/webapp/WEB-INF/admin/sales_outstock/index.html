@@ -421,8 +421,12 @@ function orderDetail(id) {
      dataType: "json",
      async: false,
      success: function(data) {
-     toastr.success(data.message, '操作成功');	
-     $table.bootstrapTable('refresh');     
+		if (data.message == '出库成功') {
+			toastr.success(data.message, '操作成功');
+		} else {
+			toastr.error(data.message,'操作失败');
+		}
+	     $table.bootstrapTable('refresh');     
      }
    });
  }
