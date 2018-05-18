@@ -72,6 +72,11 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 
 	@RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
 	public void index() {
+		String dataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA);
+		List<Record> typeList = CustomerTypeQuery.me().findCustomerTypeList(dataArea);
+
+		setAttr("typeList", typeList);
+		render("index.html");
 	}
 
 	@RequiresPermissions(value = { "/admin/sellerCustomer", "/admin/dealer/all", "/admin/all" }, logical = Logical.OR)
@@ -83,14 +88,19 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		String status = getPara("status");
 		Map<String, String[]> paraMap = getParaMap();
 		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
-		String keyword1 = StringUtils.getArrayFirst(paraMap.get("k1"));
+		String realname = StringUtils.getArrayFirst(paraMap.get("realname"));
 		String customerType = getPara("customerType");
+		String subType = getPara("subType");
+
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
+		if (StrKit.notBlank(realname)) {
+			realname = StringUtils.urlDecode(realname);
+		}
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
 
-		Page<Record> page = SellerCustomerQuery.me()._paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort,sortOrder, customerType,keyword1,status);
+		Page<Record> page = SellerCustomerQuery.me()._paginate(getPageNumber(), getPageSize(), keyword, selectDataArea, dealerDataArea, sort, sortOrder, customerType, realname, status, subType);
 		List<Record> customerList = page.getList();
 
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(), "rows", customerList);
@@ -427,7 +437,7 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 		}
 
 		String dealerDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";
-		Page<Record> page = SellerCustomerQuery.me()._paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "","","1");
+		Page<Record> page = SellerCustomerQuery.me()._paginate(1, Integer.MAX_VALUE, "", dataArea + "%", dealerDataArea, "","", "","","1", "");
 		List<Record> customerList = page.getList();
 
 		List<CustomerExcel> excellist = Lists.newArrayList();
@@ -616,6 +626,21 @@ public class _SellerCustomerController extends JBaseCRUDController<SellerCustome
 			UserJoinCustomerQuery.me().deleteBySelerCustomerId(sellerCustomerId);
 			for (String userId : userIds)
 				this.insertUserJoinCustomer(sellerCustomerId, userId);
+		}
+
+		renderAjaxResultForSuccess();
+	}
+
+	@Before(Tx.class)
+	@RequiresPermissions(value = { "/admin/sellerCustomer/batchSubType", "/admin/dealer/all",
+			"/admin/all" }, logical = Logical.OR)
+	public void batchSubType() {
+		String[] sellerCustomerIds = getParaValues("sellerCustomerIds[]");
+		String subType = getPara("subType");
+		for (String sellerCustomerId : sellerCustomerIds) {
+			SellerCustomer sellerCustomer = SellerCustomerQuery.me().findById(sellerCustomerId);
+			sellerCustomer.setSubType(subType);
+			sellerCustomer.saveOrUpdate();
 		}
 
 		renderAjaxResultForSuccess();

@@ -122,7 +122,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		return Db.paginate(pageNumber, pageSize, select, fromBuilder.toString(), params.toArray());
 	}
 
-	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String sort,String sortOrder, String customerType, String keyword1,String status) {
+	public Page<Record> _paginate(int pageNumber, int pageSize, String keyword, String dataArea, String dealerDataArea, String sort,String sortOrder, String customerType, String realname, String status, String subType) {
 
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
@@ -142,16 +142,15 @@ public class SellerCustomerQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "ujc.data_area", dataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(fromBuilder, "ct.id", customerType, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(fromBuilder, "c.customer_name", keyword, params, needWhere);
-		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", keyword1, params, needWhere);
-		if(StrKit.notBlank(status)) {
-			needWhere = appendIfNotEmpty(fromBuilder, "sc.is_enabled", status, params, needWhere);
-		}
+		needWhere = appendIfNotEmptyWithLike(fromBuilder, "u.realname", realname, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "sc.is_enabled", status, params, needWhere);
+		needWhere = appendIfNotEmpty(fromBuilder, "sc.sub_type", subType, params, needWhere);
+
 		fromBuilder.append("  GROUP BY sc.id ");
 		if(StrKit.notBlank(sort)) {
-			fromBuilder.append(" order by "+sort);
-			if(!sortOrder.equals("")) {
-				fromBuilder.append(" "+ sortOrder);
-			}
+			fromBuilder.append(" order by "+ sort + sortOrder);
+		}else{
+			fromBuilder.append(" order by  sc.sub_type asc, sc.create_date desc ");
 		}
 
 		if (params.isEmpty())

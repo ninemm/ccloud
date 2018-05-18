@@ -29,15 +29,13 @@
 
 	var $table = $("#_customer_table");
 	var url = '${CPATH}/admin/sellerCustomer/list';
-	$("#customerTypes").select2({width:'100%'});
 	var batchFlg = true;
 
 	$(function() {
-		$("#status").find("option[value='1']").attr("selected",true);
 		jQuery.mm.initEditTable('#_customer_table', url, initParams, initFields(), null);
-
 		jQuery.mm.initValidator('#form', validatorFields);
-		initCustomerType();
+		$("#customer_type").val($.cookie('customerType'));
+		$("#customerTypes").select2({width:'100%'});
 	});
 
 	$("#search-submit").click(function() {
@@ -47,22 +45,22 @@
 	var initParams = function(params) {
 
 		var keyword = $('#search').val();
-		var keyword1 = $('#search1').val();
+		if (keyword) keyword = encodeURIComponent(keyword);
+		var realname = $('#realname').val();
+		if (realname) realname = encodeURIComponent(realname);
 		var customerType = $('#customer_type').val();
+		var subType = $('#subType').val();
 		var status = $('#status').val();
-		if(customerType!=null){
-			var date = new Date();
-			date.setTime(date.getTime()+2*60*1000);
-			$.cookie('customerType', customerType, { expires: date });
-		}
-		customerType=$.cookie('customerType');
+		$.cookie('customerType', customerType);
+
 		var param = {
 			size: params.limit,
 			page: params.offset/params.limit + 1,
 			customerType: customerType,
 			k: keyword,
-			k1:keyword1,
+			realname:realname,
 			status: status,
+			subType: subType,
 			sort: params.sort,      //排序列名  
             sortOrder: params.order //排位命令（desc,asc）
 		};
@@ -80,7 +78,6 @@
 					edit:false
 				},
 				{field: "customer_name", title: "客户名称", align: "center", width: '8%',sortable: true, edit:false},
-				{field: "nickname", title: "客户昵称", align: "center", width: '5%',sortable: true, edit: false},
 				{field: "contact", title: "联系人", align: "center", width: '5%',sortable: true, edit: false},
 				{field: "mobile", title: "手机号", align: "center", width: '5%',sortable: true, edit: false},
 				{field: "address", title: "地址", align: "center", width: '15%',sortable: true,
@@ -98,13 +95,22 @@
 					},
 					edit: false
 				},
+				{field: "sub_type", title: "客户子类型", align: "center",sortable: true, width: '5%',
+					formatter: function(value, row, rowIndex) {
+						if(value == 100301) return 'A类';
+						if(value == 100302) return 'B类';
+						if(value == 100303) return 'C类';
+						return 'A类';
+					},
+					edit: false
+				},
 				{field: "is_enabled", title: "状态", align: "center", width: '5%',sortable: true,
 					formatter: function(value, row, rowIndex) {
 						return value == 1 ? '启用' : '停用';
 					},
 					edit: false
 				},
-				{field: "action", title: "操作", align: "center", width: '20%',
+				{field: "action", title: "操作", align: "center", width: '15%',
 					formatter: function(value, row, rowIndex) {
 						var url = '${CPATH}/admin/sellerCustomer/edit?id=' + row.id + '&c=${c!}&p=${p!}';
 						var strHtml = '<a href="' + url + '" class="btn btn-xs bg-olive btn-flat">编辑</a> ';
@@ -138,7 +144,7 @@
 	function batchAction(action) {
 		var $form = $("#form");
 		if ($(":input[name='dataItem']:checked").length == 0) {
-			toastr.warning('请选择客户','操作失败');
+			toastr.warning('请选先择客户','操作失败');
 			return ;
 		} else if (action == 'setUser') {
 			layer.open({
@@ -190,7 +196,7 @@
 		 var flang = true;
 		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
 		 if(checklist.length == 0){
-			toastr.error("未选中任何数据!");
+			toastr.warning('请选择客户','操作失败');
 			flang=false;
 			return;		 
 		 }
@@ -231,7 +237,7 @@
 		 var flang = true;
 		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
 		 if(checklist.length == 0){
-			toastr.error("未选中任何数据!");
+			toastr.warning('请先选择客户','操作失败');
 			flang=false;
 			return;		 
 		 }
@@ -268,18 +274,17 @@
 	}
 	
 	var updateSellerCustomerType = function(){
-		 var sellerCustomerItems = new Array();
-		 var checklist = $('input[name="dataItem"]:checked').parent().parent();
-		 if(checklist.length == 0){
-			toastr.error("未选中任何客户!");
-			return;		 
-		 }
+		var sellerCustomerItems = new Array();
+		var checklist = $('input[name="dataItem"]:checked').parent().parent();
+		if(checklist.length == 0){
+			toastr.warning('请先选择客户','操作失败');
+			return;
+		}
 		 var list = $("#customerTypes").select2("val");
 		 var ids = "";
 		 if (list != null && list.length > 0) {
 		 	ids = list.toString();
 		 }
-		 console.log(ids);
 		 $('input[name="dataItem"]:checked').parent().parent().each(function(idx, item) {
 		 	var obj = {
 								"id": $(this).find('td').eq(0).find("input").val(),
@@ -309,28 +314,44 @@
 				}
 			});
 	}
-	
-		$('#exampleModal').on('show.bs.modal', function (event) {
-			$("#customerType_table").bootstrapTable('destroy');
-			$.ajax({
-				url:"${CPATH}/admin/sellerCustomer/getCustomerType",
-				type:"post",
-				dataType:"json",
-				success:function(data)
-				{
-					for (var i = 0; i < data.length; i++) {
-							$("#customerTypes").append("<option value=" + data[i].id + ">" + data[i].name + "</option>");
-					}
-				},
-				error : function(data) {
-					if(data.status == 200){
-						location.href = "${CPATH}/admin/login";
-					}else{
-						alert("信息提交错误");
-					}
-				}
-			});
+
+	var updateSellerCustomerSubType = function(){
+		var sellerCustomerIds = new Array();
+		if ($(":input[name='dataItem']:checked").length == 0) {
+			toastr.warning('请选择客户','操作失败');
+			return ;
+		}
+		var batchSubType = $("#batchSubType").val();
+		$(":input[name='dataItem']:checked").each(function(index, el){
+			var val = $(el).val();
+			if(val != ''){
+				sellerCustomerIds.push(val);
+			}
 		})
+
+		$.ajax({
+			url:"${CPATH}/admin/sellerCustomer/batchSubType",
+			type:"post",
+			dataType:"json",
+			data : {'sellerCustomerIds' : sellerCustomerIds, 'subType' : $("#batchSubType").val()},
+			success:function(result){
+				if (result.errorCode > 0) {
+					toastr.error(result.message, '操作失败');
+				} else {
+					toastr.success(result.message, '操作成功');
+					$table.bootstrapTable('refresh');
+				}
+			},
+			error : function(result) {
+				if(result.status == 200){
+					location.href = "${CPATH}/admin/login";
+				}else{
+					alert("信息提交错误");
+				}
+			}
+		});
+	}
+
 	
 </#macro>
 
@@ -354,15 +375,27 @@
 
 			 <div class="form-group">
 				<div class="col-sm-4">
-					<label class="control-label col-sm-5">客户类型:</label>
-                    <div class="col-sm-7 input-group input-group-sm">
+					<label class="control-label col-sm-4">客户类型:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
                     	<select  class="form-control" name="customer_type" id="customer_type">
+							<option value="">请选择</option>
+							<#list typeList as type>
+							 <option value="${(type.id)!}">${(type.name)!}</option>
+						 	</#list>
+						</select>
+                    </div>
+				</div>
+				 <div class="col-sm-4">
+					<label class="control-label col-sm-4">客户子类型:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+                    	<select  class="form-control" name="subType" id="subType">
+                    		${DICT_BOX('customer_subtype', 'select')}
 						</select>
                     </div>
 				</div>
 				<div class="col-sm-4">
-					<label class="control-label col-sm-5">状态:</label>
-                    <div class="col-sm-7 input-group input-group-sm">
+					<label class="control-label col-sm-4">状态:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
                     	<select  class="form-control" name="status" id="status">
                     		<option value = "">请选择</option>
                     		<option value = "1">启用</option>
@@ -370,18 +403,26 @@
 						</select>
                     </div>
 				</div>
+			</div>
+			<div class="form-group">
 				<div class="col-sm-4">
 					<label class="control-label col-sm-4">客户名称:</label>
                     <div class="col-sm-8 input-group input-group-sm">
 						<input id="search" class="form-control" type="search" value="${k!}" name="k" placeholder="搜索客户名称">
                     </div>
 				</div>
+				<div class="col-sm-4">
+					<label class="control-label col-sm-4">业务员:</label>
+                    <div class="col-sm-8 input-group input-group-sm">
+						<input id="realname" class="form-control" type="search" value="${realname!}" name="realname" placeholder="搜索业务员名称">
+                    </div>
+				</div>
+				<div class="col-sm-4" style="text-align: center">
+					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+				</div>
 			</div>
 			 <div class="form-group">
 			  <div class="col-sm-8">
-					<@shiro.hasPermission name="/admin/sellerCustomer/batchSetUser, /admin/dealer/all, /admin/all">
-						<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction('setUser')"> 设置负责人 </button>
-					</@shiro.hasPermission>
 					<a href="${CPATH}/admin/sellerCustomer/edit?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-plus"></i> 新增 </a>
 					<@shiro.hasPermission name="/admin/sellerCustomer/uploading, /admin/dealer/all, /admin/all">
 						<a href="${CPATH}/admin/sellerCustomer/upload?c=${c!}&p=${p!}" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-upload"></i> 导入</a>
@@ -395,18 +436,15 @@
 					<@shiro.hasPermission name="/admin/sellerCustomer/downIsenable, /admin/dealer/all, /admin/all">
 						<a href="#" onclick = "downSellerCustomer()" class="btn btn-sm btn-primary btn-flat"><i class="fa fa-arrow-down"></i> 批量停用</a>
 					</@shiro.hasPermission>
+					<@shiro.hasPermission name="/admin/sellerCustomer/batchSetUser, /admin/dealer/all, /admin/all">
+						<button class="btn btn-sm btn-primary btn-flat" type="button" onclick="batchAction('setUser')"><i class="fa fa-user"></i> 批量设置负责人 </button>
+					</@shiro.hasPermission>
 					<@shiro.hasPermission name="/admin/sellerCustomer/updateSellerCustomerType, /admin/dealer/all, /admin/all">	
 						<button type="button"  class="btn btn-sm btn-primary btn-flat" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo"><i class="fa fa-list"></i> 批量设置客户类型</button>
 					</@shiro.hasPermission>
-				</div>
-				<div class="col-sm-3">
-					<label class="control-label col-sm-5">业务员:</label>
-                    <div class="col-sm-7 input-group input-group-sm">
-						<input id="search1" class="form-control" type="search" value="${k1!}" name="k1" placeholder="搜索业务员名称">
-                    </div>
-				</div>
-				<div class="col-sm-1">
-					<input id="search-submit" class="btn btn-sm btn-primary btn-flat" type="button" value="搜索">
+					<@shiro.hasPermission name="/admin/sellerCustomer/updateSellerCustomerSubType, /admin/dealer/all, /admin/all">
+						<button type="button"  class="btn btn-sm btn-primary btn-flat" data-toggle="modal" data-target="#batchSubTypeModel" data-whatever="@mdo"><i class="fa fa-list"></i> 批量设置客户子类型</button>
+					</@shiro.hasPermission>
 				</div>
 			</div>
 		<div class="box">
@@ -429,13 +467,43 @@
 	                 <label class="control-label col-sm-4">客户类型:</label>
 	                 <div class="input-group col-sm-8" >
 	                     <select class="form-control input-sm" name="customerTypes" id ="customerTypes" multiple="multiple" >
-	                  </select>
+							 <#list typeList as type>
+							 <option value="${(type.id)!}">${(type.name)!}</option>
+						 	</#list>
+						 </select>
 	                 </div>
 	             </div>
 	          </div>
 		  	</div>
 	      <div class="modal-footer">
 	        <button type="button" onclick="updateSellerCustomerType()" class="btn btn-sm btn-primary btn-flat">确认</button>
+	        <button type="button" class="btn btn-sm btn-primary btn-flat btn-flat" data-dismiss="modal">关闭</button>
+	      </div>
+	      </div>
+	 </div>
+</div>
+
+<div class="modal fade" id="batchSubTypeModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="padding-top:200px;">
+  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="exampleModalLabel">选择客户类型</h4>
+	      </div>
+	      <div class="modal-body" id = "modal-body">
+		      <div class="form-group">
+		       <div class="col-sm-12 validata-box">
+	                 <label class="control-label col-sm-4">客户类型:</label>
+	                 <div class="input-group col-sm-8" >
+						 <select class="form-control input-sm" name="batchSubType" id ="batchSubType">
+							 ${DICT_BOX('customer_subtype', 'select')}
+						 </select>
+	                 </div>
+	             </div>
+	          </div>
+		  	</div>
+	      <div class="modal-footer">
+	        <button type="button" onclick="updateSellerCustomerSubType()" class="btn btn-sm btn-primary btn-flat">确认</button>
 	        <button type="button" class="btn btn-sm btn-primary btn-flat btn-flat" data-dismiss="modal">关闭</button>
 	      </div>
 	      </div>

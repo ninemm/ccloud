@@ -191,6 +191,11 @@
 				stringLength: { max: 15, message: '客户联系人最大长度是15字符，请重新输入' }
 			}
 		},
+		'customer.mobile': {
+			validators: {
+				notEmpty: { message: '手机号不能为空' }
+			}
+		},
 		'customer.prov_name': {
 			validators: {
 				notEmpty: { message: '省不能为空' },
