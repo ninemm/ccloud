@@ -283,6 +283,8 @@ public class CustomerVisitController extends BaseFrontController {
 		List<ImageJson> list = JSON.parseArray(imageListStore, ImageJson.class);
 		CustomerVisit visit = CustomerVisitQuery.me().findMoreById(id);
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findByCustomerVisitId(id);
+		Record activity = ActivityQuery.me().findByActivityApplyId(customerVisit.getActiveApplyId());
+		setAttr("activity",activity.getStr("title"));
 		setAttr("visit", visit);
 		setAttr("list",list);
 		setAttr("activityExecutes",activityExecutes);
@@ -443,8 +445,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -740,7 +742,7 @@ public class CustomerVisitController extends BaseFrontController {
 		int vs = (int) CustomerVisitQuery.me().findIntByActivityApplyId(activityApplyId);
 		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityApplyId(activityApplyId);
 		map.put("size", size);
-		if(vs <= activityExecutes.size()) {
+		if(vs < activityExecutes.size()) {
 			map.put("activityExecute", activityExecutes.get(vs));
 		}
 		map.put("check_size", check_size);
@@ -799,8 +801,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -877,8 +879,8 @@ public class CustomerVisitController extends BaseFrontController {
 					//添加的水印内容
 					String waterFont1 = customerVisit.getSellerCustomer().getCustomer().getCustomerName();
 					String waterFont2 = user.getRealname() +  DateUtils.dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss" );
-//					String waterFont3 =  customerVisit.getLocation();
-					String waterFont3 = "湖北省-武汉市-洪山区";
+					String waterFont3 =  customerVisit.getLocation();
+//					String waterFont3 = "湖北省-武汉市-洪山区";
 					//图片添加水印  上传图片  水印图
 					String savePath = qiniuUpload(ImageUtils.waterMark(pic, Color.WHITE, waterFont1, waterFont2, waterFont3));
 					
@@ -929,6 +931,8 @@ public class CustomerVisitController extends BaseFrontController {
 		String orderList = getPara("orderList");
 		CustomerVisit cv = CustomerVisitQuery.me().findByActivityApplyIdAndOrderList(activityApplyId, orderList);
 		ExpenseDetail expenseDetail = ExpenseDetailQuery.me().findByActivityApplyId(activityApplyId);
+		//通过申请ID 和 活动执行步骤序号 来确定进入活动拜访的是第几步
+		ActivityExecute activityExecute = ActivityExecuteQuery.me().findActivityApplyIdAndOrderList(activityApplyId,orderList);
 		String has_size = "0";
 		String check_size = null;		
 		if (expenseDetail != null) {
@@ -946,10 +950,7 @@ public class CustomerVisitController extends BaseFrontController {
 			setAttr("imgeLists",JSON.toJSON(JSON.parseArray(cv.getPhoto(), ImageJson.class)));
 		}
 		Record record = ActivityQuery.me().findByApplyId(activityApplyId);
-//		List<ActivityExecute> activityExecutes = ActivityExecuteQuery.me().findbyActivityIdAndOrderList(record.getStr("activity_id"),orderList);
 		
-		//通过申请ID 和 活动执行步骤序号 来确定进入活动拜访的是第几步
-		ActivityExecute activityExecute = ActivityExecuteQuery.me().findActivityApplyIdAndOrderList(activityApplyId,orderList);
 		List<Map<String, String>> list = getVisitTypeList();
 		setAttr("has_size", has_size);
 		setAttr("check_size", check_size);

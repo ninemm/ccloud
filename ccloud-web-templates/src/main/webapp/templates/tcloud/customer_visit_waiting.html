@@ -224,6 +224,7 @@
                     location.href = '${CPATH}/customerVisit';
                 } else {
                     $.alert(res.message);
+                    $('._submit_btn').attr('disabled', false);
                 }
             },
             error: function(res) {

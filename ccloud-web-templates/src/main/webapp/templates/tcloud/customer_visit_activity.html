@@ -41,10 +41,8 @@
 	var numI = 0;
     $(function() {
     	var activityExecutesList = ${(activityExecute)!};
-        var imgeList = ${(list)!'1'};
         var domain = "${(domain)!}";
         var flang = false;
-        var _orderList = "${(orderList)!}";//点击的是第几执行步骤
     	$("#customer_id").val("${(record.seller_customer_id)!}");
    	    $("#customer_name").val("${(record.customer_name)!}");
        	$("#contact").val("${(record.contact)!}");
@@ -84,7 +82,6 @@
         $(".imageActivityExecute").hide();
         $(".weui-cell__ft").hide();
 		$(".imgeInfo").hide();
-        var _orderList = "${(orderList)!}";
        	var imgeList = ${(imgeLists)!'1'};
        	numImage = imgeList.length ;
         if(activityExecutesList != null){
@@ -285,6 +282,7 @@
                     location.href = '${CPATH}/customerVisit';
                 } else {
                     $.alert(res.message);
+                    $('._submit_btn').attr('disabled', false);
                 }
             },
             error: function(res) {

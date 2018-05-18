@@ -504,6 +504,9 @@ public class CustomerVisitQuery extends JBaseQuery {
 	public CustomerVisit findByApplyIdAndExecteIdAndSellerCustomerId(String applyId,String activityExecuteId,String sellerCustomerId) {
 		return DAO.doFindFirst("active_apply_id = ? and activity_execute_id = ? and seller_customer_id = ?", applyId, activityExecuteId, sellerCustomerId);
 	}
+	public CustomerVisit findByApplyIdAndExecteId(String applyId,String activityExecuteId) {
+		return DAO.doFindFirst("active_apply_id = ? and activity_execute_id = ? ", applyId, activityExecuteId);
+	}
 	
 	public CustomerVisit findByActivityApplyIdAndOrderList(String activityApplyId, String orderList) {
 		String sql = "SELECT ccv.*,d.name as typeName from cc_customer_visit ccv LEFT JOIN dict d on d.value = ccv.question_type "
