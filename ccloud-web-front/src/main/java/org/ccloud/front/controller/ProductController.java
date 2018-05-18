@@ -42,7 +42,7 @@ public class ProductController extends BaseFrontController {
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId1(user.getId());
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
 		
 		List<Record> compositionRecords = new ArrayList<Record>();
 
@@ -110,7 +110,7 @@ public class ProductController extends BaseFrontController {
 		List<Record> productList = new ArrayList<>();
 		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId1(user.getId());
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
 		if (wlist.size() > 0 && !StrKit.notBlank(warehouseId)) {
 			warehouseId=wlist.get(0).getId();
 		}
@@ -147,7 +147,7 @@ public class ProductController extends BaseFrontController {
 		Integer pageNumber = Integer.parseInt(getPara("pageNumber"))*Integer.parseInt(getPara("pageSize"));
 		Integer pageSize = Integer.parseInt(getPara("pageSize"));
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId1(user.getId());
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
 		if (wlist.size() > 0 && !StrKit.notBlank(warehouseId)) {
 			warehouseId=wlist.get(0).getId();
 		}
