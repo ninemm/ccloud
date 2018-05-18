@@ -211,7 +211,12 @@ public class OutstockController extends BaseFrontController {
 			BigDecimal oldBalanceCount = inventory.getBalanceCount() == null ? new BigDecimal(0) : inventory.getBalanceCount();
 
 			BigDecimal storeCount = (new BigDecimal(record.getInt("product_count"))).divide(new BigDecimal(record.getInt("convert_relate")), 2, BigDecimal.ROUND_HALF_UP);
-
+			Record record1 = SalesOutstockQuery.me().findnumBySellProductIdAndwareHouseId(record.getStr("sell_product_id"),salesOutstock.getWarehouseId());
+			BigDecimal balanceCount = new BigDecimal(record1.getStr("balance_count"));
+			
+			if (balanceCount.compareTo(storeCount)==-1) {
+				return record.getStr("custom_name") + "库存数量不足";
+			}
 			inventory.setOutCount(oldOutCount.add(storeCount));
 			inventory.setOutAmount(oldOutAmount.add(record.getBigDecimal("product_amount")));
 			inventory.setOutPrice(record.getBigDecimal("price"));

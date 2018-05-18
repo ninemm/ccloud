@@ -791,5 +791,11 @@ public class SalesOutstockQuery extends JBaseQuery {
 
 		return Db.find(fromBuilder.toString(), params.toArray());
 	}
+
+	public Record findnumBySellProductIdAndwareHouseId(String sellProductId, String wareHouseId) {
+		// TODO Auto-generated method stub
+		String sql="SELECT( IFNULL(SUM(c.in_count) , 0) - IFNULL(SUM(c.out_count) , 0)) balance_count , c.sell_product_id FROM cc_inventory_detail c WHERE c.warehouse_id =? AND c.sell_product_id = ?";
+		return Db.findFirst(sql,wareHouseId,sellProductId);
+	}
 	
 }

@@ -47,11 +47,14 @@ import org.ccloud.route.RouterNotAllowConvert;
 import org.ccloud.utils.DateUtils;
 import org.ccloud.utils.StringUtils;
 
+import com.alibaba.druid.sql.dialect.oracle.ast.clause.ModelClause.ReturnRowsClause;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jfinal.aop.Before;
+import com.jfinal.kit.Kv;
+import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.IAtom;
@@ -248,11 +251,11 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String sellerId = getSessionAttr("sellerId");
 		String sellerCode = getSessionAttr("sellerCode");
-		boolean isSave = this.out(paraMap, user, sellerId, sellerCode);
-		if (isSave) {
+		Ret ret = this.out(paraMap, user, sellerId, sellerCode);
+		if (ret==null || ret.size()<1) {
 			renderAjaxResultForSuccess("出库成功");
 		} else {
-			renderAjaxResultForError("出库失败!");
+			renderAjaxResultForError(ret.getStr("errMessage"));
 		}
 
 	}
@@ -278,11 +281,11 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		if (!isStockOut) {
 			renderAjaxResultForError("批量出库失败,单子已有出库或取消，请检查！");
 		} else {
-			boolean isSave = this.saveBatchStockOut(outId, StockDate, remark, user, sellerId, sellerCode, date);
-			if (isSave) {
-				renderAjaxResultForSuccess("批量出库成功");
+			Ret ret  = this.saveBatchStockOut(outId, StockDate, remark, user, sellerId, sellerCode, date);
+			if (ret==null || ret.size()<1) {
+				renderAjaxResultForSuccess("出库成功");
 			} else {
-				renderAjaxResultForError("批量出库失败!");
+				renderAjaxResultForError(ret.getStr("errMessage"));
 			}
 		}
 	}
@@ -319,8 +322,10 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		SalesOutstockQuery.me().updatePrintStatus(printAllNeedInfo.getSalesOutStockId());
 	}
 
-	public boolean out(final Map<String, String[]> paraMap, final User user, final String sellerId,
+	public Ret out(final Map<String, String[]> paraMap, final User user, final String sellerId,
 			final String sellerCode) {
+		
+		final Ret ret = Ret.create();
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
@@ -340,14 +345,20 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				String total = StringUtils.getArrayFirst(paraMap.get("total"));
 				Integer count = 0;
 				Integer index = 0;
-
 				while (productNum > count) {
 					index++;
 					String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
+					
 					if (StrKit.notBlank(sellProductId)) {
-						if (!SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, date, deptId, dataArea, index,
-								user.getId(),
-								outStockSN, wareHouseId, sellProductId, sellerCustomerId, order_user, order_date)) {
+						Integer outStock = SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, date, deptId, dataArea, index, user.getId(),
+								outStockSN, wareHouseId, sellProductId, sellerCustomerId, order_user, order_date);
+						if (outStock==1) {
+							ret.set("errMessage", "出库失败");
+							return false;
+						}
+						if (outStock==2) {
+							SellerProduct sellerProduct = SellerProductQuery.me().findById(sellProductId);
+							ret.set("errMessage",sellerProduct.getCustomName() +"库存不足");
 							return false;
 						}
 						count++;
@@ -355,6 +366,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 
 				}
 				if (!SalesOrderQuery.me().checkStatus(outStockId, user.getId(), date, total)) {
+					ret.set("errMessage", "库存不足");
 					return false;
 				}
 
@@ -374,6 +386,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
 					if (!PurchaseInstockQuery.me().insertBySalesOutStock(paraMap, seller, purchaseInstockId,
 							pwarehouseSn, warehouse.getId(), user.getId(), date, sellerId)) {
+						ret.set("errMessage", "库存不足");
 						return false;
 					}
 					// 直营商的应付账款
@@ -387,28 +400,27 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 						if (StrKit.notBlank(sellProductId)) {
 							if (!PurchaseInstockDetailQuery.me().insertBySalesOrder(paraMap, purchaseInstockId, seller,
 									index, date, getRequest(), pwarehouseSn, sellerCustomer)) {
+								ret.set("errMessage", "库存不足");
 								return false;
 							}
 							count++;
 						}
-
 					}
-
 				}
-
 				//如果有活动关联
 				if (StrKit.notBlank(activity_apply_id) && (!Consts.SALES_ORDER_ACTIVITY_APPLY_ID_OTHER.equals(activity_apply_id))){
 					ActivityApply activityApply = ActivityApplyQuery.me().findById(activity_apply_id);
 					activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_END);
 					if(!activityApply.update()){
+						ret.set("errMessage", "库存不足");
 						return false;
 					}
 				}
-
 				return true;
 			}
 		});
-		return isSave;
+		
+		return ret;
 	}
 
 	private void createPayables(SellerCustomer sellerCustomer, String countAll,Record seller) {
@@ -467,8 +479,9 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 	}
 
 	//批量出库  应收账款
-	public boolean saveBatchStockOut(final String[] outId, final Date stockDate, final String remark, final User user,
+	public Ret saveBatchStockOut(final String[] outId, final Date stockDate, final String remark, final User user,
 			final String sellerId, String sellerCode, final Date date) {
+		final Ret ret = Ret.create();
 		boolean isSave = Db.tx(new IAtom() {
 			@Override
 			public boolean run() throws SQLException {
@@ -483,16 +496,20 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					BigDecimal productAmout=salesOutstock.getTotalAmount();
 					
 					String total=productAmout.toString();
-					if (!SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, date,
+					String batchOutStock = SalesOutstockDetailQuery.me().batchOutStock(orderProductInfos, sellerId, date,
 							user.getDepartmentId(), user.getDataArea(), user.getId(),
 							printAllNeedInfo.getOutstockSn(),printAllNeedInfo.getCustomerId(),
-							printAllNeedInfo.getBizUserId(),printAllNeedInfo.getPlaceOrderTime().toString())) {
+							printAllNeedInfo.getBizUserId(),printAllNeedInfo.getPlaceOrderTime().toString());
+					if (StrKit.notBlank(batchOutStock)) {
+						ret.set("errMessage", batchOutStock);
 						return false;
 					}
+					
 					if (!SalesOutstockQuery.me().updateStockOutStatus(printAllNeedInfo.getSalesOutStockId(),
 							user.getId(), stockDate, Consts.SALES_OUT_STOCK_STATUS_OUT, date, remark)
 							| !SalesOrderQuery.me().checkStatus(printAllNeedInfo.getSalesOutStockId(), user.getId(),
 									date, total)) {
+						ret.set("errMessage", "出库失败");
 						return false;
 					}
 					// 如果客户种类是直营商，则生成直营商的采购入库单
@@ -512,11 +529,13 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 						Warehouse warehouse = WarehouseQuery.me().findBySellerId(seller.getStr("id"));
 						if (!PurchaseInstockQuery.me().insertByBatchSalesOutStock(printAllNeedInfo, seller,
 								purchaseInstockId, pwarehouseSn, warehouse.getId(), user.getId(), date, sellerId)) {
+							ret.set("errMessage", "出库失败");
 							return false;
 						}
 
 						if (!PurchaseInstockDetailQuery.me().insertByBatchSalesOrder(orderProductInfos,
 								purchaseInstockId, seller, date, getRequest(),pwarehouseSn,sellerCustomer,productAmout)) {
+							ret.set("errMessage", "出库失败");
 							return false;
 						}
 					}
@@ -526,6 +545,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 						ActivityApply activityApply = ActivityApplyQuery.me().findById(printAllNeedInfo.getActivityApplyId());
 						activityApply.setStatus(Consts.ACTIVITY_APPLY_STATUS_END);
 						if(!activityApply.update()){
+							ret.set("errMessage", "出库失败");
 							return false;
 						}
 					}
@@ -533,7 +553,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 				return true;
 			}
 		});
-		return isSave;
+		return ret;
 	}
 
 	// 获取车销仓库
