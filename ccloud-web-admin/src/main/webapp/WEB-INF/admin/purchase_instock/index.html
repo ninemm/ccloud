@@ -94,7 +94,11 @@
 				},
 				{field: "", title: "采购单号", align: "center", width: '10%',
 					formatter: function(value, row, rowIndex) {
-						return '<a href="#" onclick="orderDetail(\''+row.purchaseOrderId+'\')" >'+row.porder_sn +'</a>';
+						if(row.porder_sn == null){
+							return '无';
+						}else{
+							return '<a href="#" onclick="orderDetail(\''+row.purchaseOrderId+'\')" >'+row.porder_sn +'</a>';
+						}
 					},
 					edit: false
 				},
