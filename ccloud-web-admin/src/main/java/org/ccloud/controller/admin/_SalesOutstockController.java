@@ -61,6 +61,7 @@ import com.jfinal.plugin.activerecord.IAtom;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.activerecord.tx.Tx;
+import com.jfinal.qyweixin.sdk.kit.SignatureCheckKit;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
@@ -350,15 +351,10 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 					String sellProductId = StringUtils.getArrayFirst(paraMap.get("sellProductId" + index));
 					
 					if (StrKit.notBlank(sellProductId)) {
-						Integer outStock = SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, date, deptId, dataArea, index, user.getId(),
+						String outStock = SalesOutstockDetailQuery.me().outStock(paraMap, sellerId, date, deptId, dataArea, index, user.getId(),
 								outStockSN, wareHouseId, sellProductId, sellerCustomerId, order_user, order_date);
-						if (outStock==1) {
-							ret.set("errMessage", "出库失败");
-							return false;
-						}
-						if (outStock==2) {
-							SellerProduct sellerProduct = SellerProductQuery.me().findById(sellProductId);
-							ret.set("errMessage",sellerProduct.getCustomName() +"库存不足");
+						if (StrKit.notBlank(outStock)) {
+							ret.set("errMessage", outStock);
 							return false;
 						}
 						count++;

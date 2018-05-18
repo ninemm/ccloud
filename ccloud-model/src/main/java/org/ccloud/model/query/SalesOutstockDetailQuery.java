@@ -216,7 +216,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		return 0;
 	}
 
-	public Integer outStock(Map<String, String[]> paraMap, String sellerId, Date date, String deptId, String dataArea,
+	public String outStock(Map<String, String[]> paraMap, String sellerId, Date date, String deptId, String dataArea,
 	                        Integer index, String userId, String outStockSN, String wareHouseId, String sellerProductId, String customerId,
 			                String order_user, String order_date) {
 		SalesOutstockDetail detail = SalesOutstockDetailQuery.me().
@@ -234,7 +234,8 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		Record record = SalesOutstockQuery.me().findnumBySellProductIdAndwareHouseId(sellerProductId,wareHouseId);
 		Double balanceCount = Double.valueOf(record.getStr("balance_count"))*productConvert;
 		if (productCount>balanceCount) {
-			return 2;
+			SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
+			return sellerProduct.getCustomName() + "库存数量不足,剩余"+balanceCount;
 		}
 		String productAmount = StringUtils.getArrayFirst(paraMap.get("rowTotal" + index));
 		BigDecimal productPrice = new BigDecimal(price);
@@ -244,7 +245,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		detail.setModifyDate(date);
 		
 		if (!detail.update()) {
-			return 1;
+			return "出库失败";
 		}
 		
 		BigDecimal smallStoreCount = (new BigDecimal(smallCount)).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP);
@@ -252,7 +253,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
 		Inventory inventory = InventoryQuery.me().findBySellerIdAndProductIdAndWareHouseId(sellerId, productId, wareHouseId);
 		if (inventory == null) {
-			return 1;
+			return "出库失败";
 		}
 		BigDecimal oldOutCount = inventory.getOutCount() == null? new BigDecimal(0) : inventory.getOutCount();
 		BigDecimal oldOutAmount = inventory.getOutAmount() == null? new BigDecimal(0) : inventory.getOutAmount();
@@ -269,7 +270,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		inventory.setModifyDate(date);
 		
 		if (!inventory.update()) {
-			return 1;
+			return "出库失败";
 		}
 		
 		InventoryDetail oldDetail = InventoryDetailQuery.me().findBySellerProductId(sellerProductId, wareHouseId);
@@ -293,7 +294,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		inventoryDetail.setCreateDate(date);
 		
 		if (!inventoryDetail.save()) {
-			return 1;
+			return "出库失败";
 		}
 		
 		SellerProduct sellerProduct = SellerProductQuery.me().findById(sellerProductId);
@@ -301,7 +302,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 				.subtract(smallStoreCount));
 		sellerProduct.setModifyDate(date);
 		if (!sellerProduct.update()) {
-			return 1;
+			return "出库失败";
 		}
 		
 		SalesOrderDetail salesOrderDetail = SalesOrderDetailQuery.me().findById(detail.getOrderDetailId());
@@ -309,7 +310,7 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		salesOrderDetail.setLeftCount(salesOrderDetail.getLeftCount() - productCount);
 		salesOrderDetail.setModifyDate(date);
 		if (!salesOrderDetail.update()) {
-			return 1;
+			return "出库失败";
 		}
 		
 		
@@ -328,18 +329,18 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		receivablesDetail.setCreateDate(date);		
 		
 		if (!receivablesDetail.save()) {
-			return 1;
+			return "出库失败";
 		}
 		String isGift = StringUtils.getArrayFirst(paraMap.get("_isGift" + index));
 		if(isGift.equals("0")) {
 			//更新计划
 			BigDecimal bigProductCount = new BigDecimal(bigCount).add(new BigDecimal(smallCount).divide(new BigDecimal(productConvert), 2, BigDecimal.ROUND_HALF_UP));
 			if (!updatePlans(order_user, sellerProductId, order_date, bigProductCount)) {
-				return 1;
+				return "出库失败";
 			}
 		}
 		
-		return 0;
+		return null;
 	}
 
 	private boolean updatePlans(String order_user, String sellerProductId, String orderDate, BigDecimal productCount) {
@@ -381,9 +382,9 @@ public class SalesOutstockDetailQuery extends JBaseQuery {
 		
 			Record record = SalesOutstockQuery.me().findnumBySellProductIdAndwareHouseId(orderProductInfo.getSellerProductId(),orderProductInfo.getWareHouseId());
 			BigDecimal balanceCount = new BigDecimal(record.getStr("balance_count"));
-			if (balanceCount.compareTo(smallStoreCount)==-1) {
+			if (balanceCount.compareTo((new BigDecimal(orderProductInfo.getBigCount())).add(smallStoreCount))==-1) {
 				SellerProduct sellerProduct = SellerProductQuery.me().findById(orderProductInfo.getSellerProductId());
-				return sellerProduct.getCustomName() + "库存数量不足";
+				return sellerProduct.getCustomName() + "库存数量不足,剩余"+balanceCount;
 			}
 			
 			inventory.setOutCount(oldOutCount.add(new BigDecimal(orderProductInfo.getBigCount())).add(smallStoreCount));
