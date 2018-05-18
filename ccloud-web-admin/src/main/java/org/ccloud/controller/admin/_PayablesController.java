@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -89,17 +90,13 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword,startDate,endDate);
+		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
 		List<Record> payList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", payList);
-		setAttr("startDate", startDate);
-		setAttr("endDate", endDate);
 		renderJson(map);
 	}
 	
@@ -218,10 +215,8 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 //		String type = getPara("type");
 		String keyword=getPara("keyword");
 		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
+			keyword = URLDecoder.decode(keyword, "UTF-8");;
 		}
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
@@ -229,7 +224,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
 				+ "应付账款.xlsx";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword,startDate,endDate);
+		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
 		List<Record> payablesList = page.getList();
 		
 		List<payablesExcel> excellist = Lists.newArrayList();

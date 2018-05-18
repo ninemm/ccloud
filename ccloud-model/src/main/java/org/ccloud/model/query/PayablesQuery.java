@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import org.ccloud.Consts;
 import org.ccloud.model.Payables;
 
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -58,27 +59,23 @@ public class PayablesQuery extends JBaseQuery {
 		Db.update(sqlBuilder.toString());
 	}
 	
-    public Page<Record> paginate(int pageNumber, int pageSize, String id,String userId,String dataArea,String sellerId,String deptId,String keyword, String startDate, String endDate) {
+    public Page<Record> paginate(int pageNumber, int pageSize, String id,String userId,String dataArea,String sellerId,String deptId,String keyword) {
 		Boolean b = true;
 		String select;
 		StringBuilder fromBuilder;
 		LinkedList<Object> params = new LinkedList<Object>();
 		if(id.equals("1")) {
 			select = "SELECT *  ";
-			fromBuilder = new StringBuilder(" FROM (SELECT CASE WHEN cs.id IS NOT NULL THEN cs.id ELSE s.id END AS id,CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS name,sum(pd.pay_amount) pay_amount, IFNULL(r.act_amount,0) act_amount , (IFNULL(sum(pd.pay_amount),0)-IFNULL(r.act_amount,0)) balance_amount FROM cc_payables_detail pd");
+			fromBuilder = new StringBuilder(" FROM (SELECT CASE WHEN cs.id IS NOT NULL THEN cs.id ELSE s.id END AS id,CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END AS name,IFNULL(r.pay_amount,0) pay_amount, IFNULL(r.act_amount,0) act_amount , IFNULL(r.balance_amount,0) balance_amount FROM cc_payables_detail pd");
 			fromBuilder.append(" LEFT JOIN `cc_payables` AS r ON pd.object_id=r.obj_id ");
 			fromBuilder.append(" LEFT JOIN `cc_supplier` AS cs on r.obj_id=cs.id LEFT JOIN cc_seller s ON r.obj_id = s.id");
 			appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
-			fromBuilder.append(" and pd.create_date >= ?");
-			params.add(startDate+" 00:00:00");
-			fromBuilder.append(" and pd.create_date <= ?");
-			params.add(endDate+" 23:59:59");
-			if(!keyword.equals("")) {
+			if(StrKit.notBlank(keyword)) {
 				fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN cs.`name` ELSE s.seller_name END like '%"+keyword+"%' ");
 			}
 			fromBuilder.append(" AND r.dept_id = '"+deptId+"' GROUP BY cs.id ) x WHERE id is not null ");
 		}else {
-			select = " SELECT  r.obj_id AS id  , t1.customerTypeNames,CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END AS name , sum(pd.pay_amount) pay_amount, IFNULL(r.act_amount,0) act_amount , (IFNULL(sum(pd.pay_amount),0)-IFNULL(r.act_amount,0)) balance_amount ";
+			select = " SELECT  r.obj_id AS id  , t1.customerTypeNames,CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END AS name , IFNULL(r.pay_amount,0) pay_amount, IFNULL(r.act_amount,0) act_amount , IFNULL(r.balance_amount,0) balance_amount ";
 			fromBuilder = new StringBuilder(" FROM cc_payables_detail pd");
 			fromBuilder.append(" LEFT JOIN cc_payables AS r ON pd.object_id=r.obj_id ");
 			fromBuilder.append(" inner JOIN (SELECT c1.id, c1.customer_id, ct.id AS customer_type_id, GROUP_CONCAT(ct.NAME) AS customerTypeNames FROM cc_seller_customer c1 INNER JOIN cc_customer_join_customer_type cjct ON c1.id =cjct.seller_customer_id INNER JOIN cc_customer_type ct ON cjct.customer_type_id = ct.id ");
@@ -93,11 +90,7 @@ public class PayablesQuery extends JBaseQuery {
 				fromBuilder.append(" where 1=1 ");
 			}
 			appendIfNotEmptyWithLike(fromBuilder, "r.data_area", dataArea, params, b);
-			fromBuilder.append(" and pd.create_date >= ?");
-			params.add(startDate+" 00:00:00");
-			fromBuilder.append(" and pd.create_date <= ?");
-			params.add(endDate+" 23:59:59");
-			if(!keyword.equals("")) {
+			if(StrKit.notBlank(keyword)) {
 				fromBuilder.append(" and CASE WHEN cs.`name` IS NOT NULL THEN  cs.`name` WHEN c.customer_name IS NOT NULL THEN c.customer_name ELSE s.seller_name END like '%"+keyword+"%' ");
 			}
 			fromBuilder.append(" GROUP BY r.obj_id");
