@@ -41,7 +41,7 @@ public class ProductController extends BaseFrontController {
 		String refund = getPara("refund");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId1(user.getId());
 		
 		List<Record> compositionRecords = new ArrayList<Record>();
 
@@ -50,16 +50,14 @@ public class ProductController extends BaseFrontController {
 		List<Map<String, Object>> goodsCategory=new ArrayList<Map<String, Object>>();
 		
 		Set<String> tagSet = SellerProductQuery.me().findTagsBySellerId(sellerId);
-		
 		List<Record> goodsCategoryList=GoodsCategoryQuery.me().findBySellerId(sellerId,"");
 		List<Record> productRecords = new ArrayList<>();
-		if (goodsCategoryList.size()>0) {
-			if (wlist.size() > 0) {
-				productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),goodsCategoryList.get(0).getStr("categoryId"),0,10);
-			} else {
-				productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",goodsCategoryList.get(0).getStr("categoryId"),0,10);
-				compositionRecords=ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
-			}
+		
+		if (wlist.size() > 0) {
+			productRecords = SellerProductQuery.me().findProductListForAppByCar(sellerId, "", "", wlist.get(0).getId(),null,0,10);
+		} else {
+			productRecords = SellerProductQuery.me().findProductListForApp(sellerId, "", "",null,0,10);
+			compositionRecords=ProductCompositionQuery.me().findDetailByProductId("", sellerId, "", "");
 		}
 		
 		for (Record record : goodsCategoryList) {
@@ -98,16 +96,16 @@ public class ProductController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		String tag = getPara("tag");
 		String categoryId = getPara("categoryId");
+		if (categoryId.equals("all")) {
+			categoryId = null ;
+		}
 		String warehouseId = getPara("warehouseId");
-		
 		List<Record> goodsCategory = GoodsCategoryQuery.me().findBySellerId(sellerId,tag);
 		List<Record> compositionList = new ArrayList<>();
 		List<Record> productList = new ArrayList<>();
-		if (!StrKit.notBlank(categoryId)) {
-			categoryId=goodsCategory.get(0).getStr("categoryId");
-		}
+		
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId1(user.getId());
 		if (wlist.size() > 0 && !StrKit.notBlank(warehouseId)) {
 			warehouseId=wlist.get(0).getId();
 		}
@@ -137,11 +135,14 @@ public class ProductController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		String tag = getPara("tag");
 		String categoryId = getPara("categoryId");
+		if (categoryId.equals("all")) {
+			categoryId = null ;
+		}
 		String warehouseId = getPara("warehouseId");
 		Integer pageNumber = Integer.parseInt(getPara("pageNumber"))*Integer.parseInt(getPara("pageSize"));
 		Integer pageSize = Integer.parseInt(getPara("pageSize"));
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId(user.getId());
+		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId1(user.getId());
 		if (wlist.size() > 0 && !StrKit.notBlank(warehouseId)) {
 			warehouseId=wlist.get(0).getId();
 		}

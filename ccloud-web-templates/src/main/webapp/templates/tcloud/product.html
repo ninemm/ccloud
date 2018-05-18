@@ -61,6 +61,7 @@ $(function() {
 
 	$(document).on("submit", ".weui-search-bar__form", function() {
 		keyword = $("#searchInput").val();
+		categoryId='';
 		changeInit();
 		return false;
 	}).on("click", "#searchCancel", function() {
@@ -83,6 +84,7 @@ $(function() {
         $(this).addClass("active").siblings().removeClass("active");
 		tag = $(this).text();
 		categoryId='';
+		keyword = $("#searchInput").val();
 		if(tag == '全部') {
 			tag = '';
 		}
@@ -91,12 +93,13 @@ $(function() {
 		pageNumber = 1;
 		$(this).addClass("active").siblings().removeClass("active");
     		categoryId = $(this).attr("id");
+    		keyword = $("#searchInput").val();
     		changeInit();
     }).on("click", "#searchCancel", function () {
-    		keyword = $(this).val();
+    		keyword = $("#searchInput").val();
 		changeInit();
 	}).on("click", "#searchClear", function () {
-		keyword = $(this).val();
+		keyword = $("#searchInput").val();
 		changeInit();
     }).on("click", "#shoppingCart", function () {
    	 	shoppingCart();
@@ -109,6 +112,8 @@ $(function() {
       productChange($(this));
       
     }).on("change", "#warehouse", function() {
+    		keyword = $("#searchInput").val();
+    		categoryId = "all";
 		warehouseId = $("#warehouse").data('values');
    		setItemBykey("warehouseId", $("#warehouse").data('values'));
    		removeItemBykey("productList");
@@ -253,14 +258,14 @@ function combo(productList, compositionList,goodsCategory){
 
 function initTags(tags) {
 	$tags.empty();
-	$tags.append("<div class='swiper-slide active'>全部</div>")
-	$.each(tags, function (index, el) {
-		$tags.append("<div class='swiper-slide'>" + el + "</div>");
-	});
+	//$tags.append("<div class='swiper-slide active'>全部</div>")
+	//	 $.each(tags, function (index, el) {
+	//	$tags.append("<div class='swiper-slide'>" + el + "</div>");
+	//});
 	var wlist=${wlist!'1'};
 	if (wlist!=1){
 		wlist=${wlist!'1'};
-		$tags.append("<div style='float:right;margin-top:10px;' class='weui-flex__item select-area'><i style='float: right;padding-right:15px;' class='icon-sort-desc'></i><input type='text' id='warehouse' placeholder='仓库' style='border:0; background-color:transparent;font-size:15px;width: 100px;float: right;' readonly></div>");
+		$tags.append("<div class='weui-flex__item select-area'><input type='text' id='warehouse' value='"+wlist[0].title+"' style='margin-left: 20%;border:0; background-color:transparent;font-size:16px;margin-top:10px;text-align: center;' readonly><i class='icon-sort-desc'></i></div>");
 	 	$("#warehouse").select({
 	        title: "选择仓库",
 	        items: wlist
@@ -272,20 +277,22 @@ function initTags(tags) {
 }
 
 function initProduct(productList,goodsCategory,compositionList){
+	if(categoryId=='' || categoryId == 'all'){
+		$sidebar.append("<li name='category' class='active' id='all'>全部<span class='goods-num'></span> </li>");
+		$menuRight.append(" <div class='type' id='all' > </div>")
+		categoryId="all";
+	}else{
+		$sidebar.append("<li name='category' id='all'>全部<span class='goods-num'></span> </li>");
+		$menuRight.append("<div class='type' id='all' style='display:none'> </div>")
+	}
 	$.each(goodsCategory, function(index, el) {
-		map[el.categoryId] = 0;
-		if(categoryId==''){
+		map[el.categoryId] = 0; 
+		if(categoryId != el.categoryId){
+			$sidebar.append("<li name='category' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
+			$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
+		}else{
 			$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
 			$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
-			categoryId=el.categoryId;
-		}else{
-			if(categoryId != el.categoryId){
-				$sidebar.append("<li name='category' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-				$menuRight.append("<div class='type' id='" + el.categoryId + "' style='display:none'> </div>")
-			}else{
-				$sidebar.append("<li name='category' class='active' id='" + el.categoryId + "'>" + el.categoryName + " <span class='goods-num'></span> </li>");
-				$menuRight.append(" <div class='type' id='" + el.categoryId + "' > </div>")
-			}
 		}
 	});
 	if(compositionList.length > 0) {
@@ -739,18 +746,26 @@ function order(){
 				</div>
 			</header>
 			<div class="product-content">
-				<div class="swiper-container t-c">
-					<div class="swiper-wrapper" id="tags">
-						<div class="swiper-slide active">全部</div>
+				<#if (wlist) ??>
+					<div class="swiper-container t-c">
+						<div class="swiper-wrapper" id="tags">
+							<div class="swiper-slide active">全部</div>
+						</div>
 					</div>
-				</div>
+				</#if>
 				<div class="product-inner-content">
 					<aside>
-						<div id="sidebar" class="menu-left">
-							<ul>
-
-							</ul>
-						</div>
+						<#if (wlist) ??>
+							<div id="sidebar" class="menu-left" style="margin-top: -10%; z-index:100;">
+								<ul>
+								</ul>
+							</div>
+						<#else>
+							<div id="sidebar" class="menu-left" >
+								<ul>
+								</ul>
+							</div>
+						</#if>
 					</aside>
 					<article class="menu-right infinite">
 						<div class="" style="display: none">

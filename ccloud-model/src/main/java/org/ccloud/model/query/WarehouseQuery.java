@@ -100,6 +100,11 @@ public class WarehouseQuery extends JBaseQuery {
 		return DAO.find(sql, userId);
 	}
 
+	public List<Warehouse> findWarehouseByUserId1(String userId) {
+		String sql = "select w.* from  cc_warehouse w,cc_user_join_warehouse uw where w.id =uw.warehouse_id and uw.user_id=? and w.is_enabled=1 and  w.type !=1 order by w.type desc";
+		return DAO.find(sql, userId);
+	}
+	
 	public List<Warehouse> findIsDefault(String id, String sellerId) {
 		String sql = "select * from  cc_warehouse w , cc_user_join_warehouse uw where uw.warehouse_id=w.id and w.is_default=1 and uw.user_id=? and w.seller_id=?";
 		return DAO.find(sql,id,sellerId);
