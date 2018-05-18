@@ -141,6 +141,7 @@ function initProduct(){
 			var $newProductDetail = $main.find(".common:last");
 			$newProductDetail.find("#productName").text(el.productName);
 			$newProductDetail.find("#valueName").text(el.valueName);
+			$newProductDetail.find("#stock").html(el.stock);
 			$newProductDetail.find("#categoryId").val(el.categoryId);
 	
 			$newProductDetail.find("#bigPriceSpan").text(el.bigPriceSpan);
@@ -303,6 +304,7 @@ function initProductComposition(){
 		$main.append("<div class='weui-panel weui-panel_access composition'>" + compositionHtml + "</div>");
 		var $newProductDetail = $main.find(".composition:last");
 		$newProductDetail.find("#compositionName").text(el.compositionName);
+		$newProductDetail.find("#stock").html(el.stock);
 
 		$newProductDetail.find("#compositionPriceSpan").text(el.compositionPriceSpan);
 
@@ -409,7 +411,7 @@ function getProduct($el){
 		smallPriceSpan : $el.find("#smallPriceSpan").text(),
 		bigUnitSpan : $el.find("#bigUnitSpan").text(),
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
-		stock : $el.find("#stock").text(),
+		stock : $el.find("#stock").html(),
 		categoryId : $el.find("#categoryId").val(),
 
 		bigCost : $el.find("#bigCost").val(),
@@ -459,7 +461,7 @@ function getComposition($el){
 		compositionName : $el.find("#compositionName").text(),
 		
 		compositionPriceSpan : $el.find("#compositionPriceSpan").text(),
-		stock : $el.find("#stock").text(),
+		stock : $el.find("#stock").html(),
 		
 		compositionPrice : $el.find("#compositionPrice").val(),
 		compositionId : $el.find("#compositionId").val(),
@@ -497,6 +499,7 @@ function order(){
 				<input type="hidden" id="bigAccountPrice" value="">
 				<input type="hidden" id="smallAccountPrice" value="">
 				<input type="hidden" id="categoryId" value="">
+				<div id="stock" style="display: none"></div>
 				<nobr>
 					<p class="product_name" id="productName">
 						<!-- <span class="gift-tag">赠品</span> -->
@@ -584,6 +587,7 @@ function order(){
 			<div class="weui-panel weui-panel_access composition" style="display: none">
 				<input type="hidden" id="compositionId" value="">
 				<input type="hidden" id="comTotalCount" value="">
+				<div id="stock" style="display: none"></div>
 				<nobr>
 					<p class="product_name" id="compositionName"></p>
 				</nobr>

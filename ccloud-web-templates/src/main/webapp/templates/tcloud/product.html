@@ -216,6 +216,7 @@ var $tags = $("#tags");
 var $sidebar = $("#sidebar ul");
 var $menuRight = $(".menu-right");
 var categoryId = '';
+var storeWarningNum = ${storeWarningNum!};
 var map = {};
 var pageNumber = 1;
 var pageSize = 10;
@@ -319,7 +320,11 @@ function initProduct(productList,goodsCategory,compositionList){
 		$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
 		$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
 		$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
-		$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
+		var stock = '库存：' + el.store_count + el.big_unit;
+		if(el.store_count <= storeWarningNum){
+			stock = '<span style="color: #e51c23">库存：' + el.store_count + el.big_unit + '</span>';
+		}
+		$newProductDetail.find("#stock").html(stock);
 
 		$newProductDetail.find("#bigCost").val(bigCost);
 		$newProductDetail.find("#smallCost").val(smallCost);
@@ -547,7 +552,7 @@ function getProduct($el){
 		smallPriceSpan : $el.find("#smallPriceSpan").text(),
 		bigUnitSpan : $el.find("#bigUnitSpan").text(),
 		smallUnitSpan : $el.find("#smallUnitSpan").text(),
-		stock : $el.find("#stock").text(),
+		stock : $el.find("#stock").html(),
 		categoryId : $el.find("#categoryId").val(),
 		
 		bigCost : $el.find("#bigCost").val(),
@@ -597,7 +602,7 @@ function getComposition($el){
 		compositionName : $el.find("#compositionName").text(),
 		
 		compositionPriceSpan : $el.find("#compositionPriceSpan").text(),
-		stock : $el.find("#stock").text(),
+		stock : $el.find("#stock").html(),
 		
 		compositionPrice : $el.find("#compositionPrice").val(),
 		compositionId : $el.find("#compositionId").val(),
@@ -699,7 +704,11 @@ function order(){
 					$newProductDetail.find("#smallPriceSpan").text('￥' + smallPrice);
 					$newProductDetail.find("#bigUnitSpan").text(' / '+ el.big_unit);
 					$newProductDetail.find("#smallUnitSpan").text(' / ' + el.small_unit);
-					$newProductDetail.find("#stock").text('库存：' + el.store_count + el.big_unit);
+					var stock = '库存：' + el.store_count + el.big_unit;
+					if(el.store_count <= storeWarningNum){
+						stock = '<span style="color: #e51c23">库存：' + el.store_count + el.big_unit + '</span>';
+					}
+					$newProductDetail.find("#stock").html(stock);
 			
 					$newProductDetail.find("#bigCost").val(bigCost);
 					$newProductDetail.find("#smallCost").val(smallCost);
@@ -874,6 +883,7 @@ function order(){
 										<p id="subsubProduct" class="none">
 										</p>
 									</div>
+									<div id="stock" style="display: none"></div>
 								</div>
 							</section>
 						</div>

@@ -40,6 +40,7 @@ public class ProductController extends BaseFrontController {
 	public void index() {
 		String refund = getPara("refund");
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
+		String sellerCode = getSessionAttr(Consts.SESSION_SELLER_CODE);
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		List<Warehouse> wlist = WarehouseQuery.me().findWarehouseByUserId1(user.getId());
 		
@@ -86,6 +87,10 @@ public class ProductController extends BaseFrontController {
 		setAttr("goodsCategory", JSON.toJSON(goodsCategory));
 		setAttr("compositionList", JSON.toJSON(compositionList));
 		setAttr("tags", JSON.toJSON(tagSet));
+
+		Float storeWarningNum = OptionQuery.me().findValueAsFloat(Consts.OPTION_SELLER_STORE_WARNING_NUM + sellerCode);
+		storeWarningNum = storeWarningNum != null ? storeWarningNum : 0;
+		setAttr("storeWarningNum", storeWarningNum);
 		render("product.html");
 		
 	}
