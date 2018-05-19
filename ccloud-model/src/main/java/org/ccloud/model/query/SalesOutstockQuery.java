@@ -904,7 +904,7 @@ public class SalesOutstockQuery extends JBaseQuery {
 			params.add(Consts.SALES_OUT_STOCK_STATUS_DEFUALT);
 		}		
 
-		fromBuilder.append(" and cso.status != " + Consts.SALES_ORDER_STATUS_CANCEL + " ");
+		fromBuilder.append(" and cso.status != " + Consts.SALES_ORDER_STATUS_CANCEL + " GROUP BY o.id ");
 
 		if (sort == "" || null == sort) {
 			fromBuilder.append("order by " + "o.create_date desc");

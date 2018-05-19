@@ -593,7 +593,7 @@ public class _SalesOutstockController extends JBaseCRUDController<SalesOrder> {
 		List<SalesOutstockExcel> excellist = Lists.newArrayList();
 		for (Record record : salesOutstckList) {
 			//客户信息
-			String customerInfo = record.getStr("customer_name")+"," + record.get("prov_name")+" " +record.get("city_name")+" " +record.get("country_name")+" "+record.get("address");
+			String customerInfo = record.getStr("customer_name")+"," + record.get("prov_name") +record.get("city_name") +record.get("country_name")+record.get("address");
 			//下单日期
 			String saveDate =record.getStr("create_date").substring(0, 10); 
 			//下单时间
