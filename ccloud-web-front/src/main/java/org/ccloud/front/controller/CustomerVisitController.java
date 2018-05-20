@@ -450,7 +450,17 @@ public class CustomerVisitController extends BaseFrontController {
 					String originalPath = qiniuUpload(pic);
 					//添加的水印内容
 					String waterFont1 = "";
-					SellerCustomer sellerCustomer =  customerVisit.getSellerCustomer();
+					SellerCustomer sellerCustomer = null;
+					if (customerVisit.getSellerCustomerId() == null) {
+						String customerName = getPara("customer_name");
+						if (customerName == null) {
+							renderAjaxResultForError("客户信息有误!保存失败");
+							return ;							
+						}
+						sellerCustomer = SellerCustomerQuery.me().findByNameAndUser(user.getId(), customerName);
+					} else {
+						sellerCustomer =  customerVisit.getSellerCustomer();
+					}
 					if (sellerCustomer != null) {
 						Customer customer = sellerCustomer.getCustomer();
 						if (customer != null) {

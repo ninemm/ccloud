@@ -764,5 +764,17 @@ public class SellerCustomerQuery extends JBaseQuery {
 		fromBuilder.append(" GROUP BY cs.id");
 		return Db.find(fromBuilder.toString(), sellerId);
 	}
+
+	public SellerCustomer findByNameAndUser(String id, String customerName) {
+		StringBuilder fromBuilder = new StringBuilder(
+				" select cs.*, cc.customer_name, cc.contact, cc.mobile, cc.prov_name, cc.city_name, cc.country_name, cc.address ");
+		fromBuilder.append(" from `cc_seller_customer` cs ");
+		fromBuilder.append(" LEFT JOIN cc_customer cc ON cs.customer_id = cc.id ");
+		fromBuilder.append(" LEFT JOIN cc_user_join_customer ujc ON cs.id = ujc.seller_customer_id");
+		fromBuilder.append(" LEFT JOIN `user` u ON u.id = ujc.user_id");
+		fromBuilder.append(" WHERE cs.is_enabled = 1 AND cc.customer_name = ? and u.id = ?");
+		fromBuilder.append(" GROUP BY cs.id");
+		return DAO.findFirst(fromBuilder.toString(), customerName, id);
+	}
 	
 }
