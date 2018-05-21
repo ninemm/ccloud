@@ -771,7 +771,7 @@ public class _UserController extends JBaseCRUDController<User> {
 		String sortOrder = getPara("sortOrder");
 		Map<String, String[]> paraMap = getParaMap();
 		String keyword = StringUtils.getArrayFirst(paraMap.get("k"));
-		String departmentType = getPara("departmentType");
+		String departmentType = getPara("departmentType")+"%";
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
