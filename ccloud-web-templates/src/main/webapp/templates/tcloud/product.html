@@ -326,7 +326,7 @@ function initProduct(productList,goodsCategory,compositionList){
 		var $newProductDetail = $type.find(".common:last");
 		$newProductDetail.find("#productName").text(el.custom_name);
 		$newProductDetail.find("#valueName").text(el.valueName);
-		$newProductDetail.find("#categoryId").val(categoryId);
+		$newProductDetail.find("#categoryId").val(el.categoryId);
 		var bigPrice = el.price;
 		var convert = el.convert_relate;
 		var smallPrice = (bigPrice / convert).toFixed(2);
@@ -711,7 +711,7 @@ function order(){
 					var $newProductDetail = $type.find(".common:last");
 					$newProductDetail.find("#productName").text(el.custom_name);
 					$newProductDetail.find("#valueName").text(el.valueName);
-					$newProductDetail.find("#categoryId").val(categoryId);
+					$newProductDetail.find("#categoryId").val(el.categoryId);
 					var bigPrice = el.price;
 					var convert = el.convert_relate;
 					var smallPrice = (bigPrice / convert).toFixed(2);

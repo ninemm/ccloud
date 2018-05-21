@@ -174,7 +174,7 @@ public class SellerProductQuery extends JBaseQuery {
 			params.add(tag);
 		}
 
-		fromBuilder.append(" ORDER BY gc.`parent_id`, gc.`order_list`, gc.`id`, sp.order_list ");
+		fromBuilder.append(" GROUP BY sp.id ORDER BY gc.`parent_id`, gc.`order_list`, gc.`id`, sp.order_list ");
 		if (null!=pageSize) {
 			fromBuilder.append("limit "+pageNumber+","+ pageSize);
 		}
@@ -293,7 +293,7 @@ public class SellerProductQuery extends JBaseQuery {
 			params.add(tag);
 		}
 
-		fromBuilder.append(" ORDER BY gc.`parent_id`, gc.`order_list`, gc.`id`, sp.order_list ");
+		fromBuilder.append(" GROUP BY sp.id ORDER BY gc.`parent_id`, gc.`order_list`, gc.`id`, sp.order_list ");
 		if (null!=pageSize) {
 			fromBuilder.append("limit "+pageNumber+","+ pageSize);
 		}
