@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -89,17 +90,13 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		if (StrKit.notBlank(keyword)) {
 			keyword = StringUtils.urlDecode(keyword);
 		}
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword,startDate,endDate);
+		Page<Record> page = PayablesQuery.me().paginate(getPageNumber(),getPageSize(),customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
 		List<Record> payList = page.getList();
 		Map<String, Object> map = ImmutableMap.of("total", page.getTotalRow(),"rows", payList);
-		setAttr("startDate", startDate);
-		setAttr("endDate", endDate);
 		renderJson(map);
 	}
 	
@@ -140,7 +137,12 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String pay_amount = getPara("pay_amount");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		//通过客户Id找到应收账款主表ID
-		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type);
+		Payables payables = new Payables();
+		if(ref_type.equals(Consts.BIZ_TYPE_INSTOCK)) {
+			payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type,user.getDepartmentId());
+		}else {
+			payables = PayablesQuery.me().findByObjIdAndDeptId(object_id, obj_type);
+		}
 //		PurchaseInstock purchaseInstock = PurchaseInstockQuery.me().findBySn(ref_sn);
 		String deptDataArea = DataAreaUtil.getDeptDataAreaByCurUserDataArea(user.getDataArea());
 		Page<Payment> page = PaymentQuery.me().paginate(getPageNumber(), getPageSize(), ref_sn,deptDataArea);
@@ -181,7 +183,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 			public boolean run() throws SQLException{
 				
 				Payment payment = new Payment();
-				String payables_id = StrKit.getRandomUUID();
+				String payment_id = StrKit.getRandomUUID();
 				User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 				String act_amount = getPara("act_amount");
 				String ref_sn = getPara("ref_sn");
@@ -189,7 +191,7 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 				String pay_user_id = getPara("pay_user");
 				Date date = new Date();
 				
-				payment.set("id", payables_id);
+				payment.set("id", payment_id);
 				payment.set("payables_detail_id", getPara("bill_id"));
 				payment.set("act_amount", act_amount);
 				payment.set("biz_date", getPara("biz_date"));
@@ -218,10 +220,8 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 //		String type = getPara("type");
 		String keyword=getPara("keyword");
 		if (StrKit.notBlank(keyword)) {
-			keyword = StringUtils.urlDecode(keyword);
+			keyword = URLDecoder.decode(keyword, "UTF-8");;
 		}
-		String startDate = getPara("startDate");
-		String endDate = getPara("endDate");
 		String customerTypeId = getPara("customerTypeId");
 		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
 		String deptDataArea = getSessionAttr(Consts.SESSION_DEALER_DATA_AREA) + "%";	
@@ -229,14 +229,18 @@ public class _PayablesController extends JBaseCRUDController<Payables> {
 		String filePath = getSession().getServletContext().getRealPath("\\") + "\\WEB-INF\\admin\\payables\\"
 				+ "应付账款.xlsx";
 		String sellerId = getSessionAttr(Consts.SESSION_SELLER_ID);
-		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword,startDate,endDate);
+		Page<Record> page = PayablesQuery.me().paginate(1,Integer.MAX_VALUE,customerTypeId,user.getId(),deptDataArea,sellerId,user.getDepartmentId(),keyword);
 		List<Record> payablesList = page.getList();
 		
 		List<payablesExcel> excellist = Lists.newArrayList();
 		for (Record record : payablesList) {
 		
 			payablesExcel excel = new payablesExcel();
-			excel.setCustomerType(record.getStr("customerTypeNames"));
+			if(StrKit.isBlank(record.getStr("customerTypeNames"))) {
+				excel.setCustomerType("供应商");
+			}else {
+				excel.setCustomerType(record.getStr("customerTypeNames"));
+			}
 			excel.setCustomerName(record.getStr("name"));
 			excel.setPayAmount(record.getBigDecimal("pay_amount"));
 			excel.setActAmount(record.getBigDecimal("act_amount"));

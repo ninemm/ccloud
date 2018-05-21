@@ -368,7 +368,8 @@ public class OutstockController extends BaseFrontController {
 
 			// 直营商的应付账款
 			String payablesType = Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER;
-			Payables payables = PayablesQuery.me().findByObjIdAndDeptId(sellerCustomer.getSellerId(), payablesType);
+			Seller sellerSupplier= SellerQuery.me().findById(sellerCustomer.getSellerId());
+			Payables payables = PayablesQuery.me().findByObjIdAndDeptId(sellerCustomer.getSellerId(), payablesType,sellerSupplier.getDeptId());
 			if (payables == null) {
 				payables = new Payables();
 				payables.setObjId(sellerCustomer.getSellerId());

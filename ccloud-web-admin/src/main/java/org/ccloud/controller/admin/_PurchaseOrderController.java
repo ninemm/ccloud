@@ -96,9 +96,9 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	
 	public void detail(){
 		String orderId = getPara("purchaseOrderId");
-		String warehouseId = getPara("warehouseId");
+		String status = getPara("status");
+		setAttr("status", status);
 		setAttr("orderId", orderId);
-		setAttr("warehouseId", warehouseId);
 		render("detail.html");
 	}
 	
@@ -192,7 +192,7 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 		
 		//审核通过，生成对应的应付账款
 		//应付账款汇总
-		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(purchaseOrder.getSupplierId(),Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER);
+		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(purchaseOrder.getSupplierId(),Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER,user.getDepartmentId());
 		if(payables==null){
 			Payables payable = new Payables();
 			payable.setId(StrKit.getRandomUUID());
@@ -244,148 +244,34 @@ public class _PurchaseOrderController extends JBaseCRUDController<PurchaseOrder>
 	@Override
 	@Before(Tx.class)
 	public void save(){
-		final PurchaseInstock purchaseInstock = getModel(PurchaseInstock.class);
-		final PurchaseInstockDetail purchaseInstockDetail = getModel(PurchaseInstockDetail.class);
-		final PurchaseOrderJoinInstock purchaseOrderJoinInstock = getModel(PurchaseOrderJoinInstock.class);
 		Map<String, String[]> paraMap = getParaMap();
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Seller seller = SellerQuery.me().findById(getSessionAttr("sellerId").toString());
-		//默认仓库
-		/*Warehouse warehouse = new Warehouse();
-		List<Department> tmpList = DepartmentQuery.me().findAllParentDepartmentsBySubDeptId(user.getDepartmentId());
-		for(Department dept : tmpList) {
-			Seller sr = SellerQuery.me().findById(dept.getStr("seller_id"));
-			if(sr.getHasStore()==1) {
-				warehouse = WarehouseQuery.me().findBySellerId(sr.getId());
-				break;
-			}else {
-				continue;
-			}
-		}*/
-		//仓库ID
-		String warehouseId = getPara("warehouseId");
-		String purchaseInstockId = StrKit.getRandomUUID();
-
-		//采购入库单： PS + 100000(机构编号或企业编号6位) + 20171108(时间) + 100001(流水号)
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		String fomatDate = sdf.format(date);
 		String purchaseOrderId=StringUtils.getArrayFirst(paraMap.get("purchaseOrderId"));
-		String pwarehouseSn="PS"+seller.getSellerCode()+fomatDate.substring(0,8)+PurchaseInstockQuery.me().getNewSn(seller.getId());
-		purchaseInstock.set("id", purchaseInstockId);
-		purchaseInstock.set("pwarehouse_sn", pwarehouseSn);
-		purchaseInstock.set("supplier_id", StringUtils.getArrayFirst(paraMap.get("supplierId")));
-		purchaseInstock.set("warehouse_id", warehouseId);
-		purchaseInstock.set("biz_user_id", user.getId());
-		purchaseInstock.set("biz_date", new Date());
-		purchaseInstock.set("input_user_id", user.getId());
-		purchaseInstock.set("status", 0);//待审核
-		purchaseInstock.set("total_amount", StringUtils.getArrayFirst(paraMap.get("total")));
-		purchaseInstock.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
-		purchaseInstock.set("remark",  StringUtils.getArrayFirst(paraMap.get("remark")));
-		purchaseInstock.set("dept_id", user.getDepartmentId());
-		purchaseInstock.set("data_area", user.getDataArea());
-		purchaseInstock.set("create_date", date);
-		
 		PurchaseOrder order = PurchaseOrderQuery.me().findById(purchaseOrderId);
 		order.set("total_amount", new BigDecimal( StringUtils.getArrayFirst(paraMap.get("total"))));
 		order.set("payment_type", StringUtils.getArrayFirst(paraMap.get("paymentType")));
 		order.set("deal_date",StringUtils.getArrayFirst(paraMap.get("dealDate")));
-		order.set("status", 1000);
+		order.set("status", 0);
 		order.set("modify_date", new Date());
-		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
-		Integer productNum = Integer.valueOf(productNumStr);
+//		String productNumStr = StringUtils.getArrayFirst(paraMap.get("productNum"));
+		Integer productNum = PurchaseOrderDetailQuery.me().findBySize(purchaseOrderId);
 		
 		Integer index = 0;
-
 		for ( Integer count = 0;count<productNum;count++) {
 			index++;
-			HttpServletRequest request = getRequest();
+			if(paraMap.get("convert" + index) == null) {
+				continue;
+			}
 			String convert = StringUtils.getArrayFirst(paraMap.get("convert" + index));
 			String bigNum = StringUtils.getArrayFirst(paraMap.get("bigNum" + index));
 			String smallNum = StringUtils.getArrayFirst(paraMap.get("smallNum" + index));
 			Integer productCount = Integer.valueOf(bigNum) * Integer.valueOf(convert) + Integer.valueOf(smallNum);
-			String productId = StringUtils.getArrayFirst(paraMap.get("productId" + index));
 			String purchaseOrserDetailId = StringUtils.getArrayFirst(paraMap.get("purchaseOrderDetailId" + index));
 			PurchaseOrderDetail purchaseOrderDetail = PurchaseOrderDetailQuery.me().findById(purchaseOrserDetailId);
-			Product product = ProductQuery.me().findById(productId);
-			List<SellerProduct> sellerProducts = SellerProductQuery.me()._findByProductIdAndSellerId(productId,seller.getId());
-			if(sellerProducts.size()==0){
-				SellerProduct sellerProduct = SellerProductQuery.me().newProduct(seller.getId(), date, fomatDate, product, request);
-				sellerProducts.add(sellerProduct);
-			}
 			purchaseOrderDetail.set("product_count", productCount);
 			purchaseOrderDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
 			purchaseOrderDetail.update();
-			for(int i=0;i<sellerProducts.size();i++){
-				
-				
-				purchaseInstockDetail.set("id", StrKit.getRandomUUID());
-				purchaseInstockDetail.set("purchase_instock_id", purchaseInstockId);
-				purchaseInstockDetail.set("seller_product_id", sellerProducts.get(i).getId());
-				purchaseInstockDetail.set("product_count", productCount);
-				purchaseInstockDetail.set("product_price", StringUtils.getArrayFirst(paraMap.get("bigPrice" + index)));
-				purchaseInstockDetail.set("product_amount", StringUtils.getArrayFirst(paraMap.get("rowTotal" + index)));
-				purchaseInstockDetail.set("purchase_order_detail_id", purchaseOrserDetailId);
-				purchaseInstockDetail.set("order_list", index);
-				purchaseInstockDetail.set("create_date", date);
-				purchaseInstockDetail.set("dept_id", user.getDepartmentId());
-				purchaseInstockDetail.set("data_area", user.getDataArea());
-				purchaseInstockDetail.save();
-				
-			}
-
 		}
 		order.update();
-		purchaseInstock.save();
-		purchaseOrderJoinInstock.set("id", StrKit.getRandomUUID());
-		purchaseOrderJoinInstock.set("purchase_order_id", StringUtils.getArrayFirst(paraMap.get("purchaseOrderId")));
-		purchaseOrderJoinInstock.set("purchase_instock_id", purchaseInstockId);
-		purchaseOrderJoinInstock.save();
-		
-		//审核通过，生成对应的应付账款
-		//应付账款汇总
-		Payables payables = PayablesQuery.me().findByObjIdAndDeptId(order.getSupplierId(),Consts.RECEIVABLES_OBJECT_TYPE_SUPPLIER);
-		if(payables==null){
-			Payables payable = new Payables();
-			payable.setId(StrKit.getRandomUUID());
-			payable.setObjId(order.getSupplierId());
-			payable.setObjType("supplier");
-			payable.setPayAmount(order.getTotalAmount());
-			payable.setActAmount(new BigDecimal(0));
-			payable.setBalanceAmount(order.getTotalAmount());
-			payable.setDeptId(user.getDepartmentId());
-			payable.setDataArea(user.getDataArea());
-			payable.setCreateDate(new Date());
-			payable.save();
-		}else
-		{
-			payables.setPayAmount(order.getTotalAmount().add(payables.getPayAmount()));
-			payables.setActAmount(payables.getActAmount());
-			payables.setBalanceAmount((order.getTotalAmount().add(payables.getBalanceAmount())));
-			payables.setModifyDate(new Date());
-			payables.update();
-		}
-		
-		//应付账款明细
-		List<PurchaseOrderDetail> purchaseOrderDetails = PurchaseOrderDetailQuery.me().findByPurchaseOrderId(order.getId());
-		for(int i = 0; i<purchaseOrderDetails.size();i++){
-			PayablesDetail  payablesDetail = new PayablesDetail();
-			payablesDetail.setId(StrKit.getRandomUUID());
-			payablesDetail.setObjectId(order.getSupplierId());
-			payablesDetail.setObjectType("supplier");
-			payablesDetail.setPayAmount(purchaseOrderDetails.get(i).getProductAmount());
-			payablesDetail.setActAmount(new BigDecimal(0));
-			payablesDetail.setBalanceAmount(purchaseOrderDetails.get(i).getProductAmount());
-			payablesDetail.setRefSn(order.getPorderSn());
-			payablesDetail.setRefType(Consts.BIZ_TYPE_INSTOCK);
-			payablesDetail.setBizDate(new Date());
-			payablesDetail.setDeptId(user.getDepartmentId());
-			payablesDetail.setDataArea(user.getDataArea());
-			payablesDetail.setCreateDate(new Date());
-			payablesDetail.save();
-		}
-		
 		renderAjaxResultForSuccess("OK");
 	} 
 	
