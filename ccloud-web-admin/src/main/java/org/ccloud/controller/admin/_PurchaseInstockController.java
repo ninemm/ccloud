@@ -157,9 +157,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 	
 	public void orderDetail(){
 		String orderId = getPara(0);
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Record order = PurchaseOrderQuery.me().findMoreById(orderId,user.getDataArea());
-		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId,user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Record order = PurchaseOrderQuery.me().findMoreById(orderId,dataArea);
+		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId,dataArea);
 
 		setAttr("order", order);
 		setAttr("orderDetail", orderDetail);
@@ -169,9 +169,9 @@ public class _PurchaseInstockController extends JBaseCRUDController<PurchaseInst
 	
 	public void refund() {
 		String orderId = getPara("orderId");
-		User user = getSessionAttr(Consts.SESSION_LOGINED_USER);
-		Record order = PurchaseOrderQuery.me().findMoreById(orderId,user.getDataArea());
-		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId,user.getDataArea());
+		String dataArea = getSessionAttr(Consts.SESSION_SELECT_DATAAREA);
+		Record order = PurchaseOrderQuery.me().findMoreById(orderId,dataArea);
+		List<Record> orderDetail = PurchaseOrderDetailQuery.me().findByOutstockId(orderId,dataArea);
 
 		HashMap<String, Object> result = Maps.newHashMap();
 		result.put("order", order);
