@@ -1052,7 +1052,6 @@ public class SalesOrderQuery extends JBaseQuery {
 		}
 		LinkedList<Object> params = new LinkedList<Object>();
 		StringBuilder fromBuilder = new StringBuilder("SELECT IFNULL(SUM(cc.total_count),0) as productCount, IFNULL(SUM(cc.total_amount),0) as totalAmount, count(*) as orderCount FROM cc_sales_order cc ");
-		fromBuilder.append("LEFT JOIN cc_customer_type ct on cc.customer_type_id = ct.id ");		
 		boolean needWhere = true;
 		if (StringUtils.isBlank(userId)) {
 			if (StringUtils.isNotBlank(deptId)) {
@@ -1116,6 +1115,20 @@ public class SalesOrderQuery extends JBaseQuery {
 		fromBuilder.append("LEFT JOIN cc_sales_order_join_outstock cso on cso.outstock_id = o.id ");
 		fromBuilder.append("GROUP BY cso.order_id) t3 ON t3.order_id = cc.id ");
 	}
+	
+	@SuppressWarnings("unused")
+	private void refundFromBuilderAppendOrderAmount(StringBuilder fromBuilder, String dataArea, String startDate, String endDate) {
+		fromBuilder.append("UNION ALL ");
+		fromBuilder.append("SELECT -SUM(refund.refundCount) as refundCount ,-SUM(refund.refundAmount) as refundAmount,-COUNT(*) as refundNum FROM( ");
+		fromBuilder.append("SELECT cc.total_reject_amount as refundAmount,SUM(ccd.reject_product_count/cp.convert_relate) as refundCount FROM cc_sales_refund_instock cc ");
+		fromBuilder.append("LEFT JOIN cc_sales_refund_instock_detail ccd ON cc.id = ccd.refund_instock_id ");
+		fromBuilder.append("LEFT JOIN cc_seller_product cs ON ccd.sell_product_id = cs.id ");
+		fromBuilder.append("LEFT JOIN cc_product cp ON cp.id = cs.product_id ");
+		fromBuilder.append("WHERE cc.data_area LIKE '" + dataArea + "' ");
+		fromBuilder.append("AND cc. STATUS NOT IN (1001, 1002) ");
+		fromBuilder.append("AND cc.create_date >= '" + startDate  + "' AND cc.create_date <= '" + endDate + "' ");
+		fromBuilder.append("GROUP BY cc.id) refund ");
+	}	
 
 	public Record getMyOrderAmountByOutStock(String startDate, String endDate, String dayTag, String customerType,
 			String deptId, String sellerId, String userId, String dataArea, String receiveType) {
