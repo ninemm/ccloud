@@ -31,6 +31,7 @@ import org.ccloud.model.Department;
 import org.ccloud.model.User;
 import org.ccloud.model.query.DepartmentQuery;
 import org.ccloud.model.query.OptionQuery;
+import org.ccloud.model.query.SellerQuery;
 import org.ccloud.model.query.StationQuery;
 import org.ccloud.model.query.UserQuery;
 import org.ccloud.route.RouterMapping;
@@ -228,8 +229,16 @@ public class _DepartmentController extends JBaseCRUDController<Department> {
 	}
 	
 	public void organizationSyn() {
-		List<Record>list = DepartmentQuery.me().findDataArea();
-		setAttr("list", list);
+		List<Record>department = DepartmentQuery.me().findDataArea();
+		List<Map<String, Object>> departmentList = new ArrayList<>();
+
+		for(Record name : department) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("id", name.getStr("data_area"));
+			item.put("text", name.getStr("dept_name"));
+			departmentList.add(item);
+		}
+		setAttr("departmentType", JSON.toJSON(departmentList));
 		render("department_sync.html");
 	}
 		
