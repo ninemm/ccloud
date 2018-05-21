@@ -42,9 +42,11 @@
         <#if history??>
   			var region = getItemBykey("region");
   			var customerType = getItemBykey("customerType");
+  			var subType = getItemBykey("subType");
   			var keywordName = getItemBykey("keyword");
   			$("#region").val(region);
   			$("#customer-type").val(customerType);
+  			$("#subType").val(subType);
             if(keywordName !=null && keywordName.length!=0) {
                 $('.weui-search-bar').addClass('weui-search-bar_focusing');
   			    $("#searchInput").val(keywordName);
@@ -67,6 +69,10 @@
 			setItemBykey("customerTypeId", $("#customer-type").data('values'));
 			setItemBykey("customerType", $("#customer-type").val());
 			refresh();
+		}).on("change", "#subType", function() {
+			setItemBykey("subTypeId", $("#subType").data('values'));
+			setItemBykey("subType", $("#subType").val());
+			refresh();
 		});
 
         $("#region").select({
@@ -78,6 +84,11 @@
             title: "选择客户类型",
             items: ${customerType!}
         });
+
+		$("#subType").select({
+			title: "选择客户子类型",
+			items: ${subType!}
+		});
 
         var str = '';
         var searchArea = ${searchArea!};
@@ -95,18 +106,21 @@
 			    "pageNumber": pageNumber,
 			    "pageSize": pageSize,
 			    "region": $("#region")[0].dataset.values,
-			    "customerType": $("#customer-type")[0].dataset.values
+			    "customerType": $("#customer-type")[0].dataset.values,
+				"subType": $("#subType")[0].dataset.values
 			};
 		<#else>
 			var region = getItemBykey("regionId");
   			var customerType = getItemBykey("customerTypeId");
+  			var subType = getItemBykey("subTypeId");
   			var keywordName = getItemBykey("keyword");
 			return  {
 			    "searchKey": keywordName,
 			    "pageNumber": pageNumber,
 			    "pageSize": pageSize,
 			    "region": region,
-			    "customerType": customerType
+			    "customerType": customerType,
+				"subType": subType
 			};
        </#if>
     }
@@ -312,6 +326,10 @@
                                 <input type="text" id="customer-type" placeholder="客户类型" class="weui-input" readonly>
                                 <i class="icon-sort-desc"></i>
                             </div>
+							<div class="weui-flex__item">
+								<input type="text" id="subType" placeholder="客户子类型" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
                             <input type="hidden" name="lng" id="lng">
                             <input type="hidden" name="lat" id="lat">
                     </div>

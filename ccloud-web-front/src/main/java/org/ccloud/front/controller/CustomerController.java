@@ -97,8 +97,20 @@ public class CustomerController extends BaseFrontController {
 			nearBy.add(item);
 		}
 
+		List<Dict> subTypeList = DictQuery.me().findDictByType(Dict.DICT_TYPE_CUSTOMER_SUBTYPE);
+		List<Map<String, Object>> subType = new ArrayList<>();
+		subType.add(all);
+
+		for(Dict dict : subTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", dict.get("name"));
+			item.put("value", dict.get("value"));
+			subType.add(item);
+		}
+
 		setAttr("region", JSON.toJSON(region));
 		setAttr("customerType", JSON.toJSON(customerTypeList2));
+		setAttr("subType", JSON.toJSON(subType));
 		setAttr("searchArea", JSON.toJSON(nearBy));
 
 		String history = getPara("history");
@@ -123,6 +135,7 @@ public class CustomerController extends BaseFrontController {
 		
 		String custName = getPara("searchKey");
 		String custTypeId = getPara("customerType");
+		String subType = getPara("subType");
 		Integer pageSize = getParaToInt("pageSize");
 		Integer pageNumber = getParaToInt("pageNumber");
 		
@@ -130,8 +143,8 @@ public class CustomerController extends BaseFrontController {
 			selectDataArea = UserQuery.me().findById(region).getDataArea() + "%";
 		}
 
-		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, custTypeId, custName, "");
-		Long OrderedCustomerCount = SellerCustomerQuery.me().findOrderedCustomerCountByDataArea(selectDataArea, dealerDataArea, custTypeId, custName);
+		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(pageNumber, pageSize, selectDataArea, custTypeId, custName, "", subType);
+		Long OrderedCustomerCount = SellerCustomerQuery.me().findOrderedCustomerCountByDataArea(selectDataArea, dealerDataArea, custTypeId, custName, subType);
 		String customerOrderCount = OrderedCustomerCount != null ? OrderedCustomerCount.toString() : "0";
 		long customerCount = SellerCustomerQuery.me().findCustomerCount(selectDataArea);
 

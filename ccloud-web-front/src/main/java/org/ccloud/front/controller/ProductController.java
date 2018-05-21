@@ -199,8 +199,20 @@ public class ProductController extends BaseFrontController {
 			customerTypes.add(item);
 		}
 
+		List<Dict> subTypeList = DictQuery.me().findDictByType(Dict.DICT_TYPE_CUSTOMER_SUBTYPE);
+		List<Map<String, Object>> subType = new ArrayList<>();
+		subType.add(all);
+
+		for(Dict dict : subTypeList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("title", dict.get("name"));
+			item.put("value", dict.get("value"));
+			subType.add(item);
+		}
+
 		setAttr("userIds", JSON.toJSON(userIds));
 		setAttr("customerTypes", JSON.toJSON(customerTypes));
+		setAttr("subType", JSON.toJSON(subType));
 		setAttr("deliveryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
 
 		Boolean isMix = OptionQuery.me().findValueAsBool(Consts.OPTION_WEB_ORDER_MIX_GIFT + sellerCode);
@@ -254,6 +266,8 @@ public class ProductController extends BaseFrontController {
 		String keyword = getPara("keyword");
 		String userId = getPara("userId");
 		String customerTypeId = getPara("customerTypeId");
+		String subType = getPara("subType");
+
 //		String isOrdered = getPara("isOrdered");
 //		String provName = getPara("provName", "");
 //		String cityName = getPara("cityName", "");
@@ -273,7 +287,7 @@ public class ProductController extends BaseFrontController {
 			customerKind = Consts.CUSTOMER_KIND_SELLER;
 		}
 
-		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(getPageNumber(), getPageSize(), selectDataArea, customerTypeId, keyword, customerKind);
+		Page<Record> customerList = SellerCustomerQuery.me().findByDataAreaInCurUser(getPageNumber(), getPageSize(), selectDataArea, customerTypeId, keyword, customerKind, subType);
 //				SellerCustomerQuery.me().paginateForApp(getPageNumber(), getPageSize(), keyword,
 //				selectDataArea, dealerDataArea, userId, customerTypeId, isOrdered, customerKind, provName, cityName, countryName);
 

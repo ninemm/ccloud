@@ -29,6 +29,7 @@ public class Dict extends BaseDict<Dict> {
 	private static final long serialVersionUID = 1L;
 	
 	public static final String CACHE_KEY = "dict_list";
+	public static final String DICT_TYPE_CUSTOMER_SUBTYPE = "customer_subtype";
 
 	@Override
 	public boolean save() {

@@ -221,6 +221,8 @@ $(function() {
 			combo();
 	}).on("change", "#customerTypeId", function() {
 			combo();
+	}).on("change", "#subType", function() {
+			combo();
 	}).on("click", "#customerInfo", function() {
 			var el = $(this);
 			var customerInfo = {
@@ -586,6 +588,11 @@ $(function() {
      title: "选择客户类型",
      items: ${customerTypes!}
     });
+	
+	$("#subType").select({
+		title: "选择客户子类型",
+		items: ${subType!}
+	});
     
 	var customerHtml = $(".customerSelect").eq(0).html();
 	var $loading = $("#loading");
@@ -611,6 +618,7 @@ $(function() {
 	        "keyword": $("#searchInput").val(),
 	        "userId": $("#userId").data('values'),
 	        "customerTypeId": $("#customerTypeId").data('values'),
+			"subType": $("#subType").data('values'),
 	        "isOrdered": $("#isOrdered").data('values')
 	    }
 
@@ -922,6 +930,10 @@ $(function() {
 							</div>
 							<div class="weui-flex__item">
 								<input type="text" id="customerTypeId" placeholder="客户类型" class="weui-input" readonly>
+								<i class="icon-sort-desc"></i>
+							</div>
+							<div class="weui-flex__item">
+								<input type="text" id="subType" placeholder="客户子类型" class="weui-input" readonly>
 								<i class="icon-sort-desc"></i>
 							</div>
 						</div>

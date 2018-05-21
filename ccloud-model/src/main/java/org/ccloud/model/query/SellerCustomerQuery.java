@@ -278,12 +278,12 @@ public class SellerCustomerQuery extends JBaseQuery {
 
 	}
 	
-	public Page<Record> findByDataAreaInCurUser(int pageNumber, int pageSize, String selectDataArea, String customerTypeId, String custName, String customerKind) {
+	public Page<Record> findByDataAreaInCurUser(int pageNumber, int pageSize, String selectDataArea, String customerTypeId, String custName, String customerKind, String subType) {
 		
 		boolean needWhere = true;
 		LinkedList<Object> params = new LinkedList<Object>();
 		
-		String select = "SELECT DISTINCT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,sc.id as sellerCustomerId, sc.image_list_store, sc.customer_kind ";
+		String select = "SELECT DISTINCT c.id,c.customer_name,c.contact,c.mobile,c.prov_name,c.city_name,c.country_name,c.address,sc.id as sellerCustomerId, sc.image_list_store, sc.customer_kind, sc.sub_type ";
 		
 		StringBuilder builder = new StringBuilder("FROM cc_user_join_customer ujc");
 		builder.append(" LEFT JOIN cc_seller_customer sc ON ujc.seller_customer_id = sc.id");
@@ -296,13 +296,14 @@ public class SellerCustomerQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(builder, "ujc.data_area", selectDataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(builder, "sc.is_enabled", 1, params, needWhere);
 		needWhere = appendIfNotEmpty(builder, "cust_type.id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "sc.sub_type", subType, params, needWhere);
 		
 		builder.append("ORDER BY sc.create_date DESC ");
 		
 		return Db.paginate(pageNumber, pageSize, select, builder.toString(), params.toArray());
 	}
 	
-	public Long findOrderedCustomerCountByDataArea(String selectDataArea, String dealerDataArea, String customerTypeId, String custName) {
+	public Long findOrderedCustomerCountByDataArea(String selectDataArea, String dealerDataArea, String customerTypeId, String custName, String subType) {
 		boolean needWhere = false;
 		LinkedList<Object> params = new LinkedList<Object>();
 		
@@ -315,6 +316,7 @@ public class SellerCustomerQuery extends JBaseQuery {
 		needWhere = appendIfNotEmptyWithLike(builder, "c.customer_name", custName, params, needWhere);
 		needWhere = appendIfNotEmptyWithLike(builder, "o.data_area", selectDataArea, params, needWhere);
 		needWhere = appendIfNotEmpty(builder, "o.customer_type_id", customerTypeId, params, needWhere);
+		needWhere = appendIfNotEmpty(builder, "sc.sub_type", subType, params, needWhere);
 		
 		return Db.queryLong(builder.toString(), params.toArray());
 	}
